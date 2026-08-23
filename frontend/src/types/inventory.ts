@@ -126,3 +126,87 @@ export interface OptimizationMetrics {
   savings: number;
   savingsPercentage: number;
 }
+
+export type InventoryRisk = "critical" | "high" | "medium" | "low";
+export type InventoryDetailStatus = "healthy" | "reorder_required" | "overstocked" | "at_risk" | "expiring";
+
+export interface InventoryTableItem {
+  id: string;
+  name: string;
+  category: string;
+  location: string;
+  onHand: number;
+  safetyStock: number;
+  reorderPoint: number;
+  daysOfSupply: number;
+  unitValue: number;
+  inventoryValue: number;
+  risk: InventoryRisk;
+  status: InventoryDetailStatus;
+}
+
+export interface InventoryPageKPIs {
+  totalInventoryValue: number;
+  totalSkus: number;
+  inStockRate: number;
+  atRiskSkus: number;
+  atRiskCritical: number;
+  excessInventoryValue: number;
+}
+
+export interface InventoryHealthBreakdown {
+  healthy: number;
+  belowReorderPoint: number;
+  criticalStock: number;
+  excessStock: number;
+  expiringSoon: number;
+  total: number;
+}
+
+export interface StockBatch {
+  id: string;
+  sku: string;
+  location: string;
+  quantity: number;
+  manufacturingDate: string;
+  expiryDate: string;
+  daysRemaining: number;
+  valueAtRisk: number;
+  expiryRisk: "critical" | "high" | "medium" | "low";
+}
+
+export type MovementType = "Purchase" | "Transfer" | "Replenishment" | "Consumption" | "Adjustment";
+
+export interface StockMovement {
+  id: string;
+  date: string;
+  movementType: MovementType;
+  sku: string;
+  quantity: number;
+  fromLocation: string;
+  toLocation: string;
+  reference: string;
+  userOrSystem: string;
+}
+
+export interface SkuDetailData extends InventoryTableItem {
+  manufacturer: string;
+  maximumStock: number;
+  avgDailyDemand: number;
+  leadTimeDays: number;
+  stockoutRiskLevel: "critical" | "high" | "medium" | "low" | "none";
+  stockoutRiskReason?: string;
+  expiryRiskLevel: "critical" | "high" | "medium" | "low" | "none";
+  expiryRiskReason?: string;
+  excessRiskLevel: "critical" | "high" | "medium" | "low" | "none";
+  excessRiskReason?: string;
+  aiRecommendation: {
+    action: string;
+    confidence: number;
+    expectedImpact: string;
+    reasoning: string;
+    suggestedQuantity: number;
+  };
+  batches: StockBatch[];
+  movements: StockMovement[];
+}

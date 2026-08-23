@@ -13,7 +13,9 @@ export function PageHeader() {
         </p>
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-xs text-muted-foreground font-medium">Last updated: {lastUpdated}</span>
+        <span className="text-xs text-muted-foreground font-medium" suppressHydrationWarning>
+          Last updated: {lastUpdated}
+        </span>
         <Button variant="outline" size="sm" className="h-8 gap-2 cursor-pointer">
           <RefreshCw className="h-3.5 w-3.5" />
           <span>Refresh</span>
