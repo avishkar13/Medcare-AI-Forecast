@@ -4,6 +4,8 @@ Mounted at `/api` (`src/routes/masterdata_route.ts`). All routes are `GET`, open
 
 Reference data the dashboard needs for selectors, filters and labels. Read-only for now — no create, update or delete.
 
+Shared conventions — response envelope, error codes, headers and rate limits — are in [`conventions.api.md`](conventions.api.md) and not repeated here.
+
 ---
 
 ## `GET /api/products`
@@ -17,11 +19,11 @@ Paginated product catalogue.
 | `search` | string | — | Case-insensitive substring, matched against **either** `sku` or `name` |
 | `category` | string | — | Exact match |
 | `criticality` | `LOW` \| `MEDIUM` \| `HIGH` \| `CRITICAL` | — | Exact match; any other value is `422` |
-| `isActive` | boolean | — | Accepts `true`/`false`/`1`/`0`/`yes`/`no` |
+| `isActive` | boolean | — | Case-insensitive: `true`/`1`/`yes`/`on`/`y`/`enabled` and their negatives |
 | `page` | integer ≥ 1 | `1` | `0` or negative is `422` |
 | `pageSize` | integer 1–200 | `50` | Above 200 is `422` |
 
-Results are ordered by `sku` ascending.
+Results are ordered by `sku` ascending. A `page` past the end returns an empty `data` array with the true `meta.total`, not a `404`.
 
 ### Response `200`
 
@@ -63,7 +65,9 @@ Results are ordered by `sku` ascending.
 
 ### Errors
 
-`422 VALIDATION_FAILED` on any invalid parameter, with the offending field in `error.details[].path`.
+`422 VALIDATION_FAILED` on any invalid parameter, with the offending field in `error.details[].path`. The text filters are trimmed and must be non-empty, so `?search=` is `422` rather than an unfiltered list — omit the parameter instead.
+
+Unknown query parameters are ignored, not rejected.
 
 ---
 
@@ -118,7 +122,7 @@ All distribution centres. Not paginated — the network is four DCs and will not
 | --- | --- | --- |
 | `tier` | `METRO` \| `TIER_1` \| `TIER_2` \| `TIER_3` | Exact match; any other value is `422` |
 | `region` | string | Exact match |
-| `isActive` | boolean | Accepts `true`/`false`/`1`/`0`/`yes`/`no` |
+| `isActive` | boolean | Case-insensitive: `true`/`1`/`yes`/`on`/`y`/`enabled` and their negatives |
 
 Results are ordered by `code` ascending.
 

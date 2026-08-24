@@ -2,7 +2,9 @@
 
 Mounted at `/api/health` (`src/routes/health_route.ts`).
 
-Health responses are **not** wrapped in the standard `{ data, meta }` envelope. See `health.routedecision.md`.
+Health responses are **not** wrapped in the standard `{ data, meta }` envelope — a probe answers with the smallest body that carries the verdict.
+
+Shared conventions — response envelope, error codes, headers and rate limits — are in [`conventions.api.md`](conventions.api.md) and not repeated here.
 
 ---
 

@@ -2,6 +2,8 @@
 
 Mounted at `/api/dashboard` (`src/routes/dashboard_route.ts`). All routes are `GET`, open, and rate limited on the `read` tier.
 
+Shared conventions — response envelope, error codes, headers and rate limits — are in [`conventions.api.md`](conventions.api.md) and not repeated here.
+
 ## Route status
 
 | Route | Answers | Status |
@@ -62,7 +64,7 @@ No parameters.
 | `activeAlerts` | number | Positions below safety stock **plus** batches expiring within 30 days |
 | `pendingRecommendations` | number | `Recommendation` rows with `status = OPEN`. `0` until the planning engine runs. |
 
-> **Two fields are always `null` this phase.** Clients must type them as `number | null` and render an explicit "not yet available" state. Returning a fabricated percentage was rejected — see `dashboard.routedecision.md`.
+> **Two fields are always `null` this phase.** Clients must type them as `number | null` and render an explicit "not yet available" state. Returning a fabricated percentage was rejected.
 
 ### `networkHealth`
 
@@ -90,7 +92,7 @@ daysOfSupply = onHand / μdemand
 - `leadTimeDays`, `σleadTime`, `serviceLevel` — from `PlanningParameter`; defaults `7`, `0`, `0.95` if no row exists.
 - `z()` — inverse normal CDF, Acklam approximation, in `src/utils/inventory.ts`.
 
-`orderedQuantity` is used rather than `fulfilledQuantity` deliberately. See `dashboard.routedecision.md`.
+`orderedQuantity` is used rather than `fulfilledQuantity` deliberately: it is demand as the customer expressed it, unclipped by whatever stock happened to be on hand.
 
 ### Errors
 
