@@ -57,10 +57,6 @@ export interface ResponseMeta {
   total?: number;
 }
 
-export type RiskLevel = "critical" | "high" | "medium" | "low";
-export type RiskLevelOrNone = RiskLevel | "none";
-export type InventoryDetailStatus = "healthy" | "reorder_required" | "overstocked" | "at_risk" | "expiring";
-
 export interface ProductSummary {
   id: string;
   sku: string;
@@ -103,131 +99,142 @@ export interface NetworkHealthSummary {
   shortageValue: number;
 }
 
-export interface DistributionCenterStats {
-  id: string;
-  name: string;
-  capacity: number;
-  utilization: number;
-  inventoryValue: number;
-  atRiskInventory: number;
-  stockoutRisk: number;
+export type RiskLevel = "critical" | "high" | "medium" | "low";
+
+export interface ExpiryRiskItem {
+  batchId: string;
+  batchNumber: string;
+  productId: string;
+  sku: string;
+  productName: string;
+  category: string | null;
+  criticality: string;
+  warehouseId: string;
+  warehouseCode: string;
+  warehouseName: string;
+  tier: string;
+  quantity: number;
+  unitCost: number;
+  valueAtRisk: number;
+  expiryDate: string;
+  daysToExpiry: number;
+  severity: RiskLevel;
+  avgDailyDemand: number;
+  projectedWaste: number;
+  projectedWasteValue: number;
 }
 
+export interface ExpiryRiskTotals {
+  batchCount: number;
+  quantity: number;
+  valueAtRisk: number;
+  projectedWaste: number;
+  projectedWasteValue: number;
+}
+
+export interface ExpiryRiskReport {
+  items: ExpiryRiskItem[];
+  totals: ExpiryRiskTotals;
+}
+
+export type PriorityActionType =
+  | "TRANSFER_OPPORTUNITY"
+  | "STOCKOUT_IMMINENT"
+  | "BELOW_REORDER_POINT"
+  | "EXPIRY_WRITE_OFF"
+  | "EXCESS_STOCK";
+
+export interface PriorityAction {
+  id: string;
+  type: PriorityActionType;
+  severity: RiskLevel;
+  sku: string;
+  productName: string;
+  criticality: string;
+  warehouseId: string;
+  warehouseCode: string;
+  warehouseName: string;
+  tier: string;
+  problem: string;
+  recommendedAction: string;
+  quantity: number | null;
+  impactValue: number;
+  sourceWarehouseCode: string | null;
+  sourceWarehouseName: string | null;
+}
+
+export interface PriorityActionsReport {
+  items: PriorityAction[];
+  counts: {
+    critical: number;
+    high: number;
+    medium: number;
+    low: number;
+    total: number;
+  };
+}
+
+export type InventoryHealthState =
+  | "criticalStock"
+  | "belowReorderPoint"
+  | "expiringSoon"
+  | "excessStock"
+  | "healthy";
+
 export interface InventoryHealthBreakdown {
-  healthy: number;
-  belowReorderPoint: number;
   criticalStock: number;
-  excessStock: number;
+  belowReorderPoint: number;
   expiringSoon: number;
+  excessStock: number;
+  healthy: number;
   total: number;
 }
 
-export interface InventoryTableItem {
-  id: string;
-  sku: string;
-  name: string;
-  category: string | null;
-  location: string;
-  onHand: number;
-  safetyStock: number;
-  reorderPoint: number;
-  daysOfSupply: number;
-  unitValue: number;
+export interface InventoryConditionCounts {
+  belowSafetyStock: number;
+  belowReorderPoint: number;
+  aboveMaximum: number;
+  expiringWithin30Days: number;
+  expiringWithin90Days: number;
+}
+
+export interface CategoryHealth {
+  category: string;
+  skuCount: number;
   inventoryValue: number;
-  risk: RiskLevel;
-  status: InventoryDetailStatus;
+  atRiskCount: number;
+  expiringValue: number;
+}
+
+export interface CriticalityHealth {
+  criticality: string;
+  skuCount: number;
+  atRiskCount: number;
+  stockoutRisk: number;
 }
 
 export interface InventoryHealthReport {
   breakdown: InventoryHealthBreakdown;
-  byCategory: { category: string; value: number; count: number }[];
-  topItems: InventoryTableItem[];
+  conditions: InventoryConditionCounts;
+  byCategory: CategoryHealth[];
+  byCriticality: CriticalityHealth[];
 }
 
-export interface ExpiryRiskItem {
+export interface WarehouseStats {
   id: string;
-  sku: string;
+  code: string;
   name: string;
-  batchId: string;
-  currentQuantity: number;
-  daysToExpiry: number;
+  region: string | null;
+  tier: string;
+  capacity: number | null;
+  skuCount: number;
+  onHandUnits: number;
+  utilization: number | null;
   inventoryValue: number;
-  dc: string;
-  severity: RiskLevel;
-}
-
-export interface PriorityAction {
-  id: string;
-  sku: string;
-  dc: string;
-  problem: string;
-  severity: "critical" | "warning" | "info";
-  recommendedAction: string;
-}
-
-export interface ForecastPoint {
-  date: string;
-  actualDemand?: number;
-  predictedDemand?: number;
-  lowerBound?: number;
-  upperBound?: number;
-}
-
-export interface ReplenishmentRecommendation {
-  id: string;
-  itemId: string;
-  action: "order" | "transfer" | "discard";
-  sourceDc?: string;
-  destinationDc?: string;
-  currentInventory: number;
-  forecastDemand: number;
-  riskStatus: RiskLevel;
-  suggestedQuantity: number;
-  confidenceScore: number;
-  estimatedDeliveryDate: string;
-  reason: string;
-  expectedImpact: string;
-  priority: RiskLevel;
-}
-
-export interface OptimizationCostBreakdown {
-  holdingCost: number;
-  stockoutPenalty: number;
-  expiryCost: number;
-  transferCost: number;
-  totalCost: number;
-}
-
-export interface OptimizationMetrics {
-  current: OptimizationCostBreakdown;
-  optimized: OptimizationCostBreakdown;
-  savings: number;
-  savingsPercentage: number;
-}
-
-export interface SimulationResult {
-  scenarioId: string;
-  scenarioName: string;
-  projectedStockoutRisk: number;
-  estimatedCostSavings: number;
-  impactScore: number;
-}
-
-export interface WhatIfResult {
-  currentStockoutRisk: number;
-  projectedStockoutRisk: number;
-  currentCost: number;
-  projectedCost: number;
-  estimatedCostSavings: number;
-  impactScore: number;
-}
-
-export interface EngineStatusReport {
-  forecast: DependencyStatus;
-  inventory: DependencyStatus;
-  optimization: DependencyStatus;
-  simulation: DependencyStatus;
-  lastRunId: string | null;
-  lastRunStatus: string | null;
-  lastRunCompletedAt: string | null;
+  belowReorderPointCount: number;
+  belowSafetyStockCount: number;
+  stockoutRisk: number;
+  shortageValue: number;
+  excessValue: number;
+  expiringValue: number;
 }

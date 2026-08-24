@@ -49,6 +49,25 @@ export const safetyStock = ({
 export const reorderPoint = (profile: DemandProfile): number =>
   profile.avgDailyDemand * profile.leadTimeDays + safetyStock(profile);
 
+export interface FefoBatch {
+  quantity: number;
+  daysToExpiry: number;
+}
+
+export const projectFefoWaste = (batches: FefoBatch[], avgDailyDemand: number): number[] => {
+  let quantityAhead = 0;
+
+  return batches.map((batch) => {
+    const consumableByExpiry = avgDailyDemand * Math.max(0, batch.daysToExpiry);
+    const waste = Math.min(
+      batch.quantity,
+      Math.max(0, quantityAhead + batch.quantity - consumableByExpiry),
+    );
+    quantityAhead += batch.quantity;
+    return waste;
+  });
+};
+
 export const round = (value: number, decimals = 2): number => {
   const factor = 10 ** decimals;
   return Math.round(value * factor) / factor;
