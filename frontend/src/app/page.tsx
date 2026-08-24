@@ -1,9 +1,6 @@
-// import Image from "next/image";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <>
-      <div className="text-3xl">hello</div>
-    </>
-  );
+  redirect("/dashboard");
 }
+

@@ -54,7 +54,7 @@ export function SidebarContent() {
           <Activity className="h-5 w-5" />
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-semibold tracking-tight leading-none text-foreground">MedCare AI</span>
+          <span className="text-sm font-semibold tracking-tight leading-none text-foreground">MedCare Pharma</span>
           <span className="text-[10px] font-medium text-muted-foreground mt-1">Forecast & Replenishment</span>
         </div>
       </div>
@@ -104,7 +104,7 @@ export function SidebarContent() {
           </div>
           <span className="text-xs font-medium text-muted-foreground">AI Engine Online</span>
         </div>
-        
+
         <div className="flex items-center gap-3 rounded-md border border-sidebar-border p-2 bg-card">
           <Avatar className="h-8 w-8">
             <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">SA</AvatarFallback>

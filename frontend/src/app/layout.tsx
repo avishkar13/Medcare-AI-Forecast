@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MedCare AI",
+  title: "MedCare Pharma",
   description: "A healthcare supply chain management system",
 };
 

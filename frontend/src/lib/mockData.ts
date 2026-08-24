@@ -164,28 +164,28 @@ export const mockForecastData: Record<string, ForecastPoint[]> = {
     // Historical (last 7 days)
     ...Array.from({ length: 7 }).map((_, i) => ({
       date: formatDate(i - 7),
-      actualDemand: 160 + Math.floor(Math.random() * 30),
+      actualDemand: 160 + ((i * 13) % 30),
     })),
     // Forecast (next 14 days)
     ...Array.from({ length: 14 }).map((_, i) => ({
       date: formatDate(i),
-      predictedDemand: 150 + Math.floor(Math.random() * 50),
-      lowerBound: 120 + Math.floor(Math.random() * 30),
-      upperBound: 190 + Math.floor(Math.random() * 40),
+      predictedDemand: 150 + ((i * 17) % 50),
+      lowerBound: 120 + ((i * 11) % 30),
+      upperBound: 190 + ((i * 19) % 40),
     }))
   ],
   "SKU-OME-20": [
     // Historical (last 7 days)
     ...Array.from({ length: 7 }).map((_, i) => ({
       date: formatDate(i - 7),
-      actualDemand: 210 + Math.floor(Math.random() * 40),
+      actualDemand: 210 + ((i * 23) % 40),
     })),
     // Forecast (next 14 days)
     ...Array.from({ length: 14 }).map((_, i) => ({
       date: formatDate(i),
-      predictedDemand: 200 + Math.floor(Math.random() * 80),
-      lowerBound: 160 + Math.floor(Math.random() * 40),
-      upperBound: 260 + Math.floor(Math.random() * 60),
+      predictedDemand: 200 + ((i * 29) % 80),
+      lowerBound: 160 + ((i * 7) % 40),
+      upperBound: 260 + ((i * 31) % 60),
     }))
   ],
 };
@@ -1007,3 +1007,242 @@ export function getSkuDetailData(skuId: string): SkuDetailData {
     ],
   };
 }
+
+// ============================================
+// FORECAST PAGE DATA
+// ============================================
+
+import { 
+  ForecastPageKPIs, 
+  ForecastSummaryData, 
+  ForecastTrendData, 
+  ForecastInsightData 
+} from "@/types/forecast";
+
+export const mockForecastPageKPIs: ForecastPageKPIs = {
+  forecastedDemand: 12480,
+  forecastHorizonDays: 30,
+  forecastAccuracy: 88.5,
+  accuracyChange: 1.2,
+  confidenceLevel: 94,
+  expectedPeakDemand: 620,
+  peakDate: formatDate(18), // Sep 12 approx
+  demandGrowth: 8.4,
+};
+
+export const mockForecastSummary: ForecastSummaryData = {
+  predictedPeak: 620,
+  peakDate: formatDate(18),
+  avgDailyDemand: 416,
+  minExpectedDemand: 390,
+  maxExpectedDemand: 710,
+  confidenceRange: [540, 690],
+  historicalAccuracy: 88.5,
+  expectedTrend: "Growing",
+};
+
+export const mockForecastTrends: ForecastTrendData = {
+  sevenDayTrend: 4.2,
+  thirtyDayTrend: 8.4,
+  seasonalPattern: "Weekly (Tue-Thu peaks)",
+  growthRate: 12.5,
+  demandVolatility: "Low",
+};
+
+export const mockForecastInsights: ForecastInsightData = {
+  keyDriver: "Recurring weekly pattern + Northeast DC volume increase",
+  riskImplication: "Inventory may fall below safety stock during peak (Sep 12)",
+  confidence: "High",
+  recommendedAttention: "Review replenishment schedule for Northeast DC",
+  detailedInsight: "Demand for Lisinopril is expected to increase by 8.4% over the next 30 days. The model identifies a recurring weekly pattern and increasing demand across Northeast DC. Current inventory may fall below safety stock during the forecast peak.",
+};
+
+import { ForecastTableItem, NetworkForecastItem, SeasonalityData, ModelPerformanceItem, ForecastImpactData } from "@/types/forecast";
+
+export const mockForecastTableItems: ForecastTableItem[] = [
+  {
+    id: "SKU-LIS-10",
+    product: "Lisinopril 10mg Tablets",
+    category: "Cardiovascular",
+    currentDemand: 165,
+    forecastDemand: 179,
+    growth: 8.4,
+    accuracy: 94.2,
+    confidence: 96,
+    trend: "Growing",
+    risk: "Critical"
+  },
+  {
+    id: "SKU-OME-20",
+    product: "Omeprazole 20mg Capsules",
+    category: "Gastrointestinal",
+    currentDemand: 215,
+    forecastDemand: 210,
+    growth: -2.3,
+    accuracy: 88.5,
+    confidence: 82,
+    trend: "Stable",
+    risk: "Medium"
+  },
+  {
+    id: "SKU-IBU-400",
+    product: "Ibuprofen 400mg Tablets",
+    category: "Analgesics",
+    currentDemand: 420,
+    forecastDemand: 450,
+    growth: 7.1,
+    accuracy: 91.0,
+    confidence: 89,
+    trend: "Growing",
+    risk: "Low"
+  },
+  {
+    id: "SKU-CET-10",
+    product: "Cetirizine 10mg Tablets",
+    category: "Antihistamines",
+    currentDemand: 180,
+    forecastDemand: 140,
+    growth: -22.2,
+    accuracy: 85.4,
+    confidence: 78,
+    trend: "Declining",
+    risk: "High"
+  },
+  {
+    id: "SKU-AMX-500",
+    product: "Amoxicillin 500mg Capsules",
+    category: "Antibiotics",
+    currentDemand: 310,
+    forecastDemand: 345,
+    growth: 11.2,
+    accuracy: 89.9,
+    confidence: 92,
+    trend: "Growing",
+    risk: "Low"
+  },
+  {
+    id: "SKU-MET-500",
+    product: "Metformin 500mg Tablets",
+    category: "Antidiabetics",
+    currentDemand: 520,
+    forecastDemand: 530,
+    growth: 1.9,
+    accuracy: 95.1,
+    confidence: 97,
+    trend: "Stable",
+    risk: "Low"
+  }
+];
+
+export const mockNetworkForecasts: NetworkForecastItem[] = [
+  {
+    id: "DC-01",
+    dcName: "Northeast DC",
+    currentDemand: 4200,
+    forecastDemand: 4650,
+    growth: 10.7,
+    confidence: 94,
+    peakDemand: 4800,
+    peakDate: formatDate(12)
+  },
+  {
+    id: "DC-02",
+    dcName: "South DC",
+    currentDemand: 3100,
+    forecastDemand: 3050,
+    growth: -1.6,
+    confidence: 88,
+    peakDemand: 3200,
+    peakDate: formatDate(18)
+  },
+  {
+    id: "DC-03",
+    dcName: "West Coast DC",
+    currentDemand: 5800,
+    forecastDemand: 6200,
+    growth: 6.8,
+    confidence: 91,
+    peakDemand: 6500,
+    peakDate: formatDate(22)
+  },
+  {
+    id: "DC-04",
+    dcName: "Midwest DC",
+    currentDemand: 2400,
+    forecastDemand: 2300,
+    growth: -4.1,
+    confidence: 85,
+    peakDemand: 2600,
+    peakDate: formatDate(8)
+  }
+];
+
+export const mockSeasonalityData: SeasonalityData = {
+  weeklyPattern: [
+    { day: "Mon", value: 105 },
+    { day: "Tue", value: 120 },
+    { day: "Wed", value: 125 },
+    { day: "Thu", value: 115 },
+    { day: "Fri", value: 95 },
+    { day: "Sat", value: 45 },
+    { day: "Sun", value: 35 }
+  ],
+  monthlyTrend: [
+    { month: "Jan", value: 110 },
+    { month: "Feb", value: 115 },
+    { month: "Mar", value: 105 },
+    { month: "Apr", value: 95 },
+    { month: "May", value: 85 },
+    { month: "Jun", value: 80 }
+  ],
+  seasonalUplift: 14.5,
+  volatility: "Low (Stable predictable peaks)"
+};
+
+export const mockModelPerformances: ModelPerformanceItem[] = [
+  {
+    modelName: "AI Ensemble",
+    mape: 4.2,
+    mae: 12.5,
+    rmse: 15.8,
+    accuracy: 95.8,
+    bias: 0.4,
+    isPrimary: true
+  },
+  {
+    modelName: "Seasonal Model",
+    mape: 8.5,
+    mae: 24.1,
+    rmse: 31.2,
+    accuracy: 91.5,
+    bias: -2.1,
+    isPrimary: false
+  },
+  {
+    modelName: "Moving Average",
+    mape: 12.4,
+    mae: 35.6,
+    rmse: 42.9,
+    accuracy: 87.6,
+    bias: -5.4,
+    isPrimary: false
+  },
+  {
+    modelName: "Exponential Smoothing",
+    mape: 11.2,
+    mae: 32.1,
+    rmse: 38.4,
+    accuracy: 88.8,
+    bias: 3.2,
+    isPrimary: false
+  }
+];
+
+export const mockForecastImpact: ForecastImpactData = {
+  stockoutRiskReduction: 14,
+  safetyStockOptimization: 8,
+  reorderQuantityChange: -3.5,
+  excessInventoryReduction: 17800,
+  expectedInventoryValue: 1227200,
+  insightText: "Improved forecast accuracy is expected to reduce stockout exposure by 14% while reducing excess inventory by approximately $17.8K across the network."
+};

@@ -19,16 +19,16 @@ import { SidebarContent } from "./sidebar";
 
 export function Navbar() {
   const pathname = usePathname();
-  
+
   // Basic breadcrumb logic based on pathname
   const pathSegments = pathname?.split("/").filter(Boolean) || [];
-  const currentPage = pathSegments.length > 0 
+  const currentPage = pathSegments.length > 0
     ? pathSegments[0].charAt(0).toUpperCase() + pathSegments[0].slice(1)
     : "Dashboard";
 
   return (
     <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-border bg-background/95 px-4 md:px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      
+
       {/* Left side: Mobile menu & Breadcrumbs */}
       <div className="flex items-center gap-4">
         <Sheet>
@@ -41,7 +41,7 @@ export function Navbar() {
             <SidebarContent />
           </SheetContent>
         </Sheet>
-        
+
         <div className="hidden sm:flex flex-col">
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Pages</span>
           <h1 className="text-sm font-semibold text-foreground">{currentPage}</h1>
@@ -50,13 +50,13 @@ export function Navbar() {
 
       {/* Right side: Search, Notifications, Avatar */}
       <div className="flex items-center gap-2 sm:gap-4">
-        
+
         {/* Search */}
         <div className="relative hidden md:flex items-center w-64">
           <Search className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
-          <Input 
-            type="search" 
-            placeholder="Search inventory, SKU..." 
+          <Input
+            type="search"
+            placeholder="Search inventory, SKU..."
             className="w-full rounded-md bg-muted/50 pl-9 border border-border focus-visible:bg-transparent h-9 text-sm"
           />
         </div>
