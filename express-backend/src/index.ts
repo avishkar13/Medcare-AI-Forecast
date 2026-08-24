@@ -9,7 +9,9 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { notFound } from "./middleware/notFound.js";
 import { rateLimiter, rateLimitStoreKind } from "./middleware/rateLimiter.js";
 import { requestContext } from "./middleware/requestContext.js";
+import { dashboardRouter } from "./routes/dashboard_route.js";
 import { healthRouter } from "./routes/health_route.js";
+import { masterDataRouter } from "./routes/masterdata_route.js";
 
 const app = express();
 
@@ -29,6 +31,8 @@ app.use(express.json({ limit: SERVER.bodyLimit }));
 app.use(express.urlencoded({ extended: true, limit: SERVER.bodyLimit }));
 
 app.use(`${SERVER.apiPrefix}/health`, healthRouter);
+app.use(SERVER.apiPrefix, masterDataRouter);
+app.use(`${SERVER.apiPrefix}/dashboard`, dashboardRouter);
 
 app.use(notFound);
 app.use(errorHandler);

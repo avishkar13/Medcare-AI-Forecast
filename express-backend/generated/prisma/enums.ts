@@ -9,10 +9,99 @@
 * 🟢 You can import this file directly.
 */
 
+export const UserRole = {
+  ADMIN: 'ADMIN',
+  PLANNER: 'PLANNER',
+  VIEWER: 'VIEWER'
+} as const
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+
 export const Criticality = {
   LOW: 'LOW',
   MEDIUM: 'MEDIUM',
-  HIGH: 'HIGH'
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
 } as const
 
 export type Criticality = (typeof Criticality)[keyof typeof Criticality]
+
+
+export const WarehouseTier = {
+  METRO: 'METRO',
+  TIER_1: 'TIER_1',
+  TIER_2: 'TIER_2',
+  TIER_3: 'TIER_3'
+} as const
+
+export type WarehouseTier = (typeof WarehouseTier)[keyof typeof WarehouseTier]
+
+
+export const PromotionType = {
+  PROMOTION: 'PROMOTION',
+  SEASONAL: 'SEASONAL',
+  HOLIDAY: 'HOLIDAY',
+  CAMPAIGN: 'CAMPAIGN'
+} as const
+
+export type PromotionType = (typeof PromotionType)[keyof typeof PromotionType]
+
+
+export const RunStatus = {
+  PENDING: 'PENDING',
+  RUNNING: 'RUNNING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+} as const
+
+export type RunStatus = (typeof RunStatus)[keyof typeof RunStatus]
+
+
+export const SupplySource = {
+  EXISTING: 'EXISTING',
+  TRANSFER: 'TRANSFER',
+  PLANNED_SUPPLY: 'PLANNED_SUPPLY'
+} as const
+
+export type SupplySource = (typeof SupplySource)[keyof typeof SupplySource]
+
+
+export const PlanStatus = {
+  PROPOSED: 'PROPOSED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type PlanStatus = (typeof PlanStatus)[keyof typeof PlanStatus]
+
+
+export const RecommendationType = {
+  INCREASE_SUPPLY: 'INCREASE_SUPPLY',
+  REDUCE_SUPPLY: 'REDUCE_SUPPLY',
+  TRANSFER_STOCK: 'TRANSFER_STOCK',
+  STOCKOUT_RISK: 'STOCKOUT_RISK',
+  EXPIRY_RISK: 'EXPIRY_RISK'
+} as const
+
+export type RecommendationType = (typeof RecommendationType)[keyof typeof RecommendationType]
+
+
+export const Priority = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
+} as const
+
+export type Priority = (typeof Priority)[keyof typeof Priority]
+
+
+export const RecommendationStatus = {
+  OPEN: 'OPEN',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type RecommendationStatus = (typeof RecommendationStatus)[keyof typeof RecommendationStatus]

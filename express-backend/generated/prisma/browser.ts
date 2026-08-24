@@ -18,7 +18,102 @@ export { Prisma }
 export * as $Enums from './enums.js'
 export * from './enums.js';
 /**
+ * Model User
+ * 
+ */
+export type User = Prisma.UserModel
+/**
  * Model Product
  * 
  */
 export type Product = Prisma.ProductModel
+/**
+ * Model Warehouse
+ * 
+ */
+export type Warehouse = Prisma.WarehouseModel
+/**
+ * Model DemandHistory
+ * 
+ */
+export type DemandHistory = Prisma.DemandHistoryModel
+/**
+ * Model Inventory
+ * 
+ */
+export type Inventory = Prisma.InventoryModel
+/**
+ * Model InventoryBatch
+ * 
+ */
+export type InventoryBatch = Prisma.InventoryBatchModel
+/**
+ * Model PlanningParameter
+ * 
+ */
+export type PlanningParameter = Prisma.PlanningParameterModel
+/**
+ * Model PromotionEvent
+ * 
+ */
+export type PromotionEvent = Prisma.PromotionEventModel
+/**
+ * Model DemandSignal
+ * 
+ */
+export type DemandSignal = Prisma.DemandSignalModel
+/**
+ * Model Distributor
+ * 
+ */
+export type Distributor = Prisma.DistributorModel
+/**
+ * Model DistributorOrder
+ * 
+ */
+export type DistributorOrder = Prisma.DistributorOrderModel
+/**
+ * Model Scenario
+ * 
+ */
+export type Scenario = Prisma.ScenarioModel
+/**
+ * Model PlanningRun
+ * 
+ */
+export type PlanningRun = Prisma.PlanningRunModel
+/**
+ * Model Forecast
+ * 
+ */
+export type Forecast = Prisma.ForecastModel
+/**
+ * Model InventoryPlan
+ * 
+ */
+export type InventoryPlan = Prisma.InventoryPlanModel
+/**
+ * Model SupplyPlan
+ * 
+ */
+export type SupplyPlan = Prisma.SupplyPlanModel
+/**
+ * Model DRPPlan
+ * 
+ */
+export type DRPPlan = Prisma.DRPPlanModel
+/**
+ * Model OptimizationResult
+ * 
+ */
+export type OptimizationResult = Prisma.OptimizationResultModel
+/**
+ * Model SimulationRun
+ * 
+ */
+export type SimulationRun = Prisma.SimulationRunModel
+/**
+ * Model Recommendation
+ * 
+ */
+export type Recommendation = Prisma.RecommendationModel

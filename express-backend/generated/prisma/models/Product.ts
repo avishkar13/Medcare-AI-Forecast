@@ -44,7 +44,10 @@ export type ProductMinAggregateOutputType = {
   unit: string | null
   unitCost: runtime.Decimal | null
   shelfLifeDays: number | null
+  criticality: $Enums.Criticality | null
   isActive: boolean | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type ProductMaxAggregateOutputType = {
@@ -55,7 +58,10 @@ export type ProductMaxAggregateOutputType = {
   unit: string | null
   unitCost: runtime.Decimal | null
   shelfLifeDays: number | null
+  criticality: $Enums.Criticality | null
   isActive: boolean | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type ProductCountAggregateOutputType = {
@@ -66,7 +72,10 @@ export type ProductCountAggregateOutputType = {
   unit: number
   unitCost: number
   shelfLifeDays: number
+  criticality: number
   isActive: number
+  createdAt: number
+  updatedAt: number
   _all: number
 }
 
@@ -89,7 +98,10 @@ export type ProductMinAggregateInputType = {
   unit?: true
   unitCost?: true
   shelfLifeDays?: true
+  criticality?: true
   isActive?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ProductMaxAggregateInputType = {
@@ -100,7 +112,10 @@ export type ProductMaxAggregateInputType = {
   unit?: true
   unitCost?: true
   shelfLifeDays?: true
+  criticality?: true
   isActive?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type ProductCountAggregateInputType = {
@@ -111,7 +126,10 @@ export type ProductCountAggregateInputType = {
   unit?: true
   unitCost?: true
   shelfLifeDays?: true
+  criticality?: true
   isActive?: true
+  createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -209,7 +227,10 @@ export type ProductGroupByOutputType = {
   unit: string
   unitCost: runtime.Decimal
   shelfLifeDays: number | null
+  criticality: $Enums.Criticality
   isActive: boolean
+  createdAt: Date
+  updatedAt: Date
   _count: ProductCountAggregateOutputType | null
   _avg: ProductAvgAggregateOutputType | null
   _sum: ProductSumAggregateOutputType | null
@@ -243,7 +264,22 @@ export type ProductWhereInput = {
   unit?: Prisma.StringFilter<"Product"> | string
   unitCost?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   shelfLifeDays?: Prisma.IntNullableFilter<"Product"> | number | null
+  criticality?: Prisma.EnumCriticalityFilter<"Product"> | $Enums.Criticality
   isActive?: Prisma.BoolFilter<"Product"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
+  demandHistory?: Prisma.DemandHistoryListRelationFilter
+  inventory?: Prisma.InventoryListRelationFilter
+  batches?: Prisma.InventoryBatchListRelationFilter
+  planningParameters?: Prisma.PlanningParameterListRelationFilter
+  forecasts?: Prisma.ForecastListRelationFilter
+  inventoryPlans?: Prisma.InventoryPlanListRelationFilter
+  supplyPlans?: Prisma.SupplyPlanListRelationFilter
+  drpPlans?: Prisma.DRPPlanListRelationFilter
+  recommendations?: Prisma.RecommendationListRelationFilter
+  promotionEvents?: Prisma.PromotionEventListRelationFilter
+  demandSignals?: Prisma.DemandSignalListRelationFilter
+  distributorOrders?: Prisma.DistributorOrderListRelationFilter
 }
 
 export type ProductOrderByWithRelationInput = {
@@ -254,7 +290,22 @@ export type ProductOrderByWithRelationInput = {
   unit?: Prisma.SortOrder
   unitCost?: Prisma.SortOrder
   shelfLifeDays?: Prisma.SortOrderInput | Prisma.SortOrder
+  criticality?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
+  demandHistory?: Prisma.DemandHistoryOrderByRelationAggregateInput
+  inventory?: Prisma.InventoryOrderByRelationAggregateInput
+  batches?: Prisma.InventoryBatchOrderByRelationAggregateInput
+  planningParameters?: Prisma.PlanningParameterOrderByRelationAggregateInput
+  forecasts?: Prisma.ForecastOrderByRelationAggregateInput
+  inventoryPlans?: Prisma.InventoryPlanOrderByRelationAggregateInput
+  supplyPlans?: Prisma.SupplyPlanOrderByRelationAggregateInput
+  drpPlans?: Prisma.DRPPlanOrderByRelationAggregateInput
+  recommendations?: Prisma.RecommendationOrderByRelationAggregateInput
+  promotionEvents?: Prisma.PromotionEventOrderByRelationAggregateInput
+  demandSignals?: Prisma.DemandSignalOrderByRelationAggregateInput
+  distributorOrders?: Prisma.DistributorOrderOrderByRelationAggregateInput
 }
 
 export type ProductWhereUniqueInput = Prisma.AtLeast<{
@@ -268,7 +319,22 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   unit?: Prisma.StringFilter<"Product"> | string
   unitCost?: Prisma.DecimalFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   shelfLifeDays?: Prisma.IntNullableFilter<"Product"> | number | null
+  criticality?: Prisma.EnumCriticalityFilter<"Product"> | $Enums.Criticality
   isActive?: Prisma.BoolFilter<"Product"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
+  demandHistory?: Prisma.DemandHistoryListRelationFilter
+  inventory?: Prisma.InventoryListRelationFilter
+  batches?: Prisma.InventoryBatchListRelationFilter
+  planningParameters?: Prisma.PlanningParameterListRelationFilter
+  forecasts?: Prisma.ForecastListRelationFilter
+  inventoryPlans?: Prisma.InventoryPlanListRelationFilter
+  supplyPlans?: Prisma.SupplyPlanListRelationFilter
+  drpPlans?: Prisma.DRPPlanListRelationFilter
+  recommendations?: Prisma.RecommendationListRelationFilter
+  promotionEvents?: Prisma.PromotionEventListRelationFilter
+  demandSignals?: Prisma.DemandSignalListRelationFilter
+  distributorOrders?: Prisma.DistributorOrderListRelationFilter
 }, "id" | "sku">
 
 export type ProductOrderByWithAggregationInput = {
@@ -279,7 +345,10 @@ export type ProductOrderByWithAggregationInput = {
   unit?: Prisma.SortOrder
   unitCost?: Prisma.SortOrder
   shelfLifeDays?: Prisma.SortOrderInput | Prisma.SortOrder
+  criticality?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProductCountOrderByAggregateInput
   _avg?: Prisma.ProductAvgOrderByAggregateInput
   _max?: Prisma.ProductMaxOrderByAggregateInput
@@ -298,7 +367,10 @@ export type ProductScalarWhereWithAggregatesInput = {
   unit?: Prisma.StringWithAggregatesFilter<"Product"> | string
   unitCost?: Prisma.DecimalWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   shelfLifeDays?: Prisma.IntNullableWithAggregatesFilter<"Product"> | number | null
+  criticality?: Prisma.EnumCriticalityWithAggregatesFilter<"Product"> | $Enums.Criticality
   isActive?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
 }
 
 export type ProductCreateInput = {
@@ -309,7 +381,22 @@ export type ProductCreateInput = {
   unit?: string
   unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
   shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
   isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateInput = {
@@ -320,7 +407,22 @@ export type ProductUncheckedCreateInput = {
   unit?: string
   unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
   shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
   isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductUpdateInput = {
@@ -331,7 +433,22 @@ export type ProductUpdateInput = {
   unit?: Prisma.StringFieldUpdateOperationsInput | string
   unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateInput = {
@@ -342,7 +459,22 @@ export type ProductUncheckedUpdateInput = {
   unit?: Prisma.StringFieldUpdateOperationsInput | string
   unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateManyInput = {
@@ -353,7 +485,10 @@ export type ProductCreateManyInput = {
   unit?: string
   unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
   shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
   isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ProductUpdateManyMutationInput = {
@@ -364,7 +499,10 @@ export type ProductUpdateManyMutationInput = {
   unit?: Prisma.StringFieldUpdateOperationsInput | string
   unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ProductUncheckedUpdateManyInput = {
@@ -375,7 +513,10 @@ export type ProductUncheckedUpdateManyInput = {
   unit?: Prisma.StringFieldUpdateOperationsInput | string
   unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ProductCountOrderByAggregateInput = {
@@ -386,7 +527,10 @@ export type ProductCountOrderByAggregateInput = {
   unit?: Prisma.SortOrder
   unitCost?: Prisma.SortOrder
   shelfLifeDays?: Prisma.SortOrder
+  criticality?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ProductAvgOrderByAggregateInput = {
@@ -402,7 +546,10 @@ export type ProductMaxOrderByAggregateInput = {
   unit?: Prisma.SortOrder
   unitCost?: Prisma.SortOrder
   shelfLifeDays?: Prisma.SortOrder
+  criticality?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ProductMinOrderByAggregateInput = {
@@ -413,7 +560,10 @@ export type ProductMinOrderByAggregateInput = {
   unit?: Prisma.SortOrder
   unitCost?: Prisma.SortOrder
   shelfLifeDays?: Prisma.SortOrder
+  criticality?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type ProductSumOrderByAggregateInput = {
@@ -421,8 +571,14 @@ export type ProductSumOrderByAggregateInput = {
   shelfLifeDays?: Prisma.SortOrder
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
+export type ProductScalarRelationFilter = {
+  is?: Prisma.ProductWhereInput
+  isNot?: Prisma.ProductWhereInput
+}
+
+export type ProductNullableScalarRelationFilter = {
+  is?: Prisma.ProductWhereInput | null
+  isNot?: Prisma.ProductWhereInput | null
 }
 
 export type NullableStringFieldUpdateOperationsInput = {
@@ -445,10 +601,1706 @@ export type NullableIntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type EnumCriticalityFieldUpdateOperationsInput = {
+  set?: $Enums.Criticality
+}
+
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type ProductCreateNestedOneWithoutDemandHistoryInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutDemandHistoryInput, Prisma.ProductUncheckedCreateWithoutDemandHistoryInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutDemandHistoryInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutDemandHistoryNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutDemandHistoryInput, Prisma.ProductUncheckedCreateWithoutDemandHistoryInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutDemandHistoryInput
+  upsert?: Prisma.ProductUpsertWithoutDemandHistoryInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutDemandHistoryInput, Prisma.ProductUpdateWithoutDemandHistoryInput>, Prisma.ProductUncheckedUpdateWithoutDemandHistoryInput>
+}
+
+export type ProductCreateNestedOneWithoutInventoryInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutInventoryInput, Prisma.ProductUncheckedCreateWithoutInventoryInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutInventoryInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutInventoryNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutInventoryInput, Prisma.ProductUncheckedCreateWithoutInventoryInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutInventoryInput
+  upsert?: Prisma.ProductUpsertWithoutInventoryInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutInventoryInput, Prisma.ProductUpdateWithoutInventoryInput>, Prisma.ProductUncheckedUpdateWithoutInventoryInput>
+}
+
+export type ProductCreateNestedOneWithoutBatchesInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutBatchesInput, Prisma.ProductUncheckedCreateWithoutBatchesInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutBatchesInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutBatchesNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutBatchesInput, Prisma.ProductUncheckedCreateWithoutBatchesInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutBatchesInput
+  upsert?: Prisma.ProductUpsertWithoutBatchesInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutBatchesInput, Prisma.ProductUpdateWithoutBatchesInput>, Prisma.ProductUncheckedUpdateWithoutBatchesInput>
+}
+
+export type ProductCreateNestedOneWithoutPlanningParametersInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutPlanningParametersInput, Prisma.ProductUncheckedCreateWithoutPlanningParametersInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutPlanningParametersInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutPlanningParametersNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutPlanningParametersInput, Prisma.ProductUncheckedCreateWithoutPlanningParametersInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutPlanningParametersInput
+  upsert?: Prisma.ProductUpsertWithoutPlanningParametersInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutPlanningParametersInput, Prisma.ProductUpdateWithoutPlanningParametersInput>, Prisma.ProductUncheckedUpdateWithoutPlanningParametersInput>
+}
+
+export type ProductCreateNestedOneWithoutPromotionEventsInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutPromotionEventsInput, Prisma.ProductUncheckedCreateWithoutPromotionEventsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutPromotionEventsInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneWithoutPromotionEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutPromotionEventsInput, Prisma.ProductUncheckedCreateWithoutPromotionEventsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutPromotionEventsInput
+  upsert?: Prisma.ProductUpsertWithoutPromotionEventsInput
+  disconnect?: Prisma.ProductWhereInput | boolean
+  delete?: Prisma.ProductWhereInput | boolean
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutPromotionEventsInput, Prisma.ProductUpdateWithoutPromotionEventsInput>, Prisma.ProductUncheckedUpdateWithoutPromotionEventsInput>
+}
+
+export type ProductCreateNestedOneWithoutDemandSignalsInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutDemandSignalsInput, Prisma.ProductUncheckedCreateWithoutDemandSignalsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutDemandSignalsInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneWithoutDemandSignalsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutDemandSignalsInput, Prisma.ProductUncheckedCreateWithoutDemandSignalsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutDemandSignalsInput
+  upsert?: Prisma.ProductUpsertWithoutDemandSignalsInput
+  disconnect?: Prisma.ProductWhereInput | boolean
+  delete?: Prisma.ProductWhereInput | boolean
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutDemandSignalsInput, Prisma.ProductUpdateWithoutDemandSignalsInput>, Prisma.ProductUncheckedUpdateWithoutDemandSignalsInput>
+}
+
+export type ProductCreateNestedOneWithoutDistributorOrdersInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutDistributorOrdersInput, Prisma.ProductUncheckedCreateWithoutDistributorOrdersInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutDistributorOrdersInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutDistributorOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutDistributorOrdersInput, Prisma.ProductUncheckedCreateWithoutDistributorOrdersInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutDistributorOrdersInput
+  upsert?: Prisma.ProductUpsertWithoutDistributorOrdersInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutDistributorOrdersInput, Prisma.ProductUpdateWithoutDistributorOrdersInput>, Prisma.ProductUncheckedUpdateWithoutDistributorOrdersInput>
+}
+
+export type ProductCreateNestedOneWithoutForecastsInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutForecastsInput, Prisma.ProductUncheckedCreateWithoutForecastsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutForecastsInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutForecastsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutForecastsInput, Prisma.ProductUncheckedCreateWithoutForecastsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutForecastsInput
+  upsert?: Prisma.ProductUpsertWithoutForecastsInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutForecastsInput, Prisma.ProductUpdateWithoutForecastsInput>, Prisma.ProductUncheckedUpdateWithoutForecastsInput>
+}
+
+export type ProductCreateNestedOneWithoutInventoryPlansInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutInventoryPlansInput, Prisma.ProductUncheckedCreateWithoutInventoryPlansInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutInventoryPlansInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutInventoryPlansNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutInventoryPlansInput, Prisma.ProductUncheckedCreateWithoutInventoryPlansInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutInventoryPlansInput
+  upsert?: Prisma.ProductUpsertWithoutInventoryPlansInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutInventoryPlansInput, Prisma.ProductUpdateWithoutInventoryPlansInput>, Prisma.ProductUncheckedUpdateWithoutInventoryPlansInput>
+}
+
+export type ProductCreateNestedOneWithoutSupplyPlansInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutSupplyPlansInput, Prisma.ProductUncheckedCreateWithoutSupplyPlansInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutSupplyPlansInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutSupplyPlansNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutSupplyPlansInput, Prisma.ProductUncheckedCreateWithoutSupplyPlansInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutSupplyPlansInput
+  upsert?: Prisma.ProductUpsertWithoutSupplyPlansInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutSupplyPlansInput, Prisma.ProductUpdateWithoutSupplyPlansInput>, Prisma.ProductUncheckedUpdateWithoutSupplyPlansInput>
+}
+
+export type ProductCreateNestedOneWithoutDrpPlansInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutDrpPlansInput, Prisma.ProductUncheckedCreateWithoutDrpPlansInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutDrpPlansInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutDrpPlansNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutDrpPlansInput, Prisma.ProductUncheckedCreateWithoutDrpPlansInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutDrpPlansInput
+  upsert?: Prisma.ProductUpsertWithoutDrpPlansInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutDrpPlansInput, Prisma.ProductUpdateWithoutDrpPlansInput>, Prisma.ProductUncheckedUpdateWithoutDrpPlansInput>
+}
+
+export type ProductCreateNestedOneWithoutRecommendationsInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutRecommendationsInput, Prisma.ProductUncheckedCreateWithoutRecommendationsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutRecommendationsInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutRecommendationsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutRecommendationsInput, Prisma.ProductUncheckedCreateWithoutRecommendationsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutRecommendationsInput
+  upsert?: Prisma.ProductUpsertWithoutRecommendationsInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutRecommendationsInput, Prisma.ProductUpdateWithoutRecommendationsInput>, Prisma.ProductUncheckedUpdateWithoutRecommendationsInput>
+}
+
+export type ProductCreateWithoutDemandHistoryInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutDemandHistoryInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutDemandHistoryInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutDemandHistoryInput, Prisma.ProductUncheckedCreateWithoutDemandHistoryInput>
+}
+
+export type ProductUpsertWithoutDemandHistoryInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutDemandHistoryInput, Prisma.ProductUncheckedUpdateWithoutDemandHistoryInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutDemandHistoryInput, Prisma.ProductUncheckedCreateWithoutDemandHistoryInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutDemandHistoryInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutDemandHistoryInput, Prisma.ProductUncheckedUpdateWithoutDemandHistoryInput>
+}
+
+export type ProductUpdateWithoutDemandHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutDemandHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutInventoryInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutInventoryInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutInventoryInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutInventoryInput, Prisma.ProductUncheckedCreateWithoutInventoryInput>
+}
+
+export type ProductUpsertWithoutInventoryInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutInventoryInput, Prisma.ProductUncheckedUpdateWithoutInventoryInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutInventoryInput, Prisma.ProductUncheckedCreateWithoutInventoryInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutInventoryInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutInventoryInput, Prisma.ProductUncheckedUpdateWithoutInventoryInput>
+}
+
+export type ProductUpdateWithoutInventoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutInventoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutBatchesInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutBatchesInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutBatchesInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutBatchesInput, Prisma.ProductUncheckedCreateWithoutBatchesInput>
+}
+
+export type ProductUpsertWithoutBatchesInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutBatchesInput, Prisma.ProductUncheckedUpdateWithoutBatchesInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutBatchesInput, Prisma.ProductUncheckedCreateWithoutBatchesInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutBatchesInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutBatchesInput, Prisma.ProductUncheckedUpdateWithoutBatchesInput>
+}
+
+export type ProductUpdateWithoutBatchesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutBatchesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutPlanningParametersInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutPlanningParametersInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutPlanningParametersInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutPlanningParametersInput, Prisma.ProductUncheckedCreateWithoutPlanningParametersInput>
+}
+
+export type ProductUpsertWithoutPlanningParametersInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutPlanningParametersInput, Prisma.ProductUncheckedUpdateWithoutPlanningParametersInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutPlanningParametersInput, Prisma.ProductUncheckedCreateWithoutPlanningParametersInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutPlanningParametersInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutPlanningParametersInput, Prisma.ProductUncheckedUpdateWithoutPlanningParametersInput>
+}
+
+export type ProductUpdateWithoutPlanningParametersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutPlanningParametersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutPromotionEventsInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutPromotionEventsInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutPromotionEventsInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutPromotionEventsInput, Prisma.ProductUncheckedCreateWithoutPromotionEventsInput>
+}
+
+export type ProductUpsertWithoutPromotionEventsInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutPromotionEventsInput, Prisma.ProductUncheckedUpdateWithoutPromotionEventsInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutPromotionEventsInput, Prisma.ProductUncheckedCreateWithoutPromotionEventsInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutPromotionEventsInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutPromotionEventsInput, Prisma.ProductUncheckedUpdateWithoutPromotionEventsInput>
+}
+
+export type ProductUpdateWithoutPromotionEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutPromotionEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutDemandSignalsInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutDemandSignalsInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutDemandSignalsInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutDemandSignalsInput, Prisma.ProductUncheckedCreateWithoutDemandSignalsInput>
+}
+
+export type ProductUpsertWithoutDemandSignalsInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutDemandSignalsInput, Prisma.ProductUncheckedUpdateWithoutDemandSignalsInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutDemandSignalsInput, Prisma.ProductUncheckedCreateWithoutDemandSignalsInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutDemandSignalsInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutDemandSignalsInput, Prisma.ProductUncheckedUpdateWithoutDemandSignalsInput>
+}
+
+export type ProductUpdateWithoutDemandSignalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutDemandSignalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutDistributorOrdersInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutDistributorOrdersInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutDistributorOrdersInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutDistributorOrdersInput, Prisma.ProductUncheckedCreateWithoutDistributorOrdersInput>
+}
+
+export type ProductUpsertWithoutDistributorOrdersInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutDistributorOrdersInput, Prisma.ProductUncheckedUpdateWithoutDistributorOrdersInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutDistributorOrdersInput, Prisma.ProductUncheckedCreateWithoutDistributorOrdersInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutDistributorOrdersInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutDistributorOrdersInput, Prisma.ProductUncheckedUpdateWithoutDistributorOrdersInput>
+}
+
+export type ProductUpdateWithoutDistributorOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutDistributorOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutForecastsInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutForecastsInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutForecastsInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutForecastsInput, Prisma.ProductUncheckedCreateWithoutForecastsInput>
+}
+
+export type ProductUpsertWithoutForecastsInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutForecastsInput, Prisma.ProductUncheckedUpdateWithoutForecastsInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutForecastsInput, Prisma.ProductUncheckedCreateWithoutForecastsInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutForecastsInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutForecastsInput, Prisma.ProductUncheckedUpdateWithoutForecastsInput>
+}
+
+export type ProductUpdateWithoutForecastsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutForecastsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutInventoryPlansInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutInventoryPlansInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutInventoryPlansInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutInventoryPlansInput, Prisma.ProductUncheckedCreateWithoutInventoryPlansInput>
+}
+
+export type ProductUpsertWithoutInventoryPlansInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutInventoryPlansInput, Prisma.ProductUncheckedUpdateWithoutInventoryPlansInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutInventoryPlansInput, Prisma.ProductUncheckedCreateWithoutInventoryPlansInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutInventoryPlansInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutInventoryPlansInput, Prisma.ProductUncheckedUpdateWithoutInventoryPlansInput>
+}
+
+export type ProductUpdateWithoutInventoryPlansInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutInventoryPlansInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutSupplyPlansInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutSupplyPlansInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutSupplyPlansInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutSupplyPlansInput, Prisma.ProductUncheckedCreateWithoutSupplyPlansInput>
+}
+
+export type ProductUpsertWithoutSupplyPlansInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutSupplyPlansInput, Prisma.ProductUncheckedUpdateWithoutSupplyPlansInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutSupplyPlansInput, Prisma.ProductUncheckedCreateWithoutSupplyPlansInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutSupplyPlansInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutSupplyPlansInput, Prisma.ProductUncheckedUpdateWithoutSupplyPlansInput>
+}
+
+export type ProductUpdateWithoutSupplyPlansInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutSupplyPlansInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutDrpPlansInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutDrpPlansInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutDrpPlansInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutDrpPlansInput, Prisma.ProductUncheckedCreateWithoutDrpPlansInput>
+}
+
+export type ProductUpsertWithoutDrpPlansInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutDrpPlansInput, Prisma.ProductUncheckedUpdateWithoutDrpPlansInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutDrpPlansInput, Prisma.ProductUncheckedCreateWithoutDrpPlansInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutDrpPlansInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutDrpPlansInput, Prisma.ProductUncheckedUpdateWithoutDrpPlansInput>
+}
+
+export type ProductUpdateWithoutDrpPlansInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutDrpPlansInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutRecommendationsInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutRecommendationsInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutRecommendationsInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutRecommendationsInput, Prisma.ProductUncheckedCreateWithoutRecommendationsInput>
+}
+
+export type ProductUpsertWithoutRecommendationsInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutRecommendationsInput, Prisma.ProductUncheckedUpdateWithoutRecommendationsInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutRecommendationsInput, Prisma.ProductUncheckedCreateWithoutRecommendationsInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutRecommendationsInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutRecommendationsInput, Prisma.ProductUncheckedUpdateWithoutRecommendationsInput>
+}
+
+export type ProductUpdateWithoutRecommendationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutRecommendationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+}
+
+
+/**
+ * Count Type ProductCountOutputType
+ */
+
+export type ProductCountOutputType = {
+  demandHistory: number
+  inventory: number
+  batches: number
+  planningParameters: number
+  forecasts: number
+  inventoryPlans: number
+  supplyPlans: number
+  drpPlans: number
+  recommendations: number
+  promotionEvents: number
+  demandSignals: number
+  distributorOrders: number
+}
+
+export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  demandHistory?: boolean | ProductCountOutputTypeCountDemandHistoryArgs
+  inventory?: boolean | ProductCountOutputTypeCountInventoryArgs
+  batches?: boolean | ProductCountOutputTypeCountBatchesArgs
+  planningParameters?: boolean | ProductCountOutputTypeCountPlanningParametersArgs
+  forecasts?: boolean | ProductCountOutputTypeCountForecastsArgs
+  inventoryPlans?: boolean | ProductCountOutputTypeCountInventoryPlansArgs
+  supplyPlans?: boolean | ProductCountOutputTypeCountSupplyPlansArgs
+  drpPlans?: boolean | ProductCountOutputTypeCountDrpPlansArgs
+  recommendations?: boolean | ProductCountOutputTypeCountRecommendationsArgs
+  promotionEvents?: boolean | ProductCountOutputTypeCountPromotionEventsArgs
+  demandSignals?: boolean | ProductCountOutputTypeCountDemandSignalsArgs
+  distributorOrders?: boolean | ProductCountOutputTypeCountDistributorOrdersArgs
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProductCountOutputType
+   */
+  select?: Prisma.ProductCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountDemandHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DemandHistoryWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountInventoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InventoryWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountBatchesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InventoryBatchWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountPlanningParametersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlanningParameterWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountForecastsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ForecastWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountInventoryPlansArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InventoryPlanWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountSupplyPlansArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupplyPlanWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountDrpPlansArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DRPPlanWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountRecommendationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecommendationWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountPromotionEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PromotionEventWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountDemandSignalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DemandSignalWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountDistributorOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DistributorOrderWhereInput
+}
 
 
 export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -459,7 +2311,23 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   unit?: boolean
   unitCost?: boolean
   shelfLifeDays?: boolean
+  criticality?: boolean
   isActive?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
+  demandHistory?: boolean | Prisma.Product$demandHistoryArgs<ExtArgs>
+  inventory?: boolean | Prisma.Product$inventoryArgs<ExtArgs>
+  batches?: boolean | Prisma.Product$batchesArgs<ExtArgs>
+  planningParameters?: boolean | Prisma.Product$planningParametersArgs<ExtArgs>
+  forecasts?: boolean | Prisma.Product$forecastsArgs<ExtArgs>
+  inventoryPlans?: boolean | Prisma.Product$inventoryPlansArgs<ExtArgs>
+  supplyPlans?: boolean | Prisma.Product$supplyPlansArgs<ExtArgs>
+  drpPlans?: boolean | Prisma.Product$drpPlansArgs<ExtArgs>
+  recommendations?: boolean | Prisma.Product$recommendationsArgs<ExtArgs>
+  promotionEvents?: boolean | Prisma.Product$promotionEventsArgs<ExtArgs>
+  demandSignals?: boolean | Prisma.Product$demandSignalsArgs<ExtArgs>
+  distributorOrders?: boolean | Prisma.Product$distributorOrdersArgs<ExtArgs>
+  _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
 export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -470,7 +2338,10 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   unit?: boolean
   unitCost?: boolean
   shelfLifeDays?: boolean
+  criticality?: boolean
   isActive?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }, ExtArgs["result"]["product"]>
 
 export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -481,7 +2352,10 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   unit?: boolean
   unitCost?: boolean
   shelfLifeDays?: boolean
+  criticality?: boolean
   isActive?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }, ExtArgs["result"]["product"]>
 
 export type ProductSelectScalar = {
@@ -492,14 +2366,47 @@ export type ProductSelectScalar = {
   unit?: boolean
   unitCost?: boolean
   shelfLifeDays?: boolean
+  criticality?: boolean
   isActive?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sku" | "name" | "category" | "unit" | "unitCost" | "shelfLifeDays" | "isActive", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sku" | "name" | "category" | "unit" | "unitCost" | "shelfLifeDays" | "criticality" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  demandHistory?: boolean | Prisma.Product$demandHistoryArgs<ExtArgs>
+  inventory?: boolean | Prisma.Product$inventoryArgs<ExtArgs>
+  batches?: boolean | Prisma.Product$batchesArgs<ExtArgs>
+  planningParameters?: boolean | Prisma.Product$planningParametersArgs<ExtArgs>
+  forecasts?: boolean | Prisma.Product$forecastsArgs<ExtArgs>
+  inventoryPlans?: boolean | Prisma.Product$inventoryPlansArgs<ExtArgs>
+  supplyPlans?: boolean | Prisma.Product$supplyPlansArgs<ExtArgs>
+  drpPlans?: boolean | Prisma.Product$drpPlansArgs<ExtArgs>
+  recommendations?: boolean | Prisma.Product$recommendationsArgs<ExtArgs>
+  promotionEvents?: boolean | Prisma.Product$promotionEventsArgs<ExtArgs>
+  demandSignals?: boolean | Prisma.Product$demandSignalsArgs<ExtArgs>
+  distributorOrders?: boolean | Prisma.Product$distributorOrdersArgs<ExtArgs>
+  _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type ProductIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ProductIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Product"
-  objects: {}
+  objects: {
+    demandHistory: Prisma.$DemandHistoryPayload<ExtArgs>[]
+    inventory: Prisma.$InventoryPayload<ExtArgs>[]
+    batches: Prisma.$InventoryBatchPayload<ExtArgs>[]
+    planningParameters: Prisma.$PlanningParameterPayload<ExtArgs>[]
+    forecasts: Prisma.$ForecastPayload<ExtArgs>[]
+    inventoryPlans: Prisma.$InventoryPlanPayload<ExtArgs>[]
+    supplyPlans: Prisma.$SupplyPlanPayload<ExtArgs>[]
+    drpPlans: Prisma.$DRPPlanPayload<ExtArgs>[]
+    recommendations: Prisma.$RecommendationPayload<ExtArgs>[]
+    promotionEvents: Prisma.$PromotionEventPayload<ExtArgs>[]
+    demandSignals: Prisma.$DemandSignalPayload<ExtArgs>[]
+    distributorOrders: Prisma.$DistributorOrderPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     sku: string
@@ -508,7 +2415,10 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     unit: string
     unitCost: runtime.Decimal
     shelfLifeDays: number | null
+    criticality: $Enums.Criticality
     isActive: boolean
+    createdAt: Date
+    updatedAt: Date
   }, ExtArgs["result"]["product"]>
   composites: {}
 }
@@ -903,6 +2813,18 @@ readonly fields: ProductFieldRefs;
  */
 export interface Prisma__ProductClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  demandHistory<T extends Prisma.Product$demandHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$demandHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DemandHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  inventory<T extends Prisma.Product$inventoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$inventoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  batches<T extends Prisma.Product$batchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$batchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryBatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  planningParameters<T extends Prisma.Product$planningParametersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$planningParametersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlanningParameterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  forecasts<T extends Prisma.Product$forecastsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$forecastsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ForecastPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  inventoryPlans<T extends Prisma.Product$inventoryPlansArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$inventoryPlansArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryPlanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supplyPlans<T extends Prisma.Product$supplyPlansArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$supplyPlansArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupplyPlanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  drpPlans<T extends Prisma.Product$drpPlansArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$drpPlansArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DRPPlanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  recommendations<T extends Prisma.Product$recommendationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$recommendationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecommendationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  promotionEvents<T extends Prisma.Product$promotionEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$promotionEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PromotionEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  demandSignals<T extends Prisma.Product$demandSignalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$demandSignalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DemandSignalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  distributorOrders<T extends Prisma.Product$distributorOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$distributorOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DistributorOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -939,7 +2861,10 @@ export interface ProductFieldRefs {
   readonly unit: Prisma.FieldRef<"Product", 'String'>
   readonly unitCost: Prisma.FieldRef<"Product", 'Decimal'>
   readonly shelfLifeDays: Prisma.FieldRef<"Product", 'Int'>
+  readonly criticality: Prisma.FieldRef<"Product", 'Criticality'>
   readonly isActive: Prisma.FieldRef<"Product", 'Boolean'>
+  readonly createdAt: Prisma.FieldRef<"Product", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"Product", 'DateTime'>
 }
     
 
@@ -956,6 +2881,10 @@ export type ProductFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Omit specific fields from the Product
    */
   omit?: Prisma.ProductOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
   /**
    * Filter, which Product to fetch.
    */
@@ -975,6 +2904,10 @@ export type ProductFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.ProductOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
+  /**
    * Filter, which Product to fetch.
    */
   where: Prisma.ProductWhereUniqueInput
@@ -992,6 +2925,10 @@ export type ProductFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the Product
    */
   omit?: Prisma.ProductOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
   /**
    * Filter, which Product to fetch.
    */
@@ -1041,6 +2978,10 @@ export type ProductFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.ProductOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
+  /**
    * Filter, which Product to fetch.
    */
   where?: Prisma.ProductWhereInput
@@ -1088,6 +3029,10 @@ export type ProductFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the Product
    */
   omit?: Prisma.ProductOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
   /**
    * Filter, which Products to fetch.
    */
@@ -1137,6 +3082,10 @@ export type ProductCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.ProductOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
+  /**
    * The data needed to create a Product.
    */
   data: Prisma.XOR<Prisma.ProductCreateInput, Prisma.ProductUncheckedCreateInput>
@@ -1184,6 +3133,10 @@ export type ProductUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Product
    */
   omit?: Prisma.ProductOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
   /**
    * The data needed to update a Product.
    */
@@ -1251,6 +3204,10 @@ export type ProductUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.ProductOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
+  /**
    * The filter to search for the Product to update in case it exists.
    */
   where: Prisma.ProductWhereUniqueInput
@@ -1277,6 +3234,10 @@ export type ProductDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.ProductOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
+  /**
    * Filter which Product to delete.
    */
   where: Prisma.ProductWhereUniqueInput
@@ -1297,6 +3258,294 @@ export type ProductDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
+ * Product.demandHistory
+ */
+export type Product$demandHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DemandHistory
+   */
+  select?: Prisma.DemandHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DemandHistory
+   */
+  omit?: Prisma.DemandHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DemandHistoryInclude<ExtArgs> | null
+  where?: Prisma.DemandHistoryWhereInput
+  orderBy?: Prisma.DemandHistoryOrderByWithRelationInput | Prisma.DemandHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.DemandHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DemandHistoryScalarFieldEnum | Prisma.DemandHistoryScalarFieldEnum[]
+}
+
+/**
+ * Product.inventory
+ */
+export type Product$inventoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Inventory
+   */
+  select?: Prisma.InventorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Inventory
+   */
+  omit?: Prisma.InventoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InventoryInclude<ExtArgs> | null
+  where?: Prisma.InventoryWhereInput
+  orderBy?: Prisma.InventoryOrderByWithRelationInput | Prisma.InventoryOrderByWithRelationInput[]
+  cursor?: Prisma.InventoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InventoryScalarFieldEnum | Prisma.InventoryScalarFieldEnum[]
+}
+
+/**
+ * Product.batches
+ */
+export type Product$batchesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InventoryBatch
+   */
+  select?: Prisma.InventoryBatchSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InventoryBatch
+   */
+  omit?: Prisma.InventoryBatchOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InventoryBatchInclude<ExtArgs> | null
+  where?: Prisma.InventoryBatchWhereInput
+  orderBy?: Prisma.InventoryBatchOrderByWithRelationInput | Prisma.InventoryBatchOrderByWithRelationInput[]
+  cursor?: Prisma.InventoryBatchWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InventoryBatchScalarFieldEnum | Prisma.InventoryBatchScalarFieldEnum[]
+}
+
+/**
+ * Product.planningParameters
+ */
+export type Product$planningParametersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlanningParameter
+   */
+  select?: Prisma.PlanningParameterSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlanningParameter
+   */
+  omit?: Prisma.PlanningParameterOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlanningParameterInclude<ExtArgs> | null
+  where?: Prisma.PlanningParameterWhereInput
+  orderBy?: Prisma.PlanningParameterOrderByWithRelationInput | Prisma.PlanningParameterOrderByWithRelationInput[]
+  cursor?: Prisma.PlanningParameterWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlanningParameterScalarFieldEnum | Prisma.PlanningParameterScalarFieldEnum[]
+}
+
+/**
+ * Product.forecasts
+ */
+export type Product$forecastsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Forecast
+   */
+  select?: Prisma.ForecastSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Forecast
+   */
+  omit?: Prisma.ForecastOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ForecastInclude<ExtArgs> | null
+  where?: Prisma.ForecastWhereInput
+  orderBy?: Prisma.ForecastOrderByWithRelationInput | Prisma.ForecastOrderByWithRelationInput[]
+  cursor?: Prisma.ForecastWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ForecastScalarFieldEnum | Prisma.ForecastScalarFieldEnum[]
+}
+
+/**
+ * Product.inventoryPlans
+ */
+export type Product$inventoryPlansArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InventoryPlan
+   */
+  select?: Prisma.InventoryPlanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InventoryPlan
+   */
+  omit?: Prisma.InventoryPlanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InventoryPlanInclude<ExtArgs> | null
+  where?: Prisma.InventoryPlanWhereInput
+  orderBy?: Prisma.InventoryPlanOrderByWithRelationInput | Prisma.InventoryPlanOrderByWithRelationInput[]
+  cursor?: Prisma.InventoryPlanWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InventoryPlanScalarFieldEnum | Prisma.InventoryPlanScalarFieldEnum[]
+}
+
+/**
+ * Product.supplyPlans
+ */
+export type Product$supplyPlansArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupplyPlan
+   */
+  select?: Prisma.SupplyPlanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupplyPlan
+   */
+  omit?: Prisma.SupplyPlanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupplyPlanInclude<ExtArgs> | null
+  where?: Prisma.SupplyPlanWhereInput
+  orderBy?: Prisma.SupplyPlanOrderByWithRelationInput | Prisma.SupplyPlanOrderByWithRelationInput[]
+  cursor?: Prisma.SupplyPlanWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupplyPlanScalarFieldEnum | Prisma.SupplyPlanScalarFieldEnum[]
+}
+
+/**
+ * Product.drpPlans
+ */
+export type Product$drpPlansArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DRPPlan
+   */
+  select?: Prisma.DRPPlanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DRPPlan
+   */
+  omit?: Prisma.DRPPlanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DRPPlanInclude<ExtArgs> | null
+  where?: Prisma.DRPPlanWhereInput
+  orderBy?: Prisma.DRPPlanOrderByWithRelationInput | Prisma.DRPPlanOrderByWithRelationInput[]
+  cursor?: Prisma.DRPPlanWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DRPPlanScalarFieldEnum | Prisma.DRPPlanScalarFieldEnum[]
+}
+
+/**
+ * Product.recommendations
+ */
+export type Product$recommendationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Recommendation
+   */
+  select?: Prisma.RecommendationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Recommendation
+   */
+  omit?: Prisma.RecommendationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecommendationInclude<ExtArgs> | null
+  where?: Prisma.RecommendationWhereInput
+  orderBy?: Prisma.RecommendationOrderByWithRelationInput | Prisma.RecommendationOrderByWithRelationInput[]
+  cursor?: Prisma.RecommendationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecommendationScalarFieldEnum | Prisma.RecommendationScalarFieldEnum[]
+}
+
+/**
+ * Product.promotionEvents
+ */
+export type Product$promotionEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PromotionEvent
+   */
+  select?: Prisma.PromotionEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PromotionEvent
+   */
+  omit?: Prisma.PromotionEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PromotionEventInclude<ExtArgs> | null
+  where?: Prisma.PromotionEventWhereInput
+  orderBy?: Prisma.PromotionEventOrderByWithRelationInput | Prisma.PromotionEventOrderByWithRelationInput[]
+  cursor?: Prisma.PromotionEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PromotionEventScalarFieldEnum | Prisma.PromotionEventScalarFieldEnum[]
+}
+
+/**
+ * Product.demandSignals
+ */
+export type Product$demandSignalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DemandSignal
+   */
+  select?: Prisma.DemandSignalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DemandSignal
+   */
+  omit?: Prisma.DemandSignalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DemandSignalInclude<ExtArgs> | null
+  where?: Prisma.DemandSignalWhereInput
+  orderBy?: Prisma.DemandSignalOrderByWithRelationInput | Prisma.DemandSignalOrderByWithRelationInput[]
+  cursor?: Prisma.DemandSignalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DemandSignalScalarFieldEnum | Prisma.DemandSignalScalarFieldEnum[]
+}
+
+/**
+ * Product.distributorOrders
+ */
+export type Product$distributorOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DistributorOrder
+   */
+  select?: Prisma.DistributorOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DistributorOrder
+   */
+  omit?: Prisma.DistributorOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DistributorOrderInclude<ExtArgs> | null
+  where?: Prisma.DistributorOrderWhereInput
+  orderBy?: Prisma.DistributorOrderOrderByWithRelationInput | Prisma.DistributorOrderOrderByWithRelationInput[]
+  cursor?: Prisma.DistributorOrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DistributorOrderScalarFieldEnum | Prisma.DistributorOrderScalarFieldEnum[]
+}
+
+/**
  * Product without action
  */
 export type ProductDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1308,4 +3557,8 @@ export type ProductDefaultArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Product
    */
   omit?: Prisma.ProductOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
 }

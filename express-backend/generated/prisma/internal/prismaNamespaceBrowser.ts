@@ -51,7 +51,26 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  Product: 'Product'
+  User: 'User',
+  Product: 'Product',
+  Warehouse: 'Warehouse',
+  DemandHistory: 'DemandHistory',
+  Inventory: 'Inventory',
+  InventoryBatch: 'InventoryBatch',
+  PlanningParameter: 'PlanningParameter',
+  PromotionEvent: 'PromotionEvent',
+  DemandSignal: 'DemandSignal',
+  Distributor: 'Distributor',
+  DistributorOrder: 'DistributorOrder',
+  Scenario: 'Scenario',
+  PlanningRun: 'PlanningRun',
+  Forecast: 'Forecast',
+  InventoryPlan: 'InventoryPlan',
+  SupplyPlan: 'SupplyPlan',
+  DRPPlan: 'DRPPlan',
+  OptimizationResult: 'OptimizationResult',
+  SimulationRun: 'SimulationRun',
+  Recommendation: 'Recommendation'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -70,6 +89,19 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  passwordHash: 'passwordHash',
+  role: 'role',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
 export const ProductScalarFieldEnum = {
   id: 'id',
   sku: 'sku',
@@ -78,10 +110,294 @@ export const ProductScalarFieldEnum = {
   unit: 'unit',
   unitCost: 'unitCost',
   shelfLifeDays: 'shelfLifeDays',
-  isActive: 'isActive'
+  criticality: 'criticality',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const WarehouseScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  region: 'region',
+  tier: 'tier',
+  location: 'location',
+  capacity: 'capacity',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WarehouseScalarFieldEnum = (typeof WarehouseScalarFieldEnum)[keyof typeof WarehouseScalarFieldEnum]
+
+
+export const DemandHistoryScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
+  date: 'date',
+  orderedQuantity: 'orderedQuantity',
+  fulfilledQuantity: 'fulfilledQuantity',
+  stockoutFlag: 'stockoutFlag',
+  promotionFlag: 'promotionFlag',
+  holidayFlag: 'holidayFlag',
+  season: 'season',
+  createdAt: 'createdAt'
+} as const
+
+export type DemandHistoryScalarFieldEnum = (typeof DemandHistoryScalarFieldEnum)[keyof typeof DemandHistoryScalarFieldEnum]
+
+
+export const InventoryScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
+  onHand: 'onHand',
+  reserved: 'reserved',
+  inTransit: 'inTransit',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
+
+
+export const InventoryBatchScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
+  batchNumber: 'batchNumber',
+  quantity: 'quantity',
+  manufacturingDate: 'manufacturingDate',
+  expiryDate: 'expiryDate',
+  createdAt: 'createdAt'
+} as const
+
+export type InventoryBatchScalarFieldEnum = (typeof InventoryBatchScalarFieldEnum)[keyof typeof InventoryBatchScalarFieldEnum]
+
+
+export const PlanningParameterScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
+  leadTimeDays: 'leadTimeDays',
+  leadTimeStdDev: 'leadTimeStdDev',
+  serviceLevel: 'serviceLevel',
+  reviewPeriodDays: 'reviewPeriodDays',
+  minimumOrderQty: 'minimumOrderQty',
+  maximumInventory: 'maximumInventory',
+  holdingCostPerUnit: 'holdingCostPerUnit',
+  stockoutCostPerUnit: 'stockoutCostPerUnit',
+  expiryCostPerUnit: 'expiryCostPerUnit'
+} as const
+
+export type PlanningParameterScalarFieldEnum = (typeof PlanningParameterScalarFieldEnum)[keyof typeof PlanningParameterScalarFieldEnum]
+
+
+export const PromotionEventScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
+  name: 'name',
+  type: 'type',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  upliftFactor: 'upliftFactor',
+  createdAt: 'createdAt'
+} as const
+
+export type PromotionEventScalarFieldEnum = (typeof PromotionEventScalarFieldEnum)[keyof typeof PromotionEventScalarFieldEnum]
+
+
+export const DemandSignalScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  region: 'region',
+  date: 'date',
+  signalType: 'signalType',
+  value: 'value',
+  createdAt: 'createdAt'
+} as const
+
+export type DemandSignalScalarFieldEnum = (typeof DemandSignalScalarFieldEnum)[keyof typeof DemandSignalScalarFieldEnum]
+
+
+export const DistributorScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  region: 'region',
+  warehouseId: 'warehouseId',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DistributorScalarFieldEnum = (typeof DistributorScalarFieldEnum)[keyof typeof DistributorScalarFieldEnum]
+
+
+export const DistributorOrderScalarFieldEnum = {
+  id: 'id',
+  distributorId: 'distributorId',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
+  orderDate: 'orderDate',
+  requestedDate: 'requestedDate',
+  quantity: 'quantity',
+  fulfilledQuantity: 'fulfilledQuantity',
+  createdAt: 'createdAt'
+} as const
+
+export type DistributorOrderScalarFieldEnum = (typeof DistributorOrderScalarFieldEnum)[keyof typeof DistributorOrderScalarFieldEnum]
+
+
+export const ScenarioScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  demandMultiplier: 'demandMultiplier',
+  leadTimeMultiplier: 'leadTimeMultiplier',
+  capacityMultiplier: 'capacityMultiplier',
+  serviceLevelTarget: 'serviceLevelTarget',
+  createdById: 'createdById',
+  createdAt: 'createdAt'
+} as const
+
+export type ScenarioScalarFieldEnum = (typeof ScenarioScalarFieldEnum)[keyof typeof ScenarioScalarFieldEnum]
+
+
+export const PlanningRunScalarFieldEnum = {
+  id: 'id',
+  scenarioId: 'scenarioId',
+  createdById: 'createdById',
+  status: 'status',
+  horizonDays: 'horizonDays',
+  modelVersion: 'modelVersion',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PlanningRunScalarFieldEnum = (typeof PlanningRunScalarFieldEnum)[keyof typeof PlanningRunScalarFieldEnum]
+
+
+export const ForecastScalarFieldEnum = {
+  id: 'id',
+  planningRunId: 'planningRunId',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
+  forecastDate: 'forecastDate',
+  p10: 'p10',
+  p50: 'p50',
+  p90: 'p90',
+  modelVersion: 'modelVersion',
+  createdAt: 'createdAt'
+} as const
+
+export type ForecastScalarFieldEnum = (typeof ForecastScalarFieldEnum)[keyof typeof ForecastScalarFieldEnum]
+
+
+export const InventoryPlanScalarFieldEnum = {
+  id: 'id',
+  planningRunId: 'planningRunId',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
+  date: 'date',
+  forecastDemand: 'forecastDemand',
+  safetyStock: 'safetyStock',
+  reorderPoint: 'reorderPoint',
+  openingInventory: 'openingInventory',
+  projectedInventory: 'projectedInventory',
+  netRequirement: 'netRequirement',
+  daysOfSupply: 'daysOfSupply',
+  stockoutRisk: 'stockoutRisk',
+  expiryRisk: 'expiryRisk'
+} as const
+
+export type InventoryPlanScalarFieldEnum = (typeof InventoryPlanScalarFieldEnum)[keyof typeof InventoryPlanScalarFieldEnum]
+
+
+export const SupplyPlanScalarFieldEnum = {
+  id: 'id',
+  planningRunId: 'planningRunId',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
+  date: 'date',
+  quantity: 'quantity',
+  source: 'source',
+  status: 'status'
+} as const
+
+export type SupplyPlanScalarFieldEnum = (typeof SupplyPlanScalarFieldEnum)[keyof typeof SupplyPlanScalarFieldEnum]
+
+
+export const DRPPlanScalarFieldEnum = {
+  id: 'id',
+  planningRunId: 'planningRunId',
+  productId: 'productId',
+  fromWarehouseId: 'fromWarehouseId',
+  toWarehouseId: 'toWarehouseId',
+  date: 'date',
+  quantity: 'quantity',
+  reason: 'reason'
+} as const
+
+export type DRPPlanScalarFieldEnum = (typeof DRPPlanScalarFieldEnum)[keyof typeof DRPPlanScalarFieldEnum]
+
+
+export const OptimizationResultScalarFieldEnum = {
+  id: 'id',
+  planningRunId: 'planningRunId',
+  objectiveValue: 'objectiveValue',
+  holdingCost: 'holdingCost',
+  stockoutCost: 'stockoutCost',
+  transferCost: 'transferCost',
+  expiryCost: 'expiryCost',
+  totalCost: 'totalCost',
+  solver: 'solver',
+  solverStatus: 'solverStatus',
+  createdAt: 'createdAt'
+} as const
+
+export type OptimizationResultScalarFieldEnum = (typeof OptimizationResultScalarFieldEnum)[keyof typeof OptimizationResultScalarFieldEnum]
+
+
+export const SimulationRunScalarFieldEnum = {
+  id: 'id',
+  planningRunId: 'planningRunId',
+  iterations: 'iterations',
+  serviceLevel: 'serviceLevel',
+  stockoutProbability: 'stockoutProbability',
+  expiryProbability: 'expiryProbability',
+  expectedInventory: 'expectedInventory',
+  expectedWaste: 'expectedWaste',
+  expectedCost: 'expectedCost',
+  createdAt: 'createdAt'
+} as const
+
+export type SimulationRunScalarFieldEnum = (typeof SimulationRunScalarFieldEnum)[keyof typeof SimulationRunScalarFieldEnum]
+
+
+export const RecommendationScalarFieldEnum = {
+  id: 'id',
+  planningRunId: 'planningRunId',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
+  type: 'type',
+  priority: 'priority',
+  message: 'message',
+  quantity: 'quantity',
+  status: 'status',
+  acknowledgedAt: 'acknowledgedAt',
+  resolvedAt: 'resolvedAt',
+  actedById: 'actedById',
+  createdAt: 'createdAt'
+} as const
+
+export type RecommendationScalarFieldEnum = (typeof RecommendationScalarFieldEnum)[keyof typeof RecommendationScalarFieldEnum]
 
 
 export const SortOrder = {

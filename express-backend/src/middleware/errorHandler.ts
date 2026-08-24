@@ -1,6 +1,6 @@
 import type { ErrorRequestHandler } from "express";
 import { IS_PRODUCTION } from "../config/constants.js";
-import { Prisma } from "../generated/prisma/client.js";
+import { Prisma } from "../../generated/prisma/client.js";
 import { AppError } from "../utils/errors.js";
 import { isValidationError, toErrorDetails } from "../zod/errors.js";
 import type { NormalizedError } from "../types.js";
