@@ -1,3 +1,5 @@
+import type { InventoryHealthState } from "../types.js";
+
 const A = [-3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2, 1.38357751867269e2, -3.066479806614716e1, 2.506628277459239];
 const B = [-5.447609879822406e1, 1.615858368580409e2, -1.556989798598866e2, 6.680131188771972e1, -1.328068155288572e1];
 const C = [-7.784894002430293e-3, -3.223964580411365e-1, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783];
@@ -75,3 +77,52 @@ export const round = (value: number, decimals = 2): number => {
 
 export const percentage = (part: number, whole: number): number =>
   whole <= 0 ? 0 : round((part / whole) * 100);
+
+export interface StockCondition {
+  belowSafetyStock: boolean;
+  belowReorderPoint: boolean;
+  expiringSoon: boolean;
+  aboveMaximum: boolean;
+}
+
+export const classifyStock = (condition: StockCondition): InventoryHealthState => {
+  if (condition.belowSafetyStock) return "criticalStock";
+  if (condition.belowReorderPoint) return "belowReorderPoint";
+  if (condition.expiringSoon) return "expiringSoon";
+  if (condition.aboveMaximum) return "excessStock";
+  return "healthy";
+};
+
+export interface TransferSource {
+  available: number;
+  wasteRemaining: number;
+}
+
+export interface TransferMatch {
+  sourceIndex: number;
+  quantity: number;
+  unitsRescued: number;
+}
+
+export const allocateTransfers = (
+  needs: number[],
+  sources: TransferSource[],
+  minimumUnits = 1,
+): (TransferMatch | null)[] => {
+  const pool = sources.map((source) => ({ ...source }));
+
+  return needs.map((need) => {
+    const sourceIndex = pool.findIndex((candidate) => candidate.available > 0);
+    if (sourceIndex === -1) return null;
+
+    const source = pool[sourceIndex]!;
+    const quantity = Math.round(Math.min(need, source.available));
+    if (quantity < minimumUnits) return null;
+
+    const unitsRescued = Math.min(quantity, source.wasteRemaining);
+    source.available -= quantity;
+    source.wasteRemaining -= unitsRescued;
+
+    return { sourceIndex, quantity, unitsRescued };
+  });
+};

@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cognizant}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cognizant_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-cognizant}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cognizant} -d ${POSTGRES_DB:-cognizant}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-cognizant_redis}", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD:-cognizant_redis} ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      HOST: 0.0.0.0
+      API_PREFIX: /api
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cognizant}:${POSTGRES_PASSWORD:-cognizant_secret}@postgres:5432/${POSTGRES_DB:-cognizant}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-cognizant_redis}@redis:6379
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      CORS_CREDENTIALS: "true"
+      # Seeds only when the Product table is empty. The check fails closed:
+      # if the count cannot be read, the seed is skipped rather than risked,
+      # because seeding truncates every table first.
+      RUN_SEED: ${RUN_SEED:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  redisdata:

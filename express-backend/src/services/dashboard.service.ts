@@ -1,5 +1,13 @@
 import { prisma } from "../config/prisma.js";
-import { percentage, projectFefoWaste, reorderPoint, round, safetyStock } from "../utils/inventory.js";
+import {
+  allocateTransfers,
+  classifyStock,
+  percentage,
+  projectFefoWaste,
+  reorderPoint,
+  round,
+  safetyStock,
+} from "../utils/inventory.js";
 import { NotFoundError } from "../utils/errors.js";
 import type {
   ExpiryRiskQuery,
@@ -470,22 +478,26 @@ export const getPriorityActions = async (
       .map((position) => ({
         position,
         available: position.onHand - (position.maximumInventory ?? 0),
-        waste: wasteOf(position),
+        wasteRemaining: wasteOf(position).units,
       }))
-      .sort((left, right) => right.waste.units - left.waste.units || right.available - left.available);
+      .sort((left, right) => right.wasteRemaining - left.wasteRemaining || right.available - left.available);
 
-    for (const destination of shortages) {
-      const source = surpluses.find((candidate) => candidate.available > 0);
-      if (!source) continue;
+    const matches = allocateTransfers(
+      shortages.map((shortage) => shortage.need),
+      surpluses,
+      MIN_ACTIONABLE_UNITS,
+    );
 
-      const quantity = Math.round(Math.min(destination.need, source.available));
-      if (quantity < MIN_ACTIONABLE_UNITS) continue;
+    for (const [index, match] of matches.entries()) {
+      if (!match) continue;
 
-      source.available -= quantity;
+      const destination = shortages[index]!;
+      const source = surpluses[match.sourceIndex]!;
+      const { quantity, unitsRescued } = match;
+
       addTo(transferredIn, pairKey(destination.position.productId, destination.position.warehouseId), quantity);
       addTo(transferredOut, pairKey(source.position.productId, source.position.warehouseId), quantity);
 
-      const wasteAvoided = Math.min(quantity, source.waste.units) * source.position.unitCost;
       const urgent = destination.position.daysOfSupply <= destination.position.leadTimeDays;
 
       actions.push({
@@ -493,10 +505,12 @@ export const getPriorityActions = async (
         type: "TRANSFER_OPPORTUNITY",
         severity: urgent ? "critical" : "high",
         ...describe(destination.position),
-        problem: `${units(destination.need)} units short at ${destination.position.warehouseName} while ${source.position.warehouseName} holds ${units(source.available + quantity)} above its maximum`,
+        problem: `${units(destination.need)} units short at ${destination.position.warehouseName} while ${source.position.warehouseName} holds ${units(source.available)} above its maximum`,
         recommendedAction: `Transfer ${units(quantity)} units from ${source.position.warehouseName} to ${destination.position.warehouseName}`,
         quantity,
-        impactValue: round(wasteAvoided + quantity * destination.position.stockoutCostPerUnit),
+        impactValue: round(
+          unitsRescued * source.position.unitCost + quantity * destination.position.stockoutCostPerUnit,
+        ),
         sourceWarehouseCode: source.position.warehouseCode,
         sourceWarehouseName: source.position.warehouseName,
       });
@@ -620,13 +634,13 @@ export const getInventoryHealth = async (
   );
   const expiringValue = expiringValueByPosition(batches);
 
-  const stateOf = (position: InventoryPosition): InventoryHealthState => {
-    if (isBelowSafetyStock(position)) return "criticalStock";
-    if (isBelowReorderPoint(position)) return "belowReorderPoint";
-    if (expiringSoon.has(pairKey(position.productId, position.warehouseId))) return "expiringSoon";
-    if (isAboveMaximum(position)) return "excessStock";
-    return "healthy";
-  };
+  const stateOf = (position: InventoryPosition): InventoryHealthState =>
+    classifyStock({
+      belowSafetyStock: isBelowSafetyStock(position),
+      belowReorderPoint: isBelowReorderPoint(position),
+      expiringSoon: expiringSoon.has(pairKey(position.productId, position.warehouseId)),
+      aboveMaximum: isAboveMaximum(position),
+    });
 
   const states = positions.map(stateOf);
   const countState = (state: InventoryHealthState) => states.filter((value) => value === state).length;

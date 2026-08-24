@@ -1,41 +1,9 @@
-import compression from "compression";
-import cors from "cors";
-import express from "express";
-import helmet from "helmet";
-import { CORS, IS_PRODUCTION, SERVER } from "./config/constants.js";
+import "dotenv/config";
+import { app } from "./app.js";
+import { SERVER } from "./config/constants.js";
 import { disconnectPrisma } from "./config/prisma.js";
 import { disconnectRedis } from "./config/redis.js";
-import { errorHandler } from "./middleware/errorHandler.js";
-import { notFound } from "./middleware/notFound.js";
-import { rateLimiter, rateLimitStoreKind } from "./middleware/rateLimiter.js";
-import { requestContext } from "./middleware/requestContext.js";
-import { dashboardRouter } from "./routes/dashboard_route.js";
-import { healthRouter } from "./routes/health_route.js";
-import { masterDataRouter } from "./routes/masterdata_route.js";
-
-const app = express();
-
-app.use(requestContext);
-app.use(helmet({ contentSecurityPolicy: IS_PRODUCTION, crossOriginResourcePolicy: { policy: "same-site" } }));
-app.use(
-  cors({
-    origin: CORS.origins,
-    credentials: CORS.credentials,
-    exposedHeaders: [...CORS.exposedHeaders],
-    maxAge: CORS.maxAgeSeconds,
-  }),
-);
-app.use(rateLimiter.global);
-app.use(compression());
-app.use(express.json({ limit: SERVER.bodyLimit }));
-app.use(express.urlencoded({ extended: true, limit: SERVER.bodyLimit }));
-
-app.use(`${SERVER.apiPrefix}/health`, healthRouter);
-app.use(SERVER.apiPrefix, masterDataRouter);
-app.use(`${SERVER.apiPrefix}/dashboard`, dashboardRouter);
-
-app.use(notFound);
-app.use(errorHandler);
+import { rateLimitStoreKind } from "./middleware/rateLimiter.js";
 
 const storeKind = rateLimitStoreKind();
 if (storeKind === "memory") {
