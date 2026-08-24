@@ -1246,3 +1246,363 @@ export const mockForecastImpact: ForecastImpactData = {
   expectedInventoryValue: 1227200,
   insightText: "Improved forecast accuracy is expected to reduce stockout exposure by 14% while reducing excess inventory by approximately $17.8K across the network."
 };
+
+import { RecommendationItem, RecommendationImpact, RecommendationIntelligence } from "@/types/recommendation";
+
+export const mockAIRecommendations: RecommendationItem[] = [
+  {
+    id: "REC-001",
+    title: "REPLENISH 5,000 UNITS",
+    actionType: "Replenish",
+    priority: "Critical",
+    confidence: 94,
+    reason: "Projected stockout in 4 days. Supplier lead time is 14 days.",
+    sku: "SKU-LIS-10",
+    location: "Northeast DC",
+    currentStock: 800,
+    forecastDemand: 2100,
+    recommendedQuantity: 5000,
+    expectedImpact: "Avoids $45K in stockout penalties",
+    impactValue: 45000,
+    signals: [
+      { type: "Demand", label: "Demand", direction: "up" },
+      { type: "Risk", label: "Stockout risk", direction: "up" },
+      { type: "LeadTime", label: "Lead time", direction: "up" }
+    ],
+    status: "Pending",
+    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString() // 30 mins ago
+  },
+  {
+    id: "REC-002",
+    title: "TRANSFER 1,500 UNITS",
+    actionType: "Transfer",
+    priority: "High",
+    confidence: 88,
+    reason: "Excess stock available at West Coast DC. Internal transfer is faster and cheaper than external replenishment.",
+    sku: "SKU-OME-20",
+    location: "South DC",
+    fromLocation: "West Coast DC",
+    toLocation: "South DC",
+    currentStock: 450,
+    forecastDemand: 2800,
+    recommendedQuantity: 1500,
+    expectedImpact: "Balances network, saves $1.2K freight",
+    impactValue: 1200,
+    signals: [
+      { type: "Inventory", label: "Excess inventory", direction: "up" },
+      { type: "Demand", label: "Demand", direction: "down" }
+    ],
+    status: "Pending",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString()
+  },
+  {
+    id: "REC-003",
+    title: "REPLENISH 8,000 UNITS",
+    actionType: "Replenish",
+    priority: "Medium",
+    confidence: 76,
+    reason: "Stock fell below minimum threshold. Standard reorder quantity recommended.",
+    sku: "SKU-IBU-400",
+    location: "West Coast DC",
+    currentStock: 3200,
+    forecastDemand: 7000,
+    recommendedQuantity: 8000,
+    expectedImpact: "Maintains optimal 98% service level",
+    impactValue: 8000,
+    signals: [
+      { type: "Inventory", label: "Stock level", direction: "down" },
+      { type: "Demand", label: "Demand", direction: "flat" }
+    ],
+    status: "Pending",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString()
+  },
+  {
+    id: "REC-004",
+    title: "PRIORITIZE 5,000 UNITS",
+    actionType: "Prioritize",
+    priority: "High",
+    confidence: 82,
+    reason: "Batch B-2024-11X expires in 45 days. Demand is insufficient to clear inventory before expiry.",
+    sku: "SKU-CET-10",
+    location: "West Coast DC",
+    currentStock: 5000, // Using this as quantity
+    recommendedQuantity: 5000,
+    expectedImpact: "Prioritize fulfillment to avoid $300 waste",
+    impactValue: 300,
+    signals: [
+      { type: "Expiry", label: "Expiry risk", direction: "up" },
+      { type: "Demand", label: "Demand", direction: "down" }
+    ],
+    status: "Pending",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString()
+  },
+  {
+    id: "REC-005",
+    title: "REDUCE REORDER QUANTITY",
+    actionType: "Reduce",
+    priority: "Medium",
+    confidence: 81,
+    reason: "Demand trend has declined while current inventory remains above the optimal level.",
+    sku: "SKU-MET-500",
+    location: "South DC",
+    currentStock: 8500,
+    optimalStock: 5500,
+    recommendedQuantity: 0, // Using 0 to signify reduction strategy
+    expectedImpact: "Reduces excess inventory by approximately $8.4K",
+    impactValue: 8400,
+    signals: [
+      { type: "Demand", label: "Demand trend", direction: "down" },
+      { type: "Inventory", label: "Excess inventory", direction: "up" }
+    ],
+    status: "Pending",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString()
+  }
+];
+
+export const mockRecommendationImpact: RecommendationImpact = {
+  currentSupplyChainCost: 49300,
+  aiOptimizedCost: 31500,
+  projectedSavings: 17800,
+  costReductionPercentage: 36.1,
+  categories: {
+    stockout: 45,
+    excessInventory: 30,
+    expiry: 15,
+    transfers: 10
+  }
+};
+
+export const mockRecommendationIntelligence: RecommendationIntelligence = {
+  signals: {
+    demandForecast: 92,
+    inventoryPosition: 89,
+    leadTime: 84,
+    expiryRisk: 91
+  },
+  modelConfidence: 89.4,
+  explanation: "Recommendations combine forecast demand, inventory levels, supplier lead times, expiry exposure, and network constraints."
+};
+
+// ─── Simulation Mock Data ──────────────────────────────────────────
+import { SimulationHistoryItem } from "@/types/simulation";
+
+export const mockSimulationHistory: SimulationHistoryItem[] = [
+  {
+    id: "sim-001",
+    scenario: "Demand Surge",
+    preset: "demand-surge",
+    date: "2026-08-25T02:05:00Z",
+    keyChange: "+40% demand",
+    riskLevel: "critical",
+    resultSummary: "Stockout risk +12%",
+    params: { demandShock: 40, inventoryAvailability: 100, serviceLevelTarget: 95, supplierLeadTime: 5, distributionCapacity: 100, transportationCost: 10 },
+  },
+  {
+    id: "sim-002",
+    scenario: "Supplier Delay",
+    preset: "supplier-delay",
+    date: "2026-08-24T14:30:00Z",
+    keyChange: "+10 days lead time",
+    riskLevel: "high",
+    resultSummary: "Cost +$14K",
+    params: { demandShock: 0, inventoryAvailability: 85, serviceLevelTarget: 95, supplierLeadTime: 10, distributionCapacity: 100, transportationCost: 25 },
+  },
+  {
+    id: "sim-003",
+    scenario: "Overstock",
+    preset: "overstock",
+    date: "2026-08-23T09:15:00Z",
+    keyChange: "+15% inventory",
+    riskLevel: "moderate",
+    resultSummary: "Holding cost +$7K",
+    params: { demandShock: -20, inventoryAvailability: 115, serviceLevelTarget: 95, supplierLeadTime: 0, distributionCapacity: 100, transportationCost: -10 },
+  },
+  {
+    id: "sim-004",
+    scenario: "Combined Stress",
+    preset: "combined-stress",
+    date: "2026-08-22T16:45:00Z",
+    keyChange: "Multiple adverse",
+    riskLevel: "critical",
+    resultSummary: "Service level -11%",
+    params: { demandShock: 50, inventoryAvailability: 70, serviceLevelTarget: 90, supplierLeadTime: 10, distributionCapacity: 80, transportationCost: 50 },
+  },
+];
+
+// ─── Alerts Mock Data ──────────────────────────────────────────────
+import { SystemAlert, AlertOverviewData } from "@/types/alert";
+
+const now = new Date();
+const subtractMinutes = (mins: number) => new Date(now.getTime() - mins * 60000).toISOString();
+
+export const mockAlertOverview: AlertOverviewData = {
+  criticalCount: 3,
+  highCount: 7,
+  unresolvedCount: 12,
+  todayCount: 18,
+  todayDelta: 4,
+  resolvedCount: 24,
+  resolvedPercentage: 92,
+};
+
+export const mockSystemAlerts: SystemAlert[] = [
+  {
+    id: "ALT-1001",
+    severity: "critical",
+    type: "stockout_risk",
+    title: "Projected stockout for Lisinopril 10mg",
+    sku: "SKU-LIS-10",
+    product: "Lisinopril 10mg",
+    location: "Northeast DC",
+    detectedAt: subtractMinutes(8),
+    businessImpact: "$45K potential stockout penalty",
+    status: "new",
+    recommendedAction: "Replenish 5,000 units",
+    explanation: "Projected demand is expected to exceed available inventory within the next 4 days. Supplier lead time is currently 14 days, increasing the probability of a stockout.",
+    metrics: [
+      { label: "Current Stock", value: "800 units" },
+      { label: "Safety Stock", value: "1,200 units" },
+      { label: "Forecast Demand", value: "2,100 units" },
+      { label: "Lead Time", value: "14 days" },
+      { label: "Stockout Probability", value: "87%" },
+    ],
+    timeline: [
+      { time: subtractMinutes(180), description: "Demand forecast updated" },
+      { time: subtractMinutes(25), description: "Inventory threshold breached" },
+      { time: subtractMinutes(12), description: "Stockout probability calculated" },
+      { time: subtractMinutes(9), description: "AI recommendation generated" },
+      { time: subtractMinutes(8), description: "Alert triggered" },
+    ],
+  },
+  {
+    id: "ALT-1002",
+    severity: "high",
+    type: "demand_spike",
+    title: "Demand increased 34% above expected range",
+    sku: "SKU-OME-20",
+    product: "Omeprazole 20mg",
+    location: "South DC",
+    detectedAt: subtractMinutes(21),
+    businessImpact: "High replenishment pressure",
+    status: "acknowledged",
+    recommendedAction: "Expedite shipment",
+    explanation: "A sudden localized surge in demand has deviated from the 30-day moving average. Current inventory cannot support this velocity.",
+    metrics: [
+      { label: "Current Velocity", value: "450 units/day" },
+      { label: "Expected Velocity", value: "335 units/day" },
+      { label: "Deviation", value: "+34%" },
+    ],
+    timeline: [
+      { time: subtractMinutes(60), description: "Sales data synced" },
+      { time: subtractMinutes(21), description: "Anomaly detected in South region" },
+    ],
+  },
+  {
+    id: "ALT-1003",
+    severity: "high",
+    type: "expiry_risk",
+    title: "5,000 units approaching expiry",
+    sku: "SKU-CET-10",
+    product: "Cetirizine 10mg",
+    location: "West Coast DC",
+    detectedAt: subtractMinutes(42),
+    businessImpact: "$8.4K inventory exposure",
+    status: "in_progress",
+    recommendedAction: "Transfer to high-velocity DC",
+    explanation: "Batch B-9982 is expiring in 45 days. The current sell-through rate at West Coast DC is too slow to clear the inventory before expiration.",
+    metrics: [
+      { label: "Batch Quantity", value: "5,000 units" },
+      { label: "Days to Expiry", value: "45 days" },
+      { label: "Projected Sell-through", value: "1,200 units" },
+    ],
+    timeline: [
+      { time: subtractMinutes(120), description: "Daily batch aging process run" },
+      { time: subtractMinutes(42), description: "Expiry risk threshold crossed" },
+    ],
+  },
+  {
+    id: "ALT-1004",
+    severity: "medium",
+    type: "supplier_delay",
+    title: "Supplier lead time increased by 5 days",
+    sku: "SKU-IBU-400",
+    product: "Ibuprofen 400mg",
+    location: "Midwest DC",
+    detectedAt: subtractMinutes(60),
+    businessImpact: "Moderate stockout exposure",
+    status: "new",
+    recommendedAction: "Review safety stock",
+    explanation: "Primary supplier 'PharmaCorp Inc' has updated their estimated delivery date for PO-45892, adding 5 days to the expected lead time.",
+    metrics: [
+      { label: "Original ETA", value: "Oct 12" },
+      { label: "New ETA", value: "Oct 17" },
+      { label: "Buffer Stock", value: "12 days" },
+    ],
+    timeline: [
+      { time: subtractMinutes(65), description: "Supplier ASN updated via EDI" },
+      { time: subtractMinutes(60), description: "Lead time variance detected" },
+    ],
+  },
+  {
+    id: "ALT-1005",
+    severity: "medium",
+    type: "capacity_breach",
+    title: "Distribution center projected above 100% capacity",
+    location: "Northeast DC",
+    detectedAt: subtractMinutes(120),
+    businessImpact: "Operational congestion risk",
+    status: "acknowledged",
+    recommendedAction: "Reroute incoming shipments",
+    explanation: "Incoming deliveries over the next 72 hours will exceed the physical storage capacity of the facility by 4%.",
+    metrics: [
+      { label: "Current Capacity", value: "94%" },
+      { label: "Projected Inbound", value: "12,000 units" },
+      { label: "Projected Capacity", value: "104%" },
+    ],
+    timeline: [
+      { time: subtractMinutes(150), description: "Capacity forecast updated" },
+      { time: subtractMinutes(120), description: "Capacity limit breach projected" },
+    ],
+  },
+  {
+    id: "ALT-1006",
+    severity: "low",
+    type: "overstock",
+    title: "Excess inventory detected",
+    sku: "SKU-AMX-500",
+    product: "Amoxicillin 500mg",
+    location: "South DC",
+    detectedAt: subtractMinutes(300),
+    businessImpact: "$12K holding cost penalty",
+    status: "new",
+    recommendedAction: "Halt automated replenishment",
+    explanation: "Inventory levels have exceeded the maximum recommended threshold due to a recent dip in regional demand.",
+    metrics: [
+      { label: "Current Stock", value: "24,500 units" },
+      { label: "Max Threshold", value: "18,000 units" },
+    ],
+    timeline: [
+      { time: subtractMinutes(300), description: "Inventory optimization check" },
+    ],
+  },
+  {
+    id: "ALT-1007",
+    severity: "critical",
+    type: "forecast_anomaly",
+    title: "Severe deviation in ML forecast model",
+    location: "Network Wide",
+    detectedAt: subtractMinutes(15),
+    businessImpact: "Systematic over-ordering risk",
+    status: "new",
+    recommendedAction: "Revert to baseline model",
+    explanation: "The demand forecasting model has detected a massive systemic deviation in the input data streams, causing erratic predictions across the antibiotics category.",
+    metrics: [
+      { label: "Affected Category", value: "Antibiotics" },
+      { label: "Deviation Severity", value: "9.8/10" },
+    ],
+    timeline: [
+      { time: subtractMinutes(16), description: "Model inference completed" },
+      { time: subtractMinutes(15), description: "Data drift threshold breached" },
+    ],
+  },
+];

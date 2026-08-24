@@ -34,7 +34,7 @@ const navGroups = [
     title: "MONITORING",
     items: [
       { title: "Alerts", href: "/alerts", icon: Bell },
-      { title: "Expiry Risk", href: "/alerts?type=expiry", icon: CalendarClock },
+      { title: "Expiry Risk", href: "/expiry-risk", icon: CalendarClock },
     ],
   },
   {
