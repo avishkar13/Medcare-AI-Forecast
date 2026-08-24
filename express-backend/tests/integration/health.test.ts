@@ -20,6 +20,23 @@ interface Readiness {
   dependencies: { database: string; redis: string };
 }
 
+describe("GET /", () => {
+  test("answers that the service is working and says where the API lives", async () => {
+    const response = await server.get("/");
+    assert.equal(response.status, 200);
+
+    const body = (await response.json()) as { status: string; api: string };
+    assert.equal(body.status, "working");
+    assert.ok(body.api.startsWith("/"), `api prefix is not a path: ${body.api}`);
+  });
+
+  test("the advertised prefix is the one that actually serves routes", async () => {
+    const { api } = (await server.json("/")) as { api: string };
+    const response = await server.get(`${api}/health/live`);
+    assert.equal(response.status, 200, `${api} does not serve the health probe`);
+  });
+});
+
 describe("GET /api/health/live", () => {
   test("answers 200 with a bare payload", async () => {
     const response = await server.get("/api/health/live");
