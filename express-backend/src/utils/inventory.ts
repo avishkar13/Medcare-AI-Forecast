@@ -1,4 +1,4 @@
-import type { InventoryHealthState } from "../types.js";
+import type { InventoryHealthState, RiskLevel } from "../types.js";
 
 const A = [-3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2, 1.38357751867269e2, -3.066479806614716e1, 2.506628277459239];
 const B = [-5.447609879822406e1, 1.615858368580409e2, -1.556989798598866e2, 6.680131188771972e1, -1.328068155288572e1];
@@ -91,6 +91,43 @@ export const classifyStock = (condition: StockCondition): InventoryHealthState =
   if (condition.expiringSoon) return "expiringSoon";
   if (condition.aboveMaximum) return "excessStock";
   return "healthy";
+};
+
+const EXPIRY_CRITICAL_DAYS = 15;
+const EXPIRY_HIGH_DAYS = 30;
+const EXPIRY_MEDIUM_DAYS = 60;
+
+export const expirySeverity = (daysToExpiry: number): RiskLevel => {
+  if (daysToExpiry <= EXPIRY_CRITICAL_DAYS) return "critical";
+  if (daysToExpiry <= EXPIRY_HIGH_DAYS) return "high";
+  if (daysToExpiry <= EXPIRY_MEDIUM_DAYS) return "medium";
+  return "low";
+};
+
+const RISK_ORDER: Record<RiskLevel, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+
+export interface RiskCondition {
+  belowSafetyStock: boolean;
+  belowReorderPoint: boolean;
+  aboveMaximum: boolean;
+  daysToNearestExpiry: number | null;
+}
+
+export const classifyRisk = ({
+  belowSafetyStock,
+  belowReorderPoint,
+  aboveMaximum,
+  daysToNearestExpiry,
+}: RiskCondition): RiskLevel => {
+  const candidates: RiskLevel[] = ["low"];
+
+  if (belowSafetyStock) candidates.push("critical");
+  else if (belowReorderPoint) candidates.push("high");
+
+  if (aboveMaximum) candidates.push("medium");
+  if (daysToNearestExpiry !== null) candidates.push(expirySeverity(daysToNearestExpiry));
+
+  return candidates.reduce((worst, level) => (RISK_ORDER[level] < RISK_ORDER[worst] ? level : worst));
 };
 
 export interface TransferSource {

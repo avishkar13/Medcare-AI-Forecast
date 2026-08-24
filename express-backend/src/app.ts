@@ -28,6 +28,10 @@ app.use(compression());
 app.use(express.json({ limit: SERVER.bodyLimit }));
 app.use(express.urlencoded({ extended: true, limit: SERVER.bodyLimit }));
 
+app.get("/", (_req, res) => {
+  res.json({ status: "working", api: SERVER.apiPrefix });
+});
+
 app.use(`${SERVER.apiPrefix}/health`, healthRouter);
 app.use(SERVER.apiPrefix, masterDataRouter);
 app.use(`${SERVER.apiPrefix}/dashboard`, dashboardRouter);
