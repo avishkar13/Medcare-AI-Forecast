@@ -4,6 +4,8 @@ The wire contract between the Express backend and the Python forecasting service
 
 This is **not** a route in this API. The forecasting service is an outbound dependency, like Postgres and Redis — the frontend never reaches it, and it is not published outside the compose network.
 
+The engine that implements this side lives in `python_backend/`; see its `README.md` for the model and `INTEGRATION.md` for how it meets each rule below. Two engine behaviours the contract leaves open: a series with too little history to fit gets a wide weekday-profile band rather than an error, and a pair the export has never seen gets zeros — both because a response **must** carry exactly one entry per requested pair.
+
 ## Shape
 
 ```
@@ -80,6 +82,18 @@ Express :4000  ─────────────────────�
 | `start` | `YYYY-MM-DD` | Must equal `asOf + 1` |
 | `p10` / `p50` / `p90` | number[] | Length exactly `horizonDays` |
 
+**`p50` is expected demand, not the 50th percentile.** The executor reads it as
+`avgDailyDemand`, a mean, and `utils/naive-forecast.ts` already produces a mean - so the
+engine returns its point model here rather than a median quantile, which would sit below
+the mean on skewed demand and quietly under-size safety stock. `p10` and `p90` remain
+true quantiles: a calibrated 80% interval.
+
+**`stdDevFromBand` assumes the band is normal.** On the seeded data forecast errors have
+kurtosis ~26, with most of the variance in rare promotion spikes, so the standard
+deviation recovered from a correctly calibrated 80% band understates the real spread and
+the resulting buffer achieves ~88% service against a 95% target. See
+`python_backend/INTEGRATION.md`.
+
 ### Validation Node enforces
 
 WP-07 rejects the **entire response** if any of these fail. A partially-good forecast is not salvaged: a silently wrong band poisons safety stock, which poisons every downstream artefact.
@@ -122,7 +136,7 @@ On final failure Node either falls back to `utils/naive-forecast.ts` (`FORECAST_
 
 Two rules Python must follow. Both are in [`training.api.md`](training.api.md); they are repeated here because ignoring either produces a model that trains on bad data and reports success.
 
-**Check `x-training-rows`.** A stream cut short by a timeout is still syntactically valid NDJSON. Comparing the header to the number of rows parsed is the only way to detect truncation.
+**Check every count header.** A stream cut short by a timeout is still syntactically valid NDJSON, so comparing counts is the only way to detect truncation. The export has three segments — history plus `future_signal` and `future_promotion` trailers — each with its own header (`x-training-rows`, `x-future-signals`, `x-future-promotions`). **Verify each separately:** checking every parsed line against `x-training-rows` fails the moment a trailer exists, and checking one grand total lets a truncation inside history hide behind a trailer that never arrived.
 
 **Fit on `demand`, never `fulfilled`.** `demand` is `orderedQuantity`, the uncensored signal. `fulfilled` is capped by what was in stock, so fitting it teaches the model that a stockout was a quiet day. `stockout` and `fulfilled` are there as *features*, so the model can tell the two apart.
 
@@ -148,5 +162,9 @@ Two consequences:
 | `API_BASE_URL` | — | e.g. `http://backend:4000/api`. Where `/training-data` lives |
 | `ENGINE_PORT` | `8000` | |
 | `ENGINE_MAX_HORIZON_DAYS` | `180` | Clamp. Only 180 days of history exist, so a 365-day horizon has no annual seasonality to learn |
+| `ENGINE_MIN_HISTORY_DAYS` | `35` | Below this a series cannot fill a 28-day lag and takes the engine's own per-series fallback |
+| `TRAINING_CACHE_TTL_SECONDS` | `900` | How long one pull of the export is reused. Without it the 10/hour limit is gone in three forecasts |
+| `TRAINING_TIMEOUT_SECONDS` | `120` | |
+| `MODEL_VERSION` | `medcare-xgb-qrf-v1` | Returned as `modelVersion`, written to `Forecast.modelVersion` |
 
 **The dependency now points both ways** — Express calls the engine, the engine calls Express. Do **not** make `backend` and `engine` both `depends_on: condition: service_healthy` in compose, or boot deadlocks. Express degrades to the naive fallback without the engine, so only the engine should wait.

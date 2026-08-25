@@ -1,9 +1,11 @@
 import { PLANNING } from "../config/constants.js";
 import { prisma } from "../config/prisma.js";
 import { RunStatus } from "../../generated/prisma/enums.js";
+import { resolveActorId } from "../lib/actor.js";
 import { abandon, complete, reserve } from "../lib/idempotency.js";
+import { scheduleRun } from "../lib/planning-runner.js";
 import { acquireLock } from "../lib/redis-lock.js";
-import { ConflictError, NotFoundError, ServiceUnavailableError } from "../utils/errors.js";
+import { ConflictError, NotFoundError } from "../utils/errors.js";
 import type { CreateRunBody, RunParams, RunQuery } from "../zod/planning.schemas.js";
 import type {
   PlanningRunCreation,
@@ -24,6 +26,8 @@ interface RunRow {
   createdAt: Date;
   startedAt: Date | null;
   completedAt: Date | null;
+  failureReason: string | null;
+  failureStage: string | null;
   scenario: { id: string; name: string } | null;
 }
 
@@ -36,6 +40,8 @@ const runSelect = {
   createdAt: true,
   startedAt: true,
   completedAt: true,
+  failureReason: true,
+  failureStage: true,
   scenario: { select: { id: true, name: true } },
 };
 
@@ -61,31 +67,24 @@ const toSummary = (row: RunRow): PlanningRunSummary => ({
   completedAt: row.completedAt?.toISOString() ?? null,
   durationSeconds: durationSeconds(row),
   stale: isActive(row.status) && row.createdAt < staleBefore(),
+  // Every FAILED run looked identical from the API before these were returned; the
+  // executor has always written them.
+  failureReason: row.failureReason,
+  failureStage: row.failureStage,
 });
 
-const failAbandonedRuns = (): Promise<{ count: number }> =>
+export const failAbandonedRuns = (): Promise<{ count: number }> =>
   prisma.planningRun.updateMany({
     where: { status: { in: activeStatuses }, createdAt: { lt: staleBefore() } },
-    data: { status: RunStatus.FAILED, completedAt: new Date() },
+    data: {
+      status: RunStatus.FAILED,
+      completedAt: new Date(),
+      // Without this the sweep produced FAILED runs with no reason at all, which is
+      // the state these columns exist to prevent.
+      failureReason: "Abandoned: no process was executing this run when it timed out",
+      failureStage: "abandoned",
+    },
   });
-
-const resolveActorId = async (): Promise<string> => {
-  const system = await prisma.user.findUnique({
-    where: { email: PLANNING.systemUserEmail },
-    select: { id: true },
-  });
-  if (system) return system.id;
-
-  const fallback = await prisma.user.findFirst({
-    orderBy: { createdAt: "asc" },
-    select: { id: true },
-  });
-  if (fallback) return fallback.id;
-
-  throw new ServiceUnavailableError(
-    "No user exists to own a planning run; seed the database before creating one",
-  );
-};
 
 const insertRun = async (body: CreateRunBody): Promise<PlanningRunSummary> => {
   await failAbandonedRuns();
@@ -139,7 +138,11 @@ export const createRun = async (
   body: CreateRunBody,
   idempotencyKey?: string,
 ): Promise<PlanningRunCreation> => {
-  if (!idempotencyKey) return { run: await createGuardedRun(body), replayed: false };
+  if (!idempotencyKey) {
+    const run = await createGuardedRun(body);
+    scheduleRun(run.id);
+    return { run, replayed: false };
+  }
 
   const reservation = await reserve(idempotencyKey, PLANNING.idempotencyTtlMs);
 
@@ -159,6 +162,8 @@ export const createRun = async (
   try {
     const run = await createGuardedRun(body);
     await complete(idempotencyKey, run.id, PLANNING.idempotencyTtlMs);
+    // Only this branch schedules: a replay must return the original run, not re-execute it.
+    scheduleRun(run.id);
     return { run, replayed: false };
   } catch (error) {
     await abandon(idempotencyKey);

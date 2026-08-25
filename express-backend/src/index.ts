@@ -3,6 +3,8 @@ import { app } from "./app.js";
 import { SERVER } from "./config/constants.js";
 import { disconnectPrisma } from "./config/prisma.js";
 import { disconnectRedis } from "./config/redis.js";
+import { drainPlanning } from "./lib/planning-runner.js";
+import { failAbandonedRuns } from "./services/planning.service.js";
 import { rateLimitStoreKind } from "./middleware/rateLimiter.js";
 
 const storeKind = rateLimitStoreKind();
@@ -16,6 +18,14 @@ const server = app.listen(SERVER.port, SERVER.host, () => {
     rateLimitStore: storeKind,
   });
 });
+
+// A crash or a kill leaves runs stuck at PENDING/RUNNING. Sweep them at boot rather
+// than waiting for the next POST to notice.
+void failAbandonedRuns()
+  .then(({ count }) => {
+    if (count > 0) console.warn("failed abandoned planning runs at boot", { count });
+  })
+  .catch((error) => console.error("could not sweep abandoned planning runs", error));
 
 server.keepAliveTimeout = SERVER.keepAliveTimeoutMs;
 server.headersTimeout = SERVER.headersTimeoutMs;
@@ -37,6 +47,9 @@ const shutdown = async (reason: string, exitCode: number) => {
   await new Promise<void>((resolve, reject) => {
     server.close((err) => (err ? reject(err) : resolve()));
   });
+
+  // Between closing the socket and dropping the connections: a run still needs Prisma.
+  await drainPlanning(SERVER.planningDrainTimeoutMs);
 
   for (const result of await Promise.allSettled([disconnectPrisma(), disconnectRedis()])) {
     if (result.status === "rejected") console.error("teardown failed", result.reason);

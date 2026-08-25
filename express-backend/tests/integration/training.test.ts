@@ -27,18 +27,39 @@ interface TrainingRow {
   promotion: boolean;
   holiday: boolean;
   season: string | null;
+  region: string | null;
+  promotionUplift: number | null;
+  promotionType: string | null;
+  demandSignalType: string | null;
+  demandSignalValue: number | null;
 }
 
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 
-const fetchRows = async (path: string): Promise<{ rows: TrainingRow[]; response: Response }> => {
+interface TrailerRow {
+  _type: "future_signal" | "future_promotion";
+}
+
+/**
+ * The stream carries three segments. History rows have no `_type`; the trailers tag
+ * themselves. `x-training-rows` counts history only, so the trailers are split off
+ * here rather than being counted as demand.
+ */
+const fetchRows = async (
+  path: string,
+): Promise<{ rows: TrainingRow[]; trailers: TrailerRow[]; response: Response }> => {
   const response = await server.get(path);
   const body = await response.text();
-  const rows = body
+  const parsed = body
     .split("\n")
     .filter((line) => line.length > 0)
-    .map((line) => JSON.parse(line) as TrainingRow);
-  return { rows, response };
+    .map((line) => JSON.parse(line) as TrainingRow | TrailerRow);
+
+  return {
+    rows: parsed.filter((row) => !("_type" in row)) as TrainingRow[],
+    trailers: parsed.filter((row) => "_type" in row) as TrailerRow[],
+    response,
+  };
 };
 
 describe("GET /api/training-data", () => {
@@ -107,6 +128,56 @@ describe("GET /api/training-data", () => {
     const { rows: byDc } = await fetchRows(`/api/training-data?warehouse=${sample.dc}`);
     assert.ok(byDc.length > 0);
     assert.ok(byDc.every((row) => row.dc === sample.dc));
+  });
+
+  test("each segment matches its own count header", async () => {
+    const { rows, trailers, response } = await fetchRows("/api/training-data");
+
+    const signals = trailers.filter((row) => row._type === "future_signal");
+    const promotions = trailers.filter((row) => row._type === "future_promotion");
+
+    // Three counts, three headers. One grand total would let a truncation inside
+    // history hide behind a trailer that never arrived.
+    assert.equal(Number(response.headers.get("x-training-rows")), rows.length);
+    assert.equal(Number(response.headers.get("x-future-signals")), signals.length);
+    assert.equal(Number(response.headers.get("x-future-promotions")), promotions.length);
+  });
+
+  test("the forecast horizon gets forward-dated signals, not just history", async () => {
+    const { rows, trailers } = await fetchRows("/api/training-data");
+    const signals = trailers.filter((row) => row._type === "future_signal") as unknown as {
+      date: string;
+      region: string | null;
+      value: number;
+    }[];
+
+    assert.ok(signals.length > 0, "a leading indicator with no future values cannot lead");
+
+    // Every one must be past the last day of history, or it is not forward-looking.
+    const lastHistoryDay = rows.reduce((latest, row) => (row.date > latest ? row.date : latest), "");
+    for (const signal of signals) {
+      assert.ok(
+        signal.date > lastHistoryDay,
+        `signal dated ${signal.date} is not after history's last day ${lastHistoryDay}`,
+      );
+      assert.ok(Number.isFinite(signal.value));
+    }
+
+    // Regional, not national: collapsing the regions would drop the only variation
+    // that distinguishes a surge in one part of the network from a quiet one.
+    assert.ok(
+      new Set(signals.map((signal) => signal.region)).size > 1,
+      "expected one signal series per region",
+    );
+  });
+
+  test("history rows carry the region their signal is keyed by", async () => {
+    const { rows } = await fetchRows("/api/training-data?sku=SKU-AMX-500");
+
+    for (const row of rows.slice(0, 50)) {
+      assert.ok(row.region, "without a region a consumer cannot match forward-dated signals");
+      assert.equal(typeof row.demandSignalValue, "number");
+    }
   });
 
   test("filters by date window inclusively", async () => {

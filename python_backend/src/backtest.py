@@ -76,7 +76,7 @@ def main() -> None:
     parser.add_argument("--json", action="store_true", help="emit machine-readable output")
     arguments = parser.parse_args()
 
-    canonical = canonicalize_training_data(fetch_training_data())
+    canonical = canonicalize_training_data(fetch_training_data()[0])
     metadata = json.loads(METADATA_PATH.read_text()) if METADATA_PATH.exists() else {}
     delta = float(metadata.get("conformal_delta", 0.0))
     bundle = load_bundle(BUNDLE_PATH)

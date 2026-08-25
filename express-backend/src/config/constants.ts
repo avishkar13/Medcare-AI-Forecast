@@ -19,6 +19,9 @@ export const SERVER = {
   apiPrefix: env.API_PREFIX,
   bodyLimit: env.BODY_LIMIT,
   shutdownTimeoutMs: env.SHUTDOWN_TIMEOUT_MS,
+  // Draining planning runs gets most of the shutdown budget; the rest is left for
+  // marking whatever did not finish FAILED and disconnecting cleanly.
+  planningDrainTimeoutMs: Math.max(1_000, Math.round(env.SHUTDOWN_TIMEOUT_MS * 0.8)),
   keepAliveTimeoutMs: 65_000,
   headersTimeoutMs: 66_000,
   requestTimeoutMs: 30_000,
@@ -27,7 +30,7 @@ export const SERVER = {
 export const CORS = {
   origins: corsOrigins.includes("*") ? "*" : corsOrigins,
   credentials: corsOrigins.includes("*") ? false : env.CORS_CREDENTIALS,
-  exposedHeaders: [REQUEST_ID_HEADER, TRAINING_ROWS_HEADER, "RateLimit", "RateLimit-Policy", "Retry-After"],
+  exposedHeaders: [REQUEST_ID_HEADER, TRAINING_ROWS_HEADER, "x-future-promotions", "x-future-signals", "RateLimit", "RateLimit-Policy", "Retry-After"],
   maxAgeSeconds: 86_400,
 } as const;
 

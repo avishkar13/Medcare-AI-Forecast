@@ -87,6 +87,19 @@ export interface ScenarioRef {
   name: string;
 }
 
+export interface ScenarioSummary {
+  id: string;
+  name: string;
+  description: string | null;
+  demandMultiplier: number;
+  leadTimeMultiplier: number;
+  capacityMultiplier: number;
+  serviceLevelTarget: number;
+  createdById: string;
+  createdAt: string;
+  planningRunCount: number;
+}
+
 export interface PlanningRunSummary {
   id: string;
   status: PlanningRunStatus;
@@ -99,6 +112,8 @@ export interface PlanningRunSummary {
   completedAt: string | null;
   durationSeconds: number | null;
   stale: boolean;
+  failureReason: string | null;
+  failureStage: string | null;
 }
 
 export interface PlanningRunArtifacts {
@@ -359,6 +374,37 @@ export interface TrainingRow {
   promotion: boolean;
   holiday: boolean;
   season: string | null;
+  /** The warehouse's region — the key DemandSignal rows are grouped by. */
+  region: string | null;
+  /** Uplift factor from an overlapping PromotionEvent, or null if none. */
+  promotionUplift: number | null;
+  /** Type of the overlapping PromotionEvent (PROMOTION, SEASONAL, HOLIDAY, CAMPAIGN). */
+  promotionType: string | null;
+  /** Signal type of the most recent DemandSignal for this product on this date. */
+  demandSignalType: string | null;
+  /** Value of the most recent DemandSignal for this product on this date. */
+  demandSignalValue: number | null;
+}
+
+/** A signal dated past the end of demand history, streamed after the history rows. */
+export interface FutureSignalRow {
+  _type: "future_signal";
+  region: string | null;
+  date: string;
+  signalType: string;
+  value: number;
+}
+
+/** A future scheduled promotion, streamed after demand-history rows. */
+export interface FuturePromotionRow {
+  _type: "future_promotion";
+  productId: string | null;
+  warehouseId: string | null;
+  startDate: string;
+  endDate: string;
+  type: string;
+  upliftFactor: number;
+  name: string;
 }
 
 export interface ForecastPointBand {

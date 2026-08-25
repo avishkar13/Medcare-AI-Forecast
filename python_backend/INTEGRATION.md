@@ -20,18 +20,22 @@ decisions that were not obvious.
 | One feature rebuild per series per day | One rebuild per day across all series | ~9x faster: 160 pairs × 30 days went from 36s to 4s |
 | `transform(lambda s: s.rolling(...))` | `groupby().rolling()` | Same numbers to the bit, ~16x faster. The lambda walked 160 groups in Python per feature per day |
 
-## What the engine cannot see
+## What the engine now sees
 
-`/api/training-data` carries demand history and its flags. It does **not** carry
-`DemandSignal` (flu incidence) or forward-dated `PromotionEvent` rows.
+`/api/training-data` carries demand history enriched with inline `PromotionEvent`
+and `DemandSignal` data on every row:
 
-So future promotion flags are `0` rather than invented, and seasonality for a future day
-is what that series actually did on that weekday and in that month. A sensed flu surge
-reaches the plan through history, not as a leading indicator.
+- **`promotionUplift`** / **`promotionType`**: from `PromotionEvent` rows that overlap
+  each demand-history date. The highest uplift wins when multiple promotions overlap.
+- **`demandSignalValue`** / **`demandSignalType`**: from the most recent `DemandSignal`
+  for that product on that date (e.g. flu incidence).
 
-Closing that gap means publishing those two tables from Express — a `signals` field on the
-export, or a second endpoint. It is a backend change, not an engine change, and it is the
-single biggest available improvement to forecast quality.
+The stream also appends **future `PromotionEvent` rows** (discriminated by
+`_type: "future_promotion"`) so the engine can set `promotion_flag=1` and the
+actual `upliftFactor` for upcoming forecast days instead of defaulting to 0.
+
+These features are used in the model as `promotion_uplift`, `demand_signal_value`,
+`uplift_x_seasonality`, and `signal_x_seasonality`.
 
 ## Boundary
 

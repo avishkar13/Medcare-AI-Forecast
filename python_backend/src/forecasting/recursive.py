@@ -8,12 +8,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from typing import Optional
+
 import numpy as np
 import pandas as pd
 
 from src.config import MIN_HISTORY_DAYS
 from src.preprocessing.features import add_features, feature_columns
-from src.project_signals import future_frame, seasonality_profile
+from src.project_signals import build_signal_lookup, future_frame, seasonality_profile
 
 # Enough to fill the longest lag (28) and the longest rolling window (28) with room
 # to spare. The working frame is trimmed back to this after every step, so the cost
@@ -52,6 +54,8 @@ def _densify(series: pd.DataFrame, as_of: pd.Timestamp) -> pd.DataFrame:
     filled["demand"] = filled["demand"].fillna(0.0)
     filled["promotion_flag"] = filled["promotion_flag"].fillna(0).astype(int)
     filled["seasonality_index"] = filled["seasonality_index"].ffill().bfill().fillna(1.0)
+    filled["promotion_uplift"] = filled["promotion_uplift"].fillna(1.0) if "promotion_uplift" in filled.columns else 1.0
+    filled["demand_signal_value"] = filled["demand_signal_value"].fillna(0.0) if "demand_signal_value" in filled.columns else 0.0
     return filled
 
 
@@ -91,6 +95,8 @@ def forecast_series(
     horizon_days: int,
     bundle: dict,
     conformal_delta: float,
+    future_promotions: Optional[pd.DataFrame] = None,
+    future_signals: Optional[pd.DataFrame] = None,
 ) -> dict[tuple[str, str], Band]:
     """A band per requested (sku, dc) key. Every key gets an entry, always."""
     days = [as_of + pd.Timedelta(days=step) for step in range(1, horizon_days + 1)]
@@ -107,7 +113,8 @@ def forecast_series(
             bands[key] = _fallback(series, days)
             continue
         dense = _densify(
-            series[["date", "sku_id", "dc_id", "demand", "promotion_flag", "seasonality_index"]],
+            series[["date", "sku_id", "dc_id", "demand", "promotion_flag", "seasonality_index",
+                    "promotion_uplift", "demand_signal_value"]].copy(),
             as_of,
         )
         windows.append(dense.tail(WINDOW_DAYS))
@@ -118,12 +125,41 @@ def forecast_series(
 
     work = pd.concat(windows, ignore_index=True)
     profiles = {key: seasonality_profile(grouped[key]) for key in modelled}
+
+    # Each series belongs to one region, and the indicator is published per region.
+    # The last historical reading per region is the fallback once the published
+    # horizon runs out.
+    regions = {}
+    last_by_region: dict = {}
+    # PromotionEvent is scoped by cuid, while a series is keyed by sku/code. Without
+    # this map only globally-scoped promotions ever match, and every product-specific
+    # campaign is silently missed.
+    pair_index: dict = {}
+    for key in modelled:
+        frame = grouped[key]
+        region = frame["region"].iloc[-1] if "region" in frame.columns and len(frame) else None
+        regions[key] = region
+        if "demand_signal_value" in frame.columns and len(frame):
+            last_by_region.setdefault(region, float(frame["demand_signal_value"].iloc[-1]))
+        if {"product_id", "warehouse_id"} <= set(frame.columns) and len(frame):
+            pair_index[key] = (frame["product_id"].iloc[-1], frame["warehouse_id"].iloc[-1])
+    signal_lookup = build_signal_lookup(future_signals, last_by_region)
     columns = feature_columns()
     index = pd.MultiIndex.from_tuples(modelled, names=["sku_id", "dc_id"])
     collected = {key: {"p10": [], "p50": [], "p90": []} for key in modelled}
 
     for day in days:
-        work = pd.concat([work, future_frame(profiles, modelled, day)], ignore_index=True)
+        work = pd.concat(
+            [
+                work,
+                future_frame(
+                    profiles, modelled, day, future_promotions,
+                    pair_index=pair_index,
+                    signal_lookup=signal_lookup, regions=regions,
+                ),
+            ],
+            ignore_index=True,
+        )
         featured = add_features(work, training=False)
         rows = (
             featured[featured["date"] == day]

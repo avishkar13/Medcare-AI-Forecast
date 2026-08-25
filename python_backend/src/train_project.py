@@ -19,7 +19,7 @@ def main() -> None:
     parser.add_argument("--model-version", default=MODEL_VERSION)
     arguments = parser.parse_args()
 
-    raw = fetch_training_data(force=True)
+    raw, _future_promotions = fetch_training_data(force=True)
     canonical = canonicalize_training_data(raw)
     print(
         f"pulled {len(raw)} rows, "

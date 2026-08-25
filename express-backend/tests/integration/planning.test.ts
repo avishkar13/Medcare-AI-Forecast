@@ -22,6 +22,8 @@ interface PlanningRun {
   completedAt: string | null;
   durationSeconds: number | null;
   stale: boolean;
+  failureReason: string | null;
+  failureStage: string | null;
 }
 
 interface PlanningRunDetail extends PlanningRun {
@@ -132,10 +134,40 @@ describe("POST /api/planning/runs", () => {
 
     const previous = await prisma.planningRun.findUniqueOrThrow({
       where: { id: abandoned.id },
-      select: { status: true, completedAt: true },
+      select: { status: true, completedAt: true, failureReason: true, failureStage: true },
     });
     assert.equal(previous.status, "FAILED");
     assert.ok(previous.completedAt, "an abandoned run must be closed out, not left open");
+    assert.ok(previous.failureReason, "a swept run must say why it failed");
+    assert.equal(previous.failureStage, "abandoned");
+  });
+
+  test("a failed run tells the API why it failed", async () => {
+    const user = await prisma.user.findFirstOrThrow({ select: { id: true } });
+    const { id } = await prisma.planningRun.create({
+      data: {
+        horizonDays: 30,
+        createdById: user.id,
+        status: "FAILED",
+        startedAt: new Date(),
+        completedAt: new Date(),
+        failureReason: "the forecasting service was unreachable",
+        failureStage: "forecast",
+      },
+      select: { id: true },
+    });
+
+    const { data } = expectEnvelope<PlanningRunDetail>(await server.json("/api/planning/runs/" + id));
+    assert.equal(data.status, "FAILED");
+    assert.equal(data.failureReason, "the forecasting service was unreachable");
+    assert.equal(data.failureStage, "forecast");
+  });
+
+  test("a run that has not failed reports null, not an empty string", async () => {
+    const { body } = await createRun();
+    const { data } = expectEnvelope<PlanningRun>(body);
+    assert.equal(data.failureReason, null);
+    assert.equal(data.failureStage, null);
   });
 
   test("reports an abandoned run as stale before anything reaps it", async () => {

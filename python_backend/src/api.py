@@ -30,6 +30,7 @@ from src.training_client import (
     TrainingDataUnavailable,
     cache_state,
     fetch_training_data,
+    future_signals,
     reachable,
 )
 from src.training_core import train_dataframe
@@ -75,14 +76,15 @@ def _metadata() -> dict:
     return json.loads(METADATA_PATH.read_text())
 
 
-def _training_frame(force: bool = False) -> pd.DataFrame:
+def _training_frame(force: bool = False) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Returns (canonical_demand_frame, future_promotions_frame)."""
     try:
-        raw = fetch_training_data(force=force)
+        raw, future_promotions = fetch_training_data(force=force)
     except TrainingDataUnavailable as error:
         raise EngineError(502, "TRAINING_DATA_UNAVAILABLE", str(error)) from error
     except RuntimeError as error:
         raise EngineError(500, "ENGINE_MISCONFIGURED", str(error)) from error
-    return canonicalize_training_data(raw)
+    return canonicalize_training_data(raw), future_promotions
 
 
 @app.post("/forecast")
@@ -105,7 +107,7 @@ def forecast(request: ForecastRequest):
             "No model artifact. Train the engine first: python -m src.train_project",
         )
 
-    canonical = _training_frame()
+    canonical, future_promotions = _training_frame()
     index = pair_index(canonical)
     lookup = {
         (row.product_id, row.warehouse_id): (row.sku_id, row.dc_id)
@@ -138,6 +140,8 @@ def forecast(request: ForecastRequest):
             request.horizonDays,
             bundle,
             float(_metadata().get("conformal_delta", 0.0)),
+            future_promotions=future_promotions,
+            future_signals=future_signals(),
         )
     except EngineError:
         raise
@@ -171,7 +175,7 @@ def forecast(request: ForecastRequest):
 
 @app.post("/train")
 def train(request: TrainRequest):
-    canonical = _training_frame(force=True)
+    canonical, _future_promotions = _training_frame(force=True)
     try:
         result = train_dataframe(
             canonical,

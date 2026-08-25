@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 import { describe, test } from "node:test";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
-const read = (path: string) => readFileSync(join(root, path), "utf8");
+// Normalised: a checkout with CRLF endings must not fail assertions about layout.
+const read = (path: string) => readFileSync(join(root, path), "utf8").replaceAll("\r\n", "\n");
 const has = (path: string) => existsSync(join(root, path));
 
 const dockerfile = read("Dockerfile");

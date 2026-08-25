@@ -2,7 +2,7 @@
 
 What turns a `PENDING` planning run into a `COMPLETED` one with artefacts, or a `FAILED` one with a reason.
 
-This is not a route. It is `executeRun(runId)` in `src/services/planning-executor.service.ts`, called after `POST /api/planning/runs` answers `202`. Nothing here touches HTTP.
+This is not a route. It is `executeRun(runId)` in `src/services/planning-executor.service.ts`, called after `POST /api/planning/runs` answers `202` — see [Scheduling](#scheduling) for what does the calling. Nothing here touches HTTP.
 
 Shared conventions — response envelope, error codes, headers and rate limits — are in [`conventions.api.md`](conventions.api.md).
 
@@ -80,6 +80,20 @@ Zero rows affected means someone else claimed it, and the call returns `SKIPPED`
 
 Re-execution is idempotent: every stage clears its own table for that run first (`clearRunArtifacts`), so running the same run twice converges instead of doubling.
 
+## Scheduling
+
+`src/lib/planning-runner.ts` is the only caller in production, and the only file that would change if runs ever moved to a worker container.
+
+| Moment | What happens |
+| --- | --- |
+| After the `202` is written | `scheduleRun(id)` hands the run to `setImmediate`. It never throws and never awaits — the client already has its response |
+| A duplicate `scheduleRun` for the same id | Ignored. The runner keeps one promise per run id, and the claim would refuse the second one anyway |
+| An idempotency replay | **Not scheduled.** A replay returns the run the first call created; re-executing it would double the work for a client that retried a network timeout |
+| Shutdown | `drainPlanning()` runs between `server.close()` and the Prisma/Redis disconnects — a run in flight still needs its connections. It gets 80% of `SHUTDOWN_TIMEOUT_MS`; the rest is reserved for marking whatever did not finish `FAILED` and disconnecting |
+| Boot | `failAbandonedRuns()` sweeps runs left `PENDING`/`RUNNING` by a previous process and older than `PLANNING_RUN_TIMEOUT_MS`. Without it, a crash blocks the next POST with a `409` until someone notices |
+
+**In-process, deliberately.** Roughly 10,000 rows finishing in well under a minute does not justify a queue, and `insertRun` already caps concurrency at one active run. A worker would add a broker, a second deployable and a serialisation format to solve a problem this workload does not have.
+
 ## What it never does
 
 - **Never mutates operational state.** `Inventory`, `InventoryBatch`, `DemandHistory` and `DistributorOrder` are read-only here. A `DRPPlan` is a proposal; nothing moves stock. There is an integration test asserting the totals are unchanged after a run.
@@ -92,7 +106,7 @@ Re-execution is idempotent: every stage clears its own table for that run first 
 
 | Variable | Default | Effect |
 | --- | --- | --- |
-| `PLANNING_EXECUTOR` | `inline` | `disabled` stops runs from being executed at all — used by the test suite, which drives `executeRun()` directly |
+| `PLANNING_EXECUTOR` | `inline` | `disabled` stops scheduling: runs are created and stay `PENDING`. The test suite defaults to `disabled` so its "a new run is `PENDING`" assertions cannot race the executor, and drives `executeRun()` directly instead |
 | `PLANNING_SIMULATION_ITERATIONS` | `500` | Monte Carlo iterations. The only CPU-bound stage; it yields every 50 iterations so readiness keeps answering |
 | `FORECAST_SERVICE_URL` | unset | Unset means the naive fallback is the only path |
 | `FORECAST_FALLBACK` | `true` | `false` makes a forecasting outage fail the run instead |

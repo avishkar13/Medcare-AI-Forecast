@@ -7,7 +7,11 @@ from __future__ import annotations
 
 import pandas as pd
 
-CANONICAL = ["date", "sku_id", "dc_id", "demand", "promotion_flag", "seasonality_index"]
+CANONICAL = [
+    "date", "sku_id", "dc_id", "demand",
+    "promotion_flag", "seasonality_index",
+    "promotion_uplift", "demand_signal_value",
+]
 
 
 def _seasonality_index(frame: pd.DataFrame) -> pd.Series:
@@ -34,12 +38,21 @@ def canonicalize_training_data(raw: pd.DataFrame) -> pd.DataFrame:
             "date": pd.to_datetime(raw["date"], errors="coerce"),
             "sku_id": raw["sku"].astype(str),
             "dc_id": raw["dc"].astype(str),
+            # Carried so a forecast day can look up its region's forward-dated signal.
+            "region": raw.get("region", pd.Series(dtype=object)).astype(object),
             "product_id": raw["productId"].astype(str),
             "warehouse_id": raw["warehouseId"].astype(str),
             "demand": pd.to_numeric(raw["demand"], errors="coerce").clip(lower=0),
             "promotion_flag": raw.get("promotion", False).astype(bool).astype(int),
             "holiday_flag": raw.get("holiday", False).astype(bool).astype(int),
             "stockout_flag": raw.get("stockout", False).astype(bool).astype(int),
+            # New enrichment fields — safe defaults when absent (older backends)
+            "promotion_uplift": pd.to_numeric(
+                raw.get("promotionUplift", pd.Series(dtype=float)), errors="coerce"
+            ).fillna(1.0),
+            "demand_signal_value": pd.to_numeric(
+                raw.get("demandSignalValue", pd.Series(dtype=float)), errors="coerce"
+            ).fillna(0.0),
         }
     ).dropna(subset=["date", "demand"])
 
@@ -55,3 +68,4 @@ def pair_index(canonical: pd.DataFrame) -> pd.DataFrame:
         .drop_duplicates()
         .reset_index(drop=True)
     )
+

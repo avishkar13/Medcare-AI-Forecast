@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 
 REQ = [
-    "date","sku_id","dc_id","demand","promotion_flag","seasonality_index"
+    "date","sku_id","dc_id","demand","promotion_flag","seasonality_index",
+    "promotion_uplift","demand_signal_value"
 ]
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -18,11 +19,15 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     x["demand"]=x["demand"].clip(lower=0)
     x["promotion_flag"]=x["promotion_flag"].fillna(0).astype(int).clip(0,1)
     x["seasonality_index"]=x["seasonality_index"].replace([np.inf,-np.inf],np.nan).fillna(1.0)
+    x["promotion_uplift"]=x["promotion_uplift"].replace([np.inf,-np.inf],np.nan).fillna(1.0)
+    x["demand_signal_value"]=x["demand_signal_value"].replace([np.inf,-np.inf],np.nan).fillna(0.0)
     # Demand is the series-level truth. Aggregate accidental duplicate rows safely.
     x=(x.groupby(["date","sku_id","dc_id"],as_index=False)
          .agg(demand=("demand","sum"),
               promotion_flag=("promotion_flag","max"),
-              seasonality_index=("seasonality_index","mean"))
+              seasonality_index=("seasonality_index","mean"),
+              promotion_uplift=("promotion_uplift","max"),
+              demand_signal_value=("demand_signal_value","mean"))
          .sort_values(["date","sku_id","dc_id"])
          .reset_index(drop=True))
     return x
@@ -80,6 +85,10 @@ def add_features(df: pd.DataFrame, training=True) -> pd.DataFrame:
         promo.groupby("sku_id", sort=False)["_promotion"].rolling(28,min_periods=3).mean(), 0
     )
 
+    # Enrichment interactions.
+    x["uplift_x_seasonality"]=x.promotion_uplift*x.seasonality_index
+    x["signal_x_seasonality"]=x.demand_signal_value*x.seasonality_index
+
 
     if training:
         needed=[
@@ -91,12 +100,15 @@ def add_features(df: pd.DataFrame, training=True) -> pd.DataFrame:
 
 def feature_columns():
     return [
-        "sku_id","dc_id","promotion_flag","seasonality_index","demand_lag_1","demand_lag_2","demand_lag_3","demand_lag_7",
+        "sku_id","dc_id","promotion_flag","seasonality_index",
+        "promotion_uplift","demand_signal_value",
+        "demand_lag_1","demand_lag_2","demand_lag_3","demand_lag_7",
         "demand_lag_14","demand_lag_21","demand_lag_28",
         "rolling_mean_3","rolling_mean_7","rolling_mean_14","rolling_mean_28",
         "rolling_median_7","rolling_median_28","rolling_std_7","rolling_std_14",
         "rolling_std_28","ewm_7","demand_velocity","demand_acceleration","demand_cv_28",
         "day_of_week","week_of_year","month","quarter","day_of_month","day_of_year",
         "is_weekend","dow_sin","dow_cos","doy_sin","doy_cos",
-        "promotion_seasonality","promotion_recent_rate"
+        "promotion_seasonality","promotion_recent_rate",
+        "uplift_x_seasonality","signal_x_seasonality"
     ]

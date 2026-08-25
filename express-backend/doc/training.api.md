@@ -60,10 +60,36 @@ x-training-rows: 28800
 | `promotion` | boolean | `promotionFlag` | A promotion was active |
 | `holiday` | boolean | `holidayFlag` | |
 | `season` | string \| null | `season` | A label, not an index. `"flu"` / `"regular"` in seeded data. |
+| `region` | string \| null | `Warehouse.region` | The key `DemandSignal` rows are grouped by. Without it a consumer cannot line the forward-dated signals up with the warehouses they apply to. |
+| `promotionUplift` | number \| null | `PromotionEvent.upliftFactor` | From a promotion overlapping this row's date, scoped to this product/warehouse. `null` when none |
+| `promotionType` | string \| null | `PromotionEvent.type` | |
+| `demandSignalType` | string \| null | `DemandSignal.signalType` | `flu_incidence_per_100k` in seeded data |
+| `demandSignalValue` | number \| null | `DemandSignal.value` | The signal for **this warehouse's region** on this date |
 
 Both key forms travel on every row on purpose: read `sku` and `dc`, write back `productId` and `warehouseId`. It costs ~50 bytes a row and removes a join from the consumer.
 
 **`demand` is `orderedQuantity`, not `fulfilledQuantity`.** Fitting against what shipped teaches the model that a stockout was low demand. `orderedQuantity` is the uncensored signal; `stockout` and `fulfilled` are there so the model can tell a quiet day from a day you could not supply.
+
+### Trailer segments
+
+After the history rows, the stream carries two more segments. Both tag themselves with `_type`; history rows have no `_type`, so a reader groups history by filtering them out.
+
+```
+{"_type":"future_signal","region":"West","date":"2026-08-24","signalType":"flu_incidence_per_100k","value":37.45}
+{"_type":"future_promotion","productId":"cmt6...","warehouseId":null,"startDate":"2026-08-31","endDate":"2026-09-21","type":"CAMPAIGN","upliftFactor":1.2,"name":"Antibiotic Stewardship Push"}
+```
+
+| Segment | Header | Contains |
+| --- | --- | --- |
+| history | `x-training-rows` | One row per product per warehouse per day |
+| `future_signal` | `x-future-signals` | Signals dated **after the last day of history** |
+| `future_promotion` | `x-future-promotions` | Promotions **still running or starting later** — `endDate >= today` |
+
+**Why these exist.** A forecast horizon is in the future, and both of these describe it. Flu incidence is published ahead of the demand it drives, so without the forward-dated signals the model trains on a leading indicator and then predicts with nothing in that column. Same for promotions: a scheduled campaign is knowable in advance, and a horizon without it forecasts a normal week.
+
+**`future_promotion` is not `startDate > now`.** A promotion that began last week and runs another month is the most relevant one there is, and it cannot ride on a history row either, because history stops before today.
+
+**Each segment is counted separately.** Compare each against its own header. Comparing every parsed line against `x-training-rows` fails the moment a trailer exists; comparing against one grand total lets a truncation inside history hide behind a trailer that never arrived.
 
 ### Ordering
 
