@@ -1,12 +1,18 @@
 import { Router } from "express";
-import { recommendationsController } from "../controller/recommendationscontroller.js";
+import * as recommendationsController from "../controller/recommendationscontroller.js";
+import { rateLimiter } from "../middleware/rateLimiter.js";
 
 export const recommendationsRouter = Router();
 
-recommendationsRouter.get("/kpi", recommendationsController.getKpi);
-recommendationsRouter.get("/impact", recommendationsController.getImpact);
-recommendationsRouter.get("/summary", recommendationsController.getSummary);
-recommendationsRouter.get("/list", recommendationsController.getList);
-recommendationsRouter.get("/intelligence", recommendationsController.getIntelligence);
-recommendationsRouter.patch("/:id/execute", recommendationsController.execute);
-recommendationsRouter.patch("/:id/dismiss", recommendationsController.dismiss);
+recommendationsRouter.get("/", rateLimiter.read, recommendationsController.getList);
+recommendationsRouter.get("/kpi", rateLimiter.read, recommendationsController.getKpi);
+recommendationsRouter.get("/impact", rateLimiter.read, recommendationsController.getImpact);
+recommendationsRouter.get("/summary", rateLimiter.read, recommendationsController.getSummary);
+recommendationsRouter.get("/intelligence", rateLimiter.read, recommendationsController.getIntelligence);
+
+// `/list` kept as an alias: it is the path already published in doc/new_docs.
+recommendationsRouter.get("/list", rateLimiter.read, recommendationsController.getList);
+
+// State changes, so the write tier.
+recommendationsRouter.patch("/:id/execute", rateLimiter.write, recommendationsController.execute);
+recommendationsRouter.patch("/:id/dismiss", rateLimiter.write, recommendationsController.dismiss);

@@ -18,6 +18,10 @@ export const runQuerySchema = z.object({
 
 export const runParamsSchema = z.object({ id: identifier });
 
+// Required, not defaulted to "the previous run": a comparison whose baseline moved
+// on its own would change meaning between two identical requests.
+export const compareQuerySchema = z.object({ baseline: identifier });
+
 export const idempotencyKeySchema = z
   .string()
   .trim()
@@ -28,3 +32,4 @@ export const idempotencyKeySchema = z
 export type CreateRunBody = z.infer<typeof createRunBodySchema>;
 export type RunQuery = z.infer<typeof runQuerySchema>;
 export type RunParams = z.infer<typeof runParamsSchema>;
+export type CompareQuery = z.infer<typeof compareQuerySchema>;

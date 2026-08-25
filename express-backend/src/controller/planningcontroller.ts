@@ -1,8 +1,10 @@
 import type { Request, Response } from "express";
 import { SERVER } from "../config/constants.js";
 import * as planning from "../services/planning.service.js";
+import * as compare from "../services/planning-compare.service.js";
 import { ok, paginated } from "../utils/response.js";
 import {
+  compareQuerySchema,
   createRunBodySchema,
   idempotencyKeySchema,
   runParamsSchema,
@@ -32,4 +34,11 @@ export const getRun = async (req: Request, res: Response) => {
   const params = runParamsSchema.parse(req.params);
   const run = await planning.getRun(params);
   ok(res, run, { planningRunId: run.id });
+};
+
+export const compareRuns = async (req: Request, res: Response) => {
+  const params = runParamsSchema.parse(req.params);
+  const query = compareQuerySchema.parse(req.query);
+  const comparison = await compare.compareRuns(params, query);
+  ok(res, comparison, { planningRunId: params.id });
 };

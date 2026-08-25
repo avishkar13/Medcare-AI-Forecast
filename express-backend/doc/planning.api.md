@@ -146,6 +146,74 @@ They are on every run shape, `null` on runs that have not failed. Artifacts writ
 
 ---
 
+## `GET /api/planning/runs/:id/compare?baseline=<runId>`
+
+The delta between two completed runs — `:id` is the scenario, `baseline` is the do-nothing.
+
+This is what turns "+60% flu spike vs do-nothing" from two tables into an answer. Every figure is read from artefacts the executor already wrote; nothing is recomputed, so a comparison can never disagree with the runs it describes.
+
+| Parameter | Required | Notes |
+| --- | --- | --- |
+| `baseline` | **yes** | The run to compare against. Not defaulted to "the previous run" — a baseline that moved on its own would change the meaning of two identical requests |
+
+### Response `200`
+
+```json
+{
+  "data": {
+    "scenario": { "id": "cmt9...", "horizonDays": 7, "modelVersion": "medcare-xgb-qrf-v1",
+                  "scenario": { "id": "cmt9...", "name": "Flu surge +60%",
+                                "demandMultiplier": 1.6, "serviceLevelTarget": 0.98 },
+                  "completedAt": "2026-08-26T04:20:11.004Z" },
+    "baseline": { "id": "cmt9...", "scenario": null, "...": "same shape" },
+    "headline": {
+      "stockoutDaysAvoided": -32.65,
+      "writeOffUnitsAvoided": 10318.64,
+      "costSaved": 29091.05,
+      "serviceLevelChange": -0.04,
+      "transfersProposed": -3
+    },
+    "cost": { "holding": {"baseline":5014.79,"scenario":4652.39,"delta":-362.4,"percentChange":-7.23},
+              "stockout": {}, "transfer": {}, "expiry": {}, "total": {} },
+    "risk": { "serviceLevel": {}, "stockoutProbability": {}, "expiryProbability": {},
+              "expectedInventory": {}, "expectedWaste": {}, "expectedCost": {} },
+    "plan": { "forecastDemand": {}, "safetyStock": {}, "expectedStockoutDays": {},
+              "transfers": {}, "transferUnits": {}, "recommendations": {} },
+    "warnings": []
+  }
+}
+```
+
+### Reading the signs
+
+Every entry in `cost`, `risk` and `plan` is `{ baseline, scenario, delta, percentChange }` where **`delta` is `scenario - baseline`**. The sign means different things per metric — a negative cost delta is a saving, a negative service-level delta is a regression — so `headline` is **pre-oriented: positive always means the scenario did better**. `percentChange` is `null` when the baseline is `0`, where a percentage has no meaning.
+
+`expectedStockoutDays` is the **sum of per-day stockout probabilities**, which is the expected number of stockout cell-days. Counting only the days over some threshold would discard every near-miss the scenario caused.
+
+`serviceLevel` is a **type-2 fill rate**: the share of simulated demand met from stock.
+
+### `warnings`
+
+Non-blocking notes that the two runs may not be like for like. Empty when they are.
+
+| Warning | Why it matters |
+| --- | --- |
+| Horizons differ | A 30-day run holds stock longer than a 7-day one whatever the scenario did, so absolute totals are not comparable. Said out loud rather than silently normalised, because which figure you want depends on the question |
+| Different forecast models | Part of the difference is the model, not the scenario |
+| Neither run has a scenario | You are comparing two baselines |
+
+### Errors
+
+| Status | When |
+| --- | --- |
+| `404` | Either run id is unknown |
+| `409` | Either run is not `COMPLETED`; the two ids are the same; or a completed run is missing its cost roll-up or simulation |
+| `422` | `baseline` was not supplied |
+
+A run is only real once `COMPLETED`, so comparing anything else would be reading artefacts that are unreachable by contract. Comparing a run against itself is refused rather than answered with a wall of zeros.
+
+---
+
 ## Lifecycle and scheduling
 
 ```

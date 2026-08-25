@@ -1,84 +1,30 @@
 import type { Request, Response } from "express";
-import { prisma } from "../config/prisma.js";
+import * as expiry from "../services/expiry.service.js";
+import { ok, paginated } from "../utils/response.js";
+import { expiryBatchQuerySchema, expiryQuerySchema } from "../zod/expiry.schemas.js";
 
-export const expiryController = {
-  getBatches: async (_req: Request, res: Response) => {
-    try {
-      const batches = await prisma.inventoryBatch.findMany({
-        include: { product: true, warehouse: true },
-        take: 50,
-      });
+export const getBatches = async (req: Request, res: Response) => {
+  const query = expiryBatchQuerySchema.parse(req.query);
+  const { items, total } = await expiry.listBatches(query);
+  paginated(res, items, query.page, query.pageSize, total);
+};
 
-      const formatted = batches.map((b: any) => {
-        const daysRemaining = Math.max(0, Math.floor((b.expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
-        const risk = daysRemaining < 30 ? "critical" : daysRemaining < 60 ? "high" : "medium";
-        
-        return {
-          id: b.id,
-          sku: b.product.sku,
-          productName: b.product.name,
-          location: b.warehouse.name,
-          quantity: b.quantity,
-          manufacturingDate: b.manufacturingDate,
-          expiryDate: b.expiryDate,
-          daysRemaining,
-          valueAtRisk: b.quantity * Number(b.product.unitCost),
-          expiryRisk: risk,
-          riskLevel: risk,
-          wasteValue: b.quantity * Number(b.product.unitCost),
-          demandCoverage: 100, 
-          inventoryValue: b.quantity * Number(b.product.unitCost),
-          batchNumber: b.batchNumber
-        };
-      });
-      res.json(formatted);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Failed to fetch expiry batches" });
-    }
-  },
+export const getOverview = async (req: Request, res: Response) => {
+  ok(res, await expiry.getOverview(expiryQuerySchema.parse(req.query)));
+};
 
-  getOverview: async (_req: Request, res: Response) => {
-    res.json({
-      totalAtRiskValue: 45000,
-      criticalBatchesCount: 12,
-      preventedWaste: 12500,
-      averageDaysToExpiry: 85
-    });
-  },
+export const getTimeline = async (req: Request, res: Response) => {
+  ok(res, await expiry.getTimeline(expiryQuerySchema.parse(req.query)));
+};
 
-  getTimeline: async (_req: Request, res: Response) => {
-    res.json([
-      { month: "2024-04", valueExpiring: 5400, batchCount: 3 },
-      { month: "2024-05", valueExpiring: 12000, batchCount: 8 }
-    ]);
-  },
+export const getDcExposure = async (req: Request, res: Response) => {
+  ok(res, await expiry.getDcExposure(expiryQuerySchema.parse(req.query)));
+};
 
-  getDcExposure: async (_req: Request, res: Response) => {
-    res.json([
-      { dcId: "DC-01", dcName: "Northeast DC", totalExposureValue: 15400, criticalExposure: 4500 }
-    ]);
-  },
+export const getAssessment = async (req: Request, res: Response) => {
+  ok(res, await expiry.getAssessment(expiryQuerySchema.parse(req.query)));
+};
 
-  getAiAssessment: async (_req: Request, res: Response) => {
-    res.json({
-      riskAssessment: "Elevated risk in West Coast DC due to slow-moving inventory.",
-      recommendedStrategy: "Initiate network transfer for Cetirizine 10mg.",
-      confidence: 88
-    });
-  },
-
-  getWastePrevention: async (_req: Request, res: Response) => {
-    try {
-      const records = await prisma.wastePreventionRecord.findMany({ take: 10 });
-      res.json(records);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Failed to fetch waste prevention records" });
-    }
-  },
-
-  prioritizeBatch: async (_req: Request, res: Response) => {
-    res.json({ success: true, status: "prioritized" });
-  }
+export const getWastePrevention = async (_req: Request, res: Response) => {
+  ok(res, await expiry.listWastePrevention());
 };

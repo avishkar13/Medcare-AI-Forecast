@@ -130,6 +130,62 @@ export interface PlanningRunDetail extends PlanningRunSummary {
   artifacts: PlanningRunArtifacts;
 }
 
+export interface Delta {
+  baseline: number;
+  scenario: number;
+  /** scenario - baseline. On a cost, negative is a saving. */
+  delta: number;
+  /** null when the baseline is 0, where a percentage has no meaning. */
+  percentChange: number | null;
+}
+
+export interface RunComparisonSide {
+  id: string;
+  horizonDays: number;
+  modelVersion: string | null;
+  scenario: {
+    id: string;
+    name: string;
+    demandMultiplier: number;
+    serviceLevelTarget: number;
+  } | null;
+  completedAt: string | null;
+}
+
+export interface RunComparison {
+  scenario: RunComparisonSide;
+  baseline: RunComparisonSide;
+  /** Pre-oriented: positive always means the scenario did better. */
+  headline: {
+    stockoutDaysAvoided: number;
+    writeOffUnitsAvoided: number;
+    costSaved: number;
+    serviceLevelChange: number;
+    transfersProposed: number;
+  };
+  cost: Record<"holding" | "stockout" | "transfer" | "expiry" | "total", Delta>;
+  risk: Record<
+    | "serviceLevel"
+    | "stockoutProbability"
+    | "expiryProbability"
+    | "expectedInventory"
+    | "expectedWaste"
+    | "expectedCost",
+    Delta
+  >;
+  plan: Record<
+    | "forecastDemand"
+    | "safetyStock"
+    | "expectedStockoutDays"
+    | "transfers"
+    | "transferUnits"
+    | "recommendations",
+    Delta
+  >;
+  /** Reasons the numbers may not be like for like. Empty when they are. */
+  warnings: string[];
+}
+
 export interface PlanningRunCreation {
   run: PlanningRunSummary;
   replayed: boolean;

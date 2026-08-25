@@ -2,7 +2,7 @@
 
 Everything that holds for every route, so the per-route files can stay about their own payloads. Written for the frontend client.
 
-Base path is `/api` (`API_PREFIX`), so the backend running locally on port 4000 serves `http://localhost:4000/api/...`. Every route today is a `GET`.
+Base path is `/api` (`API_PREFIX`), so the backend running locally on port 4000 serves `http://localhost:4000/api/...`. Most routes are `GET`; the ones that change state use `POST`, `PATCH`, `PUT` and `DELETE` and are listed in their own files.
 
 ---
 

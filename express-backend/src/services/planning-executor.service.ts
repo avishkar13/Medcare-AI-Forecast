@@ -520,15 +520,21 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
     stage = "simulation";
     const rng = createRng(PLANNING.simulationSeed);
     const iterations = PLANNING.simulationIterations;
-    let stockoutRuns = 0;
-    let expiryRuns = 0;
+    // Measured per cell-day, not once per iteration. A single flag across 160 series
+    // and a whole horizon is set by any one of ~1,000 chances, so it was true in
+    // essentially every iteration - pinning serviceLevel at 0 and both probabilities
+    // at 1 for any network of a realistic size.
+    let stockoutCellDays = 0;
+    let cellDays = 0;
+    let expiredCells = 0;
+    let cellsSeen = 0;
+    let unmetTotal = 0;
+    let demandTotal = 0;
     let inventoryTotal = 0;
     let wasteTotal = 0;
     let costTotal = 0;
 
     for (let iteration = 0; iteration < iterations; iteration += 1) {
-      let stockedOut = false;
-      let expired = false;
       let inventory = 0;
       let waste = 0;
       let cost = 0;
@@ -544,20 +550,26 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
           const normal = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
           const demand = Math.max(0, point.p50 + normal * stdDev);
 
-          if (demand > onHand) stockedOut = true;
+          // Fill rate: how much demand was met from stock, not whether a shortfall
+          // happened somewhere. The unmet units are what a planner can act on.
+          const shipped = Math.min(demand, onHand);
+          unmetTotal += demand - shipped;
+          demandTotal += demand;
+          if (demand > onHand) stockoutCellDays += 1;
+          cellDays += 1;
+
           onHand = Math.max(0, onHand - demand);
           inventory += onHand;
           cost += onHand * cell.parameters.holdingCostPerUnit;
         }
 
+        cellsSeen += 1;
         if (cell.maximumInventory !== null && onHand > cell.maximumInventory) {
-          expired = true;
+          expiredCells += 1;
           waste += onHand - cell.maximumInventory;
         }
       }
 
-      if (stockedOut) stockoutRuns += 1;
-      if (expired) expiryRuns += 1;
       inventoryTotal += inventory;
       wasteTotal += waste;
       costTotal += cost;
@@ -588,9 +600,10 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
       },
       simulation: {
         iterations,
-        serviceLevel: round(1 - stockoutRuns / iterations, 4),
-        stockoutProbability: round(stockoutRuns / iterations, 4),
-        expiryProbability: round(expiryRuns / iterations, 4),
+        // Type-2 service (fill rate): the share of simulated demand met from stock.
+        serviceLevel: round(demandTotal === 0 ? 1 : 1 - unmetTotal / demandTotal, 4),
+        stockoutProbability: round(cellDays === 0 ? 0 : stockoutCellDays / cellDays, 4),
+        expiryProbability: round(cellsSeen === 0 ? 0 : expiredCells / cellsSeen, 4),
         expectedInventory: round(inventoryTotal / iterations),
         expectedWaste: round(wasteTotal / iterations),
         expectedCost: round(costTotal / iterations),

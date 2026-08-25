@@ -144,9 +144,21 @@ describe("executeRun", () => {
     ]) {
       assert.ok(probability >= 0 && probability <= 1, `${probability} is not a probability`);
     }
+    // These are deliberately NOT complements. serviceLevel is a type-2 fill rate -
+    // the share of demand met, weighted by volume - while stockoutProbability counts
+    // cell-days with any shortfall at all. A day that met 95% of a spike is a stockout
+    // day and a good service day at once.
+    //
+    // They used to sum to exactly 1 because both came from one per-iteration flag,
+    // set by any of ~1,000 chances across the network. That pinned serviceLevel at 0
+    // and stockoutProbability at 1 on every run, so these two guard the collapse.
     assert.ok(
-      Math.abs(simulation.serviceLevel + simulation.stockoutProbability - 1) < 0.001,
-      "service level is the complement of the stockout probability",
+      simulation.serviceLevel > 0,
+      "a fill rate of exactly 0 means the metric collapsed rather than measured",
+    );
+    assert.ok(
+      simulation.stockoutProbability < 1,
+      "a stockout probability of exactly 1 means every cell-day was counted as a failure",
     );
   });
 
