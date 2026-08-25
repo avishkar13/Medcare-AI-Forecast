@@ -49,6 +49,7 @@ export type ScenarioMinAggregateOutputType = {
   capacityMultiplier: number | null
   serviceLevelTarget: number | null
   createdById: string | null
+  riskLevel: string | null
   createdAt: Date | null
 }
 
@@ -61,6 +62,7 @@ export type ScenarioMaxAggregateOutputType = {
   capacityMultiplier: number | null
   serviceLevelTarget: number | null
   createdById: string | null
+  riskLevel: string | null
   createdAt: Date | null
 }
 
@@ -73,6 +75,7 @@ export type ScenarioCountAggregateOutputType = {
   capacityMultiplier: number
   serviceLevelTarget: number
   createdById: number
+  riskLevel: number
   createdAt: number
   _all: number
 }
@@ -101,6 +104,7 @@ export type ScenarioMinAggregateInputType = {
   capacityMultiplier?: true
   serviceLevelTarget?: true
   createdById?: true
+  riskLevel?: true
   createdAt?: true
 }
 
@@ -113,6 +117,7 @@ export type ScenarioMaxAggregateInputType = {
   capacityMultiplier?: true
   serviceLevelTarget?: true
   createdById?: true
+  riskLevel?: true
   createdAt?: true
 }
 
@@ -125,6 +130,7 @@ export type ScenarioCountAggregateInputType = {
   capacityMultiplier?: true
   serviceLevelTarget?: true
   createdById?: true
+  riskLevel?: true
   createdAt?: true
   _all?: true
 }
@@ -224,6 +230,7 @@ export type ScenarioGroupByOutputType = {
   capacityMultiplier: number
   serviceLevelTarget: number
   createdById: string
+  riskLevel: string | null
   createdAt: Date
   _count: ScenarioCountAggregateOutputType | null
   _avg: ScenarioAvgAggregateOutputType | null
@@ -259,9 +266,14 @@ export type ScenarioWhereInput = {
   capacityMultiplier?: Prisma.FloatFilter<"Scenario"> | number
   serviceLevelTarget?: Prisma.FloatFilter<"Scenario"> | number
   createdById?: Prisma.StringFilter<"Scenario"> | string
+  riskLevel?: Prisma.StringNullableFilter<"Scenario"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Scenario"> | Date | string
   createdBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   planningRuns?: Prisma.PlanningRunListRelationFilter
+  metrics?: Prisma.SimulationMetricListRelationFilter
+  dcImpacts?: Prisma.ScenarioDCImpactListRelationFilter
+  skuImpacts?: Prisma.ScenarioSKUImpactListRelationFilter
+  risks?: Prisma.ScenarioRiskIndicatorListRelationFilter
 }
 
 export type ScenarioOrderByWithRelationInput = {
@@ -273,9 +285,14 @@ export type ScenarioOrderByWithRelationInput = {
   capacityMultiplier?: Prisma.SortOrder
   serviceLevelTarget?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
+  riskLevel?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   createdBy?: Prisma.UserOrderByWithRelationInput
   planningRuns?: Prisma.PlanningRunOrderByRelationAggregateInput
+  metrics?: Prisma.SimulationMetricOrderByRelationAggregateInput
+  dcImpacts?: Prisma.ScenarioDCImpactOrderByRelationAggregateInput
+  skuImpacts?: Prisma.ScenarioSKUImpactOrderByRelationAggregateInput
+  risks?: Prisma.ScenarioRiskIndicatorOrderByRelationAggregateInput
 }
 
 export type ScenarioWhereUniqueInput = Prisma.AtLeast<{
@@ -290,9 +307,14 @@ export type ScenarioWhereUniqueInput = Prisma.AtLeast<{
   capacityMultiplier?: Prisma.FloatFilter<"Scenario"> | number
   serviceLevelTarget?: Prisma.FloatFilter<"Scenario"> | number
   createdById?: Prisma.StringFilter<"Scenario"> | string
+  riskLevel?: Prisma.StringNullableFilter<"Scenario"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Scenario"> | Date | string
   createdBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   planningRuns?: Prisma.PlanningRunListRelationFilter
+  metrics?: Prisma.SimulationMetricListRelationFilter
+  dcImpacts?: Prisma.ScenarioDCImpactListRelationFilter
+  skuImpacts?: Prisma.ScenarioSKUImpactListRelationFilter
+  risks?: Prisma.ScenarioRiskIndicatorListRelationFilter
 }, "id">
 
 export type ScenarioOrderByWithAggregationInput = {
@@ -304,6 +326,7 @@ export type ScenarioOrderByWithAggregationInput = {
   capacityMultiplier?: Prisma.SortOrder
   serviceLevelTarget?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
+  riskLevel?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ScenarioCountOrderByAggregateInput
   _avg?: Prisma.ScenarioAvgOrderByAggregateInput
@@ -324,6 +347,7 @@ export type ScenarioScalarWhereWithAggregatesInput = {
   capacityMultiplier?: Prisma.FloatWithAggregatesFilter<"Scenario"> | number
   serviceLevelTarget?: Prisma.FloatWithAggregatesFilter<"Scenario"> | number
   createdById?: Prisma.StringWithAggregatesFilter<"Scenario"> | string
+  riskLevel?: Prisma.StringNullableWithAggregatesFilter<"Scenario"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Scenario"> | Date | string
 }
 
@@ -335,9 +359,14 @@ export type ScenarioCreateInput = {
   leadTimeMultiplier?: number
   capacityMultiplier?: number
   serviceLevelTarget?: number
+  riskLevel?: string | null
   createdAt?: Date | string
   createdBy: Prisma.UserCreateNestedOneWithoutScenariosInput
   planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutScenarioInput
+  metrics?: Prisma.SimulationMetricCreateNestedManyWithoutScenarioInput
+  dcImpacts?: Prisma.ScenarioDCImpactCreateNestedManyWithoutScenarioInput
+  skuImpacts?: Prisma.ScenarioSKUImpactCreateNestedManyWithoutScenarioInput
+  risks?: Prisma.ScenarioRiskIndicatorCreateNestedManyWithoutScenarioInput
 }
 
 export type ScenarioUncheckedCreateInput = {
@@ -349,8 +378,13 @@ export type ScenarioUncheckedCreateInput = {
   capacityMultiplier?: number
   serviceLevelTarget?: number
   createdById: string
+  riskLevel?: string | null
   createdAt?: Date | string
   planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutScenarioInput
+  metrics?: Prisma.SimulationMetricUncheckedCreateNestedManyWithoutScenarioInput
+  dcImpacts?: Prisma.ScenarioDCImpactUncheckedCreateNestedManyWithoutScenarioInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUncheckedCreateNestedManyWithoutScenarioInput
+  risks?: Prisma.ScenarioRiskIndicatorUncheckedCreateNestedManyWithoutScenarioInput
 }
 
 export type ScenarioUpdateInput = {
@@ -361,9 +395,14 @@ export type ScenarioUpdateInput = {
   leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.UserUpdateOneRequiredWithoutScenariosNestedInput
   planningRuns?: Prisma.PlanningRunUpdateManyWithoutScenarioNestedInput
+  metrics?: Prisma.SimulationMetricUpdateManyWithoutScenarioNestedInput
+  dcImpacts?: Prisma.ScenarioDCImpactUpdateManyWithoutScenarioNestedInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUpdateManyWithoutScenarioNestedInput
+  risks?: Prisma.ScenarioRiskIndicatorUpdateManyWithoutScenarioNestedInput
 }
 
 export type ScenarioUncheckedUpdateInput = {
@@ -375,8 +414,13 @@ export type ScenarioUncheckedUpdateInput = {
   capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutScenarioNestedInput
+  metrics?: Prisma.SimulationMetricUncheckedUpdateManyWithoutScenarioNestedInput
+  dcImpacts?: Prisma.ScenarioDCImpactUncheckedUpdateManyWithoutScenarioNestedInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUncheckedUpdateManyWithoutScenarioNestedInput
+  risks?: Prisma.ScenarioRiskIndicatorUncheckedUpdateManyWithoutScenarioNestedInput
 }
 
 export type ScenarioCreateManyInput = {
@@ -388,6 +432,7 @@ export type ScenarioCreateManyInput = {
   capacityMultiplier?: number
   serviceLevelTarget?: number
   createdById: string
+  riskLevel?: string | null
   createdAt?: Date | string
 }
 
@@ -399,6 +444,7 @@ export type ScenarioUpdateManyMutationInput = {
   leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -411,6 +457,7 @@ export type ScenarioUncheckedUpdateManyInput = {
   capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -433,6 +480,7 @@ export type ScenarioCountOrderByAggregateInput = {
   capacityMultiplier?: Prisma.SortOrder
   serviceLevelTarget?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
+  riskLevel?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -452,6 +500,7 @@ export type ScenarioMaxOrderByAggregateInput = {
   capacityMultiplier?: Prisma.SortOrder
   serviceLevelTarget?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
+  riskLevel?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -464,6 +513,7 @@ export type ScenarioMinOrderByAggregateInput = {
   capacityMultiplier?: Prisma.SortOrder
   serviceLevelTarget?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
+  riskLevel?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -477,6 +527,11 @@ export type ScenarioSumOrderByAggregateInput = {
 export type ScenarioNullableScalarRelationFilter = {
   is?: Prisma.ScenarioWhereInput | null
   isNot?: Prisma.ScenarioWhereInput | null
+}
+
+export type ScenarioScalarRelationFilter = {
+  is?: Prisma.ScenarioWhereInput
+  isNot?: Prisma.ScenarioWhereInput
 }
 
 export type ScenarioCreateNestedManyWithoutCreatedByInput = {
@@ -537,6 +592,62 @@ export type ScenarioUpdateOneWithoutPlanningRunsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ScenarioUpdateToOneWithWhereWithoutPlanningRunsInput, Prisma.ScenarioUpdateWithoutPlanningRunsInput>, Prisma.ScenarioUncheckedUpdateWithoutPlanningRunsInput>
 }
 
+export type ScenarioCreateNestedOneWithoutMetricsInput = {
+  create?: Prisma.XOR<Prisma.ScenarioCreateWithoutMetricsInput, Prisma.ScenarioUncheckedCreateWithoutMetricsInput>
+  connectOrCreate?: Prisma.ScenarioCreateOrConnectWithoutMetricsInput
+  connect?: Prisma.ScenarioWhereUniqueInput
+}
+
+export type ScenarioUpdateOneRequiredWithoutMetricsNestedInput = {
+  create?: Prisma.XOR<Prisma.ScenarioCreateWithoutMetricsInput, Prisma.ScenarioUncheckedCreateWithoutMetricsInput>
+  connectOrCreate?: Prisma.ScenarioCreateOrConnectWithoutMetricsInput
+  upsert?: Prisma.ScenarioUpsertWithoutMetricsInput
+  connect?: Prisma.ScenarioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScenarioUpdateToOneWithWhereWithoutMetricsInput, Prisma.ScenarioUpdateWithoutMetricsInput>, Prisma.ScenarioUncheckedUpdateWithoutMetricsInput>
+}
+
+export type ScenarioCreateNestedOneWithoutDcImpactsInput = {
+  create?: Prisma.XOR<Prisma.ScenarioCreateWithoutDcImpactsInput, Prisma.ScenarioUncheckedCreateWithoutDcImpactsInput>
+  connectOrCreate?: Prisma.ScenarioCreateOrConnectWithoutDcImpactsInput
+  connect?: Prisma.ScenarioWhereUniqueInput
+}
+
+export type ScenarioUpdateOneRequiredWithoutDcImpactsNestedInput = {
+  create?: Prisma.XOR<Prisma.ScenarioCreateWithoutDcImpactsInput, Prisma.ScenarioUncheckedCreateWithoutDcImpactsInput>
+  connectOrCreate?: Prisma.ScenarioCreateOrConnectWithoutDcImpactsInput
+  upsert?: Prisma.ScenarioUpsertWithoutDcImpactsInput
+  connect?: Prisma.ScenarioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScenarioUpdateToOneWithWhereWithoutDcImpactsInput, Prisma.ScenarioUpdateWithoutDcImpactsInput>, Prisma.ScenarioUncheckedUpdateWithoutDcImpactsInput>
+}
+
+export type ScenarioCreateNestedOneWithoutSkuImpactsInput = {
+  create?: Prisma.XOR<Prisma.ScenarioCreateWithoutSkuImpactsInput, Prisma.ScenarioUncheckedCreateWithoutSkuImpactsInput>
+  connectOrCreate?: Prisma.ScenarioCreateOrConnectWithoutSkuImpactsInput
+  connect?: Prisma.ScenarioWhereUniqueInput
+}
+
+export type ScenarioUpdateOneRequiredWithoutSkuImpactsNestedInput = {
+  create?: Prisma.XOR<Prisma.ScenarioCreateWithoutSkuImpactsInput, Prisma.ScenarioUncheckedCreateWithoutSkuImpactsInput>
+  connectOrCreate?: Prisma.ScenarioCreateOrConnectWithoutSkuImpactsInput
+  upsert?: Prisma.ScenarioUpsertWithoutSkuImpactsInput
+  connect?: Prisma.ScenarioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScenarioUpdateToOneWithWhereWithoutSkuImpactsInput, Prisma.ScenarioUpdateWithoutSkuImpactsInput>, Prisma.ScenarioUncheckedUpdateWithoutSkuImpactsInput>
+}
+
+export type ScenarioCreateNestedOneWithoutRisksInput = {
+  create?: Prisma.XOR<Prisma.ScenarioCreateWithoutRisksInput, Prisma.ScenarioUncheckedCreateWithoutRisksInput>
+  connectOrCreate?: Prisma.ScenarioCreateOrConnectWithoutRisksInput
+  connect?: Prisma.ScenarioWhereUniqueInput
+}
+
+export type ScenarioUpdateOneRequiredWithoutRisksNestedInput = {
+  create?: Prisma.XOR<Prisma.ScenarioCreateWithoutRisksInput, Prisma.ScenarioUncheckedCreateWithoutRisksInput>
+  connectOrCreate?: Prisma.ScenarioCreateOrConnectWithoutRisksInput
+  upsert?: Prisma.ScenarioUpsertWithoutRisksInput
+  connect?: Prisma.ScenarioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScenarioUpdateToOneWithWhereWithoutRisksInput, Prisma.ScenarioUpdateWithoutRisksInput>, Prisma.ScenarioUncheckedUpdateWithoutRisksInput>
+}
+
 export type ScenarioCreateWithoutCreatedByInput = {
   id?: string
   name: string
@@ -545,8 +656,13 @@ export type ScenarioCreateWithoutCreatedByInput = {
   leadTimeMultiplier?: number
   capacityMultiplier?: number
   serviceLevelTarget?: number
+  riskLevel?: string | null
   createdAt?: Date | string
   planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutScenarioInput
+  metrics?: Prisma.SimulationMetricCreateNestedManyWithoutScenarioInput
+  dcImpacts?: Prisma.ScenarioDCImpactCreateNestedManyWithoutScenarioInput
+  skuImpacts?: Prisma.ScenarioSKUImpactCreateNestedManyWithoutScenarioInput
+  risks?: Prisma.ScenarioRiskIndicatorCreateNestedManyWithoutScenarioInput
 }
 
 export type ScenarioUncheckedCreateWithoutCreatedByInput = {
@@ -557,8 +673,13 @@ export type ScenarioUncheckedCreateWithoutCreatedByInput = {
   leadTimeMultiplier?: number
   capacityMultiplier?: number
   serviceLevelTarget?: number
+  riskLevel?: string | null
   createdAt?: Date | string
   planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutScenarioInput
+  metrics?: Prisma.SimulationMetricUncheckedCreateNestedManyWithoutScenarioInput
+  dcImpacts?: Prisma.ScenarioDCImpactUncheckedCreateNestedManyWithoutScenarioInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUncheckedCreateNestedManyWithoutScenarioInput
+  risks?: Prisma.ScenarioRiskIndicatorUncheckedCreateNestedManyWithoutScenarioInput
 }
 
 export type ScenarioCreateOrConnectWithoutCreatedByInput = {
@@ -599,6 +720,7 @@ export type ScenarioScalarWhereInput = {
   capacityMultiplier?: Prisma.FloatFilter<"Scenario"> | number
   serviceLevelTarget?: Prisma.FloatFilter<"Scenario"> | number
   createdById?: Prisma.StringFilter<"Scenario"> | string
+  riskLevel?: Prisma.StringNullableFilter<"Scenario"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Scenario"> | Date | string
 }
 
@@ -610,8 +732,13 @@ export type ScenarioCreateWithoutPlanningRunsInput = {
   leadTimeMultiplier?: number
   capacityMultiplier?: number
   serviceLevelTarget?: number
+  riskLevel?: string | null
   createdAt?: Date | string
   createdBy: Prisma.UserCreateNestedOneWithoutScenariosInput
+  metrics?: Prisma.SimulationMetricCreateNestedManyWithoutScenarioInput
+  dcImpacts?: Prisma.ScenarioDCImpactCreateNestedManyWithoutScenarioInput
+  skuImpacts?: Prisma.ScenarioSKUImpactCreateNestedManyWithoutScenarioInput
+  risks?: Prisma.ScenarioRiskIndicatorCreateNestedManyWithoutScenarioInput
 }
 
 export type ScenarioUncheckedCreateWithoutPlanningRunsInput = {
@@ -623,7 +750,12 @@ export type ScenarioUncheckedCreateWithoutPlanningRunsInput = {
   capacityMultiplier?: number
   serviceLevelTarget?: number
   createdById: string
+  riskLevel?: string | null
   createdAt?: Date | string
+  metrics?: Prisma.SimulationMetricUncheckedCreateNestedManyWithoutScenarioInput
+  dcImpacts?: Prisma.ScenarioDCImpactUncheckedCreateNestedManyWithoutScenarioInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUncheckedCreateNestedManyWithoutScenarioInput
+  risks?: Prisma.ScenarioRiskIndicatorUncheckedCreateNestedManyWithoutScenarioInput
 }
 
 export type ScenarioCreateOrConnectWithoutPlanningRunsInput = {
@@ -650,8 +782,13 @@ export type ScenarioUpdateWithoutPlanningRunsInput = {
   leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.UserUpdateOneRequiredWithoutScenariosNestedInput
+  metrics?: Prisma.SimulationMetricUpdateManyWithoutScenarioNestedInput
+  dcImpacts?: Prisma.ScenarioDCImpactUpdateManyWithoutScenarioNestedInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUpdateManyWithoutScenarioNestedInput
+  risks?: Prisma.ScenarioRiskIndicatorUpdateManyWithoutScenarioNestedInput
 }
 
 export type ScenarioUncheckedUpdateWithoutPlanningRunsInput = {
@@ -663,7 +800,348 @@ export type ScenarioUncheckedUpdateWithoutPlanningRunsInput = {
   capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metrics?: Prisma.SimulationMetricUncheckedUpdateManyWithoutScenarioNestedInput
+  dcImpacts?: Prisma.ScenarioDCImpactUncheckedUpdateManyWithoutScenarioNestedInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUncheckedUpdateManyWithoutScenarioNestedInput
+  risks?: Prisma.ScenarioRiskIndicatorUncheckedUpdateManyWithoutScenarioNestedInput
+}
+
+export type ScenarioCreateWithoutMetricsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  demandMultiplier?: number
+  leadTimeMultiplier?: number
+  capacityMultiplier?: number
+  serviceLevelTarget?: number
+  riskLevel?: string | null
+  createdAt?: Date | string
+  createdBy: Prisma.UserCreateNestedOneWithoutScenariosInput
+  planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutScenarioInput
+  dcImpacts?: Prisma.ScenarioDCImpactCreateNestedManyWithoutScenarioInput
+  skuImpacts?: Prisma.ScenarioSKUImpactCreateNestedManyWithoutScenarioInput
+  risks?: Prisma.ScenarioRiskIndicatorCreateNestedManyWithoutScenarioInput
+}
+
+export type ScenarioUncheckedCreateWithoutMetricsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  demandMultiplier?: number
+  leadTimeMultiplier?: number
+  capacityMultiplier?: number
+  serviceLevelTarget?: number
+  createdById: string
+  riskLevel?: string | null
+  createdAt?: Date | string
+  planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutScenarioInput
+  dcImpacts?: Prisma.ScenarioDCImpactUncheckedCreateNestedManyWithoutScenarioInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUncheckedCreateNestedManyWithoutScenarioInput
+  risks?: Prisma.ScenarioRiskIndicatorUncheckedCreateNestedManyWithoutScenarioInput
+}
+
+export type ScenarioCreateOrConnectWithoutMetricsInput = {
+  where: Prisma.ScenarioWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScenarioCreateWithoutMetricsInput, Prisma.ScenarioUncheckedCreateWithoutMetricsInput>
+}
+
+export type ScenarioUpsertWithoutMetricsInput = {
+  update: Prisma.XOR<Prisma.ScenarioUpdateWithoutMetricsInput, Prisma.ScenarioUncheckedUpdateWithoutMetricsInput>
+  create: Prisma.XOR<Prisma.ScenarioCreateWithoutMetricsInput, Prisma.ScenarioUncheckedCreateWithoutMetricsInput>
+  where?: Prisma.ScenarioWhereInput
+}
+
+export type ScenarioUpdateToOneWithWhereWithoutMetricsInput = {
+  where?: Prisma.ScenarioWhereInput
+  data: Prisma.XOR<Prisma.ScenarioUpdateWithoutMetricsInput, Prisma.ScenarioUncheckedUpdateWithoutMetricsInput>
+}
+
+export type ScenarioUpdateWithoutMetricsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demandMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneRequiredWithoutScenariosNestedInput
+  planningRuns?: Prisma.PlanningRunUpdateManyWithoutScenarioNestedInput
+  dcImpacts?: Prisma.ScenarioDCImpactUpdateManyWithoutScenarioNestedInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUpdateManyWithoutScenarioNestedInput
+  risks?: Prisma.ScenarioRiskIndicatorUpdateManyWithoutScenarioNestedInput
+}
+
+export type ScenarioUncheckedUpdateWithoutMetricsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demandMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdById?: Prisma.StringFieldUpdateOperationsInput | string
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutScenarioNestedInput
+  dcImpacts?: Prisma.ScenarioDCImpactUncheckedUpdateManyWithoutScenarioNestedInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUncheckedUpdateManyWithoutScenarioNestedInput
+  risks?: Prisma.ScenarioRiskIndicatorUncheckedUpdateManyWithoutScenarioNestedInput
+}
+
+export type ScenarioCreateWithoutDcImpactsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  demandMultiplier?: number
+  leadTimeMultiplier?: number
+  capacityMultiplier?: number
+  serviceLevelTarget?: number
+  riskLevel?: string | null
+  createdAt?: Date | string
+  createdBy: Prisma.UserCreateNestedOneWithoutScenariosInput
+  planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutScenarioInput
+  metrics?: Prisma.SimulationMetricCreateNestedManyWithoutScenarioInput
+  skuImpacts?: Prisma.ScenarioSKUImpactCreateNestedManyWithoutScenarioInput
+  risks?: Prisma.ScenarioRiskIndicatorCreateNestedManyWithoutScenarioInput
+}
+
+export type ScenarioUncheckedCreateWithoutDcImpactsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  demandMultiplier?: number
+  leadTimeMultiplier?: number
+  capacityMultiplier?: number
+  serviceLevelTarget?: number
+  createdById: string
+  riskLevel?: string | null
+  createdAt?: Date | string
+  planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutScenarioInput
+  metrics?: Prisma.SimulationMetricUncheckedCreateNestedManyWithoutScenarioInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUncheckedCreateNestedManyWithoutScenarioInput
+  risks?: Prisma.ScenarioRiskIndicatorUncheckedCreateNestedManyWithoutScenarioInput
+}
+
+export type ScenarioCreateOrConnectWithoutDcImpactsInput = {
+  where: Prisma.ScenarioWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScenarioCreateWithoutDcImpactsInput, Prisma.ScenarioUncheckedCreateWithoutDcImpactsInput>
+}
+
+export type ScenarioUpsertWithoutDcImpactsInput = {
+  update: Prisma.XOR<Prisma.ScenarioUpdateWithoutDcImpactsInput, Prisma.ScenarioUncheckedUpdateWithoutDcImpactsInput>
+  create: Prisma.XOR<Prisma.ScenarioCreateWithoutDcImpactsInput, Prisma.ScenarioUncheckedCreateWithoutDcImpactsInput>
+  where?: Prisma.ScenarioWhereInput
+}
+
+export type ScenarioUpdateToOneWithWhereWithoutDcImpactsInput = {
+  where?: Prisma.ScenarioWhereInput
+  data: Prisma.XOR<Prisma.ScenarioUpdateWithoutDcImpactsInput, Prisma.ScenarioUncheckedUpdateWithoutDcImpactsInput>
+}
+
+export type ScenarioUpdateWithoutDcImpactsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demandMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneRequiredWithoutScenariosNestedInput
+  planningRuns?: Prisma.PlanningRunUpdateManyWithoutScenarioNestedInput
+  metrics?: Prisma.SimulationMetricUpdateManyWithoutScenarioNestedInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUpdateManyWithoutScenarioNestedInput
+  risks?: Prisma.ScenarioRiskIndicatorUpdateManyWithoutScenarioNestedInput
+}
+
+export type ScenarioUncheckedUpdateWithoutDcImpactsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demandMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdById?: Prisma.StringFieldUpdateOperationsInput | string
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutScenarioNestedInput
+  metrics?: Prisma.SimulationMetricUncheckedUpdateManyWithoutScenarioNestedInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUncheckedUpdateManyWithoutScenarioNestedInput
+  risks?: Prisma.ScenarioRiskIndicatorUncheckedUpdateManyWithoutScenarioNestedInput
+}
+
+export type ScenarioCreateWithoutSkuImpactsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  demandMultiplier?: number
+  leadTimeMultiplier?: number
+  capacityMultiplier?: number
+  serviceLevelTarget?: number
+  riskLevel?: string | null
+  createdAt?: Date | string
+  createdBy: Prisma.UserCreateNestedOneWithoutScenariosInput
+  planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutScenarioInput
+  metrics?: Prisma.SimulationMetricCreateNestedManyWithoutScenarioInput
+  dcImpacts?: Prisma.ScenarioDCImpactCreateNestedManyWithoutScenarioInput
+  risks?: Prisma.ScenarioRiskIndicatorCreateNestedManyWithoutScenarioInput
+}
+
+export type ScenarioUncheckedCreateWithoutSkuImpactsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  demandMultiplier?: number
+  leadTimeMultiplier?: number
+  capacityMultiplier?: number
+  serviceLevelTarget?: number
+  createdById: string
+  riskLevel?: string | null
+  createdAt?: Date | string
+  planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutScenarioInput
+  metrics?: Prisma.SimulationMetricUncheckedCreateNestedManyWithoutScenarioInput
+  dcImpacts?: Prisma.ScenarioDCImpactUncheckedCreateNestedManyWithoutScenarioInput
+  risks?: Prisma.ScenarioRiskIndicatorUncheckedCreateNestedManyWithoutScenarioInput
+}
+
+export type ScenarioCreateOrConnectWithoutSkuImpactsInput = {
+  where: Prisma.ScenarioWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScenarioCreateWithoutSkuImpactsInput, Prisma.ScenarioUncheckedCreateWithoutSkuImpactsInput>
+}
+
+export type ScenarioUpsertWithoutSkuImpactsInput = {
+  update: Prisma.XOR<Prisma.ScenarioUpdateWithoutSkuImpactsInput, Prisma.ScenarioUncheckedUpdateWithoutSkuImpactsInput>
+  create: Prisma.XOR<Prisma.ScenarioCreateWithoutSkuImpactsInput, Prisma.ScenarioUncheckedCreateWithoutSkuImpactsInput>
+  where?: Prisma.ScenarioWhereInput
+}
+
+export type ScenarioUpdateToOneWithWhereWithoutSkuImpactsInput = {
+  where?: Prisma.ScenarioWhereInput
+  data: Prisma.XOR<Prisma.ScenarioUpdateWithoutSkuImpactsInput, Prisma.ScenarioUncheckedUpdateWithoutSkuImpactsInput>
+}
+
+export type ScenarioUpdateWithoutSkuImpactsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demandMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneRequiredWithoutScenariosNestedInput
+  planningRuns?: Prisma.PlanningRunUpdateManyWithoutScenarioNestedInput
+  metrics?: Prisma.SimulationMetricUpdateManyWithoutScenarioNestedInput
+  dcImpacts?: Prisma.ScenarioDCImpactUpdateManyWithoutScenarioNestedInput
+  risks?: Prisma.ScenarioRiskIndicatorUpdateManyWithoutScenarioNestedInput
+}
+
+export type ScenarioUncheckedUpdateWithoutSkuImpactsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demandMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdById?: Prisma.StringFieldUpdateOperationsInput | string
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutScenarioNestedInput
+  metrics?: Prisma.SimulationMetricUncheckedUpdateManyWithoutScenarioNestedInput
+  dcImpacts?: Prisma.ScenarioDCImpactUncheckedUpdateManyWithoutScenarioNestedInput
+  risks?: Prisma.ScenarioRiskIndicatorUncheckedUpdateManyWithoutScenarioNestedInput
+}
+
+export type ScenarioCreateWithoutRisksInput = {
+  id?: string
+  name: string
+  description?: string | null
+  demandMultiplier?: number
+  leadTimeMultiplier?: number
+  capacityMultiplier?: number
+  serviceLevelTarget?: number
+  riskLevel?: string | null
+  createdAt?: Date | string
+  createdBy: Prisma.UserCreateNestedOneWithoutScenariosInput
+  planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutScenarioInput
+  metrics?: Prisma.SimulationMetricCreateNestedManyWithoutScenarioInput
+  dcImpacts?: Prisma.ScenarioDCImpactCreateNestedManyWithoutScenarioInput
+  skuImpacts?: Prisma.ScenarioSKUImpactCreateNestedManyWithoutScenarioInput
+}
+
+export type ScenarioUncheckedCreateWithoutRisksInput = {
+  id?: string
+  name: string
+  description?: string | null
+  demandMultiplier?: number
+  leadTimeMultiplier?: number
+  capacityMultiplier?: number
+  serviceLevelTarget?: number
+  createdById: string
+  riskLevel?: string | null
+  createdAt?: Date | string
+  planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutScenarioInput
+  metrics?: Prisma.SimulationMetricUncheckedCreateNestedManyWithoutScenarioInput
+  dcImpacts?: Prisma.ScenarioDCImpactUncheckedCreateNestedManyWithoutScenarioInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUncheckedCreateNestedManyWithoutScenarioInput
+}
+
+export type ScenarioCreateOrConnectWithoutRisksInput = {
+  where: Prisma.ScenarioWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScenarioCreateWithoutRisksInput, Prisma.ScenarioUncheckedCreateWithoutRisksInput>
+}
+
+export type ScenarioUpsertWithoutRisksInput = {
+  update: Prisma.XOR<Prisma.ScenarioUpdateWithoutRisksInput, Prisma.ScenarioUncheckedUpdateWithoutRisksInput>
+  create: Prisma.XOR<Prisma.ScenarioCreateWithoutRisksInput, Prisma.ScenarioUncheckedCreateWithoutRisksInput>
+  where?: Prisma.ScenarioWhereInput
+}
+
+export type ScenarioUpdateToOneWithWhereWithoutRisksInput = {
+  where?: Prisma.ScenarioWhereInput
+  data: Prisma.XOR<Prisma.ScenarioUpdateWithoutRisksInput, Prisma.ScenarioUncheckedUpdateWithoutRisksInput>
+}
+
+export type ScenarioUpdateWithoutRisksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demandMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneRequiredWithoutScenariosNestedInput
+  planningRuns?: Prisma.PlanningRunUpdateManyWithoutScenarioNestedInput
+  metrics?: Prisma.SimulationMetricUpdateManyWithoutScenarioNestedInput
+  dcImpacts?: Prisma.ScenarioDCImpactUpdateManyWithoutScenarioNestedInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUpdateManyWithoutScenarioNestedInput
+}
+
+export type ScenarioUncheckedUpdateWithoutRisksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demandMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdById?: Prisma.StringFieldUpdateOperationsInput | string
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutScenarioNestedInput
+  metrics?: Prisma.SimulationMetricUncheckedUpdateManyWithoutScenarioNestedInput
+  dcImpacts?: Prisma.ScenarioDCImpactUncheckedUpdateManyWithoutScenarioNestedInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUncheckedUpdateManyWithoutScenarioNestedInput
 }
 
 export type ScenarioCreateManyCreatedByInput = {
@@ -674,6 +1152,7 @@ export type ScenarioCreateManyCreatedByInput = {
   leadTimeMultiplier?: number
   capacityMultiplier?: number
   serviceLevelTarget?: number
+  riskLevel?: string | null
   createdAt?: Date | string
 }
 
@@ -685,8 +1164,13 @@ export type ScenarioUpdateWithoutCreatedByInput = {
   leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   planningRuns?: Prisma.PlanningRunUpdateManyWithoutScenarioNestedInput
+  metrics?: Prisma.SimulationMetricUpdateManyWithoutScenarioNestedInput
+  dcImpacts?: Prisma.ScenarioDCImpactUpdateManyWithoutScenarioNestedInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUpdateManyWithoutScenarioNestedInput
+  risks?: Prisma.ScenarioRiskIndicatorUpdateManyWithoutScenarioNestedInput
 }
 
 export type ScenarioUncheckedUpdateWithoutCreatedByInput = {
@@ -697,8 +1181,13 @@ export type ScenarioUncheckedUpdateWithoutCreatedByInput = {
   leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutScenarioNestedInput
+  metrics?: Prisma.SimulationMetricUncheckedUpdateManyWithoutScenarioNestedInput
+  dcImpacts?: Prisma.ScenarioDCImpactUncheckedUpdateManyWithoutScenarioNestedInput
+  skuImpacts?: Prisma.ScenarioSKUImpactUncheckedUpdateManyWithoutScenarioNestedInput
+  risks?: Prisma.ScenarioRiskIndicatorUncheckedUpdateManyWithoutScenarioNestedInput
 }
 
 export type ScenarioUncheckedUpdateManyWithoutCreatedByInput = {
@@ -709,6 +1198,7 @@ export type ScenarioUncheckedUpdateManyWithoutCreatedByInput = {
   leadTimeMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   capacityMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceLevelTarget?: Prisma.FloatFieldUpdateOperationsInput | number
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -719,10 +1209,18 @@ export type ScenarioUncheckedUpdateManyWithoutCreatedByInput = {
 
 export type ScenarioCountOutputType = {
   planningRuns: number
+  metrics: number
+  dcImpacts: number
+  skuImpacts: number
+  risks: number
 }
 
 export type ScenarioCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   planningRuns?: boolean | ScenarioCountOutputTypeCountPlanningRunsArgs
+  metrics?: boolean | ScenarioCountOutputTypeCountMetricsArgs
+  dcImpacts?: boolean | ScenarioCountOutputTypeCountDcImpactsArgs
+  skuImpacts?: boolean | ScenarioCountOutputTypeCountSkuImpactsArgs
+  risks?: boolean | ScenarioCountOutputTypeCountRisksArgs
 }
 
 /**
@@ -742,6 +1240,34 @@ export type ScenarioCountOutputTypeCountPlanningRunsArgs<ExtArgs extends runtime
   where?: Prisma.PlanningRunWhereInput
 }
 
+/**
+ * ScenarioCountOutputType without action
+ */
+export type ScenarioCountOutputTypeCountMetricsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SimulationMetricWhereInput
+}
+
+/**
+ * ScenarioCountOutputType without action
+ */
+export type ScenarioCountOutputTypeCountDcImpactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ScenarioDCImpactWhereInput
+}
+
+/**
+ * ScenarioCountOutputType without action
+ */
+export type ScenarioCountOutputTypeCountSkuImpactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ScenarioSKUImpactWhereInput
+}
+
+/**
+ * ScenarioCountOutputType without action
+ */
+export type ScenarioCountOutputTypeCountRisksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ScenarioRiskIndicatorWhereInput
+}
+
 
 export type ScenarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -752,9 +1278,14 @@ export type ScenarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   capacityMultiplier?: boolean
   serviceLevelTarget?: boolean
   createdById?: boolean
+  riskLevel?: boolean
   createdAt?: boolean
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   planningRuns?: boolean | Prisma.Scenario$planningRunsArgs<ExtArgs>
+  metrics?: boolean | Prisma.Scenario$metricsArgs<ExtArgs>
+  dcImpacts?: boolean | Prisma.Scenario$dcImpactsArgs<ExtArgs>
+  skuImpacts?: boolean | Prisma.Scenario$skuImpactsArgs<ExtArgs>
+  risks?: boolean | Prisma.Scenario$risksArgs<ExtArgs>
   _count?: boolean | Prisma.ScenarioCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["scenario"]>
 
@@ -767,6 +1298,7 @@ export type ScenarioSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   capacityMultiplier?: boolean
   serviceLevelTarget?: boolean
   createdById?: boolean
+  riskLevel?: boolean
   createdAt?: boolean
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["scenario"]>
@@ -780,6 +1312,7 @@ export type ScenarioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   capacityMultiplier?: boolean
   serviceLevelTarget?: boolean
   createdById?: boolean
+  riskLevel?: boolean
   createdAt?: boolean
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["scenario"]>
@@ -793,13 +1326,18 @@ export type ScenarioSelectScalar = {
   capacityMultiplier?: boolean
   serviceLevelTarget?: boolean
   createdById?: boolean
+  riskLevel?: boolean
   createdAt?: boolean
 }
 
-export type ScenarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "demandMultiplier" | "leadTimeMultiplier" | "capacityMultiplier" | "serviceLevelTarget" | "createdById" | "createdAt", ExtArgs["result"]["scenario"]>
+export type ScenarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "demandMultiplier" | "leadTimeMultiplier" | "capacityMultiplier" | "serviceLevelTarget" | "createdById" | "riskLevel" | "createdAt", ExtArgs["result"]["scenario"]>
 export type ScenarioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   planningRuns?: boolean | Prisma.Scenario$planningRunsArgs<ExtArgs>
+  metrics?: boolean | Prisma.Scenario$metricsArgs<ExtArgs>
+  dcImpacts?: boolean | Prisma.Scenario$dcImpactsArgs<ExtArgs>
+  skuImpacts?: boolean | Prisma.Scenario$skuImpactsArgs<ExtArgs>
+  risks?: boolean | Prisma.Scenario$risksArgs<ExtArgs>
   _count?: boolean | Prisma.ScenarioCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ScenarioIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -814,6 +1352,10 @@ export type $ScenarioPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     createdBy: Prisma.$UserPayload<ExtArgs>
     planningRuns: Prisma.$PlanningRunPayload<ExtArgs>[]
+    metrics: Prisma.$SimulationMetricPayload<ExtArgs>[]
+    dcImpacts: Prisma.$ScenarioDCImpactPayload<ExtArgs>[]
+    skuImpacts: Prisma.$ScenarioSKUImpactPayload<ExtArgs>[]
+    risks: Prisma.$ScenarioRiskIndicatorPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -824,6 +1366,7 @@ export type $ScenarioPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     capacityMultiplier: number
     serviceLevelTarget: number
     createdById: string
+    riskLevel: string | null
     createdAt: Date
   }, ExtArgs["result"]["scenario"]>
   composites: {}
@@ -1221,6 +1764,10 @@ export interface Prisma__ScenarioClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   createdBy<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   planningRuns<T extends Prisma.Scenario$planningRunsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scenario$planningRunsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlanningRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  metrics<T extends Prisma.Scenario$metricsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scenario$metricsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SimulationMetricPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  dcImpacts<T extends Prisma.Scenario$dcImpactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scenario$dcImpactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScenarioDCImpactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  skuImpacts<T extends Prisma.Scenario$skuImpactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scenario$skuImpactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScenarioSKUImpactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  risks<T extends Prisma.Scenario$risksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scenario$risksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScenarioRiskIndicatorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1258,6 +1805,7 @@ export interface ScenarioFieldRefs {
   readonly capacityMultiplier: Prisma.FieldRef<"Scenario", 'Float'>
   readonly serviceLevelTarget: Prisma.FieldRef<"Scenario", 'Float'>
   readonly createdById: Prisma.FieldRef<"Scenario", 'String'>
+  readonly riskLevel: Prisma.FieldRef<"Scenario", 'String'>
   readonly createdAt: Prisma.FieldRef<"Scenario", 'DateTime'>
 }
     
@@ -1681,6 +2229,102 @@ export type Scenario$planningRunsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.PlanningRunScalarFieldEnum | Prisma.PlanningRunScalarFieldEnum[]
+}
+
+/**
+ * Scenario.metrics
+ */
+export type Scenario$metricsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SimulationMetric
+   */
+  select?: Prisma.SimulationMetricSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SimulationMetric
+   */
+  omit?: Prisma.SimulationMetricOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SimulationMetricInclude<ExtArgs> | null
+  where?: Prisma.SimulationMetricWhereInput
+  orderBy?: Prisma.SimulationMetricOrderByWithRelationInput | Prisma.SimulationMetricOrderByWithRelationInput[]
+  cursor?: Prisma.SimulationMetricWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SimulationMetricScalarFieldEnum | Prisma.SimulationMetricScalarFieldEnum[]
+}
+
+/**
+ * Scenario.dcImpacts
+ */
+export type Scenario$dcImpactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ScenarioDCImpact
+   */
+  select?: Prisma.ScenarioDCImpactSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ScenarioDCImpact
+   */
+  omit?: Prisma.ScenarioDCImpactOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScenarioDCImpactInclude<ExtArgs> | null
+  where?: Prisma.ScenarioDCImpactWhereInput
+  orderBy?: Prisma.ScenarioDCImpactOrderByWithRelationInput | Prisma.ScenarioDCImpactOrderByWithRelationInput[]
+  cursor?: Prisma.ScenarioDCImpactWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ScenarioDCImpactScalarFieldEnum | Prisma.ScenarioDCImpactScalarFieldEnum[]
+}
+
+/**
+ * Scenario.skuImpacts
+ */
+export type Scenario$skuImpactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ScenarioSKUImpact
+   */
+  select?: Prisma.ScenarioSKUImpactSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ScenarioSKUImpact
+   */
+  omit?: Prisma.ScenarioSKUImpactOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScenarioSKUImpactInclude<ExtArgs> | null
+  where?: Prisma.ScenarioSKUImpactWhereInput
+  orderBy?: Prisma.ScenarioSKUImpactOrderByWithRelationInput | Prisma.ScenarioSKUImpactOrderByWithRelationInput[]
+  cursor?: Prisma.ScenarioSKUImpactWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ScenarioSKUImpactScalarFieldEnum | Prisma.ScenarioSKUImpactScalarFieldEnum[]
+}
+
+/**
+ * Scenario.risks
+ */
+export type Scenario$risksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ScenarioRiskIndicator
+   */
+  select?: Prisma.ScenarioRiskIndicatorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ScenarioRiskIndicator
+   */
+  omit?: Prisma.ScenarioRiskIndicatorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScenarioRiskIndicatorInclude<ExtArgs> | null
+  where?: Prisma.ScenarioRiskIndicatorWhereInput
+  orderBy?: Prisma.ScenarioRiskIndicatorOrderByWithRelationInput | Prisma.ScenarioRiskIndicatorOrderByWithRelationInput[]
+  cursor?: Prisma.ScenarioRiskIndicatorWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ScenarioRiskIndicatorScalarFieldEnum | Prisma.ScenarioRiskIndicatorScalarFieldEnum[]
 }
 
 /**

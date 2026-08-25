@@ -1,21 +1,12 @@
 import { prisma } from "../src/config/prisma.js";
 import type { Criticality, WarehouseTier } from "../generated/prisma/enums.js";
+import { createRng, between as betweenOf, intBetween as intBetweenOf } from "../src/utils/random.js";
 
 const SEED = 0x2f6e2b1;
 
-const createRng = (seed: number) => {
-  let state = seed;
-  return () => {
-    state = (state + 0x6d2b79f5) | 0;
-    let t = Math.imul(state ^ (state >>> 15), 1 | state);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-};
-
 const rng = createRng(SEED);
-const between = (min: number, max: number) => min + rng() * (max - min);
-const intBetween = (min: number, max: number) => Math.floor(between(min, max + 1));
+const between = (min: number, max: number) => betweenOf(rng, min, max);
+const intBetween = (min: number, max: number) => intBetweenOf(rng, min, max);
 
 const HISTORY_DAYS = 180;
 const startOfDay = (date: Date) =>
@@ -134,12 +125,23 @@ const clear = async () => {
 const main = async () => {
   await clear();
 
-  await prisma.user.create({
+  const systemUser = await prisma.user.create({
     data: {
       name: "System",
       email: "system@medcare.local",
       passwordHash: "!",
       role: "ADMIN",
+    },
+  });
+
+  await prisma.scenario.create({
+    data: {
+      name: "Flu Surge +60%",
+      description:
+        "Peak flu season. Demand runs 60% above baseline and critical SKUs are held to a 98% service level.",
+      demandMultiplier: 1.6,
+      serviceLevelTarget: 0.98,
+      createdById: systemUser.id,
     },
   });
 

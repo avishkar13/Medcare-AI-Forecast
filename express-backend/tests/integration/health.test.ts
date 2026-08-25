@@ -17,7 +17,7 @@ after(async () => {
 interface Readiness {
   status: "ok" | "degraded";
   uptimeSeconds: number;
-  dependencies: { database: string; redis: string };
+  dependencies: { database: string; redis: string; forecast: string };
 }
 
 describe("GET /", () => {
@@ -62,7 +62,7 @@ describe("GET /api/health/ready", () => {
     assert.ok(["ok", "degraded"].includes(body.status));
     assert.equal(typeof body.uptimeSeconds, "number");
     assert.ok(body.uptimeSeconds >= 0);
-    for (const dependency of [body.dependencies.database, body.dependencies.redis]) {
+    for (const dependency of Object.values(body.dependencies)) {
       assert.ok(["up", "down", "not_configured"].includes(dependency));
     }
   });
@@ -70,10 +70,33 @@ describe("GET /api/health/ready", () => {
   test("status agrees with the dependency states", async () => {
     const response = await server.get("/api/health/ready");
     const body = (await response.json()) as Readiness;
-    const degraded = Object.values(body.dependencies).includes("down");
+    // The forecast engine is deliberately excluded: with the fallback enabled a
+    // dead engine does not take the instance out of rotation.
+    const degraded = [body.dependencies.database, body.dependencies.redis].includes("down");
 
     assert.equal(body.status, degraded ? "degraded" : "ok");
     assert.equal(response.status, degraded ? 503 : 200, "a degraded instance must not stay in rotation");
+  });
+
+  test("an absent forecast engine is not configured, not down", async () => {
+    const body = (await server.json("/api/health/ready")) as Readiness;
+    assert.ok(["up", "down", "not_configured"].includes(body.dependencies.forecast));
+
+    if (body.dependencies.forecast === "not_configured") {
+      assert.notEqual(body.status, "degraded", "no engine configured is not a fault");
+    }
+  });
+
+  test("a dead engine does not take the instance out of rotation", async () => {
+    const body = (await server.json("/api/health/ready")) as Readiness;
+
+    if (body.dependencies.forecast === "down" && body.dependencies.database === "up") {
+      assert.notEqual(
+        body.status,
+        "degraded",
+        "the naive fallback still produces plans, so the instance is still ready",
+      );
+    }
   });
 
   test("an unconfigured Redis does not degrade readiness", async () => {

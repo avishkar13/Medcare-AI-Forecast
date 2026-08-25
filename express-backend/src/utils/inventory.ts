@@ -28,6 +28,20 @@ export const zScore = (probability: number): number => {
     (((((B[0]! * r + B[1]!) * r + B[2]!) * r + B[3]!) * r + B[4]!) * r + 1);
 };
 
+const SQRT_2PI = Math.sqrt(2 * Math.PI);
+
+export const normalPdf = (z: number): number => Math.exp(-0.5 * z * z) / SQRT_2PI;
+
+// Zelen & Severo (A&S 26.2.17), |error| < 7.5e-8. The inverse of zScore above.
+export const normalCdf = (z: number): number => {
+  const x = Math.abs(z);
+  const t = 1 / (1 + 0.2316419 * x);
+  const poly =
+    ((((1.330274429 * t - 1.821255978) * t + 1.781477937) * t - 0.356563782) * t + 0.31938153) * t;
+  const upperTail = normalPdf(x) * poly;
+  return z >= 0 ? 1 - upperTail : upperTail;
+};
+
 export interface DemandProfile {
   avgDailyDemand: number;
   demandStdDev: number;
@@ -50,6 +64,45 @@ export const safetyStock = ({
 
 export const reorderPoint = (profile: DemandProfile): number =>
   profile.avgDailyDemand * profile.leadTimeDays + safetyStock(profile);
+
+// z(0.9) - z(0.1): the width of an 80% forecast band, in standard deviations.
+const P10_P90_SPREAD = 2.5631031;
+
+export const stdDevFromBand = (p10: number, p90: number): number =>
+  Math.max(0, (p90 - p10) / P10_P90_SPREAD);
+
+export interface OrderUpToInputs {
+  avgDailyDemand: number;
+  leadTimeDays: number;
+  reviewPeriodDays: number;
+  safetyStock: number;
+}
+
+// (R,S) policy: cover lead time plus one review period, then add the buffer.
+export const orderUpToLevel = ({
+  avgDailyDemand,
+  leadTimeDays,
+  reviewPeriodDays,
+  safetyStock: buffer,
+}: OrderUpToInputs): number =>
+  Math.max(0, avgDailyDemand * (leadTimeDays + reviewPeriodDays) + buffer);
+
+export interface ShortfallInputs {
+  demandMean: number;
+  demandStdDev: number;
+  availableUnits: number;
+}
+
+// E[(demand - stock)+] under normal demand - the standard loss function.
+export const expectedShortfall = ({
+  demandMean,
+  demandStdDev,
+  availableUnits,
+}: ShortfallInputs): number => {
+  if (!(demandStdDev > 0)) return Math.max(0, demandMean - availableUnits);
+  const k = (availableUnits - demandMean) / demandStdDev;
+  return Math.max(0, demandStdDev * (normalPdf(k) - k * (1 - normalCdf(k))));
+};
 
 export interface FefoBatch {
   quantity: number;

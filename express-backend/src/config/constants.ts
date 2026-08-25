@@ -50,6 +50,24 @@ export const PLANNING = {
   lockTtlMs: 10_000,
   systemUserEmail: "system@medcare.local",
   activeStatuses: ["PENDING", "RUNNING"],
+  executor: env.PLANNING_EXECUTOR,
+  simulationIterations: env.PLANNING_SIMULATION_ITERATIONS,
+  // Fixed, so two runs over the same inputs produce the same numbers. A run that
+  // cannot be reproduced cannot be compared against another one.
+  simulationSeed: 0x5eed_1a4b,
+  // No lane or distance model exists, so one flat rate per unit moved. A TransferLane
+  // model is the honest fix if per-lane costs ever matter.
+  transferCostPerUnit: 0.05,
+  // The review list stays usable; anything past this is noise a planner never reaches.
+  maxRecommendations: 200,
+} as const;
+
+export const FORECAST = {
+  serviceUrl: env.FORECAST_SERVICE_URL,
+  timeoutMs: env.FORECAST_TIMEOUT_MS,
+  retries: env.FORECAST_RETRIES,
+  fallbackEnabled: env.FORECAST_FALLBACK,
+  fallbackModelVersion: "naive-seasonal-fallback",
 } as const;
 
 export const DATABASE_URL = env.DATABASE_URL;

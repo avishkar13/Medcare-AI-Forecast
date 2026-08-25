@@ -70,7 +70,28 @@ export const ModelName = {
   DRPPlan: 'DRPPlan',
   OptimizationResult: 'OptimizationResult',
   SimulationRun: 'SimulationRun',
-  Recommendation: 'Recommendation'
+  Recommendation: 'Recommendation',
+  Alert: 'Alert',
+  SystemSettings: 'SystemSettings',
+  StockMovement: 'StockMovement',
+  WastePreventionRecord: 'WastePreventionRecord',
+  AlertMetric: 'AlertMetric',
+  AlertTimelineEvent: 'AlertTimelineEvent',
+  RecommendationSignal: 'RecommendationSignal',
+  SimulationMetric: 'SimulationMetric',
+  ScenarioDCImpact: 'ScenarioDCImpact',
+  ScenarioSKUImpact: 'ScenarioSKUImpact',
+  ScenarioRiskIndicator: 'ScenarioRiskIndicator',
+  GeneralSettings: 'GeneralSettings',
+  ForecastSettings: 'ForecastSettings',
+  InventorySettings: 'InventorySettings',
+  AlertSettings: 'AlertSettings',
+  NotificationSettings: 'NotificationSettings',
+  NotificationRule: 'NotificationRule',
+  AISettings: 'AISettings',
+  IntegrationSettings: 'IntegrationSettings',
+  IntegrationSource: 'IntegrationSource',
+  SecuritySettings: 'SecuritySettings'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -263,6 +284,7 @@ export const ScenarioScalarFieldEnum = {
   capacityMultiplier: 'capacityMultiplier',
   serviceLevelTarget: 'serviceLevelTarget',
   createdById: 'createdById',
+  riskLevel: 'riskLevel',
   createdAt: 'createdAt'
 } as const
 
@@ -278,6 +300,8 @@ export const PlanningRunScalarFieldEnum = {
   modelVersion: 'modelVersion',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
+  failureReason: 'failureReason',
+  failureStage: 'failureStage',
   createdAt: 'createdAt'
 } as const
 
@@ -357,6 +381,7 @@ export const OptimizationResultScalarFieldEnum = {
   transferCost: 'transferCost',
   expiryCost: 'expiryCost',
   totalCost: 'totalCost',
+  baselineCost: 'baselineCost',
   solver: 'solver',
   solverStatus: 'solverStatus',
   createdAt: 'createdAt'
@@ -394,10 +419,323 @@ export const RecommendationScalarFieldEnum = {
   acknowledgedAt: 'acknowledgedAt',
   resolvedAt: 'resolvedAt',
   actedById: 'actedById',
+  actionType: 'actionType',
+  confidence: 'confidence',
+  expectedImpact: 'expectedImpact',
+  impactValue: 'impactValue',
   createdAt: 'createdAt'
 } as const
 
 export type RecommendationScalarFieldEnum = (typeof RecommendationScalarFieldEnum)[keyof typeof RecommendationScalarFieldEnum]
+
+
+export const AlertScalarFieldEnum = {
+  id: 'id',
+  severity: 'severity',
+  type: 'type',
+  title: 'title',
+  sku: 'sku',
+  product: 'product',
+  location: 'location',
+  detectedAt: 'detectedAt',
+  businessImpact: 'businessImpact',
+  status: 'status',
+  recommendedAction: 'recommendedAction',
+  explanation: 'explanation',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AlertScalarFieldEnum = (typeof AlertScalarFieldEnum)[keyof typeof AlertScalarFieldEnum]
+
+
+export const SystemSettingsScalarFieldEnum = {
+  id: 'id',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SystemSettingsScalarFieldEnum = (typeof SystemSettingsScalarFieldEnum)[keyof typeof SystemSettingsScalarFieldEnum]
+
+
+export const StockMovementScalarFieldEnum = {
+  id: 'id',
+  date: 'date',
+  movementType: 'movementType',
+  sku: 'sku',
+  quantity: 'quantity',
+  fromLocation: 'fromLocation',
+  toLocation: 'toLocation',
+  reference: 'reference',
+  userOrSystem: 'userOrSystem',
+  createdAt: 'createdAt'
+} as const
+
+export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)[keyof typeof StockMovementScalarFieldEnum]
+
+
+export const WastePreventionRecordScalarFieldEnum = {
+  id: 'id',
+  productName: 'productName',
+  actionTaken: 'actionTaken',
+  unitsSaved: 'unitsSaved',
+  valueSaved: 'valueSaved',
+  date: 'date',
+  createdAt: 'createdAt'
+} as const
+
+export type WastePreventionRecordScalarFieldEnum = (typeof WastePreventionRecordScalarFieldEnum)[keyof typeof WastePreventionRecordScalarFieldEnum]
+
+
+export const AlertMetricScalarFieldEnum = {
+  id: 'id',
+  alertId: 'alertId',
+  label: 'label',
+  value: 'value'
+} as const
+
+export type AlertMetricScalarFieldEnum = (typeof AlertMetricScalarFieldEnum)[keyof typeof AlertMetricScalarFieldEnum]
+
+
+export const AlertTimelineEventScalarFieldEnum = {
+  id: 'id',
+  alertId: 'alertId',
+  time: 'time',
+  description: 'description'
+} as const
+
+export type AlertTimelineEventScalarFieldEnum = (typeof AlertTimelineEventScalarFieldEnum)[keyof typeof AlertTimelineEventScalarFieldEnum]
+
+
+export const RecommendationSignalScalarFieldEnum = {
+  id: 'id',
+  recommendationId: 'recommendationId',
+  type: 'type',
+  label: 'label',
+  direction: 'direction'
+} as const
+
+export type RecommendationSignalScalarFieldEnum = (typeof RecommendationSignalScalarFieldEnum)[keyof typeof RecommendationSignalScalarFieldEnum]
+
+
+export const SimulationMetricScalarFieldEnum = {
+  id: 'id',
+  scenarioId: 'scenarioId',
+  label: 'label',
+  currentValue: 'currentValue',
+  simulatedValue: 'simulatedValue',
+  delta: 'delta',
+  unit: 'unit',
+  direction: 'direction',
+  format: 'format'
+} as const
+
+export type SimulationMetricScalarFieldEnum = (typeof SimulationMetricScalarFieldEnum)[keyof typeof SimulationMetricScalarFieldEnum]
+
+
+export const ScenarioDCImpactScalarFieldEnum = {
+  id: 'id',
+  scenarioId: 'scenarioId',
+  name: 'name',
+  currentCapacity: 'currentCapacity',
+  simulatedCapacity: 'simulatedCapacity',
+  currentStockoutRisk: 'currentStockoutRisk',
+  simulatedStockoutRisk: 'simulatedStockoutRisk',
+  currentAtRiskValue: 'currentAtRiskValue',
+  simulatedAtRiskValue: 'simulatedAtRiskValue'
+} as const
+
+export type ScenarioDCImpactScalarFieldEnum = (typeof ScenarioDCImpactScalarFieldEnum)[keyof typeof ScenarioDCImpactScalarFieldEnum]
+
+
+export const ScenarioSKUImpactScalarFieldEnum = {
+  id: 'id',
+  scenarioId: 'scenarioId',
+  name: 'name',
+  sku: 'sku',
+  currentInventory: 'currentInventory',
+  simulatedInventory: 'simulatedInventory',
+  optimalInventory: 'optimalInventory'
+} as const
+
+export type ScenarioSKUImpactScalarFieldEnum = (typeof ScenarioSKUImpactScalarFieldEnum)[keyof typeof ScenarioSKUImpactScalarFieldEnum]
+
+
+export const ScenarioRiskIndicatorScalarFieldEnum = {
+  id: 'id',
+  scenarioId: 'scenarioId',
+  name: 'name',
+  icon: 'icon',
+  currentValue: 'currentValue',
+  simulatedValue: 'simulatedValue',
+  delta: 'delta',
+  severity: 'severity'
+} as const
+
+export type ScenarioRiskIndicatorScalarFieldEnum = (typeof ScenarioRiskIndicatorScalarFieldEnum)[keyof typeof ScenarioRiskIndicatorScalarFieldEnum]
+
+
+export const GeneralSettingsScalarFieldEnum = {
+  id: 'id',
+  systemSettingsId: 'systemSettingsId',
+  workspaceName: 'workspaceName',
+  organization: 'organization',
+  region: 'region',
+  timezone: 'timezone',
+  dateFormat: 'dateFormat',
+  currency: 'currency',
+  language: 'language',
+  theme: 'theme',
+  density: 'density',
+  defaultLandingPage: 'defaultLandingPage'
+} as const
+
+export type GeneralSettingsScalarFieldEnum = (typeof GeneralSettingsScalarFieldEnum)[keyof typeof GeneralSettingsScalarFieldEnum]
+
+
+export const ForecastSettingsScalarFieldEnum = {
+  id: 'id',
+  systemSettingsId: 'systemSettingsId',
+  defaultHorizon: 'defaultHorizon',
+  defaultModel: 'defaultModel',
+  confidenceThreshold: 'confidenceThreshold',
+  updateFrequency: 'updateFrequency',
+  predictionInterval: 'predictionInterval',
+  autoRefresh: 'autoRefresh',
+  targetAccuracy: 'targetAccuracy',
+  alertAccuracyThreshold: 'alertAccuracyThreshold'
+} as const
+
+export type ForecastSettingsScalarFieldEnum = (typeof ForecastSettingsScalarFieldEnum)[keyof typeof ForecastSettingsScalarFieldEnum]
+
+
+export const InventorySettingsScalarFieldEnum = {
+  id: 'id',
+  systemSettingsId: 'systemSettingsId',
+  defaultSafetyStock: 'defaultSafetyStock',
+  reorderPoint: 'reorderPoint',
+  maxInventory: 'maxInventory',
+  minServiceLevel: 'minServiceLevel',
+  autoReorder: 'autoReorder',
+  coverageWarning: 'coverageWarning',
+  coverageCritical: 'coverageCritical',
+  safetyStockWarning: 'safetyStockWarning',
+  safetyStockCritical: 'safetyStockCritical',
+  capacityWarning: 'capacityWarning',
+  capacityCritical: 'capacityCritical',
+  expiryWindowWarning: 'expiryWindowWarning',
+  expiryWindowCritical: 'expiryWindowCritical'
+} as const
+
+export type InventorySettingsScalarFieldEnum = (typeof InventorySettingsScalarFieldEnum)[keyof typeof InventorySettingsScalarFieldEnum]
+
+
+export const AlertSettingsScalarFieldEnum = {
+  id: 'id',
+  systemSettingsId: 'systemSettingsId',
+  realTimeMonitoring: 'realTimeMonitoring',
+  typeStockoutRisk: 'typeStockoutRisk',
+  typeDemandSpike: 'typeDemandSpike',
+  typeExpiryRisk: 'typeExpiryRisk',
+  typeSupplierDelay: 'typeSupplierDelay',
+  typeCapacityBreach: 'typeCapacityBreach',
+  typeForecastAnomaly: 'typeForecastAnomaly',
+  typeOverstock: 'typeOverstock',
+  thresholdStockoutProb: 'thresholdStockoutProb',
+  thresholdDemandDeviation: 'thresholdDemandDeviation',
+  thresholdExpiryWindow: 'thresholdExpiryWindow',
+  thresholdCapacityUtil: 'thresholdCapacityUtil',
+  thresholdSupplierDelay: 'thresholdSupplierDelay',
+  escalationCritical: 'escalationCritical',
+  escalationHigh: 'escalationHigh',
+  escalationMedium: 'escalationMedium',
+  escalationLow: 'escalationLow'
+} as const
+
+export type AlertSettingsScalarFieldEnum = (typeof AlertSettingsScalarFieldEnum)[keyof typeof AlertSettingsScalarFieldEnum]
+
+
+export const NotificationSettingsScalarFieldEnum = {
+  id: 'id',
+  systemSettingsId: 'systemSettingsId',
+  channelInApp: 'channelInApp',
+  channelEmail: 'channelEmail',
+  channelSms: 'channelSms',
+  channelTeams: 'channelTeams',
+  dailyDigestEnabled: 'dailyDigestEnabled',
+  dailyDigestTime: 'dailyDigestTime'
+} as const
+
+export type NotificationSettingsScalarFieldEnum = (typeof NotificationSettingsScalarFieldEnum)[keyof typeof NotificationSettingsScalarFieldEnum]
+
+
+export const NotificationRuleScalarFieldEnum = {
+  id: 'id',
+  notificationSettingsId: 'notificationSettingsId',
+  event: 'event',
+  inApp: 'inApp',
+  email: 'email',
+  sms: 'sms'
+} as const
+
+export type NotificationRuleScalarFieldEnum = (typeof NotificationRuleScalarFieldEnum)[keyof typeof NotificationRuleScalarFieldEnum]
+
+
+export const AISettingsScalarFieldEnum = {
+  id: 'id',
+  systemSettingsId: 'systemSettingsId',
+  primaryModel: 'primaryModel',
+  modelConfidence: 'modelConfidence',
+  recommendationConfidence: 'recommendationConfidence',
+  featRecommendations: 'featRecommendations',
+  featExplainability: 'featExplainability',
+  featAutoRiskDetection: 'featAutoRiskDetection',
+  factorDemandForecast: 'factorDemandForecast',
+  factorInventoryPosition: 'factorInventoryPosition',
+  factorLeadTime: 'factorLeadTime',
+  factorExpiryRisk: 'factorExpiryRisk',
+  factorNetworkCapacity: 'factorNetworkCapacity'
+} as const
+
+export type AISettingsScalarFieldEnum = (typeof AISettingsScalarFieldEnum)[keyof typeof AISettingsScalarFieldEnum]
+
+
+export const IntegrationSettingsScalarFieldEnum = {
+  id: 'id',
+  systemSettingsId: 'systemSettingsId',
+  autoSync: 'autoSync',
+  syncFrequency: 'syncFrequency',
+  apiStatus: 'apiStatus',
+  apiEnvironment: 'apiEnvironment',
+  apiVersion: 'apiVersion'
+} as const
+
+export type IntegrationSettingsScalarFieldEnum = (typeof IntegrationSettingsScalarFieldEnum)[keyof typeof IntegrationSettingsScalarFieldEnum]
+
+
+export const IntegrationSourceScalarFieldEnum = {
+  id: 'id',
+  integrationSettingsId: 'integrationSettingsId',
+  sourceId: 'sourceId',
+  name: 'name',
+  status: 'status',
+  lastSync: 'lastSync',
+  records: 'records'
+} as const
+
+export type IntegrationSourceScalarFieldEnum = (typeof IntegrationSourceScalarFieldEnum)[keyof typeof IntegrationSourceScalarFieldEnum]
+
+
+export const SecuritySettingsScalarFieldEnum = {
+  id: 'id',
+  systemSettingsId: 'systemSettingsId',
+  twoFactor: 'twoFactor',
+  sessionTimeout: 'sessionTimeout',
+  passwordPolicy: 'passwordPolicy',
+  loginAlerts: 'loginAlerts',
+  auditLogging: 'auditLogging'
+} as const
+
+export type SecuritySettingsScalarFieldEnum = (typeof SecuritySettingsScalarFieldEnum)[keyof typeof SecuritySettingsScalarFieldEnum]
 
 
 export const SortOrder = {

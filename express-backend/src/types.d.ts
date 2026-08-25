@@ -46,7 +46,7 @@ export type DependencyStatus = "up" | "down" | "not_configured";
 export interface ReadinessReport {
   status: "ok" | "degraded";
   uptimeSeconds: number;
-  dependencies: Record<"database" | "redis", DependencyStatus>;
+  dependencies: Record<"database" | "redis" | "forecast", DependencyStatus>;
 }
 
 export interface ResponseMeta {
@@ -359,4 +359,22 @@ export interface TrainingRow {
   promotion: boolean;
   holiday: boolean;
   season: string | null;
+}
+
+export interface ForecastPointBand {
+  p10: number;
+  p50: number;
+  p90: number;
+}
+
+export interface ForecastSeriesResult {
+  productId: string;
+  warehouseId: string;
+  points: ForecastPointBand[];
+}
+
+export interface ForecastResult {
+  origin: "python" | "fallback";
+  modelVersion: string;
+  series: ForecastSeriesResult[];
 }

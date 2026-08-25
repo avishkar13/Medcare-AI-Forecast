@@ -192,6 +192,17 @@ describe("POST /api/planning/runs", () => {
     expectErrorShape(body, "NOT_FOUND");
   });
 
+  test("attaches a real scenario and echoes it back", async () => {
+    const scenario = await prisma.scenario.findFirst({ select: { id: true, name: true } });
+    assert.ok(scenario, "no Scenario exists - run pnpm prisma:seed");
+
+    const { response, body } = await createRun({ scenarioId: scenario.id });
+    assert.equal(response.status, 202);
+
+    const { data } = expectEnvelope<PlanningRun>(body);
+    assert.deepEqual(data.scenario, scenario, "the run must inline the scenario it was created for");
+  });
+
   test("rejects an Idempotency-Key that is too short to be unique", async () => {
     const { response, body } = await createRun({}, { "idempotency-key": "short" });
     assert.equal(response.status, 422);

@@ -43,6 +43,8 @@ export type PlanningRunMinAggregateOutputType = {
   modelVersion: string | null
   startedAt: Date | null
   completedAt: Date | null
+  failureReason: string | null
+  failureStage: string | null
   createdAt: Date | null
 }
 
@@ -55,6 +57,8 @@ export type PlanningRunMaxAggregateOutputType = {
   modelVersion: string | null
   startedAt: Date | null
   completedAt: Date | null
+  failureReason: string | null
+  failureStage: string | null
   createdAt: Date | null
 }
 
@@ -67,6 +71,8 @@ export type PlanningRunCountAggregateOutputType = {
   modelVersion: number
   startedAt: number
   completedAt: number
+  failureReason: number
+  failureStage: number
   createdAt: number
   _all: number
 }
@@ -89,6 +95,8 @@ export type PlanningRunMinAggregateInputType = {
   modelVersion?: true
   startedAt?: true
   completedAt?: true
+  failureReason?: true
+  failureStage?: true
   createdAt?: true
 }
 
@@ -101,6 +109,8 @@ export type PlanningRunMaxAggregateInputType = {
   modelVersion?: true
   startedAt?: true
   completedAt?: true
+  failureReason?: true
+  failureStage?: true
   createdAt?: true
 }
 
@@ -113,6 +123,8 @@ export type PlanningRunCountAggregateInputType = {
   modelVersion?: true
   startedAt?: true
   completedAt?: true
+  failureReason?: true
+  failureStage?: true
   createdAt?: true
   _all?: true
 }
@@ -212,6 +224,8 @@ export type PlanningRunGroupByOutputType = {
   modelVersion: string | null
   startedAt: Date | null
   completedAt: Date | null
+  failureReason: string | null
+  failureStage: string | null
   createdAt: Date
   _count: PlanningRunCountAggregateOutputType | null
   _avg: PlanningRunAvgAggregateOutputType | null
@@ -247,6 +261,8 @@ export type PlanningRunWhereInput = {
   modelVersion?: Prisma.StringNullableFilter<"PlanningRun"> | string | null
   startedAt?: Prisma.DateTimeNullableFilter<"PlanningRun"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"PlanningRun"> | Date | string | null
+  failureReason?: Prisma.StringNullableFilter<"PlanningRun"> | string | null
+  failureStage?: Prisma.StringNullableFilter<"PlanningRun"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PlanningRun"> | Date | string
   scenario?: Prisma.XOR<Prisma.ScenarioNullableScalarRelationFilter, Prisma.ScenarioWhereInput> | null
   createdBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -268,6 +284,8 @@ export type PlanningRunOrderByWithRelationInput = {
   modelVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  failureReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  failureStage?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   scenario?: Prisma.ScenarioOrderByWithRelationInput
   createdBy?: Prisma.UserOrderByWithRelationInput
@@ -292,6 +310,8 @@ export type PlanningRunWhereUniqueInput = Prisma.AtLeast<{
   modelVersion?: Prisma.StringNullableFilter<"PlanningRun"> | string | null
   startedAt?: Prisma.DateTimeNullableFilter<"PlanningRun"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"PlanningRun"> | Date | string | null
+  failureReason?: Prisma.StringNullableFilter<"PlanningRun"> | string | null
+  failureStage?: Prisma.StringNullableFilter<"PlanningRun"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PlanningRun"> | Date | string
   scenario?: Prisma.XOR<Prisma.ScenarioNullableScalarRelationFilter, Prisma.ScenarioWhereInput> | null
   createdBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -313,6 +333,8 @@ export type PlanningRunOrderByWithAggregationInput = {
   modelVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  failureReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  failureStage?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.PlanningRunCountOrderByAggregateInput
   _avg?: Prisma.PlanningRunAvgOrderByAggregateInput
@@ -333,6 +355,8 @@ export type PlanningRunScalarWhereWithAggregatesInput = {
   modelVersion?: Prisma.StringNullableWithAggregatesFilter<"PlanningRun"> | string | null
   startedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PlanningRun"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PlanningRun"> | Date | string | null
+  failureReason?: Prisma.StringNullableWithAggregatesFilter<"PlanningRun"> | string | null
+  failureStage?: Prisma.StringNullableWithAggregatesFilter<"PlanningRun"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PlanningRun"> | Date | string
 }
 
@@ -343,6 +367,8 @@ export type PlanningRunCreateInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   scenario?: Prisma.ScenarioCreateNestedOneWithoutPlanningRunsInput
   createdBy: Prisma.UserCreateNestedOneWithoutPlanningRunsInput
@@ -364,6 +390,8 @@ export type PlanningRunUncheckedCreateInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutPlanningRunInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutPlanningRunInput
@@ -381,6 +409,8 @@ export type PlanningRunUpdateInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scenario?: Prisma.ScenarioUpdateOneWithoutPlanningRunsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutPlanningRunsNestedInput
@@ -402,6 +432,8 @@ export type PlanningRunUncheckedUpdateInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutPlanningRunNestedInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutPlanningRunNestedInput
@@ -421,6 +453,8 @@ export type PlanningRunCreateManyInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
 }
 
@@ -431,6 +465,8 @@ export type PlanningRunUpdateManyMutationInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -443,6 +479,8 @@ export type PlanningRunUncheckedUpdateManyInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -465,6 +503,8 @@ export type PlanningRunCountOrderByAggregateInput = {
   modelVersion?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
+  failureReason?: Prisma.SortOrder
+  failureStage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -481,6 +521,8 @@ export type PlanningRunMaxOrderByAggregateInput = {
   modelVersion?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
+  failureReason?: Prisma.SortOrder
+  failureStage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -493,6 +535,8 @@ export type PlanningRunMinOrderByAggregateInput = {
   modelVersion?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
+  failureReason?: Prisma.SortOrder
+  failureStage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -698,6 +742,8 @@ export type PlanningRunCreateWithoutCreatedByInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   scenario?: Prisma.ScenarioCreateNestedOneWithoutPlanningRunsInput
   forecasts?: Prisma.ForecastCreateNestedManyWithoutPlanningRunInput
@@ -717,6 +763,8 @@ export type PlanningRunUncheckedCreateWithoutCreatedByInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutPlanningRunInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutPlanningRunInput
@@ -765,6 +813,8 @@ export type PlanningRunScalarWhereInput = {
   modelVersion?: Prisma.StringNullableFilter<"PlanningRun"> | string | null
   startedAt?: Prisma.DateTimeNullableFilter<"PlanningRun"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"PlanningRun"> | Date | string | null
+  failureReason?: Prisma.StringNullableFilter<"PlanningRun"> | string | null
+  failureStage?: Prisma.StringNullableFilter<"PlanningRun"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PlanningRun"> | Date | string
 }
 
@@ -775,6 +825,8 @@ export type PlanningRunCreateWithoutScenarioInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   createdBy: Prisma.UserCreateNestedOneWithoutPlanningRunsInput
   forecasts?: Prisma.ForecastCreateNestedManyWithoutPlanningRunInput
@@ -794,6 +846,8 @@ export type PlanningRunUncheckedCreateWithoutScenarioInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutPlanningRunInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutPlanningRunInput
@@ -837,6 +891,8 @@ export type PlanningRunCreateWithoutForecastsInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   scenario?: Prisma.ScenarioCreateNestedOneWithoutPlanningRunsInput
   createdBy: Prisma.UserCreateNestedOneWithoutPlanningRunsInput
@@ -857,6 +913,8 @@ export type PlanningRunUncheckedCreateWithoutForecastsInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutPlanningRunInput
   supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutPlanningRunInput
@@ -889,6 +947,8 @@ export type PlanningRunUpdateWithoutForecastsInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scenario?: Prisma.ScenarioUpdateOneWithoutPlanningRunsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutPlanningRunsNestedInput
@@ -909,6 +969,8 @@ export type PlanningRunUncheckedUpdateWithoutForecastsInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutPlanningRunNestedInput
   supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutPlanningRunNestedInput
@@ -925,6 +987,8 @@ export type PlanningRunCreateWithoutInventoryPlansInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   scenario?: Prisma.ScenarioCreateNestedOneWithoutPlanningRunsInput
   createdBy: Prisma.UserCreateNestedOneWithoutPlanningRunsInput
@@ -945,6 +1009,8 @@ export type PlanningRunUncheckedCreateWithoutInventoryPlansInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutPlanningRunInput
   supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutPlanningRunInput
@@ -977,6 +1043,8 @@ export type PlanningRunUpdateWithoutInventoryPlansInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scenario?: Prisma.ScenarioUpdateOneWithoutPlanningRunsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutPlanningRunsNestedInput
@@ -997,6 +1065,8 @@ export type PlanningRunUncheckedUpdateWithoutInventoryPlansInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutPlanningRunNestedInput
   supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutPlanningRunNestedInput
@@ -1013,6 +1083,8 @@ export type PlanningRunCreateWithoutSupplyPlansInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   scenario?: Prisma.ScenarioCreateNestedOneWithoutPlanningRunsInput
   createdBy: Prisma.UserCreateNestedOneWithoutPlanningRunsInput
@@ -1033,6 +1105,8 @@ export type PlanningRunUncheckedCreateWithoutSupplyPlansInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutPlanningRunInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutPlanningRunInput
@@ -1065,6 +1139,8 @@ export type PlanningRunUpdateWithoutSupplyPlansInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scenario?: Prisma.ScenarioUpdateOneWithoutPlanningRunsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutPlanningRunsNestedInput
@@ -1085,6 +1161,8 @@ export type PlanningRunUncheckedUpdateWithoutSupplyPlansInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutPlanningRunNestedInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutPlanningRunNestedInput
@@ -1101,6 +1179,8 @@ export type PlanningRunCreateWithoutDrpPlansInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   scenario?: Prisma.ScenarioCreateNestedOneWithoutPlanningRunsInput
   createdBy: Prisma.UserCreateNestedOneWithoutPlanningRunsInput
@@ -1121,6 +1201,8 @@ export type PlanningRunUncheckedCreateWithoutDrpPlansInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutPlanningRunInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutPlanningRunInput
@@ -1153,6 +1235,8 @@ export type PlanningRunUpdateWithoutDrpPlansInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scenario?: Prisma.ScenarioUpdateOneWithoutPlanningRunsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutPlanningRunsNestedInput
@@ -1173,6 +1257,8 @@ export type PlanningRunUncheckedUpdateWithoutDrpPlansInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutPlanningRunNestedInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutPlanningRunNestedInput
@@ -1189,6 +1275,8 @@ export type PlanningRunCreateWithoutOptimizationInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   scenario?: Prisma.ScenarioCreateNestedOneWithoutPlanningRunsInput
   createdBy: Prisma.UserCreateNestedOneWithoutPlanningRunsInput
@@ -1209,6 +1297,8 @@ export type PlanningRunUncheckedCreateWithoutOptimizationInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutPlanningRunInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutPlanningRunInput
@@ -1241,6 +1331,8 @@ export type PlanningRunUpdateWithoutOptimizationInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scenario?: Prisma.ScenarioUpdateOneWithoutPlanningRunsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutPlanningRunsNestedInput
@@ -1261,6 +1353,8 @@ export type PlanningRunUncheckedUpdateWithoutOptimizationInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutPlanningRunNestedInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutPlanningRunNestedInput
@@ -1277,6 +1371,8 @@ export type PlanningRunCreateWithoutSimulationInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   scenario?: Prisma.ScenarioCreateNestedOneWithoutPlanningRunsInput
   createdBy: Prisma.UserCreateNestedOneWithoutPlanningRunsInput
@@ -1297,6 +1393,8 @@ export type PlanningRunUncheckedCreateWithoutSimulationInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutPlanningRunInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutPlanningRunInput
@@ -1329,6 +1427,8 @@ export type PlanningRunUpdateWithoutSimulationInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scenario?: Prisma.ScenarioUpdateOneWithoutPlanningRunsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutPlanningRunsNestedInput
@@ -1349,6 +1449,8 @@ export type PlanningRunUncheckedUpdateWithoutSimulationInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutPlanningRunNestedInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutPlanningRunNestedInput
@@ -1365,6 +1467,8 @@ export type PlanningRunCreateWithoutRecommendationsInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   scenario?: Prisma.ScenarioCreateNestedOneWithoutPlanningRunsInput
   createdBy: Prisma.UserCreateNestedOneWithoutPlanningRunsInput
@@ -1385,6 +1489,8 @@ export type PlanningRunUncheckedCreateWithoutRecommendationsInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
   forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutPlanningRunInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutPlanningRunInput
@@ -1417,6 +1523,8 @@ export type PlanningRunUpdateWithoutRecommendationsInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scenario?: Prisma.ScenarioUpdateOneWithoutPlanningRunsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutPlanningRunsNestedInput
@@ -1437,6 +1545,8 @@ export type PlanningRunUncheckedUpdateWithoutRecommendationsInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutPlanningRunNestedInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutPlanningRunNestedInput
@@ -1454,6 +1564,8 @@ export type PlanningRunCreateManyCreatedByInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
 }
 
@@ -1464,6 +1576,8 @@ export type PlanningRunUpdateWithoutCreatedByInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scenario?: Prisma.ScenarioUpdateOneWithoutPlanningRunsNestedInput
   forecasts?: Prisma.ForecastUpdateManyWithoutPlanningRunNestedInput
@@ -1483,6 +1597,8 @@ export type PlanningRunUncheckedUpdateWithoutCreatedByInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutPlanningRunNestedInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutPlanningRunNestedInput
@@ -1501,6 +1617,8 @@ export type PlanningRunUncheckedUpdateManyWithoutCreatedByInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1512,6 +1630,8 @@ export type PlanningRunCreateManyScenarioInput = {
   modelVersion?: string | null
   startedAt?: Date | string | null
   completedAt?: Date | string | null
+  failureReason?: string | null
+  failureStage?: string | null
   createdAt?: Date | string
 }
 
@@ -1522,6 +1642,8 @@ export type PlanningRunUpdateWithoutScenarioInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.UserUpdateOneRequiredWithoutPlanningRunsNestedInput
   forecasts?: Prisma.ForecastUpdateManyWithoutPlanningRunNestedInput
@@ -1541,6 +1663,8 @@ export type PlanningRunUncheckedUpdateWithoutScenarioInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutPlanningRunNestedInput
   inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutPlanningRunNestedInput
@@ -1559,6 +1683,8 @@ export type PlanningRunUncheckedUpdateManyWithoutScenarioInput = {
   modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failureStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1638,6 +1764,8 @@ export type PlanningRunSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   modelVersion?: boolean
   startedAt?: boolean
   completedAt?: boolean
+  failureReason?: boolean
+  failureStage?: boolean
   createdAt?: boolean
   scenario?: boolean | Prisma.PlanningRun$scenarioArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1660,6 +1788,8 @@ export type PlanningRunSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   modelVersion?: boolean
   startedAt?: boolean
   completedAt?: boolean
+  failureReason?: boolean
+  failureStage?: boolean
   createdAt?: boolean
   scenario?: boolean | Prisma.PlanningRun$scenarioArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1674,6 +1804,8 @@ export type PlanningRunSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   modelVersion?: boolean
   startedAt?: boolean
   completedAt?: boolean
+  failureReason?: boolean
+  failureStage?: boolean
   createdAt?: boolean
   scenario?: boolean | Prisma.PlanningRun$scenarioArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1688,10 +1820,12 @@ export type PlanningRunSelectScalar = {
   modelVersion?: boolean
   startedAt?: boolean
   completedAt?: boolean
+  failureReason?: boolean
+  failureStage?: boolean
   createdAt?: boolean
 }
 
-export type PlanningRunOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "scenarioId" | "createdById" | "status" | "horizonDays" | "modelVersion" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["planningRun"]>
+export type PlanningRunOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "scenarioId" | "createdById" | "status" | "horizonDays" | "modelVersion" | "startedAt" | "completedAt" | "failureReason" | "failureStage" | "createdAt", ExtArgs["result"]["planningRun"]>
 export type PlanningRunInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   scenario?: boolean | Prisma.PlanningRun$scenarioArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1735,6 +1869,8 @@ export type $PlanningRunPayload<ExtArgs extends runtime.Types.Extensions.Interna
     modelVersion: string | null
     startedAt: Date | null
     completedAt: Date | null
+    failureReason: string | null
+    failureStage: string | null
     createdAt: Date
   }, ExtArgs["result"]["planningRun"]>
   composites: {}
@@ -2176,6 +2312,8 @@ export interface PlanningRunFieldRefs {
   readonly modelVersion: Prisma.FieldRef<"PlanningRun", 'String'>
   readonly startedAt: Prisma.FieldRef<"PlanningRun", 'DateTime'>
   readonly completedAt: Prisma.FieldRef<"PlanningRun", 'DateTime'>
+  readonly failureReason: Prisma.FieldRef<"PlanningRun", 'String'>
+  readonly failureStage: Prisma.FieldRef<"PlanningRun", 'String'>
   readonly createdAt: Prisma.FieldRef<"PlanningRun", 'DateTime'>
 }
     

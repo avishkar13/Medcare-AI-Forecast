@@ -4,12 +4,17 @@ import {
   allocateTransfers,
   classifyRisk,
   classifyStock,
+  expectedShortfall,
   expirySeverity,
+  normalCdf,
+  normalPdf,
+  orderUpToLevel,
   percentage,
   projectFefoWaste,
   reorderPoint,
   round,
   safetyStock,
+  stdDevFromBand,
   supplyUrgency,
   zScore,
   type DemandProfile,
@@ -430,5 +435,165 @@ describe("supplyUrgency", () => {
 
   test("zero days of supply with real demand is the most urgent case there is", () => {
     assert.equal(supplyUrgency({ avgDailyDemand: 30, daysOfSupply: 0 }), 0);
+  });
+});
+
+describe("normalCdf", () => {
+  test("round-trips against zScore, which is its inverse", () => {
+    for (const probability of [0.01, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99]) {
+      const recovered = normalCdf(zScore(probability));
+      assert.ok(
+        Math.abs(recovered - probability) < 1e-6,
+        "zScore(" + probability + ") did not round-trip: got " + recovered,
+      );
+    }
+  });
+
+  test("is monotone increasing", () => {
+    let previous = normalCdf(-5);
+    for (let z = -4.9; z <= 5; z += 0.1) {
+      const current = normalCdf(z);
+      assert.ok(current >= previous, "decreased at z=" + z);
+      previous = current;
+    }
+  });
+
+  test("is symmetric about zero", () => {
+    assert.ok(Math.abs(normalCdf(0) - 0.5) < 1e-9);
+    for (const z of [0.5, 1, 1.96, 3]) {
+      assert.ok(Math.abs(normalCdf(z) + normalCdf(-z) - 1) < 1e-7, "asymmetric at z=" + z);
+    }
+  });
+
+  test("matches the textbook values a service level is read from", () => {
+    assert.ok(Math.abs(normalCdf(1.6448536) - 0.95) < 1e-6);
+    assert.ok(Math.abs(normalCdf(1.959964) - 0.975) < 1e-6);
+  });
+
+  test("saturates without escaping [0, 1]", () => {
+    assert.ok(normalCdf(-40) >= 0);
+    assert.ok(normalCdf(40) <= 1);
+  });
+});
+
+describe("normalPdf", () => {
+  test("peaks at zero with the standard normal height", () => {
+    assert.ok(Math.abs(normalPdf(0) - 1 / Math.sqrt(2 * Math.PI)) < 1e-12);
+  });
+
+  test("is symmetric and always positive", () => {
+    for (const z of [0.5, 1, 2.5]) {
+      assert.ok(Math.abs(normalPdf(z) - normalPdf(-z)) < 1e-12);
+      assert.ok(normalPdf(z) > 0);
+    }
+  });
+});
+
+describe("stdDevFromBand", () => {
+  test("recovers the sigma that produced the band", () => {
+    const sigma = 40;
+    const median = 500;
+    const p10 = median + zScore(0.1) * sigma;
+    const p90 = median + zScore(0.9) * sigma;
+
+    assert.ok(Math.abs(stdDevFromBand(p10, p90) - sigma) < 1e-3);
+  });
+
+  test("a band of zero width is zero uncertainty", () => {
+    assert.equal(stdDevFromBand(120, 120), 0);
+  });
+
+  test("never returns a negative sigma, even from an inverted band", () => {
+    assert.equal(stdDevFromBand(900, 100), 0);
+  });
+
+  test("widens as the band widens", () => {
+    assert.ok(stdDevFromBand(400, 600) > stdDevFromBand(450, 550));
+  });
+});
+
+describe("orderUpToLevel", () => {
+  test("covers lead time plus one review period, plus the buffer", () => {
+    const level = orderUpToLevel({
+      avgDailyDemand: 10,
+      leadTimeDays: 7,
+      reviewPeriodDays: 7,
+      safetyStock: 50,
+    });
+
+    assert.equal(level, 10 * 14 + 50);
+  });
+
+  test("a longer review period raises the level", () => {
+    const base = { avgDailyDemand: 10, leadTimeDays: 7, safetyStock: 50 };
+    assert.ok(
+      orderUpToLevel({ ...base, reviewPeriodDays: 14 }) >
+        orderUpToLevel({ ...base, reviewPeriodDays: 7 }),
+      "reviewPeriodDays must affect the level - it is the frequency half of the policy",
+    );
+  });
+
+  test("no demand still holds the buffer", () => {
+    assert.equal(
+      orderUpToLevel({ avgDailyDemand: 0, leadTimeDays: 7, reviewPeriodDays: 7, safetyStock: 25 }),
+      25,
+    );
+  });
+
+  test("never returns a negative level", () => {
+    assert.equal(
+      orderUpToLevel({ avgDailyDemand: 0, leadTimeDays: 0, reviewPeriodDays: 0, safetyStock: 0 }),
+      0,
+    );
+  });
+});
+
+describe("expectedShortfall", () => {
+  test("stock far above demand is effectively no shortfall", () => {
+    const shortfall = expectedShortfall({
+      demandMean: 100,
+      demandStdDev: 10,
+      availableUnits: 200,
+    });
+
+    assert.ok(shortfall < 0.01, "expected almost no shortfall, got " + shortfall);
+  });
+
+  test("holding exactly the mean leaves half a standard deviation of loss", () => {
+    // The normal loss function at k=0 is phi(0) = 1/sqrt(2*pi).
+    const sigma = 20;
+    const shortfall = expectedShortfall({
+      demandMean: 100,
+      demandStdDev: sigma,
+      availableUnits: 100,
+    });
+
+    assert.ok(Math.abs(shortfall - sigma * normalPdf(0)) < 1e-6);
+  });
+
+  test("falls as stock rises", () => {
+    const base = { demandMean: 100, demandStdDev: 25 };
+    const low = expectedShortfall({ ...base, availableUnits: 80 });
+    const high = expectedShortfall({ ...base, availableUnits: 130 });
+
+    assert.ok(low > high, "more stock must not increase expected shortfall");
+  });
+
+  test("certain demand is a plain subtraction", () => {
+    assert.equal(
+      expectedShortfall({ demandMean: 100, demandStdDev: 0, availableUnits: 60 }),
+      40,
+    );
+    assert.equal(
+      expectedShortfall({ demandMean: 100, demandStdDev: 0, availableUnits: 140 }),
+      0,
+    );
+  });
+
+  test("is never negative", () => {
+    for (const availableUnits of [0, 50, 100, 250, 1000]) {
+      const shortfall = expectedShortfall({ demandMean: 100, demandStdDev: 30, availableUnits });
+      assert.ok(shortfall >= 0, "negative shortfall at " + availableUnits);
+    }
   });
 });
