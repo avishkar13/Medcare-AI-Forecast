@@ -5,6 +5,7 @@ export interface TestServer {
   url: string;
   get: (path: string) => Promise<Response>;
   json: <T>(path: string) => Promise<T>;
+  post: (path: string, body?: unknown, headers?: Record<string, string>) => Promise<Response>;
   close: () => Promise<void>;
 }
 
@@ -21,9 +22,17 @@ export const startServer = async (app: Express): Promise<TestServer> => {
 
   const get = (path: string) => fetch(`${url}${path}`);
 
+  const post = (path: string, body?: unknown, headers: Record<string, string> = {}) =>
+    fetch(`${url}${path}`, {
+      method: "POST",
+      headers: { "content-type": "application/json", ...headers },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    });
+
   return {
     url,
     get,
+    post,
     json: async <T>(path: string): Promise<T> => {
       const response = await get(path);
       return (await response.json()) as T;

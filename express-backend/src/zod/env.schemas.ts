@@ -34,6 +34,9 @@ export const envSchema = z
     RATE_LIMIT_AUTH_MAX: count.default(5),
     RATE_LIMIT_EXPENSIVE_WINDOW_MS: durationMs.default(3_600_000),
     RATE_LIMIT_EXPENSIVE_MAX: count.default(10),
+
+    PLANNING_RUN_TIMEOUT_MS: durationMs.default(900_000),
+    PLANNING_IDEMPOTENCY_TTL_MS: durationMs.default(86_400_000),
   })
   .superRefine((value, ctx) => {
     if (value.NODE_ENV === "production" && !value.REDIS_URL) {

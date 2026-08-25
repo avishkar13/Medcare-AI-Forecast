@@ -130,6 +130,16 @@ export const classifyRisk = ({
   return candidates.reduce((worst, level) => (RISK_ORDER[level] < RISK_ORDER[worst] ? level : worst));
 };
 
+export interface SupplyPosition {
+  avgDailyDemand: number;
+  daysOfSupply: number;
+}
+
+// A position with no recorded demand reports daysOfSupply 0, which means "unknown",
+// not "out tomorrow". Ordering by urgency has to push those to the back.
+export const supplyUrgency = ({ avgDailyDemand, daysOfSupply }: SupplyPosition): number =>
+  avgDailyDemand > 0 ? daysOfSupply : Number.POSITIVE_INFINITY;
+
 export interface TransferSource {
   available: number;
   wasteRemaining: number;

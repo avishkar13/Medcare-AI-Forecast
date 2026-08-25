@@ -60,6 +60,8 @@ export interface InventoryPosition {
   warehouseTier: string;
   warehouseCapacity: number | null;
   onHand: number;
+  reserved: number;
+  inTransit: number;
   avgDailyDemand: number;
   leadTimeDays: number;
   safetyStock: number;
@@ -151,6 +153,8 @@ export const loadPositions = async (): Promise<InventoryPosition[]> => {
       warehouseTier: row.warehouse.tier,
       warehouseCapacity: row.warehouse.capacity,
       onHand: row.onHand,
+      reserved: row.reserved,
+      inTransit: row.inTransit,
       avgDailyDemand: round(avgDailyDemand),
       leadTimeDays: profile.leadTimeDays,
       safetyStock: round(safetyStock(profile)),

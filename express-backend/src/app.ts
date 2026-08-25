@@ -9,7 +9,10 @@ import { rateLimiter } from "./middleware/rateLimiter.js";
 import { requestContext } from "./middleware/requestContext.js";
 import { dashboardRouter } from "./routes/dashboard_route.js";
 import { healthRouter } from "./routes/health_route.js";
+import { inventoryRouter } from "./routes/inventory_route.js";
 import { masterDataRouter } from "./routes/masterdata_route.js";
+import { planningRouter } from "./routes/planning_route.js";
+import { trainingRouter } from "./routes/training_route.js";
 
 export const app = express();
 
@@ -35,6 +38,9 @@ app.get("/", (_req, res) => {
 app.use(`${SERVER.apiPrefix}/health`, healthRouter);
 app.use(SERVER.apiPrefix, masterDataRouter);
 app.use(`${SERVER.apiPrefix}/dashboard`, dashboardRouter);
+app.use(`${SERVER.apiPrefix}/planning`, planningRouter);
+app.use(`${SERVER.apiPrefix}/inventory`, inventoryRouter);
+app.use(`${SERVER.apiPrefix}/training-data`, trainingRouter);
 
 app.use(notFound);
 app.use(errorHandler);

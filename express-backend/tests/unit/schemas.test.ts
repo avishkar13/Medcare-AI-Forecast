@@ -11,6 +11,11 @@ import {
   productQuerySchema,
   warehouseQuerySchema,
 } from "../../src/zod/masterdata.schemas.js";
+import {
+  createRunBodySchema,
+  idempotencyKeySchema,
+  runQuerySchema,
+} from "../../src/zod/planning.schemas.js";
 import { envSchema } from "../../src/zod/env.schemas.js";
 
 interface ParseResult<T> {
@@ -174,6 +179,69 @@ describe("priorityActionsQuerySchema", () => {
       assert.equal(parsed(priorityActionsQuerySchema.safeParse({ type })).type, type);
     }
     failedOn(priorityActionsQuerySchema.safeParse({ type: "BOGUS" }), "type");
+  });
+});
+
+describe("createRunBodySchema", () => {
+  test("defaults the horizon on an empty body", () => {
+    const value = parsed(createRunBodySchema.safeParse({}));
+    assert.equal(value.horizonDays, 30);
+    assert.equal(value.scenarioId, undefined);
+    assert.equal(value.modelVersion, undefined);
+  });
+
+  test("rejects a horizon outside one full year", () => {
+    failedOn(createRunBodySchema.safeParse({ horizonDays: 0 }), "horizonDays");
+    failedOn(createRunBodySchema.safeParse({ horizonDays: 366 }), "horizonDays");
+  });
+
+  test("rejects a fractional horizon", () => {
+    failedOn(createRunBodySchema.safeParse({ horizonDays: 30.5 }), "horizonDays");
+  });
+
+  test("does not coerce, because a JSON body is typed unlike a query string", () => {
+    failedOn(createRunBodySchema.safeParse({ horizonDays: "30" }), "horizonDays");
+  });
+
+  test("rejects an unknown field instead of dropping it", () => {
+    assert.equal(createRunBodySchema.safeParse({ iterations: 1000 }).success, false);
+  });
+});
+
+describe("runQuerySchema", () => {
+  test("applies pagination defaults", () => {
+    const value = parsed(runQuerySchema.safeParse({}));
+    assert.equal(value.page, 1);
+    assert.equal(value.pageSize, 20);
+  });
+
+  test("accepts every status the schema declares", () => {
+    for (const status of ["PENDING", "RUNNING", "COMPLETED", "FAILED"]) {
+      assert.equal(runQuerySchema.safeParse({ status }).success, true, status + " should be accepted");
+    }
+  });
+
+  test("rejects a status the schema does not declare", () => {
+    failedOn(runQuerySchema.safeParse({ status: "ABANDONED" }), "status");
+  });
+
+  test("caps pageSize at one hundred", () => {
+    failedOn(runQuerySchema.safeParse({ pageSize: "500" }), "pageSize");
+  });
+});
+
+describe("idempotencyKeySchema", () => {
+  test("accepts a key long enough to be unique", () => {
+    assert.equal(idempotencyKeySchema.safeParse("run-2026-08-25-001").success, true);
+  });
+
+  test("rejects a key too short to be unique", () => {
+    assert.equal(idempotencyKeySchema.safeParse("short").success, false);
+  });
+
+  test("rejects characters that would not survive a header round trip", () => {
+    assert.equal(idempotencyKeySchema.safeParse("key with spaces").success, false);
+    assert.equal(idempotencyKeySchema.safeParse("key/with/slashes").success, false);
   });
 });
 

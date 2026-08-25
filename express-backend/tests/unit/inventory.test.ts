@@ -2,12 +2,15 @@ import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import {
   allocateTransfers,
+  classifyRisk,
   classifyStock,
+  expirySeverity,
   percentage,
   projectFefoWaste,
   reorderPoint,
   round,
   safetyStock,
+  supplyUrgency,
   zScore,
   type DemandProfile,
 } from "../../src/utils/inventory.js";
@@ -350,5 +353,82 @@ describe("allocateTransfers", () => {
   test("handles no shortages and no sources", () => {
     assert.deepEqual(allocateTransfers([], [{ available: 10, wasteRemaining: 0 }]), []);
     assert.deepEqual(allocateTransfers([100], []), [null]);
+  });
+});
+
+describe("expirySeverity", () => {
+  test("bands are inclusive at each boundary", () => {
+    assert.equal(expirySeverity(15), "critical");
+    assert.equal(expirySeverity(16), "high");
+    assert.equal(expirySeverity(30), "high");
+    assert.equal(expirySeverity(31), "medium");
+    assert.equal(expirySeverity(60), "medium");
+    assert.equal(expirySeverity(61), "low");
+  });
+
+  test("stock that already expired is critical, not low", () => {
+    assert.equal(expirySeverity(0), "critical");
+    assert.equal(expirySeverity(-40), "critical");
+  });
+});
+
+describe("classifyRisk", () => {
+  const none = {
+    belowSafetyStock: false,
+    belowReorderPoint: false,
+    aboveMaximum: false,
+    daysToNearestExpiry: null,
+  };
+
+  test("a position with nothing wrong is low risk", () => {
+    assert.equal(classifyRisk(none), "low");
+  });
+
+  test("a spent safety buffer is critical", () => {
+    assert.equal(classifyRisk({ ...none, belowSafetyStock: true, belowReorderPoint: true }), "critical");
+  });
+
+  test("below reorder point but above safety stock is high", () => {
+    assert.equal(classifyRisk({ ...none, belowReorderPoint: true }), "high");
+  });
+
+  test("excess capital alone is medium", () => {
+    assert.equal(classifyRisk({ ...none, aboveMaximum: true }), "medium");
+  });
+
+  test("expiry alone is scored on the same bands as a batch", () => {
+    assert.equal(classifyRisk({ ...none, daysToNearestExpiry: 10 }), "critical");
+    assert.equal(classifyRisk({ ...none, daysToNearestExpiry: 25 }), "high");
+    assert.equal(classifyRisk({ ...none, daysToNearestExpiry: 45 }), "medium");
+    assert.equal(classifyRisk({ ...none, daysToNearestExpiry: 200 }), "low");
+  });
+
+  test("the worst dimension wins, whichever it is", () => {
+    assert.equal(classifyRisk({ ...none, aboveMaximum: true, daysToNearestExpiry: 5 }), "critical");
+    assert.equal(classifyRisk({ ...none, belowReorderPoint: true, daysToNearestExpiry: 5 }), "critical");
+    assert.equal(classifyRisk({ ...none, belowSafetyStock: true, daysToNearestExpiry: 300 }), "critical");
+    assert.equal(classifyRisk({ ...none, aboveMaximum: true, daysToNearestExpiry: 300 }), "medium");
+  });
+
+  test("a healthy position holding stock that expires next year stays low", () => {
+    assert.equal(classifyRisk({ ...none, daysToNearestExpiry: 365 }), "low");
+  });
+});
+
+describe("supplyUrgency", () => {
+  test("a position that consumes stock is ranked by its days of supply", () => {
+    assert.equal(supplyUrgency({ avgDailyDemand: 12, daysOfSupply: 4 }), 4);
+  });
+
+  test("no recorded demand ranks last, not first", () => {
+    const idle = supplyUrgency({ avgDailyDemand: 0, daysOfSupply: 0 });
+    const urgent = supplyUrgency({ avgDailyDemand: 50, daysOfSupply: 0.5 });
+
+    assert.equal(idle, Number.POSITIVE_INFINITY);
+    assert.ok(idle > urgent, "a position with unknown supply is not more urgent than one running out");
+  });
+
+  test("zero days of supply with real demand is the most urgent case there is", () => {
+    assert.equal(supplyUrgency({ avgDailyDemand: 30, daysOfSupply: 0 }), 0);
   });
 });

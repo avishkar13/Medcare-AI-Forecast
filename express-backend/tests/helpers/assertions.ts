@@ -2,7 +2,7 @@ import { strict as assert } from "node:assert";
 
 export interface Envelope<T> {
   data: T;
-  meta: { generatedAt: string; page?: number; pageSize?: number; total?: number };
+  meta: { generatedAt: string; planningRunId?: string | null; page?: number; pageSize?: number; total?: number };
 }
 
 export interface ErrorBody {

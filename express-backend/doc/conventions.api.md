@@ -25,7 +25,7 @@ Paginated routes add three more fields:
 
 `total` is the count matching the filter, not the length of `data`. Divide by `pageSize` for the page count.
 
-**Exception:** the two health probes return bare payloads with no envelope.
+**Exceptions:** the two health probes return bare payloads with no envelope, and `/api/training-data` streams NDJSON — see [`training.api.md`](training.api.md).
 
 ---
 
@@ -76,6 +76,7 @@ Write routes will add `400 MALFORMED_JSON`, `409 CONFLICT` and `409 FOREIGN_KEY_
 | Receive | On |
 | --- | --- |
 | `x-request-id` | Every response |
+| `x-training-rows` | `/api/training-data` only — the row count the filter matched |
 | `RateLimit`, `RateLimit-Policy` | Every rate-limited response, one pair per tier (IETF draft-8) |
 | `Retry-After` | `429` only, in seconds |
 
@@ -85,12 +86,13 @@ All four are in `Access-Control-Expose-Headers`, so they are readable from the b
 
 ## Rate limiting
 
-Two tiers count every request independently, keyed by `x-api-key` when present and by client IP otherwise:
+Tiers count every request independently, keyed by `x-api-key` when present and by client IP otherwise. Every request passes through `global`; most also pass through `read`:
 
 | Tier | Window | Limit | Applies to |
 | --- | --- | --- | --- |
 | `global` | 60s | 300 | Every request except `/api/health/*` |
-| `read` | 60s | 120 | Every `GET` route except `/api/health/live` |
+| `read` | 60s | 120 | Every `GET` route except `/api/health/live` and `/api/training-data` |
+| `expensive` | 60min | 10 | `/api/training-data` only |
 
 Both figures are the defaults and are configurable per environment. A response carries one `RateLimit` line per tier:
 
@@ -106,7 +108,7 @@ RateLimit: "read"; r=108; t=5
 ## Types and parsing
 
 - **Money and quantities** are JSON numbers. `unitCost` is `Decimal(12,2)` in Postgres and is serialized as a number, not a string.
-- **Dates** are ISO 8601 strings in UTC (`2026-08-29T00:00:00.000Z`).
+- **Dates** are ISO 8601 strings in UTC (`2026-08-29T00:00:00.000Z`). `/api/training-data` is the exception: its grain is a calendar day, so it sends `2026-08-29`.
 - **Missing values** are `null`, never omitted and never a placeholder `0`. A field documented as `number | null` is `null` because the input for it does not exist yet.
 - **Empty results** are `[]` with a `200`, not a `404`. A `page` past the end behaves the same way, with the true `meta.total`.
 - **Unknown query parameters** are ignored, not rejected.

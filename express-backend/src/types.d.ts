@@ -80,6 +80,46 @@ export interface WarehouseSummary {
   isActive: boolean;
 }
 
+export type PlanningRunStatus = "PENDING" | "RUNNING" | "COMPLETED" | "FAILED";
+
+export interface ScenarioRef {
+  id: string;
+  name: string;
+}
+
+export interface PlanningRunSummary {
+  id: string;
+  status: PlanningRunStatus;
+  horizonDays: number;
+  modelVersion: string | null;
+  scenario: ScenarioRef | null;
+  createdById: string;
+  createdAt: string;
+  startedAt: string | null;
+  completedAt: string | null;
+  durationSeconds: number | null;
+  stale: boolean;
+}
+
+export interface PlanningRunArtifacts {
+  forecasts: number;
+  inventoryPlans: number;
+  supplyPlans: number;
+  drpPlans: number;
+  recommendations: number;
+  optimization: boolean;
+  simulation: boolean;
+}
+
+export interface PlanningRunDetail extends PlanningRunSummary {
+  artifacts: PlanningRunArtifacts;
+}
+
+export interface PlanningRunCreation {
+  run: PlanningRunSummary;
+  replayed: boolean;
+}
+
 export interface DashboardKPIs {
   totalInventoryValue: number;
   skusMonitored: number;
@@ -237,4 +277,86 @@ export interface WarehouseStats {
   shortageValue: number;
   excessValue: number;
   expiringValue: number;
+}
+
+export interface InventoryPositionItem {
+  productId: string;
+  sku: string;
+  productName: string;
+  category: string | null;
+  criticality: string;
+  warehouseId: string;
+  warehouseCode: string;
+  warehouseName: string;
+  tier: string;
+  onHand: number;
+  reserved: number;
+  inTransit: number;
+  available: number;
+  safetyStock: number;
+  reorderPoint: number;
+  maximumInventory: number | null;
+  avgDailyDemand: number;
+  leadTimeDays: number;
+  daysOfSupply: number;
+  unitCost: number;
+  inventoryValue: number;
+  expiringUnits: number;
+  expiringValue: number;
+  daysToNearestExpiry: number | null;
+  status: InventoryHealthState;
+  risk: RiskLevel;
+}
+
+export interface InventoryTotals {
+  positionCount: number;
+  skuCount: number;
+  warehouseCount: number;
+  onHandUnits: number;
+  inventoryValue: number;
+  belowSafetyStockCount: number;
+  belowReorderPointCount: number;
+  aboveMaximumCount: number;
+  expiringValue: number;
+}
+
+export interface InventoryListReport {
+  items: InventoryPositionItem[];
+  totals: InventoryTotals;
+}
+
+export interface StockBatchItem {
+  batchId: string;
+  batchNumber: string;
+  warehouseId: string;
+  warehouseCode: string;
+  warehouseName: string;
+  quantity: number;
+  unitCost: number;
+  valueAtRisk: number;
+  manufacturingDate: string | null;
+  expiryDate: string;
+  daysToExpiry: number;
+  severity: RiskLevel;
+}
+
+export interface SkuInventoryDetail {
+  product: ProductSummary;
+  totals: InventoryTotals;
+  positions: InventoryPositionItem[];
+  batches: StockBatchItem[];
+}
+
+export interface TrainingRow {
+  date: string;
+  sku: string;
+  productId: string;
+  dc: string;
+  warehouseId: string;
+  demand: number;
+  fulfilled: number | null;
+  stockout: boolean;
+  promotion: boolean;
+  holiday: boolean;
+  season: string | null;
 }
