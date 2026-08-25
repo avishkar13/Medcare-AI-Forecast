@@ -141,3 +141,108 @@ export type SimulationRun = Prisma.SimulationRunModel
  * 
  */
 export type Recommendation = Prisma.RecommendationModel
+/**
+ * Model Alert
+ * 
+ */
+export type Alert = Prisma.AlertModel
+/**
+ * Model SystemSettings
+ * 
+ */
+export type SystemSettings = Prisma.SystemSettingsModel
+/**
+ * Model StockMovement
+ * 
+ */
+export type StockMovement = Prisma.StockMovementModel
+/**
+ * Model WastePreventionRecord
+ * 
+ */
+export type WastePreventionRecord = Prisma.WastePreventionRecordModel
+/**
+ * Model AlertMetric
+ * 
+ */
+export type AlertMetric = Prisma.AlertMetricModel
+/**
+ * Model AlertTimelineEvent
+ * 
+ */
+export type AlertTimelineEvent = Prisma.AlertTimelineEventModel
+/**
+ * Model RecommendationSignal
+ * 
+ */
+export type RecommendationSignal = Prisma.RecommendationSignalModel
+/**
+ * Model SimulationMetric
+ * 
+ */
+export type SimulationMetric = Prisma.SimulationMetricModel
+/**
+ * Model ScenarioDCImpact
+ * 
+ */
+export type ScenarioDCImpact = Prisma.ScenarioDCImpactModel
+/**
+ * Model ScenarioSKUImpact
+ * 
+ */
+export type ScenarioSKUImpact = Prisma.ScenarioSKUImpactModel
+/**
+ * Model ScenarioRiskIndicator
+ * 
+ */
+export type ScenarioRiskIndicator = Prisma.ScenarioRiskIndicatorModel
+/**
+ * Model GeneralSettings
+ * 
+ */
+export type GeneralSettings = Prisma.GeneralSettingsModel
+/**
+ * Model ForecastSettings
+ * 
+ */
+export type ForecastSettings = Prisma.ForecastSettingsModel
+/**
+ * Model InventorySettings
+ * 
+ */
+export type InventorySettings = Prisma.InventorySettingsModel
+/**
+ * Model AlertSettings
+ * 
+ */
+export type AlertSettings = Prisma.AlertSettingsModel
+/**
+ * Model NotificationSettings
+ * 
+ */
+export type NotificationSettings = Prisma.NotificationSettingsModel
+/**
+ * Model NotificationRule
+ * 
+ */
+export type NotificationRule = Prisma.NotificationRuleModel
+/**
+ * Model AISettings
+ * 
+ */
+export type AISettings = Prisma.AISettingsModel
+/**
+ * Model IntegrationSettings
+ * 
+ */
+export type IntegrationSettings = Prisma.IntegrationSettingsModel
+/**
+ * Model IntegrationSource
+ * 
+ */
+export type IntegrationSource = Prisma.IntegrationSourceModel
+/**
+ * Model SecuritySettings
+ * 
+ */
+export type SecuritySettings = Prisma.SecuritySettingsModel

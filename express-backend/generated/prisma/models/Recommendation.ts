@@ -28,10 +28,14 @@ export type AggregateRecommendation = {
 
 export type RecommendationAvgAggregateOutputType = {
   quantity: number | null
+  confidence: number | null
+  impactValue: number | null
 }
 
 export type RecommendationSumAggregateOutputType = {
   quantity: number | null
+  confidence: number | null
+  impactValue: number | null
 }
 
 export type RecommendationMinAggregateOutputType = {
@@ -47,6 +51,10 @@ export type RecommendationMinAggregateOutputType = {
   acknowledgedAt: Date | null
   resolvedAt: Date | null
   actedById: string | null
+  actionType: string | null
+  confidence: number | null
+  expectedImpact: string | null
+  impactValue: number | null
   createdAt: Date | null
 }
 
@@ -63,6 +71,10 @@ export type RecommendationMaxAggregateOutputType = {
   acknowledgedAt: Date | null
   resolvedAt: Date | null
   actedById: string | null
+  actionType: string | null
+  confidence: number | null
+  expectedImpact: string | null
+  impactValue: number | null
   createdAt: Date | null
 }
 
@@ -79,6 +91,10 @@ export type RecommendationCountAggregateOutputType = {
   acknowledgedAt: number
   resolvedAt: number
   actedById: number
+  actionType: number
+  confidence: number
+  expectedImpact: number
+  impactValue: number
   createdAt: number
   _all: number
 }
@@ -86,10 +102,14 @@ export type RecommendationCountAggregateOutputType = {
 
 export type RecommendationAvgAggregateInputType = {
   quantity?: true
+  confidence?: true
+  impactValue?: true
 }
 
 export type RecommendationSumAggregateInputType = {
   quantity?: true
+  confidence?: true
+  impactValue?: true
 }
 
 export type RecommendationMinAggregateInputType = {
@@ -105,6 +125,10 @@ export type RecommendationMinAggregateInputType = {
   acknowledgedAt?: true
   resolvedAt?: true
   actedById?: true
+  actionType?: true
+  confidence?: true
+  expectedImpact?: true
+  impactValue?: true
   createdAt?: true
 }
 
@@ -121,6 +145,10 @@ export type RecommendationMaxAggregateInputType = {
   acknowledgedAt?: true
   resolvedAt?: true
   actedById?: true
+  actionType?: true
+  confidence?: true
+  expectedImpact?: true
+  impactValue?: true
   createdAt?: true
 }
 
@@ -137,6 +165,10 @@ export type RecommendationCountAggregateInputType = {
   acknowledgedAt?: true
   resolvedAt?: true
   actedById?: true
+  actionType?: true
+  confidence?: true
+  expectedImpact?: true
+  impactValue?: true
   createdAt?: true
   _all?: true
 }
@@ -240,6 +272,10 @@ export type RecommendationGroupByOutputType = {
   acknowledgedAt: Date | null
   resolvedAt: Date | null
   actedById: string | null
+  actionType: string | null
+  confidence: number | null
+  expectedImpact: string | null
+  impactValue: number | null
   createdAt: Date
   _count: RecommendationCountAggregateOutputType | null
   _avg: RecommendationAvgAggregateOutputType | null
@@ -279,11 +315,16 @@ export type RecommendationWhereInput = {
   acknowledgedAt?: Prisma.DateTimeNullableFilter<"Recommendation"> | Date | string | null
   resolvedAt?: Prisma.DateTimeNullableFilter<"Recommendation"> | Date | string | null
   actedById?: Prisma.StringNullableFilter<"Recommendation"> | string | null
+  actionType?: Prisma.StringNullableFilter<"Recommendation"> | string | null
+  confidence?: Prisma.FloatNullableFilter<"Recommendation"> | number | null
+  expectedImpact?: Prisma.StringNullableFilter<"Recommendation"> | string | null
+  impactValue?: Prisma.FloatNullableFilter<"Recommendation"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Recommendation"> | Date | string
   planningRun?: Prisma.XOR<Prisma.PlanningRunScalarRelationFilter, Prisma.PlanningRunWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
   warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
   actedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  signals?: Prisma.RecommendationSignalListRelationFilter
 }
 
 export type RecommendationOrderByWithRelationInput = {
@@ -299,11 +340,16 @@ export type RecommendationOrderByWithRelationInput = {
   acknowledgedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   actedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  actionType?: Prisma.SortOrderInput | Prisma.SortOrder
+  confidence?: Prisma.SortOrderInput | Prisma.SortOrder
+  expectedImpact?: Prisma.SortOrderInput | Prisma.SortOrder
+  impactValue?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   planningRun?: Prisma.PlanningRunOrderByWithRelationInput
   product?: Prisma.ProductOrderByWithRelationInput
   warehouse?: Prisma.WarehouseOrderByWithRelationInput
   actedBy?: Prisma.UserOrderByWithRelationInput
+  signals?: Prisma.RecommendationSignalOrderByRelationAggregateInput
 }
 
 export type RecommendationWhereUniqueInput = Prisma.AtLeast<{
@@ -322,11 +368,16 @@ export type RecommendationWhereUniqueInput = Prisma.AtLeast<{
   acknowledgedAt?: Prisma.DateTimeNullableFilter<"Recommendation"> | Date | string | null
   resolvedAt?: Prisma.DateTimeNullableFilter<"Recommendation"> | Date | string | null
   actedById?: Prisma.StringNullableFilter<"Recommendation"> | string | null
+  actionType?: Prisma.StringNullableFilter<"Recommendation"> | string | null
+  confidence?: Prisma.FloatNullableFilter<"Recommendation"> | number | null
+  expectedImpact?: Prisma.StringNullableFilter<"Recommendation"> | string | null
+  impactValue?: Prisma.FloatNullableFilter<"Recommendation"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Recommendation"> | Date | string
   planningRun?: Prisma.XOR<Prisma.PlanningRunScalarRelationFilter, Prisma.PlanningRunWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
   warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
   actedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  signals?: Prisma.RecommendationSignalListRelationFilter
 }, "id">
 
 export type RecommendationOrderByWithAggregationInput = {
@@ -342,6 +393,10 @@ export type RecommendationOrderByWithAggregationInput = {
   acknowledgedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   actedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  actionType?: Prisma.SortOrderInput | Prisma.SortOrder
+  confidence?: Prisma.SortOrderInput | Prisma.SortOrder
+  expectedImpact?: Prisma.SortOrderInput | Prisma.SortOrder
+  impactValue?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.RecommendationCountOrderByAggregateInput
   _avg?: Prisma.RecommendationAvgOrderByAggregateInput
@@ -366,6 +421,10 @@ export type RecommendationScalarWhereWithAggregatesInput = {
   acknowledgedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Recommendation"> | Date | string | null
   resolvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Recommendation"> | Date | string | null
   actedById?: Prisma.StringNullableWithAggregatesFilter<"Recommendation"> | string | null
+  actionType?: Prisma.StringNullableWithAggregatesFilter<"Recommendation"> | string | null
+  confidence?: Prisma.FloatNullableWithAggregatesFilter<"Recommendation"> | number | null
+  expectedImpact?: Prisma.StringNullableWithAggregatesFilter<"Recommendation"> | string | null
+  impactValue?: Prisma.FloatNullableWithAggregatesFilter<"Recommendation"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Recommendation"> | Date | string
 }
 
@@ -378,11 +437,16 @@ export type RecommendationCreateInput = {
   status?: $Enums.RecommendationStatus
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
   planningRun: Prisma.PlanningRunCreateNestedOneWithoutRecommendationsInput
   product: Prisma.ProductCreateNestedOneWithoutRecommendationsInput
   warehouse: Prisma.WarehouseCreateNestedOneWithoutRecommendationsInput
   actedBy?: Prisma.UserCreateNestedOneWithoutActedRecommendationsInput
+  signals?: Prisma.RecommendationSignalCreateNestedManyWithoutRecommendationInput
 }
 
 export type RecommendationUncheckedCreateInput = {
@@ -398,7 +462,12 @@ export type RecommendationUncheckedCreateInput = {
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
   actedById?: string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
+  signals?: Prisma.RecommendationSignalUncheckedCreateNestedManyWithoutRecommendationInput
 }
 
 export type RecommendationUpdateInput = {
@@ -410,11 +479,16 @@ export type RecommendationUpdateInput = {
   status?: Prisma.EnumRecommendationStatusFieldUpdateOperationsInput | $Enums.RecommendationStatus
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   planningRun?: Prisma.PlanningRunUpdateOneRequiredWithoutRecommendationsNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutRecommendationsNestedInput
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutRecommendationsNestedInput
   actedBy?: Prisma.UserUpdateOneWithoutActedRecommendationsNestedInput
+  signals?: Prisma.RecommendationSignalUpdateManyWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateInput = {
@@ -430,7 +504,12 @@ export type RecommendationUncheckedUpdateInput = {
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   actedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  signals?: Prisma.RecommendationSignalUncheckedUpdateManyWithoutRecommendationNestedInput
 }
 
 export type RecommendationCreateManyInput = {
@@ -446,6 +525,10 @@ export type RecommendationCreateManyInput = {
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
   actedById?: string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
 }
 
@@ -458,6 +541,10 @@ export type RecommendationUpdateManyMutationInput = {
   status?: Prisma.EnumRecommendationStatusFieldUpdateOperationsInput | $Enums.RecommendationStatus
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -474,6 +561,10 @@ export type RecommendationUncheckedUpdateManyInput = {
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   actedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -500,11 +591,17 @@ export type RecommendationCountOrderByAggregateInput = {
   acknowledgedAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
   actedById?: Prisma.SortOrder
+  actionType?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
+  expectedImpact?: Prisma.SortOrder
+  impactValue?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type RecommendationAvgOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
+  impactValue?: Prisma.SortOrder
 }
 
 export type RecommendationMaxOrderByAggregateInput = {
@@ -520,6 +617,10 @@ export type RecommendationMaxOrderByAggregateInput = {
   acknowledgedAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
   actedById?: Prisma.SortOrder
+  actionType?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
+  expectedImpact?: Prisma.SortOrder
+  impactValue?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -536,11 +637,22 @@ export type RecommendationMinOrderByAggregateInput = {
   acknowledgedAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
   actedById?: Prisma.SortOrder
+  actionType?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
+  expectedImpact?: Prisma.SortOrder
+  impactValue?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type RecommendationSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
+  impactValue?: Prisma.SortOrder
+}
+
+export type RecommendationScalarRelationFilter = {
+  is?: Prisma.RecommendationWhereInput
+  isNot?: Prisma.RecommendationWhereInput
 }
 
 export type RecommendationCreateNestedManyWithoutActedByInput = {
@@ -723,6 +835,20 @@ export type EnumRecommendationStatusFieldUpdateOperationsInput = {
   set?: $Enums.RecommendationStatus
 }
 
+export type RecommendationCreateNestedOneWithoutSignalsInput = {
+  create?: Prisma.XOR<Prisma.RecommendationCreateWithoutSignalsInput, Prisma.RecommendationUncheckedCreateWithoutSignalsInput>
+  connectOrCreate?: Prisma.RecommendationCreateOrConnectWithoutSignalsInput
+  connect?: Prisma.RecommendationWhereUniqueInput
+}
+
+export type RecommendationUpdateOneRequiredWithoutSignalsNestedInput = {
+  create?: Prisma.XOR<Prisma.RecommendationCreateWithoutSignalsInput, Prisma.RecommendationUncheckedCreateWithoutSignalsInput>
+  connectOrCreate?: Prisma.RecommendationCreateOrConnectWithoutSignalsInput
+  upsert?: Prisma.RecommendationUpsertWithoutSignalsInput
+  connect?: Prisma.RecommendationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RecommendationUpdateToOneWithWhereWithoutSignalsInput, Prisma.RecommendationUpdateWithoutSignalsInput>, Prisma.RecommendationUncheckedUpdateWithoutSignalsInput>
+}
+
 export type RecommendationCreateWithoutActedByInput = {
   id?: string
   type: $Enums.RecommendationType
@@ -732,10 +858,15 @@ export type RecommendationCreateWithoutActedByInput = {
   status?: $Enums.RecommendationStatus
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
   planningRun: Prisma.PlanningRunCreateNestedOneWithoutRecommendationsInput
   product: Prisma.ProductCreateNestedOneWithoutRecommendationsInput
   warehouse: Prisma.WarehouseCreateNestedOneWithoutRecommendationsInput
+  signals?: Prisma.RecommendationSignalCreateNestedManyWithoutRecommendationInput
 }
 
 export type RecommendationUncheckedCreateWithoutActedByInput = {
@@ -750,7 +881,12 @@ export type RecommendationUncheckedCreateWithoutActedByInput = {
   status?: $Enums.RecommendationStatus
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
+  signals?: Prisma.RecommendationSignalUncheckedCreateNestedManyWithoutRecommendationInput
 }
 
 export type RecommendationCreateOrConnectWithoutActedByInput = {
@@ -795,6 +931,10 @@ export type RecommendationScalarWhereInput = {
   acknowledgedAt?: Prisma.DateTimeNullableFilter<"Recommendation"> | Date | string | null
   resolvedAt?: Prisma.DateTimeNullableFilter<"Recommendation"> | Date | string | null
   actedById?: Prisma.StringNullableFilter<"Recommendation"> | string | null
+  actionType?: Prisma.StringNullableFilter<"Recommendation"> | string | null
+  confidence?: Prisma.FloatNullableFilter<"Recommendation"> | number | null
+  expectedImpact?: Prisma.StringNullableFilter<"Recommendation"> | string | null
+  impactValue?: Prisma.FloatNullableFilter<"Recommendation"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Recommendation"> | Date | string
 }
 
@@ -807,10 +947,15 @@ export type RecommendationCreateWithoutProductInput = {
   status?: $Enums.RecommendationStatus
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
   planningRun: Prisma.PlanningRunCreateNestedOneWithoutRecommendationsInput
   warehouse: Prisma.WarehouseCreateNestedOneWithoutRecommendationsInput
   actedBy?: Prisma.UserCreateNestedOneWithoutActedRecommendationsInput
+  signals?: Prisma.RecommendationSignalCreateNestedManyWithoutRecommendationInput
 }
 
 export type RecommendationUncheckedCreateWithoutProductInput = {
@@ -825,7 +970,12 @@ export type RecommendationUncheckedCreateWithoutProductInput = {
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
   actedById?: string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
+  signals?: Prisma.RecommendationSignalUncheckedCreateNestedManyWithoutRecommendationInput
 }
 
 export type RecommendationCreateOrConnectWithoutProductInput = {
@@ -863,10 +1013,15 @@ export type RecommendationCreateWithoutWarehouseInput = {
   status?: $Enums.RecommendationStatus
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
   planningRun: Prisma.PlanningRunCreateNestedOneWithoutRecommendationsInput
   product: Prisma.ProductCreateNestedOneWithoutRecommendationsInput
   actedBy?: Prisma.UserCreateNestedOneWithoutActedRecommendationsInput
+  signals?: Prisma.RecommendationSignalCreateNestedManyWithoutRecommendationInput
 }
 
 export type RecommendationUncheckedCreateWithoutWarehouseInput = {
@@ -881,7 +1036,12 @@ export type RecommendationUncheckedCreateWithoutWarehouseInput = {
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
   actedById?: string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
+  signals?: Prisma.RecommendationSignalUncheckedCreateNestedManyWithoutRecommendationInput
 }
 
 export type RecommendationCreateOrConnectWithoutWarehouseInput = {
@@ -919,10 +1079,15 @@ export type RecommendationCreateWithoutPlanningRunInput = {
   status?: $Enums.RecommendationStatus
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
   product: Prisma.ProductCreateNestedOneWithoutRecommendationsInput
   warehouse: Prisma.WarehouseCreateNestedOneWithoutRecommendationsInput
   actedBy?: Prisma.UserCreateNestedOneWithoutActedRecommendationsInput
+  signals?: Prisma.RecommendationSignalCreateNestedManyWithoutRecommendationInput
 }
 
 export type RecommendationUncheckedCreateWithoutPlanningRunInput = {
@@ -937,7 +1102,12 @@ export type RecommendationUncheckedCreateWithoutPlanningRunInput = {
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
   actedById?: string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
+  signals?: Prisma.RecommendationSignalUncheckedCreateNestedManyWithoutRecommendationInput
 }
 
 export type RecommendationCreateOrConnectWithoutPlanningRunInput = {
@@ -966,6 +1136,102 @@ export type RecommendationUpdateManyWithWhereWithoutPlanningRunInput = {
   data: Prisma.XOR<Prisma.RecommendationUpdateManyMutationInput, Prisma.RecommendationUncheckedUpdateManyWithoutPlanningRunInput>
 }
 
+export type RecommendationCreateWithoutSignalsInput = {
+  id?: string
+  type: $Enums.RecommendationType
+  priority: $Enums.Priority
+  message: string
+  quantity?: number | null
+  status?: $Enums.RecommendationStatus
+  acknowledgedAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
+  createdAt?: Date | string
+  planningRun: Prisma.PlanningRunCreateNestedOneWithoutRecommendationsInput
+  product: Prisma.ProductCreateNestedOneWithoutRecommendationsInput
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutRecommendationsInput
+  actedBy?: Prisma.UserCreateNestedOneWithoutActedRecommendationsInput
+}
+
+export type RecommendationUncheckedCreateWithoutSignalsInput = {
+  id?: string
+  planningRunId: string
+  productId: string
+  warehouseId: string
+  type: $Enums.RecommendationType
+  priority: $Enums.Priority
+  message: string
+  quantity?: number | null
+  status?: $Enums.RecommendationStatus
+  acknowledgedAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  actedById?: string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
+  createdAt?: Date | string
+}
+
+export type RecommendationCreateOrConnectWithoutSignalsInput = {
+  where: Prisma.RecommendationWhereUniqueInput
+  create: Prisma.XOR<Prisma.RecommendationCreateWithoutSignalsInput, Prisma.RecommendationUncheckedCreateWithoutSignalsInput>
+}
+
+export type RecommendationUpsertWithoutSignalsInput = {
+  update: Prisma.XOR<Prisma.RecommendationUpdateWithoutSignalsInput, Prisma.RecommendationUncheckedUpdateWithoutSignalsInput>
+  create: Prisma.XOR<Prisma.RecommendationCreateWithoutSignalsInput, Prisma.RecommendationUncheckedCreateWithoutSignalsInput>
+  where?: Prisma.RecommendationWhereInput
+}
+
+export type RecommendationUpdateToOneWithWhereWithoutSignalsInput = {
+  where?: Prisma.RecommendationWhereInput
+  data: Prisma.XOR<Prisma.RecommendationUpdateWithoutSignalsInput, Prisma.RecommendationUncheckedUpdateWithoutSignalsInput>
+}
+
+export type RecommendationUpdateWithoutSignalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumRecommendationTypeFieldUpdateOperationsInput | $Enums.RecommendationType
+  priority?: Prisma.EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumRecommendationStatusFieldUpdateOperationsInput | $Enums.RecommendationStatus
+  acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  planningRun?: Prisma.PlanningRunUpdateOneRequiredWithoutRecommendationsNestedInput
+  product?: Prisma.ProductUpdateOneRequiredWithoutRecommendationsNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutRecommendationsNestedInput
+  actedBy?: Prisma.UserUpdateOneWithoutActedRecommendationsNestedInput
+}
+
+export type RecommendationUncheckedUpdateWithoutSignalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  planningRunId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumRecommendationTypeFieldUpdateOperationsInput | $Enums.RecommendationType
+  priority?: Prisma.EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumRecommendationStatusFieldUpdateOperationsInput | $Enums.RecommendationStatus
+  acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type RecommendationCreateManyActedByInput = {
   id?: string
   planningRunId: string
@@ -978,6 +1244,10 @@ export type RecommendationCreateManyActedByInput = {
   status?: $Enums.RecommendationStatus
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
 }
 
@@ -990,10 +1260,15 @@ export type RecommendationUpdateWithoutActedByInput = {
   status?: Prisma.EnumRecommendationStatusFieldUpdateOperationsInput | $Enums.RecommendationStatus
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   planningRun?: Prisma.PlanningRunUpdateOneRequiredWithoutRecommendationsNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutRecommendationsNestedInput
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutRecommendationsNestedInput
+  signals?: Prisma.RecommendationSignalUpdateManyWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateWithoutActedByInput = {
@@ -1008,7 +1283,12 @@ export type RecommendationUncheckedUpdateWithoutActedByInput = {
   status?: Prisma.EnumRecommendationStatusFieldUpdateOperationsInput | $Enums.RecommendationStatus
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  signals?: Prisma.RecommendationSignalUncheckedUpdateManyWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateManyWithoutActedByInput = {
@@ -1023,6 +1303,10 @@ export type RecommendationUncheckedUpdateManyWithoutActedByInput = {
   status?: Prisma.EnumRecommendationStatusFieldUpdateOperationsInput | $Enums.RecommendationStatus
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1038,6 +1322,10 @@ export type RecommendationCreateManyProductInput = {
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
   actedById?: string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
 }
 
@@ -1050,10 +1338,15 @@ export type RecommendationUpdateWithoutProductInput = {
   status?: Prisma.EnumRecommendationStatusFieldUpdateOperationsInput | $Enums.RecommendationStatus
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   planningRun?: Prisma.PlanningRunUpdateOneRequiredWithoutRecommendationsNestedInput
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutRecommendationsNestedInput
   actedBy?: Prisma.UserUpdateOneWithoutActedRecommendationsNestedInput
+  signals?: Prisma.RecommendationSignalUpdateManyWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateWithoutProductInput = {
@@ -1068,7 +1361,12 @@ export type RecommendationUncheckedUpdateWithoutProductInput = {
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   actedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  signals?: Prisma.RecommendationSignalUncheckedUpdateManyWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateManyWithoutProductInput = {
@@ -1083,6 +1381,10 @@ export type RecommendationUncheckedUpdateManyWithoutProductInput = {
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   actedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1098,6 +1400,10 @@ export type RecommendationCreateManyWarehouseInput = {
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
   actedById?: string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
 }
 
@@ -1110,10 +1416,15 @@ export type RecommendationUpdateWithoutWarehouseInput = {
   status?: Prisma.EnumRecommendationStatusFieldUpdateOperationsInput | $Enums.RecommendationStatus
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   planningRun?: Prisma.PlanningRunUpdateOneRequiredWithoutRecommendationsNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutRecommendationsNestedInput
   actedBy?: Prisma.UserUpdateOneWithoutActedRecommendationsNestedInput
+  signals?: Prisma.RecommendationSignalUpdateManyWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateWithoutWarehouseInput = {
@@ -1128,7 +1439,12 @@ export type RecommendationUncheckedUpdateWithoutWarehouseInput = {
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   actedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  signals?: Prisma.RecommendationSignalUncheckedUpdateManyWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateManyWithoutWarehouseInput = {
@@ -1143,6 +1459,10 @@ export type RecommendationUncheckedUpdateManyWithoutWarehouseInput = {
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   actedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1158,6 +1478,10 @@ export type RecommendationCreateManyPlanningRunInput = {
   acknowledgedAt?: Date | string | null
   resolvedAt?: Date | string | null
   actedById?: string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
   createdAt?: Date | string
 }
 
@@ -1170,10 +1494,15 @@ export type RecommendationUpdateWithoutPlanningRunInput = {
   status?: Prisma.EnumRecommendationStatusFieldUpdateOperationsInput | $Enums.RecommendationStatus
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   product?: Prisma.ProductUpdateOneRequiredWithoutRecommendationsNestedInput
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutRecommendationsNestedInput
   actedBy?: Prisma.UserUpdateOneWithoutActedRecommendationsNestedInput
+  signals?: Prisma.RecommendationSignalUpdateManyWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateWithoutPlanningRunInput = {
@@ -1188,7 +1517,12 @@ export type RecommendationUncheckedUpdateWithoutPlanningRunInput = {
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   actedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  signals?: Prisma.RecommendationSignalUncheckedUpdateManyWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateManyWithoutPlanningRunInput = {
@@ -1203,9 +1537,42 @@ export type RecommendationUncheckedUpdateManyWithoutPlanningRunInput = {
   acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   actedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type RecommendationCountOutputType
+ */
+
+export type RecommendationCountOutputType = {
+  signals: number
+}
+
+export type RecommendationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  signals?: boolean | RecommendationCountOutputTypeCountSignalsArgs
+}
+
+/**
+ * RecommendationCountOutputType without action
+ */
+export type RecommendationCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecommendationCountOutputType
+   */
+  select?: Prisma.RecommendationCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * RecommendationCountOutputType without action
+ */
+export type RecommendationCountOutputTypeCountSignalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecommendationSignalWhereInput
+}
 
 
 export type RecommendationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1221,11 +1588,17 @@ export type RecommendationSelect<ExtArgs extends runtime.Types.Extensions.Intern
   acknowledgedAt?: boolean
   resolvedAt?: boolean
   actedById?: boolean
+  actionType?: boolean
+  confidence?: boolean
+  expectedImpact?: boolean
+  impactValue?: boolean
   createdAt?: boolean
   planningRun?: boolean | Prisma.PlanningRunDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   actedBy?: boolean | Prisma.Recommendation$actedByArgs<ExtArgs>
+  signals?: boolean | Prisma.Recommendation$signalsArgs<ExtArgs>
+  _count?: boolean | Prisma.RecommendationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["recommendation"]>
 
 export type RecommendationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1241,6 +1614,10 @@ export type RecommendationSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   acknowledgedAt?: boolean
   resolvedAt?: boolean
   actedById?: boolean
+  actionType?: boolean
+  confidence?: boolean
+  expectedImpact?: boolean
+  impactValue?: boolean
   createdAt?: boolean
   planningRun?: boolean | Prisma.PlanningRunDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -1261,6 +1638,10 @@ export type RecommendationSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   acknowledgedAt?: boolean
   resolvedAt?: boolean
   actedById?: boolean
+  actionType?: boolean
+  confidence?: boolean
+  expectedImpact?: boolean
+  impactValue?: boolean
   createdAt?: boolean
   planningRun?: boolean | Prisma.PlanningRunDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -1281,15 +1662,21 @@ export type RecommendationSelectScalar = {
   acknowledgedAt?: boolean
   resolvedAt?: boolean
   actedById?: boolean
+  actionType?: boolean
+  confidence?: boolean
+  expectedImpact?: boolean
+  impactValue?: boolean
   createdAt?: boolean
 }
 
-export type RecommendationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planningRunId" | "productId" | "warehouseId" | "type" | "priority" | "message" | "quantity" | "status" | "acknowledgedAt" | "resolvedAt" | "actedById" | "createdAt", ExtArgs["result"]["recommendation"]>
+export type RecommendationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planningRunId" | "productId" | "warehouseId" | "type" | "priority" | "message" | "quantity" | "status" | "acknowledgedAt" | "resolvedAt" | "actedById" | "actionType" | "confidence" | "expectedImpact" | "impactValue" | "createdAt", ExtArgs["result"]["recommendation"]>
 export type RecommendationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   planningRun?: boolean | Prisma.PlanningRunDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   actedBy?: boolean | Prisma.Recommendation$actedByArgs<ExtArgs>
+  signals?: boolean | Prisma.Recommendation$signalsArgs<ExtArgs>
+  _count?: boolean | Prisma.RecommendationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RecommendationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   planningRun?: boolean | Prisma.PlanningRunDefaultArgs<ExtArgs>
@@ -1311,6 +1698,7 @@ export type $RecommendationPayload<ExtArgs extends runtime.Types.Extensions.Inte
     product: Prisma.$ProductPayload<ExtArgs>
     warehouse: Prisma.$WarehousePayload<ExtArgs>
     actedBy: Prisma.$UserPayload<ExtArgs> | null
+    signals: Prisma.$RecommendationSignalPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1325,6 +1713,10 @@ export type $RecommendationPayload<ExtArgs extends runtime.Types.Extensions.Inte
     acknowledgedAt: Date | null
     resolvedAt: Date | null
     actedById: string | null
+    actionType: string | null
+    confidence: number | null
+    expectedImpact: string | null
+    impactValue: number | null
     createdAt: Date
   }, ExtArgs["result"]["recommendation"]>
   composites: {}
@@ -1724,6 +2116,7 @@ export interface Prisma__RecommendationClient<T, Null = never, ExtArgs extends r
   product<T extends Prisma.ProductDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProductDefaultArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   warehouse<T extends Prisma.WarehouseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WarehouseDefaultArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   actedBy<T extends Prisma.Recommendation$actedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Recommendation$actedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  signals<T extends Prisma.Recommendation$signalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Recommendation$signalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecommendationSignalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1765,6 +2158,10 @@ export interface RecommendationFieldRefs {
   readonly acknowledgedAt: Prisma.FieldRef<"Recommendation", 'DateTime'>
   readonly resolvedAt: Prisma.FieldRef<"Recommendation", 'DateTime'>
   readonly actedById: Prisma.FieldRef<"Recommendation", 'String'>
+  readonly actionType: Prisma.FieldRef<"Recommendation", 'String'>
+  readonly confidence: Prisma.FieldRef<"Recommendation", 'Float'>
+  readonly expectedImpact: Prisma.FieldRef<"Recommendation", 'String'>
+  readonly impactValue: Prisma.FieldRef<"Recommendation", 'Float'>
   readonly createdAt: Prisma.FieldRef<"Recommendation", 'DateTime'>
 }
     
@@ -2183,6 +2580,30 @@ export type Recommendation$actedByArgs<ExtArgs extends runtime.Types.Extensions.
    */
   include?: Prisma.UserInclude<ExtArgs> | null
   where?: Prisma.UserWhereInput
+}
+
+/**
+ * Recommendation.signals
+ */
+export type Recommendation$signalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecommendationSignal
+   */
+  select?: Prisma.RecommendationSignalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RecommendationSignal
+   */
+  omit?: Prisma.RecommendationSignalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecommendationSignalInclude<ExtArgs> | null
+  where?: Prisma.RecommendationSignalWhereInput
+  orderBy?: Prisma.RecommendationSignalOrderByWithRelationInput | Prisma.RecommendationSignalOrderByWithRelationInput[]
+  cursor?: Prisma.RecommendationSignalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecommendationSignalScalarFieldEnum | Prisma.RecommendationSignalScalarFieldEnum[]
 }
 
 /**

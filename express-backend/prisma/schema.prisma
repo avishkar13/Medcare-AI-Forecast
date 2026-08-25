@@ -244,6 +244,12 @@ model Scenario {
 
   planningRuns PlanningRun[]
 
+  metrics    SimulationMetric[]
+  dcImpacts  ScenarioDCImpact[]
+  skuImpacts ScenarioSKUImpact[]
+  risks      ScenarioRiskIndicator[]
+  riskLevel  String?
+
   createdAt DateTime @default(now())
 }
 
@@ -405,6 +411,12 @@ model Recommendation {
   warehouse   Warehouse   @relation(fields: [warehouseId], references: [id])
   actedBy     User?       @relation(fields: [actedById], references: [id])
 
+  actionType     String?
+  confidence     Float?
+  expectedImpact String?
+  impactValue    Float?
+  signals        RecommendationSignal[]
+
   createdAt DateTime @default(now())
 
   @@index([status, priority])
@@ -477,4 +489,286 @@ enum RecommendationStatus {
   ACCEPTED
   REJECTED
   COMPLETED
+}
+
+model Alert {
+  id                String               @id @default(cuid())
+  severity          String
+  type              String
+  title             String
+  sku               String?
+  product           String?
+  location          String
+  detectedAt        DateTime
+  businessImpact    String
+  status            String
+  recommendedAction String
+  explanation       String
+  metrics           AlertMetric[]
+  timeline          AlertTimelineEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SystemSettings {
+  id String @id @default(cuid())
+
+  general       GeneralSettings?
+  forecast      ForecastSettings?
+  inventory     InventorySettings?
+  alerts        AlertSettings?
+  notifications NotificationSettings?
+  ai            AISettings?
+  integrations  IntegrationSettings?
+  security      SecuritySettings?
+
+  updatedAt DateTime @updatedAt
+}
+
+model StockMovement {
+  id           String   @id @default(cuid())
+  date         DateTime
+  movementType String
+  sku          String
+  quantity     Float
+  fromLocation String?
+  toLocation   String?
+  reference    String?
+  userOrSystem String?
+
+  createdAt DateTime @default(now())
+}
+
+model WastePreventionRecord {
+  id          String   @id @default(cuid())
+  productName String
+  actionTaken String
+  unitsSaved  Float
+  valueSaved  Float
+  date        DateTime
+
+  createdAt DateTime @default(now())
+}
+
+// --- Replaced JSON fields with strict relations ---
+
+model AlertMetric {
+  id      String @id @default(cuid())
+  alertId String
+  label   String
+  value   String
+  alert   Alert  @relation(fields: [alertId], references: [id], onDelete: Cascade)
+}
+
+model AlertTimelineEvent {
+  id          String   @id @default(cuid())
+  alertId     String
+  time        DateTime
+  description String
+  alert       Alert    @relation(fields: [alertId], references: [id], onDelete: Cascade)
+}
+
+model RecommendationSignal {
+  id               String         @id @default(cuid())
+  recommendationId String
+  type             String
+  label            String
+  direction        String
+  recommendation   Recommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+}
+
+model SimulationMetric {
+  id             String   @id @default(cuid())
+  scenarioId     String
+  label          String
+  currentValue   Float
+  simulatedValue Float
+  delta          Float
+  unit           String
+  direction      String
+  format         String
+  scenario       Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+}
+
+model ScenarioDCImpact {
+  id                    String   @id @default(cuid())
+  scenarioId            String
+  name                  String
+  currentCapacity       Float
+  simulatedCapacity     Float
+  currentStockoutRisk   Float
+  simulatedStockoutRisk Float
+  currentAtRiskValue    Float
+  simulatedAtRiskValue  Float
+  scenario              Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+}
+
+model ScenarioSKUImpact {
+  id                 String   @id @default(cuid())
+  scenarioId         String
+  name               String
+  sku                String
+  currentInventory   Float
+  simulatedInventory Float
+  optimalInventory   Float
+  scenario           Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+}
+
+model ScenarioRiskIndicator {
+  id             String   @id @default(cuid())
+  scenarioId     String
+  name           String
+  icon           String
+  currentValue   Float
+  simulatedValue Float
+  delta          Float
+  severity       String
+  scenario       Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+}
+
+model GeneralSettings {
+  id                 String         @id @default(cuid())
+  systemSettingsId   String         @unique
+  workspaceName      String
+  organization       String
+  region             String
+  timezone           String
+  dateFormat         String
+  currency           String
+  language           String
+  theme              String
+  density            String
+  defaultLandingPage String
+  systemSettings     SystemSettings @relation(fields: [systemSettingsId], references: [id], onDelete: Cascade)
+}
+
+model ForecastSettings {
+  id                     String         @id @default(cuid())
+  systemSettingsId       String         @unique
+  defaultHorizon         Int
+  defaultModel           String
+  confidenceThreshold    Float
+  updateFrequency        String
+  predictionInterval     Float
+  autoRefresh            Boolean
+  targetAccuracy         Float
+  alertAccuracyThreshold Float
+  systemSettings         SystemSettings @relation(fields: [systemSettingsId], references: [id], onDelete: Cascade)
+}
+
+model InventorySettings {
+  id                   String         @id @default(cuid())
+  systemSettingsId     String         @unique
+  defaultSafetyStock   Float
+  reorderPoint         Float
+  maxInventory         Float
+  minServiceLevel      Float
+  autoReorder          Boolean
+  coverageWarning      Float
+  coverageCritical     Float
+  safetyStockWarning   Float
+  safetyStockCritical  Float
+  capacityWarning      Float
+  capacityCritical     Float
+  expiryWindowWarning  Float
+  expiryWindowCritical Float
+  systemSettings       SystemSettings @relation(fields: [systemSettingsId], references: [id], onDelete: Cascade)
+}
+
+model AlertSettings {
+  id                       String         @id @default(cuid())
+  systemSettingsId         String         @unique
+  realTimeMonitoring       Boolean
+  typeStockoutRisk         Boolean
+  typeDemandSpike          Boolean
+  typeExpiryRisk           Boolean
+  typeSupplierDelay        Boolean
+  typeCapacityBreach       Boolean
+  typeForecastAnomaly      Boolean
+  typeOverstock            Boolean
+  thresholdStockoutProb    Float
+  thresholdDemandDeviation Float
+  thresholdExpiryWindow    Float
+  thresholdCapacityUtil    Float
+  thresholdSupplierDelay   Float
+  escalationCritical       String
+  escalationHigh           String
+  escalationMedium         String
+  escalationLow            String
+  systemSettings           SystemSettings @relation(fields: [systemSettingsId], references: [id], onDelete: Cascade)
+}
+
+model NotificationSettings {
+  id                 String             @id @default(cuid())
+  systemSettingsId   String             @unique
+  channelInApp       Boolean
+  channelEmail       Boolean
+  channelSms         Boolean
+  channelTeams       Boolean
+  dailyDigestEnabled Boolean
+  dailyDigestTime    String
+  systemSettings     SystemSettings     @relation(fields: [systemSettingsId], references: [id], onDelete: Cascade)
+  rules              NotificationRule[]
+}
+
+model NotificationRule {
+  id                     String               @id @default(cuid())
+  notificationSettingsId String
+  event                  String
+  inApp                  Boolean
+  email                  Boolean
+  sms                    Boolean
+  notificationSettings   NotificationSettings @relation(fields: [notificationSettingsId], references: [id], onDelete: Cascade)
+}
+
+model AISettings {
+  id                       String         @id @default(cuid())
+  systemSettingsId         String         @unique
+  primaryModel             String
+  modelConfidence          Float
+  recommendationConfidence Float
+  featRecommendations      Boolean
+  featExplainability       Boolean
+  featAutoRiskDetection    Boolean
+  factorDemandForecast     Float
+  factorInventoryPosition  Float
+  factorLeadTime           Float
+  factorExpiryRisk         Float
+  factorNetworkCapacity    Float
+  systemSettings           SystemSettings @relation(fields: [systemSettingsId], references: [id], onDelete: Cascade)
+}
+
+model IntegrationSettings {
+  id               String              @id @default(cuid())
+  systemSettingsId String              @unique
+  autoSync         Boolean
+  syncFrequency    String
+  apiStatus        String
+  apiEnvironment   String
+  apiVersion       String
+  systemSettings   SystemSettings      @relation(fields: [systemSettingsId], references: [id], onDelete: Cascade)
+  sources          IntegrationSource[]
+}
+
+model IntegrationSource {
+  id                    String              @id @default(cuid())
+  integrationSettingsId String
+  sourceId              String
+  name                  String
+  status                String
+  lastSync              String
+  records               Int
+  integrationSettings   IntegrationSettings @relation(fields: [integrationSettingsId], references: [id], onDelete: Cascade)
+}
+
+model SecuritySettings {
+  id               String         @id @default(cuid())
+  systemSettingsId String         @unique
+  twoFactor        Boolean
+  sessionTimeout   Int
+  passwordPolicy   String
+  loginAlerts      Boolean
+  auditLogging     Boolean
+  systemSettings   SystemSettings @relation(fields: [systemSettingsId], references: [id], onDelete: Cascade)
 }
