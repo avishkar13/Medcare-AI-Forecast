@@ -1,7 +1,7 @@
 {
   "production_model": "XGBoost + Quantile XGBoost",
   "model_version": "medcare-xgb-qrf-v1",
-  "data_source": "medcare-postgresql",
+  "data_source": "express:/api/training-data",
   "feature_columns": [
     "sku_id",
     "dc_id",
@@ -41,17 +41,21 @@
     "promotion_seasonality",
     "promotion_recent_rate"
   ],
-  "cutoff": "2026-07-25",
+  "cutoff": "2026-07-24",
+  "centre": "point model (expected demand, not the median)",
   "uncertainty_method": "direct quantile regression + conformal calibration",
   "quantiles": [
     0.1,
     0.5,
     0.9
   ],
-  "interval_method": "conformalized quantile regression",
-  "conformal_delta": 8.164355252794003,
+  "interval_method": "conformalized quantile regression (split CQR)",
+  "conformal_delta": 0.012352455139160518,
+  "calibration_from": "2026-06-29",
+  "calibration_ok": true,
+  "target_coverage_percent": 80,
   "cv_folds": 3,
-  "p10_p90_coverage_percent": 98.93145161290322,
+  "p10_p90_coverage_percent": 80.18145161290322,
   "training_rows": 19360,
   "test_rows": 4960,
   "unique_skus": 40,

@@ -1,211 +1,212 @@
+"""MedCare demand forecasting engine.
+
+Implements doc/forecast.contract.md from the Express backend: a batch POST /forecast
+keyed on the cuids the planner uses, dense parallel arrays out, and no database.
+"""
 from __future__ import annotations
 
-from dotenv import load_dotenv
-load_dotenv()
-
 import json
-import os
-from pathlib import Path
+from datetime import date, datetime, timezone
 from typing import Optional
 
-import numpy as np
 import pandas as pd
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from src.anomaly import detect_demand_anomaly
-from src.data_project import load_history, load_all_history, load_product_metadata
+from src.config import (
+    ARTIFACTS_DIR,
+    BUNDLE_PATH,
+    MAX_HORIZON_DAYS,
+    METADATA_PATH,
+    METRICS_PATH,
+    MODEL_VERSION,
+    OUTPUTS_DIR,
+)
+from src.forecasting.recursive import forecast_series
 from src.models.model import load_bundle
-from src.forecasting.forecast import model_drivers
-from src.preprocessing.features import clean_data, add_features, feature_columns
-from src.project_adapter import canonicalize_project_history
-from src.project_signals import build_future_signals
+from src.project_adapter import canonicalize_training_data, pair_index
+from src.training_client import (
+    TrainingDataUnavailable,
+    cache_state,
+    fetch_training_data,
+    reachable,
+)
 from src.training_core import train_dataframe
 
-ROOT = Path(__file__).resolve().parents[1]
-ART = ROOT / "artifacts"
-OUT = ROOT / "outputs"
-BUNDLE_PATH = ART / "forecast_pipeline.joblib"
-META_PATH = ART / "model_metadata.json"
-
-app = FastAPI(title="MedCare Demand Forecast ML Service", version="1.0.0")
+app = FastAPI(title="MedCare Demand Forecast Engine", version="2.0.0")
 
 
-class ForecastRequest(BaseModel):
-    sku_id: str = Field(min_length=1)
-    warehouse_id: str = Field(min_length=1)
-    horizon_days: int = Field(default=7, ge=1, le=30)
+class EngineError(Exception):
+    def __init__(self, status: int, code: str, message: str):
+        super().__init__(message)
+        self.status = status
+        self.code = code
+        self.message = message
 
 
-
-class TrainRequest(BaseModel):
-    model_version: str = Field(
-        default="medcare-xgb-qrf-v1",
-        min_length=1,
-        max_length=100
+@app.exception_handler(EngineError)
+def engine_error_handler(_request: Request, error: EngineError) -> JSONResponse:
+    return JSONResponse(
+        status_code=error.status,
+        content={"error": {"code": error.code, "message": error.message}},
     )
 
 
-@app.post("/train")
-def train_model(req: TrainRequest):
-    """Train the production forecasting models from PostgreSQL DemandHistory."""
+class Pair(BaseModel):
+    productId: str = Field(min_length=1)
+    warehouseId: str = Field(min_length=1)
+
+
+class ForecastRequest(BaseModel):
+    runId: str = Field(min_length=1)
+    horizonDays: int = Field(ge=1, le=365)
+    asOf: date
+    pairs: list[Pair] = Field(min_length=1)
+
+
+class TrainRequest(BaseModel):
+    modelVersion: str = Field(default=MODEL_VERSION, min_length=1, max_length=100)
+
+
+def _metadata() -> dict:
+    if not METADATA_PATH.exists():
+        return {}
+    return json.loads(METADATA_PATH.read_text())
+
+
+def _training_frame(force: bool = False) -> pd.DataFrame:
     try:
-        raw = load_all_history()
+        raw = fetch_training_data(force=force)
+    except TrainingDataUnavailable as error:
+        raise EngineError(502, "TRAINING_DATA_UNAVAILABLE", str(error)) from error
+    except RuntimeError as error:
+        raise EngineError(500, "ENGINE_MISCONFIGURED", str(error)) from error
+    return canonicalize_training_data(raw)
 
-        if raw.empty:
-            raise ValueError("No DemandHistory found in PostgreSQL.")
 
-        canonical = canonicalize_project_history(raw)
-
-        result = train_dataframe(
-            canonical,
-            ART,
-            OUT,
-            "medcare-postgresql",
-            req.model_version,
+@app.post("/forecast")
+def forecast(request: ForecastRequest):
+    if request.horizonDays > MAX_HORIZON_DAYS:
+        raise EngineError(
+            422,
+            "HORIZON_TOO_LONG",
+            f"horizonDays {request.horizonDays} exceeds the engine cap of {MAX_HORIZON_DAYS}",
         )
 
-        return {
-            "status": "success",
-            "message": "Model trained successfully.",
-            "model_version": req.model_version,
-            "production_model": result.get(
-                "production_model",
-                "XGBoost + Quantile XGBoost"
-            ),
-            "metrics": result,
-        }
+    seen = {(pair.productId, pair.warehouseId) for pair in request.pairs}
+    if len(seen) != len(request.pairs):
+        raise EngineError(422, "DUPLICATE_PAIRS", "pairs contains the same series twice")
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-def _meta():
-    if not META_PATH.exists():
-        return {}
-    return json.loads(META_PATH.read_text())
-
-
-def _project_forecast(sku: str, dc: str, horizon: int):
     if not BUNDLE_PATH.exists():
-        raise RuntimeError("Model artifact missing. Run: python -m src.train_project")
-    raw = load_history(sku, dc)
-    if raw.empty:
-        raise ValueError(f"No DemandHistory found for SKU={sku}, warehouse={dc}")
-    clean = canonicalize_project_history(raw)
-    if len(clean) < 35:
-        raise ValueError(f"At least 35 historical daily rows are required; found {len(clean)}")
+        raise EngineError(
+            500,
+            "MODEL_NOT_TRAINED",
+            "No model artifact. Train the engine first: python -m src.train_project",
+        )
 
-    bundle = load_bundle(BUNDLE_PATH)
-    meta = _meta()
-    w = clean.sort_values("date").reset_index(drop=True)
-    dates = [w.date.max() + pd.Timedelta(days=i) for i in range(1, horizon + 1)]
-    signals = build_future_signals(w, sku, dc, dates)
-    cols = feature_columns()
-    daily = []
-
-    for i, nd in enumerate(dates):
-        row = pd.DataFrame([{
-            "date": nd,
-            "sku_id": sku,
-            "dc_id": dc,
-            "demand": np.nan,
-            "promotion_flag": int(signals.promotion_flag.iloc[i]),
-            "seasonality_index": float(signals.seasonality_index.iloc[i]),
-        }])
-        f = add_features(pd.concat([w, row], ignore_index=True), training=False).tail(1)
-        p10 = max(0.0, float(bundle["q10"].predict(f[cols])[0]) - float(meta.get("conformal_delta", 0)))
-        p50 = max(0.0, float(bundle["q50"].predict(f[cols])[0]))
-        p90 = max(p50, float(bundle["q90"].predict(f[cols])[0]) + float(meta.get("conformal_delta", 0)))
-        daily.append({
-            "forecastDate": str(pd.Timestamp(nd).date()),
-            "p10": round(p10, 2),
-            "p50": round(p50, 2),
-            "p90": round(p90, 2),
-            "promotionFlag": int(signals.promotion_flag.iloc[i]),
-            "seasonalityIndex": round(float(signals.seasonality_index.iloc[i]), 3),
-        })
-        w = pd.concat([w, row.assign(demand=p50)], ignore_index=True)
-
-    vals = np.array([x["p50"] for x in daily])
-    lo = np.array([x["p10"] for x in daily])
-    hi = np.array([x["p90"] for x in daily])
-    point, lower, upper = float(vals.mean()), float(lo.mean()), float(hi.mean())
-    recent = float(clean.tail(7).demand.mean())
-    growth = (point - recent) / max(recent, 1e-8)
-    interval_width = (upper - lower) / max(point, 1e-8)
-    anomaly = detect_demand_anomaly(clean)
-    anomaly_risk = {"NORMAL": 0, "MEDIUM": .35, "HIGH": .7, "CRITICAL": 1}[anomaly["level"]]
-    risk = min(1.0, .55 * min(max(growth, 0) / .60, 1) + .30 * min(interval_width / .60, 1) + .15 * anomaly_risk)
-    risk_level = "CRITICAL" if risk >= .75 else "HIGH" if risk >= .50 else "MEDIUM" if risk >= .25 else "LOW"
-    coverage = float(meta.get("p10_p90_coverage_percent", 0)) / 100
-    confidence = max(.50, min(.99, .60 * coverage + .40 * (1 - min(interval_width / .80, 1))))
-
-    drivers = model_drivers(bundle, cols)
-    md = load_product_metadata(sku, dc)
-    return {
-        "sku_id": sku,
-        "warehouse_id": dc,
-        "product_id": md["product_id"],
-        "warehouse_db_id": md["warehouse_id"],
-        "model": meta.get("production_model", "XGBoost + Quantile XGBoost"),
-        "model_version": meta.get("model_version", "unknown"),
-        "forecast": round(point, 2),
-        "lower_bound": round(lower, 2),
-        "upper_bound": round(upper, 2),
-        "confidence": round(confidence, 3),
-        "confidence_interval": "P10-P90",
-        "forecast_risk_score": round(risk, 3),
-        "forecast_risk_level": risk_level,
-        "forecast_horizon_days": horizon,
-        "recent_7d_actual_mean": round(recent, 2),
-        "demand_growth_percent": round(growth * 100, 2),
-        "demand_anomaly": anomaly,
-        "global_model_drivers": drivers,
-        "daily_forecasts": daily,
-        "handoff": {
-            "forecast_is_ml_output": True,
-            "output_is_ready_for_downstream_system": True,
-            "ml_does_not_decide_replenishment_quantity": True,
-            "ml_does_not_write_inventory_or_planning_tables": True,
-        },
+    canonical = _training_frame()
+    index = pair_index(canonical)
+    lookup = {
+        (row.product_id, row.warehouse_id): (row.sku_id, row.dc_id)
+        for row in index.itertuples()
     }
+
+    # Every requested pair gets an entry, including ones the export has never seen -
+    # Node rejects a response with a pair missing, and a short answer would fail the
+    # whole planning run rather than one series.
+    keys: list[tuple[str, str]] = []
+    unknown: list[tuple[str, str]] = []
+    for pair in request.pairs:
+        cuids = (pair.productId, pair.warehouseId)
+        readable = lookup.get(cuids)
+        if readable is None:
+            unknown.append(cuids)
+            keys.append(("", ""))
+        else:
+            keys.append(readable)
+
+    wanted = [key for key in keys if key != ("", "")]
+    as_of = pd.Timestamp(request.asOf)
+
+    try:
+        bundle = load_bundle(BUNDLE_PATH)
+        bands = forecast_series(
+            canonical,
+            wanted,
+            as_of,
+            request.horizonDays,
+            bundle,
+            float(_metadata().get("conformal_delta", 0.0)),
+        )
+    except EngineError:
+        raise
+    except Exception as error:
+        raise EngineError(500, "FORECAST_FAILED", f"{type(error).__name__}: {error}") from error
+
+    start = (as_of + pd.Timedelta(days=1)).date().isoformat()
+    zeros = [0.0] * request.horizonDays
+    forecasts = []
+    for pair, key in zip(request.pairs, keys):
+        band = bands.get(key)
+        forecasts.append(
+            {
+                "productId": pair.productId,
+                "warehouseId": pair.warehouseId,
+                "start": start,
+                "p10": band.p10 if band else list(zeros),
+                "p50": band.p50 if band else list(zeros),
+                "p90": band.p90 if band else list(zeros),
+            }
+        )
+
+    return {
+        "modelVersion": _metadata().get("model_version", MODEL_VERSION),
+        "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "horizonDays": request.horizonDays,
+        "forecasts": forecasts,
+        "unknownPairs": len(unknown),
+    }
+
+
+@app.post("/train")
+def train(request: TrainRequest):
+    canonical = _training_frame(force=True)
+    try:
+        result = train_dataframe(
+            canonical,
+            ARTIFACTS_DIR,
+            OUTPUTS_DIR,
+            "express:/api/training-data",
+            request.modelVersion,
+        )
+    except ValueError as error:
+        raise EngineError(422, "TRAINING_FAILED", str(error)) from error
+    except Exception as error:
+        raise EngineError(500, "TRAINING_FAILED", f"{type(error).__name__}: {error}") from error
+    return {"status": "trained", "modelVersion": request.modelVersion, "metrics": result}
 
 
 @app.get("/health")
 def health():
-    return {
-        "status": "ok",
-        "service": "medcare-ml-forecast",
-        "data_source": os.getenv("ML_DATA_SOURCE", "project"),
-        "model_ready": BUNDLE_PATH.exists(),
+    """200 only when the engine can also reach its data source.
+
+    Express maps a non-2xx here to a `down` forecast dependency; an unset
+    FORECAST_SERVICE_URL is `not_configured` on that side, not a failure.
+    """
+    ok, detail = reachable()
+    body = {
+        "status": "ok" if ok else "degraded",
+        "service": "medcare-forecast-engine",
+        "modelReady": BUNDLE_PATH.exists(),
+        "modelVersion": _metadata().get("model_version"),
+        "trainingData": {"reachable": ok, "detail": detail, **cache_state()},
     }
-
-
-@app.get("/forecast/{sku_id}/{warehouse_id}")
-def forecast_get(
-    sku_id: str,
-    warehouse_id: str,
-    horizon: int = Query(7, ge=1, le=30),
-):
-    try:
-        if os.getenv("ML_DATA_SOURCE", "project").lower() != "project":
-            raise ValueError("This project-compatible package is configured for ML_DATA_SOURCE=project")
-        return _project_forecast(sku_id, warehouse_id, horizon)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@app.post("/forecast")
-def forecast_post(req: ForecastRequest):
-    try:
-        return _project_forecast(req.sku_id, req.warehouse_id, req.horizon_days)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return JSONResponse(status_code=200 if ok else 503, content=body)
 
 
 @app.get("/model/metrics")
 def model_metrics():
-    p = OUT / "model_metrics.json"
-    if not p.exists():
-        raise HTTPException(status_code=404, detail="Metrics unavailable. Train the project model first.")
-    return json.loads(p.read_text())
+    if not METRICS_PATH.exists():
+        raise EngineError(404, "METRICS_UNAVAILABLE", "Train the engine first")
+    return json.loads(METRICS_PATH.read_text())
