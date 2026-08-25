@@ -49,7 +49,7 @@ def load_history(sku: str, warehouse_code: str, min_date: Optional[date] = None)
         JOIN "Warehouse" w ON w.id = dh."warehouseId"
         WHERE (p.sku = %s OR p.id = %s)
           AND (w.code = %s OR w.id = %s)
-          AND (%s IS NULL OR dh.date >= %s)
+         AND (%s::date IS NULL OR dh.date >= %s::date)
         ORDER BY dh.date ASC
     """
     cutoff = min_date.isoformat() if min_date else None

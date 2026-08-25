@@ -14,12 +14,13 @@ from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from src.anomaly import detect_demand_anomaly
-from src.data_project import load_history, load_product_metadata
+from src.data_project import load_history, load_all_history, load_product_metadata
 from src.models.model import load_bundle
 from src.forecasting.forecast import model_drivers
 from src.preprocessing.features import clean_data, add_features, feature_columns
 from src.project_adapter import canonicalize_project_history
 from src.project_signals import build_future_signals
+from src.training_core import train_dataframe
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "artifacts"
@@ -35,6 +36,48 @@ class ForecastRequest(BaseModel):
     warehouse_id: str = Field(min_length=1)
     horizon_days: int = Field(default=7, ge=1, le=30)
 
+
+
+class TrainRequest(BaseModel):
+    model_version: str = Field(
+        default="medcare-xgb-qrf-v1",
+        min_length=1,
+        max_length=100
+    )
+
+
+@app.post("/train")
+def train_model(req: TrainRequest):
+    """Train the production forecasting models from PostgreSQL DemandHistory."""
+    try:
+        raw = load_all_history()
+
+        if raw.empty:
+            raise ValueError("No DemandHistory found in PostgreSQL.")
+
+        canonical = canonicalize_project_history(raw)
+
+        result = train_dataframe(
+            canonical,
+            ART,
+            OUT,
+            "medcare-postgresql",
+            req.model_version,
+        )
+
+        return {
+            "status": "success",
+            "message": "Model trained successfully.",
+            "model_version": req.model_version,
+            "production_model": result.get(
+                "production_model",
+                "XGBoost + Quantile XGBoost"
+            ),
+            "metrics": result,
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 def _meta():
     if not META_PATH.exists():
