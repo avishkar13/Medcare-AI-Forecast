@@ -209,3 +209,53 @@ export const compareRuns = async (
     warnings,
   };
 };
+
+/**
+ * A run's cost roll-up on its own.
+ *
+ * Separate from `compare` because a single run is a legitimate question - "what did
+ * this plan cost" - that should not require inventing a second run to diff against.
+ */
+export const getOptimization = async ({ id }: RunParams) => {
+  const run = await prisma.planningRun.findUnique({
+    where: { id },
+    select: { id: true, status: true, optimization: true },
+  });
+  if (!run) throw new NotFoundError(`Planning run '${id}' not found`);
+
+  // A run that never completed has no plan, so it has no cost. 404 rather than an
+  // empty body, because the resource genuinely does not exist.
+  if (!run.optimization) {
+    throw new NotFoundError(
+      `Planning run '${id}' produced no optimization result (status ${run.status})`,
+    );
+  }
+
+  const { planningRunId, createdAt, ...result } = run.optimization;
+  return {
+    planningRunId,
+    ...result,
+    // The components must add up to the total; returned so a caller can check.
+    componentSum: round(
+      result.holdingCost + result.stockoutCost + result.transferCost + result.expiryCost,
+    ),
+    createdAt: createdAt.toISOString(),
+  };
+};
+
+export const getSimulation = async ({ id }: RunParams) => {
+  const run = await prisma.planningRun.findUnique({
+    where: { id },
+    select: { id: true, status: true, simulation: true },
+  });
+  if (!run) throw new NotFoundError(`Planning run '${id}' not found`);
+
+  if (!run.simulation) {
+    throw new NotFoundError(
+      `Planning run '${id}' produced no simulation (status ${run.status})`,
+    );
+  }
+
+  const { planningRunId, createdAt, ...result } = run.simulation;
+  return { planningRunId, ...result, createdAt: createdAt.toISOString() };
+};

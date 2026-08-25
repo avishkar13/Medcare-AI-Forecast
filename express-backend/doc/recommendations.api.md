@@ -90,7 +90,9 @@ ACCEPTED ──> either
 
 Only `OPEN` and `ACCEPTED` are actionable. A resolved row cannot be acted on again — without that guard an already-dismissed recommendation could be executed, and `resolvedAt` would move every time somebody clicked.
 
-`acknowledgedAt` is stamped on the first transition out of `OPEN` and never moved afterwards. `actedById` records who acted; until [WP-16](planning.api.md) lands real identity it is the seeded SYSTEM user, resolved in `src/lib/actor.ts` — the single place that decides.
+`acknowledgedAt` is stamped on the first transition out of `OPEN` and never moved afterwards.
+
+`actedById` is **`req.userId`** — see [Who acts on a request](planning.api.md#who-acts-on-a-request). It is a stand-in until auth lands, and becomes the authenticated user with no change here.
 
 | Status | When |
 | --- | --- |

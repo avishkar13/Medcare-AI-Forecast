@@ -11,3 +11,5 @@ planningRouter.get("/runs", rateLimiter.read, planningController.listRuns);
 // but keeping the pair together reads better than splitting them.
 planningRouter.get("/runs/:id", rateLimiter.read, planningController.getRun);
 planningRouter.get("/runs/:id/compare", rateLimiter.read, planningController.compareRuns);
+planningRouter.get("/runs/:id/optimization", rateLimiter.read, planningController.getOptimization);
+planningRouter.get("/runs/:id/simulation", rateLimiter.read, planningController.getSimulation);

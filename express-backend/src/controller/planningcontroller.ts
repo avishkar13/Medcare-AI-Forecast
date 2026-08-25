@@ -18,7 +18,7 @@ const idempotencyKey = (req: Request): string | undefined => {
 
 export const createRun = async (req: Request, res: Response) => {
   const body = createRunBodySchema.parse(req.body ?? {});
-  const { run, replayed } = await planning.createRun(body, idempotencyKey(req));
+  const { run, replayed } = await planning.createRun(body, idempotencyKey(req), req.userId);
 
   res.setHeader("Location", `${SERVER.apiPrefix}/planning/runs/${run.id}`);
   ok(res.status(replayed ? 200 : 202), run, { planningRunId: run.id });
@@ -41,4 +41,16 @@ export const compareRuns = async (req: Request, res: Response) => {
   const query = compareQuerySchema.parse(req.query);
   const comparison = await compare.compareRuns(params, query);
   ok(res, comparison, { planningRunId: params.id });
+};
+
+export const getOptimization = async (req: Request, res: Response) => {
+  const params = runParamsSchema.parse(req.params);
+  const result = await compare.getOptimization(params);
+  ok(res, result, { planningRunId: params.id });
+};
+
+export const getSimulation = async (req: Request, res: Response) => {
+  const params = runParamsSchema.parse(req.params);
+  const result = await compare.getSimulation(params);
+  ok(res, result, { planningRunId: params.id });
 };

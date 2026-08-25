@@ -30,10 +30,10 @@ export const getIntelligence = async (req: Request, res: Response) => {
 
 export const execute = async (req: Request, res: Response) => {
   const params = recommendationParamsSchema.parse(req.params);
-  ok(res, await recommendations.executeRecommendation(params));
+  ok(res, await recommendations.executeRecommendation(params, req.userId));
 };
 
 export const dismiss = async (req: Request, res: Response) => {
   const params = recommendationParamsSchema.parse(req.params);
-  ok(res, await recommendations.dismissRecommendation(params));
+  ok(res, await recommendations.dismissRecommendation(params, req.userId));
 };

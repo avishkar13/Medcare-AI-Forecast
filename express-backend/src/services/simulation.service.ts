@@ -89,21 +89,22 @@ const toScenario = (row: {
  * single-active-run guard, the idempotency path and the executor scheduling all
  * apply exactly as they do to a normal run.
  */
-export const runWhatIf = async (body: WhatIfBody) => {
+export const runWhatIf = async (body: WhatIfBody, actorId?: string) => {
   const scenario = await prisma.scenario.create({
     data: {
       name: body.name,
       ...(body.description === undefined ? {} : { description: body.description }),
       ...toMultipliers(body.params),
-      createdById: await resolveActorId(),
+      createdById: await resolveActorId(actorId),
     },
     select: scenarioSelect,
   });
 
-  const { run } = await createRun({
-    horizonDays: body.horizonDays,
-    scenarioId: scenario.id,
-  });
+  const { run } = await createRun(
+    { horizonDays: body.horizonDays, scenarioId: scenario.id },
+    undefined,
+    actorId,
+  );
 
   return {
     scenario: toScenario(scenario),
@@ -156,13 +157,13 @@ export const listSaved = async (limit: number) => {
   return rows.map(toScenario);
 };
 
-export const saveScenario = async (body: SaveScenarioBody) => {
+export const saveScenario = async (body: SaveScenarioBody, actorId?: string) => {
   const row = await prisma.scenario.create({
     data: {
       name: body.name,
       ...(body.description === undefined ? {} : { description: body.description }),
       ...toMultipliers(body.params),
-      createdById: await resolveActorId(),
+      createdById: await resolveActorId(actorId),
     },
     select: scenarioSelect,
   });

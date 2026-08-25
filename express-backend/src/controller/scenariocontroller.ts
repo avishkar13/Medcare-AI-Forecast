@@ -10,7 +10,7 @@ import {
 
 export const createScenario = async (req: Request, res: Response) => {
   const body = createScenarioBodySchema.parse(req.body ?? {});
-  const scenario = await scenarios.createScenario(body);
+  const scenario = await scenarios.createScenario(body, req.userId);
 
   res.setHeader("Location", `${SERVER.apiPrefix}/scenarios/${scenario.id}`);
   ok(res.status(201), scenario);

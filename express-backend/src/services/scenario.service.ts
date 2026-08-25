@@ -49,7 +49,10 @@ const toSummary = (row: ScenarioRow): ScenarioSummary => ({
   planningRunCount: row._count.planningRuns,
 });
 
-export const createScenario = async (body: CreateScenarioBody): Promise<ScenarioSummary> => {
+export const createScenario = async (
+  body: CreateScenarioBody,
+  actorId?: string,
+): Promise<ScenarioSummary> => {
   const row = await prisma.scenario.create({
     data: {
       name: body.name,
@@ -58,7 +61,7 @@ export const createScenario = async (body: CreateScenarioBody): Promise<Scenario
       leadTimeMultiplier: body.leadTimeMultiplier,
       capacityMultiplier: body.capacityMultiplier,
       serviceLevelTarget: body.serviceLevelTarget,
-      createdById: await resolveActorId(),
+      createdById: await resolveActorId(actorId),
     },
     select: scenarioSelect,
   });

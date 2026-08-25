@@ -202,6 +202,47 @@ describe("GET /api/planning/runs/:id/compare", () => {
     expectErrorShape(await response.json(), "VALIDATION_FAILED");
   });
 
+  test("optimization and simulation are readable on their own", async () => {
+    const optimization = await server.get(`/api/planning/runs/${surgeRunId}/optimization`);
+    assert.equal(optimization.status, 200);
+
+    const opt = expectEnvelope<{
+      planningRunId: string;
+      totalCost: number;
+      componentSum: number;
+      solver: string;
+    }>(await optimization.json());
+
+    assert.equal(opt.data.planningRunId, surgeRunId);
+    assert.equal(opt.data.solver, "greedy-drp");
+    assert.ok(
+      Math.abs(opt.data.componentSum - opt.data.totalCost) < 0.5,
+      "the components must add up to the total they are shown beside",
+    );
+
+    const simulation = await server.get(`/api/planning/runs/${surgeRunId}/simulation`);
+    assert.equal(simulation.status, 200);
+
+    const sim = expectEnvelope<{ planningRunId: string; serviceLevel: number; iterations: number }>(
+      await simulation.json(),
+    );
+    assert.equal(sim.data.planningRunId, surgeRunId);
+    assert.ok(sim.data.serviceLevel > 0 && sim.data.serviceLevel <= 1);
+    assert.ok(sim.data.iterations > 0);
+  });
+
+  test("a run with no artefacts 404s rather than returning an empty body", async () => {
+    const pending = await newRun();
+
+    for (const route of ["optimization", "simulation"]) {
+      const response = await server.get(`/api/planning/runs/${pending}/${route}`);
+      assert.equal(response.status, 404, `${route} does not exist for a PENDING run`);
+      expectErrorShape(await response.json(), "NOT_FOUND");
+    }
+
+    assert.equal((await server.get("/api/planning/runs/nope/optimization")).status, 404);
+  });
+
   test("mismatched horizons are flagged rather than silently compared", async () => {
     const shortRun = await newRun({ horizonDays: 3 });
     await executeRun(shortRun);

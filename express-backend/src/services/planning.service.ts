@@ -86,7 +86,7 @@ export const failAbandonedRuns = (): Promise<{ count: number }> =>
     },
   });
 
-const insertRun = async (body: CreateRunBody): Promise<PlanningRunSummary> => {
+const insertRun = async (body: CreateRunBody, actorId?: string): Promise<PlanningRunSummary> => {
   await failAbandonedRuns();
 
   const active = await prisma.planningRun.findFirst({
@@ -113,7 +113,7 @@ const insertRun = async (body: CreateRunBody): Promise<PlanningRunSummary> => {
   const row = await prisma.planningRun.create({
     data: {
       horizonDays: body.horizonDays,
-      createdById: await resolveActorId(),
+      createdById: await resolveActorId(actorId),
       ...(body.scenarioId === undefined ? {} : { scenarioId: body.scenarioId }),
       ...(body.modelVersion === undefined ? {} : { modelVersion: body.modelVersion }),
     },
@@ -123,12 +123,12 @@ const insertRun = async (body: CreateRunBody): Promise<PlanningRunSummary> => {
   return toSummary(row);
 };
 
-const createGuardedRun = async (body: CreateRunBody): Promise<PlanningRunSummary> => {
+const createGuardedRun = async (body: CreateRunBody, actorId?: string): Promise<PlanningRunSummary> => {
   const lock = await acquireLock(RUN_LOCK, PLANNING.lockTtlMs);
   if (!lock) throw new ConflictError("Another planning run is being created; retry shortly");
 
   try {
-    return await insertRun(body);
+    return await insertRun(body, actorId);
   } finally {
     await lock.release();
   }
@@ -137,9 +137,10 @@ const createGuardedRun = async (body: CreateRunBody): Promise<PlanningRunSummary
 export const createRun = async (
   body: CreateRunBody,
   idempotencyKey?: string,
+  actorId?: string,
 ): Promise<PlanningRunCreation> => {
   if (!idempotencyKey) {
-    const run = await createGuardedRun(body);
+    const run = await createGuardedRun(body, actorId);
     scheduleRun(run.id);
     return { run, replayed: false };
   }
@@ -160,7 +161,7 @@ export const createRun = async (
   }
 
   try {
-    const run = await createGuardedRun(body);
+    const run = await createGuardedRun(body, actorId);
     await complete(idempotencyKey, run.id, PLANNING.idempotencyTtlMs);
     // Only this branch schedules: a replay must return the original run, not re-execute it.
     scheduleRun(run.id);

@@ -6,6 +6,7 @@ import { CORS, IS_PRODUCTION, SERVER } from "./config/constants.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { notFound } from "./middleware/notFound.js";
 import { rateLimiter } from "./middleware/rateLimiter.js";
+import { currentUser } from "./middleware/currentUser.js";
 import { requestContext } from "./middleware/requestContext.js";
 import { dashboardRouter } from "./routes/dashboard_route.js";
 import { healthRouter } from "./routes/health_route.js";
@@ -37,6 +38,9 @@ app.use(rateLimiter.global);
 app.use(compression());
 app.use(express.json({ limit: SERVER.bodyLimit }));
 app.use(express.urlencoded({ extended: true, limit: SERVER.bodyLimit }));
+
+// After the parsers, before the routes: everything downstream reads req.userId.
+app.use(currentUser);
 
 app.get("/", (_req, res) => {
   res.json({ status: "working", api: SERVER.apiPrefix });

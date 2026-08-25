@@ -11,7 +11,7 @@ import {
 
 export const run = async (req: Request, res: Response) => {
   const body = whatIfBodySchema.parse(req.body ?? {});
-  const result = await simulation.runWhatIf(body);
+  const result = await simulation.runWhatIf(body, req.userId);
 
   // 202: the run was accepted, not finished. Poll `pollAt`.
   res.setHeader("Location", `${SERVER.apiPrefix}/planning/runs/${result.run.id}`);
@@ -30,7 +30,7 @@ export const getSaved = async (req: Request, res: Response) => {
 
 export const save = async (req: Request, res: Response) => {
   const body = saveScenarioBodySchema.parse(req.body ?? {});
-  ok(res.status(201), await simulation.saveScenario(body));
+  ok(res.status(201), await simulation.saveScenario(body, req.userId));
 };
 
 export const deleteSaved = async (req: Request, res: Response) => {

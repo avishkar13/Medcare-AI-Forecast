@@ -214,6 +214,50 @@ A run is only real once `COMPLETED`, so comparing anything else would be reading
 
 ---
 
+## `GET /api/planning/runs/:id/optimization`
+
+The run's cost roll-up on its own — a legitimate question ("what did this plan cost") that should not require inventing a second run to diff against.
+
+```json
+{ "data": {
+  "planningRunId": "cmt9...",
+  "objectiveValue": 43972.79, "totalCost": 43972.79,
+  "holdingCost": 4652.39, "stockoutCost": 4742.78,
+  "transferCost": 3039.9, "expiryCost": 31537.72,
+  "componentSum": 43972.79,
+  "baselineCost": null,
+  "solver": "greedy-drp", "solverStatus": "FEASIBLE"
+} }
+```
+
+`componentSum` is the four components added up, returned so a caller can check they equal `totalCost` without doing the arithmetic itself.
+
+`solver` is `greedy-drp` because that is what it is — a heuristic roll-up, not an LP. `objectiveValue` equals `totalCost`, since the objective is to minimise it and a second number would only invite the two to disagree.
+
+## `GET /api/planning/runs/:id/simulation`
+
+The Monte Carlo result: `iterations`, `serviceLevel`, `stockoutProbability`, `expiryProbability`, `expectedInventory`, `expectedWaste`, `expectedCost`.
+
+`serviceLevel` is a **type-2 fill rate** — the share of simulated demand met from stock. `stockoutProbability` counts cell-days with a shortfall. They are different measures and do **not** sum to 1.
+
+### Both `404` when the run produced nothing
+
+A run that never completed has no plan, so it has no cost and no simulation. That is a `404` rather than an empty body, because the resource genuinely does not exist. An unknown run id is also `404`.
+
+---
+
+## Who acts on a request
+
+`createdById` on a run, and `actedById` on a recommendation, come from **`req.userId`**, set by `src/middleware/currentUser.ts`.
+
+There is no authentication yet, so it holds a stand-in: the seeded SYSTEM user. **When auth is added, its middleware sets `req.user` ahead of `currentUser` and `req.userId` becomes the authenticated id** — every route that records an actor keeps working untouched. `src/lib/actor.ts` is the single place that resolves it.
+
+Outside production an `x-user-id` header overrides the stand-in, which makes the recommendation and alert lifecycles testable with more than one actor. It is consulted **only when nothing has authenticated**, so it can never shadow a real user, and it is ignored entirely in production.
+
+An id that is not a real `User` row falls back to the stand-in rather than failing the write: `actedById` is a foreign key, and an unknown id would otherwise fail the insert with an error that says nothing about why.
+
+---
+
 ## Lifecycle and scheduling
 
 ```

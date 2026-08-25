@@ -294,6 +294,7 @@ const TRANSITIONS: Record<string, RecommendationStatus[]> = {
 const applyAction = async (
   { id }: RecommendationParams,
   action: "execute" | "dismiss",
+  actorId?: string,
 ) => {
   const existing = await prisma.recommendation.findUnique({
     where: { id },
@@ -319,9 +320,8 @@ const applyAction = async (
       resolvedAt: now,
       // Only stamped on the first acknowledgement, never moved by a later action.
       ...(existing.status === RecommendationStatus.OPEN ? { acknowledgedAt: now } : {}),
-      // Placeholder until WP-16 lands real identity; `lib/actor.ts` is the one place
-      // that decides who acted.
-      actedById: await resolveActorId(),
+      // `req.userId` - a stand-in today, the authenticated user once auth is wired.
+      actedById: await resolveActorId(actorId),
     },
     select: listSelect,
   });
@@ -329,8 +329,8 @@ const applyAction = async (
   return toItem(row);
 };
 
-export const executeRecommendation = (params: RecommendationParams) =>
-  applyAction(params, "execute");
+export const executeRecommendation = (params: RecommendationParams, actorId?: string) =>
+  applyAction(params, "execute", actorId);
 
-export const dismissRecommendation = (params: RecommendationParams) =>
-  applyAction(params, "dismiss");
+export const dismissRecommendation = (params: RecommendationParams, actorId?: string) =>
+  applyAction(params, "dismiss", actorId);

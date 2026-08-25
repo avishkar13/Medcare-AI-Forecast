@@ -11,6 +11,14 @@ declare global {
     interface Request {
       id: string;
       user?: AuthenticatedUser;
+      /**
+       * Who is acting on this request.
+       *
+       * Populated by `middleware/currentUser.ts`. Until real auth lands it is a
+       * stand-in id; once auth populates `req.user`, this becomes the authenticated
+       * user with no change to anything that reads it.
+       */
+      userId?: string;
       rateLimit?: RateLimitInfo;
     }
   }
