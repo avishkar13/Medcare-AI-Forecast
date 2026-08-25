@@ -46,6 +46,13 @@ services:
       REDIS_URL: redis://:${REDIS_PASSWORD:-cognizant_redis}@redis:6379
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
       CORS_CREDENTIALS: "true"
+      PLANNING_EXECUTOR: ${PLANNING_EXECUTOR:-inline}
+      PLANNING_SIMULATION_ITERATIONS: ${PLANNING_SIMULATION_ITERATIONS:-500}
+      # Empty until the Python forecasting service exists; the naive fallback covers it.
+      FORECAST_SERVICE_URL: ${FORECAST_SERVICE_URL:-}
+      FORECAST_TIMEOUT_MS: ${FORECAST_TIMEOUT_MS:-60000}
+      FORECAST_RETRIES: ${FORECAST_RETRIES:-2}
+      FORECAST_FALLBACK: ${FORECAST_FALLBACK:-true}
       # Seeds only when the Product table is empty. The check fails closed:
       # if the count cannot be read, the seed is skipped rather than risked,
       # because seeding truncates every table first.

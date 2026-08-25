@@ -33,6 +33,7 @@ export type OptimizationResultAvgAggregateOutputType = {
   transferCost: number | null
   expiryCost: number | null
   totalCost: number | null
+  baselineCost: number | null
 }
 
 export type OptimizationResultSumAggregateOutputType = {
@@ -42,6 +43,7 @@ export type OptimizationResultSumAggregateOutputType = {
   transferCost: number | null
   expiryCost: number | null
   totalCost: number | null
+  baselineCost: number | null
 }
 
 export type OptimizationResultMinAggregateOutputType = {
@@ -53,6 +55,7 @@ export type OptimizationResultMinAggregateOutputType = {
   transferCost: number | null
   expiryCost: number | null
   totalCost: number | null
+  baselineCost: number | null
   solver: string | null
   solverStatus: string | null
   createdAt: Date | null
@@ -67,6 +70,7 @@ export type OptimizationResultMaxAggregateOutputType = {
   transferCost: number | null
   expiryCost: number | null
   totalCost: number | null
+  baselineCost: number | null
   solver: string | null
   solverStatus: string | null
   createdAt: Date | null
@@ -81,6 +85,7 @@ export type OptimizationResultCountAggregateOutputType = {
   transferCost: number
   expiryCost: number
   totalCost: number
+  baselineCost: number
   solver: number
   solverStatus: number
   createdAt: number
@@ -95,6 +100,7 @@ export type OptimizationResultAvgAggregateInputType = {
   transferCost?: true
   expiryCost?: true
   totalCost?: true
+  baselineCost?: true
 }
 
 export type OptimizationResultSumAggregateInputType = {
@@ -104,6 +110,7 @@ export type OptimizationResultSumAggregateInputType = {
   transferCost?: true
   expiryCost?: true
   totalCost?: true
+  baselineCost?: true
 }
 
 export type OptimizationResultMinAggregateInputType = {
@@ -115,6 +122,7 @@ export type OptimizationResultMinAggregateInputType = {
   transferCost?: true
   expiryCost?: true
   totalCost?: true
+  baselineCost?: true
   solver?: true
   solverStatus?: true
   createdAt?: true
@@ -129,6 +137,7 @@ export type OptimizationResultMaxAggregateInputType = {
   transferCost?: true
   expiryCost?: true
   totalCost?: true
+  baselineCost?: true
   solver?: true
   solverStatus?: true
   createdAt?: true
@@ -143,6 +152,7 @@ export type OptimizationResultCountAggregateInputType = {
   transferCost?: true
   expiryCost?: true
   totalCost?: true
+  baselineCost?: true
   solver?: true
   solverStatus?: true
   createdAt?: true
@@ -244,6 +254,7 @@ export type OptimizationResultGroupByOutputType = {
   transferCost: number
   expiryCost: number
   totalCost: number
+  baselineCost: number | null
   solver: string
   solverStatus: string
   createdAt: Date
@@ -281,6 +292,7 @@ export type OptimizationResultWhereInput = {
   transferCost?: Prisma.FloatFilter<"OptimizationResult"> | number
   expiryCost?: Prisma.FloatFilter<"OptimizationResult"> | number
   totalCost?: Prisma.FloatFilter<"OptimizationResult"> | number
+  baselineCost?: Prisma.FloatNullableFilter<"OptimizationResult"> | number | null
   solver?: Prisma.StringFilter<"OptimizationResult"> | string
   solverStatus?: Prisma.StringFilter<"OptimizationResult"> | string
   createdAt?: Prisma.DateTimeFilter<"OptimizationResult"> | Date | string
@@ -296,6 +308,7 @@ export type OptimizationResultOrderByWithRelationInput = {
   transferCost?: Prisma.SortOrder
   expiryCost?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
+  baselineCost?: Prisma.SortOrderInput | Prisma.SortOrder
   solver?: Prisma.SortOrder
   solverStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -314,6 +327,7 @@ export type OptimizationResultWhereUniqueInput = Prisma.AtLeast<{
   transferCost?: Prisma.FloatFilter<"OptimizationResult"> | number
   expiryCost?: Prisma.FloatFilter<"OptimizationResult"> | number
   totalCost?: Prisma.FloatFilter<"OptimizationResult"> | number
+  baselineCost?: Prisma.FloatNullableFilter<"OptimizationResult"> | number | null
   solver?: Prisma.StringFilter<"OptimizationResult"> | string
   solverStatus?: Prisma.StringFilter<"OptimizationResult"> | string
   createdAt?: Prisma.DateTimeFilter<"OptimizationResult"> | Date | string
@@ -329,6 +343,7 @@ export type OptimizationResultOrderByWithAggregationInput = {
   transferCost?: Prisma.SortOrder
   expiryCost?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
+  baselineCost?: Prisma.SortOrderInput | Prisma.SortOrder
   solver?: Prisma.SortOrder
   solverStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -351,6 +366,7 @@ export type OptimizationResultScalarWhereWithAggregatesInput = {
   transferCost?: Prisma.FloatWithAggregatesFilter<"OptimizationResult"> | number
   expiryCost?: Prisma.FloatWithAggregatesFilter<"OptimizationResult"> | number
   totalCost?: Prisma.FloatWithAggregatesFilter<"OptimizationResult"> | number
+  baselineCost?: Prisma.FloatNullableWithAggregatesFilter<"OptimizationResult"> | number | null
   solver?: Prisma.StringWithAggregatesFilter<"OptimizationResult"> | string
   solverStatus?: Prisma.StringWithAggregatesFilter<"OptimizationResult"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"OptimizationResult"> | Date | string
@@ -364,6 +380,7 @@ export type OptimizationResultCreateInput = {
   transferCost: number
   expiryCost: number
   totalCost: number
+  baselineCost?: number | null
   solver: string
   solverStatus: string
   createdAt?: Date | string
@@ -379,6 +396,7 @@ export type OptimizationResultUncheckedCreateInput = {
   transferCost: number
   expiryCost: number
   totalCost: number
+  baselineCost?: number | null
   solver: string
   solverStatus: string
   createdAt?: Date | string
@@ -392,6 +410,7 @@ export type OptimizationResultUpdateInput = {
   transferCost?: Prisma.FloatFieldUpdateOperationsInput | number
   expiryCost?: Prisma.FloatFieldUpdateOperationsInput | number
   totalCost?: Prisma.FloatFieldUpdateOperationsInput | number
+  baselineCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   solver?: Prisma.StringFieldUpdateOperationsInput | string
   solverStatus?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -407,6 +426,7 @@ export type OptimizationResultUncheckedUpdateInput = {
   transferCost?: Prisma.FloatFieldUpdateOperationsInput | number
   expiryCost?: Prisma.FloatFieldUpdateOperationsInput | number
   totalCost?: Prisma.FloatFieldUpdateOperationsInput | number
+  baselineCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   solver?: Prisma.StringFieldUpdateOperationsInput | string
   solverStatus?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -421,6 +441,7 @@ export type OptimizationResultCreateManyInput = {
   transferCost: number
   expiryCost: number
   totalCost: number
+  baselineCost?: number | null
   solver: string
   solverStatus: string
   createdAt?: Date | string
@@ -434,6 +455,7 @@ export type OptimizationResultUpdateManyMutationInput = {
   transferCost?: Prisma.FloatFieldUpdateOperationsInput | number
   expiryCost?: Prisma.FloatFieldUpdateOperationsInput | number
   totalCost?: Prisma.FloatFieldUpdateOperationsInput | number
+  baselineCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   solver?: Prisma.StringFieldUpdateOperationsInput | string
   solverStatus?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -448,6 +470,7 @@ export type OptimizationResultUncheckedUpdateManyInput = {
   transferCost?: Prisma.FloatFieldUpdateOperationsInput | number
   expiryCost?: Prisma.FloatFieldUpdateOperationsInput | number
   totalCost?: Prisma.FloatFieldUpdateOperationsInput | number
+  baselineCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   solver?: Prisma.StringFieldUpdateOperationsInput | string
   solverStatus?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -467,6 +490,7 @@ export type OptimizationResultCountOrderByAggregateInput = {
   transferCost?: Prisma.SortOrder
   expiryCost?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
+  baselineCost?: Prisma.SortOrder
   solver?: Prisma.SortOrder
   solverStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -479,6 +503,7 @@ export type OptimizationResultAvgOrderByAggregateInput = {
   transferCost?: Prisma.SortOrder
   expiryCost?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
+  baselineCost?: Prisma.SortOrder
 }
 
 export type OptimizationResultMaxOrderByAggregateInput = {
@@ -490,6 +515,7 @@ export type OptimizationResultMaxOrderByAggregateInput = {
   transferCost?: Prisma.SortOrder
   expiryCost?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
+  baselineCost?: Prisma.SortOrder
   solver?: Prisma.SortOrder
   solverStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -504,6 +530,7 @@ export type OptimizationResultMinOrderByAggregateInput = {
   transferCost?: Prisma.SortOrder
   expiryCost?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
+  baselineCost?: Prisma.SortOrder
   solver?: Prisma.SortOrder
   solverStatus?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -516,6 +543,7 @@ export type OptimizationResultSumOrderByAggregateInput = {
   transferCost?: Prisma.SortOrder
   expiryCost?: Prisma.SortOrder
   totalCost?: Prisma.SortOrder
+  baselineCost?: Prisma.SortOrder
 }
 
 export type OptimizationResultCreateNestedOneWithoutPlanningRunInput = {
@@ -558,6 +586,7 @@ export type OptimizationResultCreateWithoutPlanningRunInput = {
   transferCost: number
   expiryCost: number
   totalCost: number
+  baselineCost?: number | null
   solver: string
   solverStatus: string
   createdAt?: Date | string
@@ -571,6 +600,7 @@ export type OptimizationResultUncheckedCreateWithoutPlanningRunInput = {
   transferCost: number
   expiryCost: number
   totalCost: number
+  baselineCost?: number | null
   solver: string
   solverStatus: string
   createdAt?: Date | string
@@ -600,6 +630,7 @@ export type OptimizationResultUpdateWithoutPlanningRunInput = {
   transferCost?: Prisma.FloatFieldUpdateOperationsInput | number
   expiryCost?: Prisma.FloatFieldUpdateOperationsInput | number
   totalCost?: Prisma.FloatFieldUpdateOperationsInput | number
+  baselineCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   solver?: Prisma.StringFieldUpdateOperationsInput | string
   solverStatus?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -613,6 +644,7 @@ export type OptimizationResultUncheckedUpdateWithoutPlanningRunInput = {
   transferCost?: Prisma.FloatFieldUpdateOperationsInput | number
   expiryCost?: Prisma.FloatFieldUpdateOperationsInput | number
   totalCost?: Prisma.FloatFieldUpdateOperationsInput | number
+  baselineCost?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   solver?: Prisma.StringFieldUpdateOperationsInput | string
   solverStatus?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -629,6 +661,7 @@ export type OptimizationResultSelect<ExtArgs extends runtime.Types.Extensions.In
   transferCost?: boolean
   expiryCost?: boolean
   totalCost?: boolean
+  baselineCost?: boolean
   solver?: boolean
   solverStatus?: boolean
   createdAt?: boolean
@@ -644,6 +677,7 @@ export type OptimizationResultSelectCreateManyAndReturn<ExtArgs extends runtime.
   transferCost?: boolean
   expiryCost?: boolean
   totalCost?: boolean
+  baselineCost?: boolean
   solver?: boolean
   solverStatus?: boolean
   createdAt?: boolean
@@ -659,6 +693,7 @@ export type OptimizationResultSelectUpdateManyAndReturn<ExtArgs extends runtime.
   transferCost?: boolean
   expiryCost?: boolean
   totalCost?: boolean
+  baselineCost?: boolean
   solver?: boolean
   solverStatus?: boolean
   createdAt?: boolean
@@ -674,12 +709,13 @@ export type OptimizationResultSelectScalar = {
   transferCost?: boolean
   expiryCost?: boolean
   totalCost?: boolean
+  baselineCost?: boolean
   solver?: boolean
   solverStatus?: boolean
   createdAt?: boolean
 }
 
-export type OptimizationResultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planningRunId" | "objectiveValue" | "holdingCost" | "stockoutCost" | "transferCost" | "expiryCost" | "totalCost" | "solver" | "solverStatus" | "createdAt", ExtArgs["result"]["optimizationResult"]>
+export type OptimizationResultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planningRunId" | "objectiveValue" | "holdingCost" | "stockoutCost" | "transferCost" | "expiryCost" | "totalCost" | "baselineCost" | "solver" | "solverStatus" | "createdAt", ExtArgs["result"]["optimizationResult"]>
 export type OptimizationResultInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   planningRun?: boolean | Prisma.PlanningRunDefaultArgs<ExtArgs>
 }
@@ -704,6 +740,7 @@ export type $OptimizationResultPayload<ExtArgs extends runtime.Types.Extensions.
     transferCost: number
     expiryCost: number
     totalCost: number
+    baselineCost: number | null
     solver: string
     solverStatus: string
     createdAt: Date
@@ -1139,6 +1176,7 @@ export interface OptimizationResultFieldRefs {
   readonly transferCost: Prisma.FieldRef<"OptimizationResult", 'Float'>
   readonly expiryCost: Prisma.FieldRef<"OptimizationResult", 'Float'>
   readonly totalCost: Prisma.FieldRef<"OptimizationResult", 'Float'>
+  readonly baselineCost: Prisma.FieldRef<"OptimizationResult", 'Float'>
   readonly solver: Prisma.FieldRef<"OptimizationResult", 'String'>
   readonly solverStatus: Prisma.FieldRef<"OptimizationResult", 'String'>
   readonly createdAt: Prisma.FieldRef<"OptimizationResult", 'DateTime'>

@@ -3720,6 +3720,8 @@ export const PlanningRunScalarFieldEnum = {
   modelVersion: 'modelVersion',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
+  failureReason: 'failureReason',
+  failureStage: 'failureStage',
   createdAt: 'createdAt'
 } as const
 
@@ -3799,6 +3801,7 @@ export const OptimizationResultScalarFieldEnum = {
   transferCost: 'transferCost',
   expiryCost: 'expiryCost',
   totalCost: 'totalCost',
+  baselineCost: 'baselineCost',
   solver: 'solver',
   solverStatus: 'solverStatus',
   createdAt: 'createdAt'

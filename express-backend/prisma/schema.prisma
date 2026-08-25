@@ -263,6 +263,9 @@ model PlanningRun {
   startedAt    DateTime?
   completedAt  DateTime?
 
+  failureReason String?
+  failureStage  String?
+
   scenario  Scenario? @relation(fields: [scenarioId], references: [id])
   createdBy User      @relation(fields: [createdById], references: [id])
 
@@ -367,6 +370,7 @@ model OptimizationResult {
   transferCost   Float
   expiryCost     Float
   totalCost      Float
+  baselineCost   Float?
   solver         String
   solverStatus   String
 

@@ -4,6 +4,11 @@ const port = z.coerce.number().int().min(1).max(65535);
 const durationMs = z.coerce.number().int().positive();
 const count = z.coerce.number().int().positive();
 const stringbool = z.enum(["true", "false", "1", "0"]).transform((v) => v === "true" || v === "1");
+const optionalUrl = z
+  .string()
+  .trim()
+  .optional()
+  .transform((value) => (value === undefined || value === "" ? undefined : value));
 
 export const envSchema = z
   .object({
@@ -37,6 +42,13 @@ export const envSchema = z
 
     PLANNING_RUN_TIMEOUT_MS: durationMs.default(900_000),
     PLANNING_IDEMPOTENCY_TTL_MS: durationMs.default(86_400_000),
+    PLANNING_EXECUTOR: z.enum(["inline", "disabled"]).default("inline"),
+    PLANNING_SIMULATION_ITERATIONS: count.default(500),
+
+    FORECAST_SERVICE_URL: optionalUrl,
+    FORECAST_TIMEOUT_MS: durationMs.default(60_000),
+    FORECAST_RETRIES: z.coerce.number().int().min(0).max(10).default(2),
+    FORECAST_FALLBACK: stringbool.default(true),
   })
   .superRefine((value, ctx) => {
     if (value.NODE_ENV === "production" && !value.REDIS_URL) {

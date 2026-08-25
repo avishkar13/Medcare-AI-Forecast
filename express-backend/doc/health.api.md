@@ -36,7 +36,7 @@ Readiness. Answers "can this instance serve traffic", which requires its depende
 {
   "status": "ok",
   "uptimeSeconds": 964,
-  "dependencies": { "database": "up", "redis": "up" }
+  "dependencies": { "database": "up", "redis": "up", "forecast": "not_configured" }
 }
 ```
 
@@ -46,7 +46,7 @@ Readiness. Answers "can this instance serve traffic", which requires its depende
 {
   "status": "degraded",
   "uptimeSeconds": 12,
-  "dependencies": { "database": "down", "redis": "up" }
+  "dependencies": { "database": "down", "redis": "up", "forecast": "up" }
 }
 ```
 
@@ -54,9 +54,12 @@ Readiness. Answers "can this instance serve traffic", which requires its depende
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `status` | `"ok" \| "degraded"` | `degraded` whenever any dependency is `down` |
+| `status` | `"ok" \| "degraded"` | `degraded` when a dependency the instance cannot work without is `down` — see below |
 | `uptimeSeconds` | `number` | Whole seconds since process start |
 | `dependencies.database` | `"up" \| "down"` | `SELECT 1` against Postgres |
 | `dependencies.redis` | `"up" \| "down" \| "not_configured"` | `not_configured` when `REDIS_URL` is unset |
+| `dependencies.forecast` | `"up" \| "down" \| "not_configured"` | The Python forecasting service. `not_configured` when `FORECAST_SERVICE_URL` is unset |
 
 `not_configured` does **not** make the report degraded — running without Redis is a supported development mode, and rate limiting falls back to per-process memory.
+
+The same applies to the forecast engine, and one step further: while `FORECAST_FALLBACK` is on, a `forecast` of **`down`** does not degrade the report either. The instance still answers every route and still produces plans from the naive forecast, so taking it out of rotation would restart a container that is working. Only with the fallback disabled does a dead engine mean the instance cannot do its job.

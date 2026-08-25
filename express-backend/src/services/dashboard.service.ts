@@ -1,6 +1,5 @@
 import { prisma } from "../config/prisma.js";
 import {
-  allocateTransfers,
   classifyStock,
   percentage,
   projectFefoWaste,
@@ -8,6 +7,7 @@ import {
   round,
   safetyStock,
 } from "../utils/inventory.js";
+import { planTransfers } from "../utils/allocation.js";
 import { NotFoundError } from "../utils/errors.js";
 import type {
   ExpiryRiskQuery,
@@ -472,51 +472,31 @@ export const getPriorityActions = async (
   });
 
   for (const [, rows] of groupBy(positions, (position) => position.productId)) {
-    const shortages = rows
-      .filter(isBelowReorderPoint)
-      .map((position) => ({ position, need: position.reorderPoint - position.onHand }))
-      .sort((left, right) => right.need - left.need);
+    const transfers = planTransfers({
+      positions: rows,
+      wasteUnitsOf: (position) => wasteOf(position).units,
+      minimumUnits: MIN_ACTIONABLE_UNITS,
+    });
 
-    const surpluses = rows
-      .filter(isAboveMaximum)
-      .map((position) => ({
-        position,
-        available: position.onHand - (position.maximumInventory ?? 0),
-        wasteRemaining: wasteOf(position).units,
-      }))
-      .sort((left, right) => right.wasteRemaining - left.wasteRemaining || right.available - left.available);
+    for (const { destination, source, need, available, quantity, unitsRescued } of transfers) {
+      addTo(transferredIn, pairKey(destination.productId, destination.warehouseId), quantity);
+      addTo(transferredOut, pairKey(source.productId, source.warehouseId), quantity);
 
-    const matches = allocateTransfers(
-      shortages.map((shortage) => shortage.need),
-      surpluses,
-      MIN_ACTIONABLE_UNITS,
-    );
-
-    for (const [index, match] of matches.entries()) {
-      if (!match) continue;
-
-      const destination = shortages[index]!;
-      const source = surpluses[match.sourceIndex]!;
-      const { quantity, unitsRescued } = match;
-
-      addTo(transferredIn, pairKey(destination.position.productId, destination.position.warehouseId), quantity);
-      addTo(transferredOut, pairKey(source.position.productId, source.position.warehouseId), quantity);
-
-      const urgent = destination.position.daysOfSupply <= destination.position.leadTimeDays;
+      const urgent = destination.daysOfSupply <= destination.leadTimeDays;
 
       actions.push({
-        id: identify("TRANSFER_OPPORTUNITY", destination.position),
+        id: identify("TRANSFER_OPPORTUNITY", destination),
         type: "TRANSFER_OPPORTUNITY",
         severity: urgent ? "critical" : "high",
-        ...describe(destination.position),
-        problem: `${units(destination.need)} units short at ${destination.position.warehouseName} while ${source.position.warehouseName} holds ${units(source.available)} above its maximum`,
-        recommendedAction: `Transfer ${units(quantity)} units from ${source.position.warehouseName} to ${destination.position.warehouseName}`,
+        ...describe(destination),
+        problem: `${units(need)} units short at ${destination.warehouseName} while ${source.warehouseName} holds ${units(available)} above its maximum`,
+        recommendedAction: `Transfer ${units(quantity)} units from ${source.warehouseName} to ${destination.warehouseName}`,
         quantity,
         impactValue: round(
-          unitsRescued * source.position.unitCost + quantity * destination.position.stockoutCostPerUnit,
+          unitsRescued * source.unitCost + quantity * destination.stockoutCostPerUnit,
         ),
-        sourceWarehouseCode: source.position.warehouseCode,
-        sourceWarehouseName: source.position.warehouseName,
+        sourceWarehouseCode: source.warehouseCode,
+        sourceWarehouseName: source.warehouseName,
       });
     }
   }
