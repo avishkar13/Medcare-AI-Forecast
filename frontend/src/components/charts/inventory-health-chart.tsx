@@ -2,23 +2,28 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
-import { mockInventoryItems } from "@/lib/mockData";
+import { useInventory } from "@/hooks/use-inventory";
 import { Info, BarChart2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function InventoryHealthChart() {
-  // Use a subset of items for clearer visualization
-  const items = mockInventoryItems.slice(0, 5).map(item => ({
-    name: item.name.split(' ')[0], // Shorten name for x-axis
-    "Current Stock": item.currentStock,
-    "Safety Stock": item.minimumStock,
-    "Reorder Point": item.minimumStock * 1.2, // Mocking reorder point slightly above minimum
-    status: item.status
-  }));
+  const { data, isPending } = useInventory();
+  const positions = data?.items ?? [];
 
-  const categoryData = mockInventoryItems.reduce((acc, item) => {
-    const val = item.currentStock * item.unitCost;
-    acc[item.category] = (acc[item.category] || 0) + val;
+  // the five positions closest to running out say more than the first five
+  const items = [...positions]
+    .sort((a, b) => a.daysOfSupply - b.daysOfSupply)
+    .slice(0, 5)
+    .map((row) => ({
+      name: row.productName.split(" ")[0],
+      "Current Stock": row.onHand,
+      "Safety Stock": row.safetyStock,
+      "Reorder Point": row.reorderPoint,
+      status: row.status,
+    }));
+
+  const categoryData = positions.reduce((acc, row) => {
+    acc[row.category] = (acc[row.category] || 0) + row.inventoryValue;
     return acc;
   }, {} as Record<string, number>);
 
@@ -26,6 +31,16 @@ export function InventoryHealthChart() {
     .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 4);
+
+  if (isPending || positions.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-10 text-sm text-muted-foreground">
+          {isPending ? "Loading inventory…" : "No inventory to chart."}
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="flex flex-col h-full">

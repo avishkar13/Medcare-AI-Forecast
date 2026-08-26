@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, ComposedChart, Line } from "recharts";
-import { mockForecastData, mockDashboardKPIs } from "@/lib/mockData";
+import { useForecastAccuracy, useForecastChart } from "@/hooks/use-forecast";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -11,7 +11,26 @@ export function DemandForecastChart() {
   const [sku, setSku] = useState("SKU-LIS-10");
   const [horizon, setHorizon] = useState(14);
   
-  const data = mockForecastData[sku] || [];
+  const { data: chart, isPending } = useForecastChart({ sku, days: horizon, historyDays: horizon });
+  const { data: accuracy } = useForecastAccuracy({ sku });
+
+  // history and prediction do not overlap in time, so they concatenate rather than merge
+  const data = [
+    ...(chart?.history ?? []).map((h) => ({
+      date: h.date,
+      actualDemand: h.actualDemand,
+      predictedDemand: undefined as number | undefined,
+      lowerBound: undefined as number | undefined,
+      upperBound: undefined as number | undefined,
+    })),
+    ...(chart?.prediction ?? []).map((p) => ({
+      date: p.date,
+      actualDemand: undefined as number | undefined,
+      predictedDemand: p.predictedDemand,
+      lowerBound: p.lowerBound,
+      upperBound: p.upperBound,
+    })),
+  ];
   
   // To render confidence bounds as a single shaded area in Recharts,
   // we use a trick: the data needs to have an array [lowerBound, upperBound] for the Area dataKey,
@@ -26,6 +45,24 @@ export function DemandForecastChart() {
   const lastPredicted = data.find(d => d.predictedDemand)?.predictedDemand || 0;
   const lastLower = data.find(d => d.lowerBound)?.lowerBound || 0;
   const lastUpper = data.find(d => d.upperBound)?.upperBound || 0;
+
+  if (isPending) {
+    return (
+      <Card>
+        <CardContent className="py-10 text-sm text-muted-foreground">Loading forecast…</CardContent>
+      </Card>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-10 text-sm text-muted-foreground">
+          No forecast yet. Run the planner to generate one.
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="col-span-full">
@@ -143,7 +180,7 @@ export function DemandForecastChart() {
             
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">Historical Accuracy</p>
-              <p className="text-xl font-semibold text-foreground">{mockDashboardKPIs.forecastAccuracy}%</p>
+              <p className="text-xl font-semibold text-foreground">{accuracy?.overall.accuracyPercent === null || accuracy?.overall.accuracyPercent === undefined ? "—" : `${accuracy.overall.accuracyPercent}%`}</p>
               <p className="text-xs text-success font-medium">+1.2% (last 30d)</p>
             </div>
             

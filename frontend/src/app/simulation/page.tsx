@@ -2,8 +2,14 @@
 
 import { useState, useCallback } from "react";
 import { ScenarioPreset, SimulationParams, SimulationOutput, SavedScenario, SimulationHistoryItem } from "@/types/simulation";
-import { SCENARIO_PRESETS, runSimulation, generateScenarioSummary } from "@/lib/simulationEngine";
-import { mockSimulationHistory } from "@/lib/mockData";
+import { SCENARIO_PRESETS, generateScenarioSummary } from "@/config/scenario-presets";
+import {
+  useSavedScenarios,
+  useScenarioMutations,
+  useSimulationHistory,
+  useWhatIf,
+} from "@/hooks/use-simulation";
+import { toSimulationOutput, toWhatIfParams } from "@/lib/simulation-mapping";
 
 import { SimulationHeader } from "@/components/simulation/simulation-header";
 import { ScenarioSelector } from "@/components/simulation/scenario-selector";
@@ -24,12 +30,56 @@ export default function SimulationPage() {
   // ─── State ─────────────────────────────────────────────────────
   const [preset, setPreset] = useState<ScenarioPreset>(DEFAULT_PRESET);
   const [params, setParams] = useState<SimulationParams>(SCENARIO_PRESETS[DEFAULT_PRESET].params);
-  const [isSimulating, setIsSimulating] = useState(false);
-  const [hasResults, setHasResults] = useState(true);
-  const [results, setResults] = useState<SimulationOutput>(() => runSimulation(DEFAULT_PRESET, SCENARIO_PRESETS[DEFAULT_PRESET].params));
-  const [lastSimulation, setLastSimulation] = useState<string | null>("02:05 AM");
-  const [savedScenarios, setSavedScenarios] = useState<SavedScenario[]>([]);
-  const [history, setHistory] = useState<SimulationHistoryItem[]>(mockSimulationHistory);
+  const whatIf = useWhatIf();
+  const historyQuery = useSimulationHistory();
+  const savedQuery = useSavedScenarios();
+  const { save } = useScenarioMutations();
+
+  const [lastSimulation, setLastSimulation] = useState<string | null>(null);
+
+  const isSimulating = whatIf.isRunning;
+  // results exist only once a run has completed; nothing is shown before that
+  const results: SimulationOutput | null = toSimulationOutput(
+    whatIf.simulation,
+    whatIf.optimization,
+    whatIf.comparison,
+  );
+  const hasResults = results !== null;
+
+  const savedScenarios: SavedScenario[] = (savedQuery.data ?? []).map((row) => ({
+    id: row.id,
+    name: row.name,
+    preset: "baseline" as ScenarioPreset,
+    params: {
+      demandShock: row.params.demandShockPercent,
+      inventoryAvailability: 100,
+      serviceLevelTarget: row.params.serviceLevelTargetPercent,
+      supplierLeadTime: 0,
+      distributionCapacity: 100 + row.params.capacityChangePercent,
+      transportationCost: 0,
+    },
+    metrics: [],
+    riskLevel: "moderate",
+    date: row.createdAt,
+  }));
+
+  const history: SimulationHistoryItem[] = (historyQuery.data ?? []).map((row) => ({
+    id: row.id,
+    scenario: row.name,
+    preset: "baseline" as ScenarioPreset,
+    date: row.createdAt,
+    keyChange: `Demand ${row.params.demandShockPercent >= 0 ? "+" : ""}${row.params.demandShockPercent}%`,
+    riskLevel: "moderate",
+    resultSummary: row.latestRun?.status ?? "",
+    params: {
+      demandShock: row.params.demandShockPercent,
+      inventoryAvailability: 100,
+      serviceLevelTarget: row.params.serviceLevelTargetPercent,
+      supplierLeadTime: 0,
+      distributionCapacity: 100 + row.params.capacityChangePercent,
+      transportationCost: 0,
+    },
+  }));
   const [summary, setSummary] = useState(() => generateScenarioSummary(DEFAULT_PRESET, SCENARIO_PRESETS[DEFAULT_PRESET].params));
 
   // ─── Handlers ──────────────────────────────────────────────────
@@ -48,41 +98,23 @@ export default function SimulationPage() {
     });
   }, [preset]);
 
+  // a what-if creates a scenario and a real planning run; results arrive by polling
   const handleRun = useCallback(() => {
-    setIsSimulating(true);
-    setTimeout(() => {
-      const output = runSimulation(preset, params);
-      setResults(output);
-      setHasResults(true);
-      setIsSimulating(false);
-
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
-      setLastSimulation(timeStr);
-
-      // Add to history
-      const historyItem: SimulationHistoryItem = {
-        id: `sim-${Date.now()}`,
-        scenario: SCENARIO_PRESETS[preset].label,
-        preset,
-        date: now.toISOString(),
-        keyChange: getKeyChange(params),
-        riskLevel: output.aiInsight.overallRisk,
-        resultSummary: getResultSummary(output),
-        params,
-      };
-      setHistory((prev) => [historyItem, ...prev]);
-    }, 1200);
-  }, [preset, params]);
+    whatIf.start.mutate({
+      name: `${SCENARIO_PRESETS[preset].label} ${new Date().toISOString().slice(11, 16)}`,
+      horizonDays: 14,
+      params: toWhatIfParams(params),
+    });
+    setLastSimulation(
+      new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true }),
+    );
+  }, [preset, params, whatIf.start]);
 
   const handleReset = useCallback(() => {
     const baselineParams = SCENARIO_PRESETS.baseline.params;
     setPreset("baseline");
     setParams(baselineParams);
     setSummary(generateScenarioSummary("baseline", baselineParams));
-    const output = runSimulation("baseline", baselineParams);
-    setResults(output);
-    setHasResults(true);
   }, []);
 
   const handleResetParams = useCallback(() => {
@@ -92,43 +124,30 @@ export default function SimulationPage() {
   }, [preset]);
 
   const handleSaveCurrent = useCallback(() => {
-    if (!hasResults) return;
-    const saved: SavedScenario = {
-      id: `saved-${Date.now()}`,
-      name: SCENARIO_PRESETS[preset].label,
-      preset,
-      params,
-      metrics: results.metrics,
-      riskLevel: results.aiInsight.overallRisk,
-      date: new Date().toISOString(),
-    };
-    setSavedScenarios((prev) => [saved, ...prev].slice(0, 3));
-  }, [hasResults, preset, params, results]);
+    save.mutate({
+      name: `${SCENARIO_PRESETS[preset].label} ${new Date().toISOString().slice(0, 16)}`,
+      params: toWhatIfParams(params),
+    });
+  }, [preset, params, save]);
 
   const handleApplyScenario = useCallback((scenario: SavedScenario) => {
     setPreset(scenario.preset);
     setParams(scenario.params);
     setSummary(generateScenarioSummary(scenario.preset, scenario.params));
-    const output = runSimulation(scenario.preset, scenario.params);
-    setResults(output);
-    setHasResults(true);
   }, []);
 
   const handleViewHistory = useCallback((item: SimulationHistoryItem) => {
     setPreset(item.preset);
     setParams(item.params);
     setSummary(generateScenarioSummary(item.preset, item.params));
-    const output = runSimulation(item.preset, item.params);
-    setResults(output);
-    setHasResults(true);
   }, []);
 
   // AI interpretation for risk section
-  const riskInterpretation = results.aiInsight.overallRisk === "critical"
+  const riskInterpretation = results?.aiInsight.overallRisk === "critical"
     ? "Under this scenario, stockout risk becomes the dominant operational risk. Distribution centers may exceed capacity and additional replenishment should be considered."
-    : results.aiInsight.overallRisk === "high"
+    : results?.aiInsight.overallRisk === "high"
     ? "The simulated scenario creates elevated risk across multiple dimensions. Proactive inventory repositioning is recommended."
-    : results.aiInsight.overallRisk === "moderate"
+    : results?.aiInsight.overallRisk === "moderate"
     ? "Moderate risk increase detected. Monitor closely and prepare contingency measures."
     : "The network remains stable under current scenario conditions. No immediate intervention required.";
 
@@ -177,19 +196,3 @@ export default function SimulationPage() {
 }
 
 // ─── Utility functions ───────────────────────────────────────────
-function getKeyChange(params: SimulationParams): string {
-  if (params.demandShock !== 0) return `${params.demandShock > 0 ? "+" : ""}${params.demandShock}% demand`;
-  if (params.supplierLeadTime !== 0) return `${params.supplierLeadTime > 0 ? "+" : ""}${params.supplierLeadTime} days lead time`;
-  if (params.inventoryAvailability !== 100) return `${params.inventoryAvailability}% inventory`;
-  if (params.distributionCapacity !== 100) return `${params.distributionCapacity}% capacity`;
-  return "Baseline";
-}
-
-function getResultSummary(output: SimulationOutput): string {
-  const stockout = output.metrics[0];
-  const cost = output.metrics[2];
-  if (Math.abs(stockout.delta) > Math.abs(cost.delta / 1000)) {
-    return `Stockout risk ${stockout.delta > 0 ? "+" : ""}${stockout.delta}%`;
-  }
-  return `Cost ${cost.delta > 0 ? "+" : ""}$${(cost.delta / 1000).toFixed(1)}K`;
-}

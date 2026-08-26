@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { mockInventoryTableItems } from "@/lib/mockData";
+import { useInventory } from "@/hooks/use-inventory";
 import { InventoryKpiCards } from "@/components/inventory/inventory-kpi-cards";
 import { InventoryHealth } from "@/components/inventory/inventory-health";
 import { InventoryNetwork } from "@/components/inventory/inventory-network";
@@ -12,7 +12,27 @@ import { InventoryTable } from "@/components/inventory/inventory-table";
 import type { InventoryTableItem } from "@/types/inventory";
 
 export default function InventoryPage() {
-  const allItems = mockInventoryTableItems;
+  const { data, isPending, isError } = useInventory();
+
+  // a position is one product at one warehouse, so the row id has to be both.
+  const allItems: InventoryTableItem[] = useMemo(
+    () =>
+      (data?.items ?? []).map((row) => ({
+        id: row.sku,
+        name: row.productName,
+        category: row.category,
+        location: row.warehouseName,
+        onHand: row.onHand,
+        safetyStock: row.safetyStock,
+        reorderPoint: row.reorderPoint,
+        daysOfSupply: row.daysOfSupply,
+        unitValue: row.unitCost,
+        inventoryValue: row.inventoryValue,
+        risk: row.risk as InventoryTableItem["risk"],
+        status: row.status as InventoryTableItem["status"],
+      })),
+    [data],
+  );
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
@@ -74,6 +94,12 @@ export default function InventoryPage() {
           <InventoryHealth />
           <InventoryNetwork />
         </div>
+
+      {isPending ? (
+        <p className="text-sm text-muted-foreground py-6">Loading inventory…</p>
+      ) : isError ? (
+        <p className="text-sm text-muted-foreground py-6">Could not load inventory.</p>
+      ) : null}
 
         <InventoryFilters
           search={search}

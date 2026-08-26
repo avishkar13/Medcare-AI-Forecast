@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScenarioPreset } from "@/types/simulation";
-import { SCENARIO_PRESETS } from "@/lib/simulationEngine";
+import { SCENARIO_PRESETS } from "@/config/scenario-presets";
 import { TrendingUp, Truck, PackageMinus, PackagePlus, Zap, BarChart3 } from "lucide-react";
 
 interface ScenarioSelectorProps {

@@ -1,14 +1,33 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { mockNetworkHealth } from "@/lib/mockData";
+import { useDashboardSummary } from "@/hooks/use-dashboard";
 import { Activity } from "lucide-react";
 
 export function NetworkHealth() {
-  const health = mockNetworkHealth;
-  
+  const { data, isPending, isError } = useDashboardSummary();
+  const health = data?.networkHealth;
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
   };
+
+  if (isPending || isError || !health) {
+    return (
+      <Card className="flex flex-col">
+        <CardHeader className="pb-4 border-b border-border/50">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <Activity className="h-4 w-4 text-primary" />
+            Network Health
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="py-6 text-sm text-muted-foreground">
+          {isPending ? "Loading…" : "Could not load network health."}
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="flex flex-col">

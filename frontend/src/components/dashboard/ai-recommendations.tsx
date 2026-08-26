@@ -1,12 +1,55 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { mockRecommendations } from "@/lib/mockData";
+import { useRecommendations } from "@/hooks/use-recommendations";
 import { Sparkles, ArrowRight, Info, CheckCircle2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function AIRecommendations() {
-  const recommendations = mockRecommendations;
+  const { data, isPending, isError } = useRecommendations({ pageSize: 10 });
+
+  // backend priority is CRITICAL/HIGH/MEDIUM/LOW, these components switch on lower case.
+  // currentInventory and forecastDemand have no backend source, so they are omitted
+  // rather than filled with a number nothing produced.
+  const recommendations = (data?.data ?? []).map((rec) => ({
+    id: rec.id,
+    itemId: rec.sku,
+    action: rec.actionType ?? rec.type,
+    priority: rec.priority.toLowerCase(),
+    reason: rec.message,
+    expectedImpact: rec.expectedImpact ?? "",
+    confidenceScore: rec.confidence ?? 0,
+    suggestedQuantity: rec.quantity ?? 0,
+    sourceDc: null as string | null,
+    destinationDc: rec.warehouseCode,
+    // a recommendation does not carry the position it was derived from. showing a
+    // dash beats inventing a stock level.
+    currentInventory: null as number | null,
+    forecastDemand: null as number | null,
+    impactValue: rec.impactValue,
+  }));
+
+  if (isPending || isError) {
+    return (
+      <Card>
+        <CardContent className="py-6 text-sm text-muted-foreground">
+          {isPending ? "Loading recommendations…" : "Could not load recommendations."}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (recommendations.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-6 text-sm text-muted-foreground">
+          No recommendations yet. Run the planner to generate them.
+        </CardContent>
+      </Card>
+    );
+  }
 
   const getPriorityColor = (priority: string) => {
     switch(priority) {
@@ -70,11 +113,11 @@ export function AIRecommendations() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-muted/40 p-3 rounded-lg border border-border/50">
                 <div className="flex flex-col gap-1">
                   <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Current Stock</span>
-                  <span className="text-sm font-semibold tabular-nums">{rec.currentInventory.toLocaleString()}</span>
+                  <span className="text-sm font-semibold tabular-nums">{rec.currentInventory?.toLocaleString() ?? "—"}</span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Forecast Demand</span>
-                  <span className="text-sm font-semibold tabular-nums">{rec.forecastDemand.toLocaleString()}</span>
+                  <span className="text-sm font-semibold tabular-nums">{rec.forecastDemand?.toLocaleString() ?? "—"}</span>
                 </div>
                 <div className="flex flex-col gap-1 md:col-span-2">
                   <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Expected Impact</span>

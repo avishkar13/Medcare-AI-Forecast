@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SimulationParams, ScenarioPreset } from "@/types/simulation";
-import { SCENARIO_PRESETS } from "@/lib/simulationEngine";
+import { SCENARIO_PRESETS } from "@/config/scenario-presets";
 import { BrainCircuit } from "lucide-react";
 
 interface ScenarioSummaryProps {

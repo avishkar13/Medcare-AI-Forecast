@@ -21,7 +21,8 @@ import {
   CheckCircle2,
   LineChart,
 } from "lucide-react";
-import { getSkuDetailData } from "@/lib/mockData";
+import { useInventoryDetail } from "@/hooks/use-inventory";
+import { useRecommendations } from "@/hooks/use-recommendations";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import type { StockBatch, StockMovement, MovementType, InventoryRisk } from "@/types/inventory";
 import Link from "next/link";
@@ -36,9 +37,73 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
   const [replenishSuccess, setReplenishSuccess] = useState(false);
   const [transferSuccess, setTransferSuccess] = useState(false);
 
+  const { data, isPending } = useInventoryDetail(skuId);
+  const { data: recs } = useRecommendations({ pageSize: 200 });
+
   if (!skuId) return null;
 
-  const item = getSkuDetailData(skuId);
+  const product = data?.product;
+  // one row per warehouse; the drawer shows the network position for the sku
+  const positions = data?.positions ?? [];
+  const worst = positions.reduce<(typeof positions)[number] | undefined>(
+    (acc, p) => (acc === undefined || p.daysOfSupply < acc.daysOfSupply ? p : acc),
+    undefined,
+  );
+
+  const sum = (pick: (p: (typeof positions)[number]) => number) =>
+    positions.reduce((total, p) => total + pick(p), 0);
+
+  const item = product
+    ? {
+        id: product.sku,
+        name: product.name,
+        category: product.category,
+        location: positions.length === 1 ? positions[0]!.warehouseName : `${positions.length} DCs`,
+        onHand: sum((p) => p.onHand),
+        safetyStock: sum((p) => p.safetyStock),
+        reorderPoint: sum((p) => p.reorderPoint),
+        maximumStock: sum((p) => p.maximumInventory ?? 0),
+        avgDailyDemand: sum((p) => p.avgDailyDemand),
+        leadTimeDays: worst?.leadTimeDays ?? 0,
+        daysOfSupply: worst?.daysOfSupply ?? 0,
+        unitValue: product.unitCost,
+        inventoryValue: sum((p) => p.inventoryValue),
+        risk: (worst?.risk ?? "low") as InventoryRisk,
+        batches: (data?.batches ?? []).map((b) => ({
+          id: b.batchId,
+          sku: product.sku,
+          location: b.warehouseCode,
+          quantity: b.quantity,
+          manufacturingDate: b.manufacturingDate ?? "",
+          expiryDate: b.expiryDate,
+          daysRemaining: b.daysToExpiry,
+          valueAtRisk: b.valueAtRisk,
+          expiryRisk: b.severity,
+        })),
+        // no movement ledger exists; it is out of scope for this deliverable.
+        movements: [] as never[],
+        manufacturer: null as string | null,
+        // the top open recommendation for this sku, if the planner produced one
+        aiRecommendation: (() => {
+          const match = (recs?.data ?? []).find((r) => r.sku === product.sku);
+          return match
+            ? {
+                action: match.actionType ?? match.type,
+                confidence: match.confidence ?? 0,
+                expectedImpact: match.expectedImpact ?? "",
+                reasoning: match.message,
+                suggestedQuantity: match.quantity ?? 0,
+              }
+            : null;
+        })(),
+        expiryRiskLevel: (data?.batches[0]?.severity ?? "low") as InventoryRisk,
+        expiryRiskReason: null as string | null,
+        stockoutRiskLevel: (worst?.risk ?? "low") as InventoryRisk,
+        stockoutRiskReason: null as string | null,
+      }
+    : null;
+
+  if (isPending || !item) return null;
 
   const getRiskBadge = (risk: InventoryRisk) => {
     const styles: Record<InventoryRisk, string> = {
@@ -407,6 +472,11 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
 
             {/* TAB 4: AI REASONING & INSIGHT */}
             <TabsContent value="ai-reasoning" className="flex flex-col gap-4 mt-4">
+              {item.aiRecommendation === null ? (
+                <p className="text-sm text-muted-foreground py-6">
+                  No recommendation for this sku. Run the planner to generate one.
+                </p>
+              ) : (
               <div className="p-5 rounded-xl border border-primary/30 bg-primary/5 flex flex-col gap-4 shadow-xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-primary font-bold text-base">
@@ -439,6 +509,7 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
                   </span>
                 </div>
               </div>
+              )}
             </TabsContent>
           </Tabs>
 
@@ -446,7 +517,7 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
           {replenishSuccess && (
             <div className="p-3.5 bg-success/15 border border-success/30 rounded-lg flex items-center gap-2 text-xs font-semibold text-success shadow-xs">
               <CheckCircle2 className="h-4 w-4 shrink-0" />
-              <span>Purchase order drafted for {formatNumber(item.aiRecommendation.suggestedQuantity)} units of {item.name}!</span>
+              <span>Purchase order drafted for {formatNumber(item.aiRecommendation?.suggestedQuantity ?? 0)} units of {item.name}!</span>
             </div>
           )}
           {transferSuccess && (

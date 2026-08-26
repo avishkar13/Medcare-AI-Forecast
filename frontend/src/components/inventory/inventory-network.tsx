@@ -2,11 +2,24 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { mockDistributionCenters } from "@/lib/mockData";
+import { useDashboardNetwork } from "@/hooks/use-dashboard";
 import { formatCompactCurrency } from "@/lib/utils";
 
 export function InventoryNetwork() {
-  const dcs = mockDistributionCenters;
+  const { data, isPending } = useDashboardNetwork();
+
+  const dcs = (data ?? []).map((dc) => ({
+    id: dc.id,
+    name: dc.name,
+    utilization: dc.utilization,
+    inventoryValue: dc.inventoryValue,
+    atRiskInventory: dc.expiringValue,
+    stockoutRisk: dc.stockoutRisk,
+    skuCount: dc.skuCount,
+    capacity: dc.capacity,
+  }));
+
+  if (isPending) return null;
 
   return (
     <Card className="flex flex-col">

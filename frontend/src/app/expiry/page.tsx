@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { mockExpiryBatches, mockDCExpiry, mockWastePrevention } from "@/lib/mockData";
+import { useDcExposure, useExpiryBatches, useWastePrevention } from "@/hooks/use-expiry";
 import { ExpiryBatch } from "@/types/expiry";
 
 import { ExpiryHeader } from "@/components/expiry/expiry-header";
@@ -19,6 +19,36 @@ import { PreventedWaste } from "@/components/expiry/prevented-waste";
 import { BatchDetailsSheet } from "@/components/expiry/batch-details-sheet";
 
 export default function ExpiryRiskPage() {
+  const batchQuery = useExpiryBatches();
+  const exposure = useDcExposure();
+  const waste = useWastePrevention();
+
+  // the api reports risk and value; forecastDemand and wasteProbability have no
+  // source on a batch, so they stay at zero rather than being invented.
+  const batches: ExpiryBatch[] = useMemo(
+    () =>
+      (batchQuery.data?.data ?? []).map((b) => ({
+    id: b.id,
+    sku: b.sku,
+    productName: b.productName,
+    category: b.criticality,
+    batchNumber: b.batchNumber,
+    location: b.warehouseName,
+    quantity: b.quantity,
+    unitCost: b.unitCost,
+    expiryDate: b.expiryDate,
+    daysRemaining: b.daysRemaining,
+    forecastDemand: 0,
+    demandCoverage: 0,
+    inventoryValue: b.inventoryValue,
+    riskLevel: b.riskLevel,
+    wasteProbability: 0,
+    wasteValue: 0,
+        status: "at-risk" as ExpiryBatch["status"],
+      })),
+    [batchQuery.data],
+  );
+
   const [fefoActive, setFefoActive] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<ExpiryBatch | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -50,7 +80,7 @@ export default function ExpiryRiskPage() {
   };
 
   const filteredAndSortedBatches = useMemo(() => {
-    let result = [...mockExpiryBatches];
+    let result = [...batches];
 
     // Search
     if (filters.search) {
@@ -116,7 +146,7 @@ export default function ExpiryRiskPage() {
     }
 
     return result;
-  }, [filters, fefoActive]);
+  }, [batches, filters, fefoActive]);
 
   const handleBatchClick = (batch: ExpiryBatch) => {
     setSelectedBatch(batch);
@@ -153,7 +183,7 @@ export default function ExpiryRiskPage() {
         </div>
         
         <div className="flex flex-col gap-6">
-          <FEFOPriorityQueue batches={mockExpiryBatches} />
+          <FEFOPriorityQueue batches={batches} />
           <AIExpiryAssessment />
         </div>
       </div>
@@ -167,10 +197,16 @@ export default function ExpiryRiskPage() {
           <WastePreventionImpact />
         </div>
         <div className="lg:col-span-1 h-[400px]">
-          <DCExpiryExposure data={mockDCExpiry} />
+          <DCExpiryExposure
+            data={(exposure.data ?? []).map((dc) => ({
+              location: dc.name,
+              atRiskValue: dc.totalExposureValue,
+              criticalBatches: dc.batchCount,
+            }))}
+          />
         </div>
         <div className="lg:col-span-1 h-[400px]">
-          <PreventedWaste records={mockWastePrevention} />
+          <PreventedWaste records={waste.data?.items ?? []} />
         </div>
       </div>
 

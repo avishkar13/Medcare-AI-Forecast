@@ -1,3 +1,5 @@
+"use client";
+
 import { 
   PackageSearch, 
   AlertTriangle, 
@@ -7,11 +9,12 @@ import {
   DollarSign 
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockDashboardKPIs } from "@/lib/mockData";
+import { useDashboardSummary } from "@/hooks/use-dashboard";
 
 export function KpiCards() {
-  const kpis = mockDashboardKPIs;
-  
+  const { data, isPending, isError } = useDashboardSummary();
+  const kpis = data?.kpis;
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
   };
@@ -19,6 +22,37 @@ export function KpiCards() {
   const formatNumber = (value: number) => {
     return new Intl.NumberFormat('en-US').format(value);
   };
+
+  // the backend returns null where a figure has nothing to measure against
+  const percent = (value: number | null | undefined) =>
+    value === null || value === undefined ? "—" : `${value}%`;
+
+  if (isPending) {
+    return (
+      <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Card key={i}>
+            <CardHeader className="pb-2">
+              <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+            </CardHeader>
+            <CardContent>
+              <div className="h-7 w-20 rounded bg-muted animate-pulse" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  if (isError || !kpis) {
+    return (
+      <Card>
+        <CardContent className="py-6 text-sm text-muted-foreground">
+          Could not load dashboard figures.
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
@@ -85,7 +119,7 @@ export function KpiCards() {
           <TrendingUp className="h-4 w-4 text-ai" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground">{kpis.forecastAccuracy}%</div>
+          <div className="text-2xl font-bold text-foreground">{percent(kpis.forecastAccuracy)}</div>
           <p className="text-xs text-muted-foreground mt-1">
             <span className="text-success font-medium">+1.2%</span> improvement (30d)
           </p>

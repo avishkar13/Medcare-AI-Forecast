@@ -1,15 +1,44 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { mockDistributionCenters } from "@/lib/mockData";
+import { useDashboardNetwork } from "@/hooks/use-dashboard";
 import { Progress } from "@/components/ui/progress";
 import { Info, MapPin } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function InventoryDistribution() {
-  const dcs = mockDistributionCenters;
+  const { data, isPending, isError } = useDashboardNetwork();
+
+  // the component calls it atRiskInventory; the backend reports the value of stock
+  // near expiry at that dc.
+  const dcs = (data ?? []).map((dc) => ({
+    id: dc.id,
+    name: dc.name,
+    utilization: dc.utilization,
+    inventoryValue: dc.inventoryValue,
+    atRiskInventory: dc.expiringValue,
+    stockoutRisk: dc.stockoutRisk,
+  }));
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", style: 'currency', currency: 'USD' }).format(value);
   };
+
+  if (isPending || isError) {
+    return (
+      <Card className="flex flex-col">
+        <CardHeader className="pb-4 border-b border-border/50">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <MapPin className="h-4 w-4 text-primary" />
+            Inventory Distribution
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="py-6 text-sm text-muted-foreground">
+          {isPending ? "Loading…" : "Could not load distribution."}
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="flex flex-col">

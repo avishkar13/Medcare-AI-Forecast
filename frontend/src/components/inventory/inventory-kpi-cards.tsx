@@ -2,11 +2,32 @@
 
 import { DollarSign, Package, ShieldCheck, AlertTriangle, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockInventoryPageKPIs } from "@/lib/mockData";
+import { useInventory } from "@/hooks/use-inventory";
 import { formatCompactCurrency, formatNumber } from "@/lib/utils";
 
 export function InventoryKpiCards() {
-  const kpis = mockInventoryPageKPIs;
+  const { data, isPending } = useInventory();
+  const totals = data?.totals;
+
+  const kpis = {
+    totalInventoryValue: totals?.inventoryValue ?? 0,
+    totalSkus: totals?.skuCount ?? 0,
+    inStockRate:
+      totals && totals.positionCount > 0
+        ? Number(
+            (
+              ((totals.positionCount - totals.belowReorderPointCount) /
+                totals.positionCount) *
+              100
+            ).toFixed(1),
+          )
+        : 0,
+    atRiskSkus: totals?.belowReorderPointCount ?? 0,
+    atRiskCritical: totals?.belowSafetyStockCount ?? 0,
+    excessInventoryValue: totals?.expiringValue ?? 0,
+  };
+
+  if (isPending || !totals) return null;
 
   const cards = [
     {

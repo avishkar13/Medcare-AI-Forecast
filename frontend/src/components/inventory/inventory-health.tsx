@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
 } from "recharts";
-import { mockInventoryHealthBreakdown } from "@/lib/mockData";
+import { useInventoryHealth } from "@/hooks/use-inventory";
 import { formatCompactCurrency } from "@/lib/utils";
 
 const COLORS = [
@@ -34,7 +34,10 @@ const categoryData = [
 ];
 
 export function InventoryHealth() {
-  const health = mockInventoryHealthBreakdown;
+  const { data, isPending } = useInventoryHealth();
+  const health = data?.breakdown;
+
+  if (isPending || !health) return null;
 
   const segments = [
     { name: "Healthy", value: health.healthy },

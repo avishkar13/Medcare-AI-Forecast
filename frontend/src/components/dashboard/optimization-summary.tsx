@@ -1,40 +1,63 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { mockOptimizationMetrics } from "@/lib/mockData";
+import { useLatestComparison } from "@/hooks/use-planning";
 import { TrendingDown, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
 
 export function OptimizationSummary() {
-  const metrics = mockOptimizationMetrics;
+  const { data, isPending, isError, hasTwoRuns } = useLatestComparison();
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", style: 'currency', currency: 'USD', maximumFractionDigits: 1 }).format(value);
   };
 
-  const chartData = [
-    {
-      name: "Holding",
-      Current: metrics.current.holdingCost,
-      Optimized: metrics.optimized.holdingCost,
-    },
-    {
-      name: "Stockout",
-      Current: metrics.current.stockoutPenalty,
-      Optimized: metrics.optimized.stockoutPenalty,
-    },
-    {
-      name: "Expiry",
-      Current: metrics.current.expiryCost,
-      Optimized: metrics.optimized.expiryCost,
-    },
-    {
-      name: "Transfer",
-      Current: metrics.current.transferCost,
-      Optimized: metrics.optimized.transferCost,
-    }
-  ];
+  const cost = data?.cost;
+
+  const chartData = cost
+    ? [
+        { name: "Holding", Current: cost.holding.baseline, Optimized: cost.holding.scenario },
+        { name: "Stockout", Current: cost.stockout.baseline, Optimized: cost.stockout.scenario },
+        { name: "Expiry", Current: cost.expiry.baseline, Optimized: cost.expiry.scenario },
+        { name: "Transfer", Current: cost.transfer.baseline, Optimized: cost.transfer.scenario },
+      ]
+    : [];
+
+  // baseline is the do-nothing run, scenario is the one being evaluated. savings is
+  // pre-oriented by the api so positive always means the scenario did better.
+  const metrics = cost
+    ? {
+        current: { totalCost: cost.total.baseline },
+        optimized: { totalCost: cost.total.scenario },
+        savings: data!.headline.costSaved,
+        savingsPercentage:
+          cost.total.percentChange === null ? null : -cost.total.percentChange,
+      }
+    : null;
+
+  if (isPending || isError || !hasTwoRuns || !metrics) {
+    return (
+      <Card className="flex flex-col">
+        <CardHeader className="pb-4 border-b border-border/50">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <TrendingDown className="h-4 w-4 text-primary" />
+            Optimization Summary
+          </CardTitle>
+          <CardDescription>Cost of the plan against a baseline run</CardDescription>
+        </CardHeader>
+        <CardContent className="py-8 text-sm text-muted-foreground">
+          {isPending
+            ? "Loading…"
+            : isError
+              ? "Could not load the comparison."
+              : "Needs two completed planning runs to compare. Run the planner twice — once as a baseline, once under a scenario."}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const warnings = data?.warnings ?? [];
 
   return (
     <Card className="flex flex-col">
@@ -70,9 +93,12 @@ export function OptimizationSummary() {
           </div>
           <div className="flex flex-col items-end gap-1">
             <span className="text-sm font-medium text-success">Cost Reduction</span>
-            <span className="text-2xl font-bold tabular-nums text-success">{metrics.savingsPercentage}%</span>
+            <span className="text-2xl font-bold tabular-nums text-success">{metrics.savingsPercentage === null ? "—" : `${metrics.savingsPercentage.toFixed(1)}%`}</span>
           </div>
         </div>
+        {warnings.length > 0 ? (
+          <p className="text-xs text-muted-foreground mt-3">{warnings.join(" ")}</p>
+        ) : null}
 
         <div className="w-full h-[140px] mt-2">
           <ResponsiveContainer width="100%" height="100%">

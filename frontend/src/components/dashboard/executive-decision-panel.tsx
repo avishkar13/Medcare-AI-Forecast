@@ -1,10 +1,33 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { mockRecommendations } from "@/lib/mockData";
+import { useRecommendations } from "@/hooks/use-recommendations";
 import { Briefcase, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export function ExecutiveDecisionPanel() {
-  const topDecisions = mockRecommendations.slice(0, 3);
+  const { data, isPending } = useRecommendations({ pageSize: 3 });
+
+  const topDecisions = (data?.data ?? []).map((rec) => ({
+    id: rec.id,
+    itemId: rec.sku,
+    action: rec.actionType ?? rec.type,
+    priority: rec.priority.toLowerCase(),
+    reason: rec.message,
+    expectedImpact: rec.expectedImpact ?? "",
+    suggestedQuantity: rec.quantity ?? 0,
+    destinationDc: rec.warehouseCode,
+  }));
+
+  if (isPending || topDecisions.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-6 text-sm text-muted-foreground">
+          {isPending ? "Loading…" : "No decisions pending. Run the planner to generate them."}
+        </CardContent>
+      </Card>
+    );
+  }
 
   const getCardStyles = (priority: string) => {
     switch(priority) {

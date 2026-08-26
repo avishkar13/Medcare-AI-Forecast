@@ -1,11 +1,32 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { mockPriorityActions } from "@/lib/mockData";
+import { useDashboardPriorityActions } from "@/hooks/use-dashboard";
 import { AlertCircle, ArrowRight } from "lucide-react";
 
 export function PriorityActions() {
-  const actions = mockPriorityActions;
+  const { data, isPending, isError } = useDashboardPriorityActions();
+
+  const actions = (data?.items ?? []).map((item) => ({
+    id: item.id,
+    severity: item.severity,
+    sku: item.sku,
+    dc: item.warehouseCode,
+    problem: item.problem,
+    recommendedAction: item.recommendedAction,
+  }));
+
+  if (isPending || isError) {
+    return (
+      <Card>
+        <CardContent className="py-6 text-sm text-muted-foreground">
+          {isPending ? "Loading priority actions…" : "Could not load priority actions."}
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="flex flex-col shadow-sm">
@@ -26,7 +47,7 @@ export function PriorityActions() {
                     variant="outline"
                     className={
                       action.severity === "critical" ? "bg-destructive text-[#FFFFFF] border-transparent hover:bg-destructive/90" : 
-                      action.severity === "warning" ? "bg-warning text-[#FFFFFF] border-transparent hover:bg-warning/80" : ""
+                      action.severity === "high" ? "bg-warning text-[#FFFFFF] border-transparent hover:bg-warning/80" : ""
                     }
                   >
                     {action.severity}

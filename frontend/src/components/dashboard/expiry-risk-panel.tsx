@@ -1,11 +1,34 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { mockExpiryRisks } from "@/lib/mockData";
+import { useDashboardExpiryRisk } from "@/hooks/use-dashboard";
 import { Info, FlaskConical } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function ExpiryRiskPanel() {
-  const risks = mockExpiryRisks;
+  const { data, isPending, isError } = useDashboardExpiryRisk();
+
+  const risks = (data?.items ?? []).map((item) => ({
+    id: item.batchId,
+    batchId: item.batchNumber,
+    sku: item.sku,
+    dc: item.warehouseCode,
+    currentQuantity: item.quantity,
+    inventoryValue: item.valueAtRisk,
+    daysToExpiry: item.daysToExpiry,
+    severity: item.severity,
+  }));
+
+  if (isPending || isError) {
+    return (
+      <Card>
+        <CardContent className="py-6 text-sm text-muted-foreground">
+          {isPending ? "Loading expiry risk…" : "Could not load expiry risk."}
+        </CardContent>
+      </Card>
+    );
+  }
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);

@@ -55,8 +55,9 @@ export interface DashboardKPIs {
   skusMonitored: number;
   stockoutRiskItems: number;
   expiryRiskItems: number;
-  onTimeDeliveryRate: number; // percentage
-  forecastAccuracy: number; // percentage
+  // null until there is something to measure them against
+  onTimeDeliveryRate: number | null;
+  forecastAccuracy: number | null;
   activeAlerts: number;
   pendingRecommendations: number;
 }

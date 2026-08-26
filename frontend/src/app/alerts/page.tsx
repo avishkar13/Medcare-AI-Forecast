@@ -10,7 +10,7 @@ import { AlertTrends } from "@/components/alerts/alert-trends";
 import { MonitoringHealth } from "@/components/alerts/monitoring-health";
 import { AlertDistribution } from "@/components/alerts/alert-distribution";
 
-import { mockSystemAlerts, mockAlertOverview } from "@/lib/mockData";
+import { useAlertActions, useAlertOverview, useAlerts } from "@/hooks/use-alerts";
 import { SystemAlert } from "@/types/alert";
 
 const defaultFilters: AlertFilterState = {
@@ -24,7 +24,11 @@ const defaultFilters: AlertFilterState = {
 };
 
 export default function AlertsPage() {
-  const [alerts, setAlerts] = useState<SystemAlert[]>(mockSystemAlerts);
+  const { data, isPending, isError } = useAlerts({ pageSize: 200 });
+  const overviewQuery = useAlertOverview();
+  const actions = useAlertActions();
+
+  const alerts: SystemAlert[] = useMemo(() => data?.data ?? [], [data]);
   const [filters, setFilters] = useState<AlertFilterState>(defaultFilters);
   const [selectedAlertId, setSelectedAlertId] = useState<string | null>(null);
   
@@ -47,13 +51,23 @@ export default function AlertsPage() {
       }
     });
 
-    return {
-      ...mockAlertOverview,
-      unresolvedCount,
-      criticalCount,
-      highCount,
-    };
-  }, [alerts]);
+    // the api computes these over the whole table, not just the loaded page
+    const live = overviewQuery.data;
+    if (live) {
+      // resolvedPercentage is null when there are no alerts at all, which is not 0%
+      return { ...live, resolvedPercentage: live.resolvedPercentage ?? 0 };
+    }
+
+    return ({
+        criticalCount,
+        highCount,
+        unresolvedCount,
+        todayCount: 0,
+        todayDelta: 0,
+        resolvedCount: 0,
+        resolvedPercentage: 0,
+    });
+  }, [alerts, overviewQuery.data]);
 
   // Filter & Sort Logic
   const filteredAlerts = useMemo(() => {
@@ -125,18 +139,26 @@ export default function AlertsPage() {
 
   // Actions
   const handleAcknowledge = (id: string) => {
-    setAlerts(alerts.map(a => a.id === id ? { ...a, status: "acknowledged" } : a));
+    actions.acknowledge.mutate(id);
   };
 
   const handleResolve = (id: string) => {
-    setAlerts(alerts.map(a => a.id === id ? { ...a, status: "resolved" } : a));
+    actions.resolve.mutate(id);
   };
 
   const handleMarkAllRead = () => {
-    setAlerts(alerts.map(a => a.status === "new" ? { ...a, status: "acknowledged" } : a));
+    actions.markAllRead.mutate();
   };
 
   const selectedAlert = useMemo(() => alerts.find(a => a.id === selectedAlertId) || null, [alerts, selectedAlertId]);
+
+  if (isPending) {
+    return <p className="text-sm text-muted-foreground p-6">Loading alerts…</p>;
+  }
+
+  if (isError) {
+    return <p className="text-sm text-muted-foreground p-6">Could not load alerts.</p>;
+  }
 
   return (
     <div className="flex flex-col gap-5 w-full max-w-7xl mx-auto pb-10 min-h-screen">
