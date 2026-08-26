@@ -11,6 +11,7 @@ from typing import Optional
 
 import pandas as pd
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -51,6 +52,31 @@ def engine_error_handler(_request: Request, error: EngineError) -> JSONResponse:
     return JSONResponse(
         status_code=error.status,
         content={"error": {"code": error.code, "message": error.message}},
+    )
+
+
+@app.exception_handler(RequestValidationError)
+def validation_error_handler(_request: Request, error: RequestValidationError) -> JSONResponse:
+    """Answers a malformed request in the contract's envelope rather than FastAPI's.
+
+    The contract pins every non-2xx body to {"error": {"code", "message"}}, and 422 to
+    "the request did not validate". FastAPI's default handler bypasses
+    `engine_error_handler` entirely and answers {"detail": [...]}, so the one status the
+    contract names explicitly was the one status that did not honour it.
+    """
+    message = "; ".join(
+        f"{'.'.join(str(part) for part in issue['loc'][1:]) or 'body'}: {issue['msg']}"
+        for issue in error.errors()[:3]
+    )
+
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error": {
+                "code": "REQUEST_INVALID",
+                "message": message or "the request did not validate",
+            }
+        },
     )
 
 
