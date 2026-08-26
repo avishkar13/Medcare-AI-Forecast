@@ -1,12 +1,48 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "./sidebar";
 import { Navbar } from "./navbar";
+import { useAuthStore } from "@/store/auth.store";
+import { Loader2 } from "lucide-react";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const isAuth = pathname?.startsWith("/auth");
+  
+  const { isAuthenticated, isInitializing } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || isInitializing) return;
+
+    if (!isAuthenticated && !isAuth) {
+      router.push("/auth");
+    } else if (isAuthenticated && isAuth) {
+      router.push("/dashboard");
+    }
+  }, [isAuthenticated, isInitializing, isAuth, router, mounted]);
+
+  // Show a subtle loading state during initial client-side hydration or while verifying auth
+  if (!mounted || isInitializing) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
+        <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
+      </div>
+    );
+  }
+
+  // If they are on a protected route but not authenticated, don't render the layout yet
+  if (!isAuthenticated && !isAuth) {
+    return null; 
+  }
 
   if (isAuth) {
     return <>{children}</>;

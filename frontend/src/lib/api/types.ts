@@ -34,3 +34,20 @@ export type QueryParams = Record<
   string,
   string | number | boolean | null | undefined
 >;
+
+export interface AuthenticatedUser {
+  id: string;
+  name: string;
+  email: string;
+  roleId: string;
+  warehouseId: string | null;
+  role?: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface LoginResponse {
+  user: AuthenticatedUser;
+  token: string;
+}
