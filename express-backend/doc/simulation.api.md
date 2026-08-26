@@ -93,3 +93,11 @@ Stores parameters without running anything. `201` with the scenario.
 | `204` | Deleted |
 | `404` | No such scenario |
 | `409` | The scenario has planning runs |
+
+---
+
+## Lead time in days
+
+`params.leadTimeChangeDays` is accepted alongside `leadTimeChangePercent` and **wins when both are present**. A day delta only means something against a base, and that base is the network's own average lead time, read from the positions by `averageLeadTimeDays()`.
+
+It exists so a caller with a days slider does not have to divide by a nominal lead time it invented. Bounds are -60 to +180 days.

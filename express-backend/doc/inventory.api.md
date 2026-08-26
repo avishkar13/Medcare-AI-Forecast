@@ -214,3 +214,16 @@ One product across the whole network: its positions, its batches, and totals ove
 ### Not available yet
 
 The stock-movement history a drawer might show has no backing table — there is no movement or ledger model in the schema, and inventory is stored as a current balance. Nothing here fabricates one.
+
+---
+
+## Figures the server works out
+
+These are served rather than left to the caller, so two surfaces cannot present the same measure differently:
+
+| Field | Where | Meaning |
+| --- | --- | --- |
+| `bufferCoveragePercent` | every position | On-hand as a percentage of `safetyStock`. `100` when no buffer is configured, rather than a division by zero |
+| `totals.inStockRatePercent` | list totals | Positions at or above their reorder point, as a share of all positions |
+| `network` | `GET /:id` | The SKU rolled up across every warehouse holding it — `onHand`, `safetyStock`, `reorderPoint`, `maximumInventory`, `avgDailyDemand`, `inventoryValue`, plus `leadTimeDays`, `daysOfSupply` and `risk` taken from the worst-off warehouse |
+| `network.stockScaleUnits` | `GET /:id` | The ceiling a stock bar should be drawn against: the network maximum where one is configured, otherwise the largest real figure among the thresholds. **Sent so a chart never pads its axis with an invented multiplier** |

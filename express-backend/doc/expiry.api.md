@@ -1,6 +1,6 @@
 # Expiry API
 
-Mounted at `/api/expiry` (`src/routes/expiry_route.ts`). Six `GET` routes on the `read` tier.
+Mounted at `/api/expiry` (`src/routes/expiry_route.ts`). Eight `GET` routes on the `read` tier.
 
 Shared conventions are in [`conventions.api.md`](conventions.api.md).
 
@@ -43,7 +43,10 @@ Adds `risk` (`critical` \| `high` \| `medium` \| `low`) and `page`/`pageSize` (d
       "warehouseName": "Northeast DC", "tier": "METRO",
       "quantity": 420, "unitCost": 2.15, "inventoryValue": 903,
       "manufacturingDate": "2026-02-11", "expiryDate": "2026-09-12",
-      "daysRemaining": 17, "riskLevel": "critical"
+      "daysRemaining": 17, "riskLevel": "critical",
+      "avgDailyDemand": 52.16, "forecastDemand": 886.72,
+      "projectedWasteUnits": 0, "projectedWasteValue": 0,
+      "demandCoveragePercent": 100, "projectedWasteSharePercent": 0
     }
   ],
   "meta": { "generatedAt": "...", "page": 1, "pageSize": 50, "total": 323 }
@@ -52,13 +55,19 @@ Adds `risk` (`critical` \| `high` \| `medium` \| `low`) and `page`/`pageSize` (d
 
 **`inventoryValue` is `quantity × unitCost`, reported once.** The route this replaced returned the same number three times, as `valueAtRisk`, `wasteValue` and `inventoryValue`, alongside a `demandCoverage` hardcoded to `100`.
 
+### Projected waste is a FEFO allocation, not a per-batch division
+
+`projectedWasteUnits` comes from `projectFefoWaste()` in `src/utils/inventory.ts`, applied per product/warehouse pair. A batch is only consumable by the demand arriving **before it** expires, and earlier batches are drawn down first — so the answer depends on the whole pair, not on the batch alone.
+
+`avgDailyDemand` is the pair's rate from `loadPositions()`. `forecastDemand` is that rate over `daysRemaining`. `demandCoveragePercent` and `projectedWasteSharePercent` are the two sides of the same split, both served so no client divides.
+
 ---
 
 ## `GET /overview`
 
 ```json
 { "data": {
-  "batchesTracked": 323, "totalAtRiskValue": 321181.76,
+  "batchesTracked": 323, "unitsAtRisk": 429523, "totalAtRiskValue": 321181.76,
   "criticalBatches": 20, "criticalAtRiskValue": 17688.86,
   "averageDaysToExpiry": 266.74,
   "preventedWasteValue": null, "preventedWasteUnits": null
@@ -73,11 +82,53 @@ Value expiring per calendar month, soonest first: `{ month, valueExpiring, units
 
 Only months that actually contain batches appear — an empty month is not a bucket.
 
+## `GET /exposure`
+
+The same batch set cut two ways, with shares already worked out:
+
+```json
+{ "data": {
+  "totalExposureValue": 321181.76, "totalUnits": 429523,
+  "byWindow": [
+    { "label": "0-30 Days", "fromDays": 0, "toDays": 30,
+      "value": 60951.02, "units": 48496, "batchCount": 37, "sharePercent": 18.98 }
+  ],
+  "byRisk": [
+    { "level": "critical", "value": 52222.86, "units": 26830,
+      "batchCount": 21, "sharePercent": 16.26 }
+  ]
+} }
+```
+
+Windows are fixed at 0–30 / 31–60 / 61–90 / 90+ days and defined once in `EXPIRY_WINDOWS`. **Both cuts used to be done in the browser from one page of raw batches**, which was wrong the moment the network held more than a page.
+
+## `GET /demand-coverage`
+
+Can demand consume the stock before it expires? A network roll-up of the same FEFO projection `/batches` reports per batch, so the headline and the table cannot disagree.
+
+```json
+{ "data": {
+  "batchesTracked": 323, "unitsExpiring": 429523,
+  "consumableUnits": 381405.97, "unusedUnits": 48117.03,
+  "utilizationPercent": 88.8, "wastedSharePercent": 11.2,
+  "valueAtRisk": 321181.76, "projectedWasteValue": 69235.59,
+  "soonestExpiryDays": 2
+} }
+```
+
 ## `GET /dc-exposure`
 
 Per warehouse: `batchCount`, `totalExposureValue`, `criticalExposureValue`, ordered by exposure. Every warehouse appears, including those with none, so a DC with zero exposure is visibly zero rather than missing.
 
 Per-DC exposure sums to `/overview`'s `totalAtRiskValue` — there is a test asserting it.
+
+## `GET /waste-prevention`
+
+`items` plus `byAction` — savings grouped by `actionTaken`, biggest first, each with `recordCount`, `unitsSaved`, `valueSaved` and `sharePercent` — and the `totalUnitsSaved` / `totalValueSaved` headline.
+
+## `GET /ai-assessment`
+
+Everything `/overview` returns, plus `findings[]` and a grade the server computes: `riskLevel` (`low` \| `moderate` \| `high`) with the `criticalSharePercent` it was derived from. **Graded here so every surface bands it the same way.**
 
 ## `GET /waste-prevention`
 

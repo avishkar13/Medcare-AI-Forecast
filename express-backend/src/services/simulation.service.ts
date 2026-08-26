@@ -1,5 +1,6 @@
 import { prisma } from "../config/prisma.js";
 import { createRun } from "./planning.service.js";
+import { loadPositions } from "./dashboard.service.js";
 import { resolveActorId } from "../lib/actor.js";
 import { ConflictError, NotFoundError } from "../utils/errors.js";
 import { round } from "../utils/inventory.js";
@@ -21,10 +22,30 @@ import type {
  * `GET /api/planning/runs/:id` and `.../compare`, which read what the executor wrote.
  */
 
+/**
+ * A lead time delta in days only means something against a base. That base is the
+ * network's demand-weighted average lead time, read from the positions rather than
+ * assumed, so no caller has to carry a nominal figure of its own.
+ */
+export const averageLeadTimeDays = async () => {
+  const positions = await loadPositions();
+  if (positions.length === 0) return 0;
+  return round(
+    positions.reduce((total, position) => total + position.leadTimeDays, 0) / positions.length,
+    2,
+  );
+};
+
+const resolveLeadTimePercent = async (params: SimulationParams) => {
+  if (params.leadTimeChangeDays === undefined) return params.leadTimeChangePercent;
+  const base = await averageLeadTimeDays();
+  return base === 0 ? 0 : round((params.leadTimeChangeDays / base) * 100, 2);
+};
+
 /** UI-facing percentages -> the multipliers a Scenario stores. */
-const toMultipliers = (params: SimulationParams) => ({
+const toMultipliers = (params: SimulationParams, leadTimeChangePercent: number) => ({
   demandMultiplier: round(1 + params.demandShockPercent / 100, 4),
-  leadTimeMultiplier: round(1 + params.leadTimeChangePercent / 100, 4),
+  leadTimeMultiplier: round(1 + leadTimeChangePercent / 100, 4),
   capacityMultiplier: round(1 + params.capacityChangePercent / 100, 4),
   serviceLevelTarget: round(params.serviceLevelTargetPercent / 100, 4),
 });
@@ -94,7 +115,7 @@ export const runWhatIf = async (body: WhatIfBody, actorId?: string) => {
     data: {
       name: body.name,
       ...(body.description === undefined ? {} : { description: body.description }),
-      ...toMultipliers(body.params),
+      ...toMultipliers(body.params, await resolveLeadTimePercent(body.params)),
       createdById: await resolveActorId(actorId),
     },
     select: scenarioSelect,
@@ -162,7 +183,7 @@ export const saveScenario = async (body: SaveScenarioBody, actorId?: string) => 
     data: {
       name: body.name,
       ...(body.description === undefined ? {} : { description: body.description }),
-      ...toMultipliers(body.params),
+      ...toMultipliers(body.params, await resolveLeadTimePercent(body.params)),
       createdById: await resolveActorId(actorId),
     },
     select: scenarioSelect,

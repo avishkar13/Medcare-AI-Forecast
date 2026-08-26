@@ -657,6 +657,8 @@ export const getInventoryHealth = async (
     };
   });
 
+  const categoryValue = byCategory.reduce((total, row) => total + row.inventoryValue, 0);
+
   return {
     breakdown: {
       criticalStock: countState("criticalStock"),
@@ -666,6 +668,15 @@ export const getInventoryHealth = async (
       healthy: countState("healthy"),
       total: positions.length,
     },
+    // Share of positions in each condition, so a legend never has to divide.
+    breakdownPercent: {
+      criticalStock: percentage(countState("criticalStock"), positions.length),
+      belowReorderPoint: percentage(countState("belowReorderPoint"), positions.length),
+      expiringSoon: percentage(countState("expiringSoon"), positions.length),
+      excessStock: percentage(countState("excessStock"), positions.length),
+      healthy: percentage(countState("healthy"), positions.length),
+    },
+    totalInventoryValue: round(categoryValue),
     conditions: {
       belowSafetyStock: positions.filter(isBelowSafetyStock).length,
       belowReorderPoint: positions.filter(isBelowReorderPoint).length,

@@ -1,7 +1,7 @@
 import { prisma } from "../config/prisma.js";
 import type { Prisma } from "../../generated/prisma/client.js";
 import { ConflictError, NotFoundError } from "../utils/errors.js";
-import { round } from "../utils/inventory.js";
+import { percentage, round } from "../utils/inventory.js";
 import type { AlertParams, AlertQuery, AlertTrendQuery } from "../zod/alert.schemas.js";
 
 /**
@@ -125,6 +125,15 @@ export const getOverview = async () => {
   };
 };
 
+interface AlertTrendPoint {
+  date: string;
+  total: number;
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+}
+
 export const getTrends = async (query: AlertTrendQuery) => {
   const since = new Date(Date.now() - query.days * MS_PER_DAY);
   since.setUTCHours(0, 0, 0, 0);
@@ -149,11 +158,33 @@ export const getTrends = async (query: AlertTrendQuery) => {
     bucket[row.severity] = (bucket[row.severity] ?? 0) + 1;
   }
 
-  return [...buckets.entries()].map(([date, counts]) => ({
+  const points = [...buckets.entries()].map(([date, counts]) => ({
     date,
     total: Object.values(counts).reduce((sum, value) => sum + value, 0),
     ...Object.fromEntries(SEVERITY_ORDER.map((level) => [level, counts[level] ?? 0])),
-  }));
+  })) as AlertTrendPoint[];
+
+  // The window split in half so the chart's footer has a real comparison rather
+  // than a figure the client invents.
+  const half = Math.floor(points.length / 2);
+  const criticalIn = (slice: AlertTrendPoint[]) =>
+    slice.reduce((sum, point) => sum + point.critical, 0);
+
+  const previousCritical = criticalIn(points.slice(0, half));
+  const currentCritical = criticalIn(points.slice(half));
+
+  return {
+    points,
+    comparison: {
+      halfWindowDays: points.length - half,
+      currentCritical,
+      previousCritical,
+      criticalChangePercent:
+        previousCritical === 0
+          ? null
+          : round(((currentCritical - previousCritical) / previousCritical) * 100),
+    },
+  };
 };
 
 export const getDistribution = async () => {
@@ -168,10 +199,26 @@ export const getDistribution = async () => {
   const sorted = <T extends { _count: number }>(rows: T[]) =>
     [...rows].sort((a, b) => b._count - a._count);
 
+  const total = byType.reduce((sum, row) => sum + row._count, 0);
+  const share = (count: number) => percentage(count, total);
+
   return {
-    byLocation: sorted(byLocation).map((row) => ({ location: row.location, count: row._count })),
-    byType: sorted(byType).map((row) => ({ type: row.type, count: row._count })),
-    bySeverity: sorted(bySeverity).map((row) => ({ severity: row.severity, count: row._count })),
+    totalAlerts: total,
+    byLocation: sorted(byLocation).map((row) => ({
+      location: row.location,
+      count: row._count,
+      sharePercent: share(row._count),
+    })),
+    byType: sorted(byType).map((row) => ({
+      type: row.type,
+      count: row._count,
+      sharePercent: share(row._count),
+    })),
+    bySeverity: sorted(bySeverity).map((row) => ({
+      severity: row.severity,
+      count: row._count,
+      sharePercent: share(row._count),
+    })),
   };
 };
 

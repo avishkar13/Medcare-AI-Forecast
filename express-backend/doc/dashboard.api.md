@@ -567,3 +567,9 @@ So a warehouse that donates 215 units of a 2,390-unit expiry problem still raise
 ### Performance
 
 Two queries in parallel — `loadPositions()` and a 90-day batch scan. Matching is O(products × positions-per-product); with 40 products across 4 warehouses that is trivial. Filtering, sorting and limiting are in memory, since severity, `impactValue` and every residual are derived.
+
+---
+
+## `GET /inventory-health` additions
+
+`breakdownPercent` mirrors `breakdown` as shares of all positions, and `totalInventoryValue` is the sum of `byCategory`. A legend never has to divide, and a chart's total never has to be re-summed from its own bars.

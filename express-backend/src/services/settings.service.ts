@@ -99,6 +99,7 @@ const DEFAULT_SETTINGS = {
     sources: [
       { id: "erp", name: "ERP", status: "connected", lastSync: "2 minutes ago", records: 42840 }
     ],
+    totalRecords: 42840,
     dataRefresh: {
       autoSync: true,
       frequency: "15_minutes",
@@ -224,6 +225,10 @@ const mapPrismaToFrontend = (dbSettings: any) => {
         lastSync: s.lastSync,
         records: s.records
       })) : [],
+      totalRecords: (dbSettings.integrations.sources ?? []).reduce(
+        (sum: number, source: any) => sum + source.records,
+        0,
+      ),
       dataRefresh: {
         autoSync: dbSettings.integrations.autoSync,
         frequency: dbSettings.integrations.syncFrequency,

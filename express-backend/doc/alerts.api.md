@@ -60,15 +60,35 @@ Rows are **shaped**, not passed straight through from Prisma: dates are ISO stri
 | --- | --- | --- |
 | `days` | integer 1–365 | `30` |
 
-One row per day, with a per-severity breakdown and a `total`.
+`points` holds one row per day, with a per-severity breakdown and a `total`. `comparison` splits the window in half and reports the critical count on each side:
+
+```json
+{ "data": {
+  "points": [ { "date": "2026-08-20", "total": 6, "critical": 1,
+                "high": 2, "medium": 2, "low": 1 } ],
+  "comparison": { "halfWindowDays": 7, "currentCritical": 9,
+                  "previousCritical": 11, "criticalChangePercent": -18.18 }
+} }
+```
 
 **Every day in the window appears, including the quiet ones.** A chart that silently skips empty days draws a straight line through an outage.
+
+`criticalChangePercent` is `null` when the earlier half raised nothing — a rise from zero has no percentage. The comparison is served rather than left to the caller so a chart's footer states the same figure the chart draws.
 
 ---
 
 ## `GET /distribution`
 
-Counts by `location`, `type` and `severity`, each ordered by count descending. Grouped in the database — the route this replaced loaded every alert into memory and reduced in JavaScript, which grows with the table for a result of a few rows.
+Counts by `location`, `type` and `severity`, each ordered by count descending and each row carrying its `sharePercent` of `totalAlerts`. Grouped in the database — the route this replaced loaded every alert into memory and reduced in JavaScript, which grows with the table for a result of a few rows.
+
+```json
+{ "data": {
+  "totalAlerts": 42,
+  "byLocation": [ { "location": "DC-01", "count": 14, "sharePercent": 33.33 } ],
+  "byType": [ { "type": "STOCKOUT_RISK", "count": 18, "sharePercent": 42.86 } ],
+  "bySeverity": [ { "severity": "critical", "count": 6, "sharePercent": 14.29 } ]
+} }
+```
 
 ## `GET /health`
 

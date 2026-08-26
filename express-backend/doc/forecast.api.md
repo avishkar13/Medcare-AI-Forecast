@@ -154,3 +154,12 @@ Not prose. The route this replaced returned a written paragraph about flu trends
 | `422` | `days` or `historyDays` outside its bounds |
 
 An empty result is **not** an error — it is `200` with nulls and `planningRunId: null`.
+
+---
+
+## Percentages the server computes
+
+- `/seasonality` entries carry `indexPercent` beside `index` (the index times 100, which is what a chart plots), and `monthlyPattern` labels are month names rather than numbers.
+- `/impact` carries `serviceLevelPercent` beside `serviceLevel`.
+
+Both exist so a caller renders what the API states instead of scaling it.

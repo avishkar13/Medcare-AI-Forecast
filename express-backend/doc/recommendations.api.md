@@ -66,7 +66,7 @@ Ordered by **priority, then impact**: `CRITICAL` first, and within a priority th
 | Route | Returns |
 | --- | --- |
 | `/kpi` | `totalRecommendations`, counts per status, `potentialSavings`, `executionRatePercent` |
-| `/summary` | `byType` (count + impact) and `byPriority` (count) |
+| `/summary` | `byType` (count + impact), `byPriority` and `byStatus` (count) |
 | `/impact` | The run's `planCost` roll-up, `attributedImpact`, and `byType` with each type's `sharePercent` |
 | `/intelligence` | `modelVersion`, `horizonDays`, `averageConfidence`, `signalsCited` |
 
@@ -101,3 +101,5 @@ Only `OPEN` and `ACCEPTED` are actionable. A resolved row cannot be acted on aga
 | `409` | The row is already resolved |
 
 A missing row is `404`, not `500`. The routes these replace caught Prisma's `P2025` and returned a server error for what is the caller's mistake.
+
+`byPriority` and `byStatus` are counted over the whole run, not over whatever page a caller happens to hold, so a summary panel beside a paginated list still totals the run.

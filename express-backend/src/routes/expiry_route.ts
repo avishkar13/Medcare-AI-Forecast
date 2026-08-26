@@ -7,6 +7,8 @@ export const expiryRouter = Router();
 expiryRouter.get("/batches", rateLimiter.read, expiryController.getBatches);
 expiryRouter.get("/overview", rateLimiter.read, expiryController.getOverview);
 expiryRouter.get("/timeline", rateLimiter.read, expiryController.getTimeline);
+expiryRouter.get("/exposure", rateLimiter.read, expiryController.getExposure);
+expiryRouter.get("/demand-coverage", rateLimiter.read, expiryController.getDemandCoverage);
 expiryRouter.get("/dc-exposure", rateLimiter.read, expiryController.getDcExposure);
 expiryRouter.get("/ai-assessment", rateLimiter.read, expiryController.getAssessment);
 expiryRouter.get("/waste-prevention", rateLimiter.read, expiryController.getWastePrevention);

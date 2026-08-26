@@ -17,6 +17,14 @@ export const getTimeline = async (req: Request, res: Response) => {
   ok(res, await expiry.getTimeline(expiryQuerySchema.parse(req.query)));
 };
 
+export const getExposure = async (req: Request, res: Response) => {
+  ok(res, await expiry.getExposure(expiryQuerySchema.parse(req.query)));
+};
+
+export const getDemandCoverage = async (req: Request, res: Response) => {
+  ok(res, await expiry.getDemandCoverage(expiryQuerySchema.parse(req.query)));
+};
+
 export const getDcExposure = async (req: Request, res: Response) => {
   ok(res, await expiry.getDcExposure(expiryQuerySchema.parse(req.query)));
 };

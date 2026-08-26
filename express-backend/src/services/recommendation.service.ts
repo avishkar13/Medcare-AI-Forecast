@@ -187,7 +187,7 @@ export const getKpi = async (query: RecommendationQuery) => {
 export const getSummary = async (query: RecommendationQuery) => {
   const { where, runId } = await whereOf(query);
 
-  const [byType, byPriority] = await Promise.all([
+  const [byType, byPriority, byStatus] = await Promise.all([
     prisma.recommendation.groupBy({
       by: ["type"],
       where,
@@ -195,6 +195,7 @@ export const getSummary = async (query: RecommendationQuery) => {
       _sum: { impactValue: true },
     }),
     prisma.recommendation.groupBy({ by: ["priority"], where, _count: true }),
+    prisma.recommendation.groupBy({ by: ["status"], where, _count: true }),
   ]);
 
   return {
@@ -207,6 +208,9 @@ export const getSummary = async (query: RecommendationQuery) => {
     byPriority: byPriority
       .map((row) => ({ priority: row.priority, count: row._count }))
       .sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]),
+    byStatus: byStatus
+      .map((row) => ({ status: row.status, count: row._count }))
+      .sort((a, b) => b.count - a.count),
   };
 };
 

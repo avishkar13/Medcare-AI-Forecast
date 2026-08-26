@@ -291,3 +291,15 @@ A `FAILED` run keeps the progress it reached and sets `currentStage` to its `fai
 ### Polling
 
 Poll `GET /api/planning/runs/:id` every second or two. A 30-day run over 160 positions finishes in tens of seconds. Stop on `COMPLETED` or `FAILED`; treat `stale: true` on an active run as failed.
+
+---
+
+## What `GET /runs/:id/simulation` adds to the stored row
+
+| Field | Meaning |
+| --- | --- |
+| `stockoutProbabilityPercent` | `stockoutProbability` as a percentage |
+| `serviceLevelPercent` | `serviceLevel` as a percentage |
+| `riskLevel` | `low` / `moderate` / `high` / `critical`, banded from `stockoutProbability` at 0.1 / 0.25 / 0.5 |
+
+Banded once here so every surface reading a simulation colours it the same way.

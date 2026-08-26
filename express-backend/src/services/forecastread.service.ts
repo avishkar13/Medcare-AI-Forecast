@@ -309,17 +309,23 @@ export const getSeasonality = async (query: ForecastQuery) => {
   };
 
   const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const weekday = bucket((date) => date.getUTCDay());
   const month = bucket((date) => date.getUTCMonth());
 
   const toEntries = <T>(sums: Map<number, { total: number; count: number }>, label: (i: number) => T) =>
     [...sums.entries()]
       .sort((a, b) => a[0] - b[0])
-      .map(([index, value]) => ({
-        label: label(index),
-        averageDemand: round(value.total / value.count),
-        index: round(overall === 0 ? 1 : value.total / value.count / overall, 3),
-      }));
+      .map(([index, value]) => {
+        const seasonalIndex = round(overall === 0 ? 1 : value.total / value.count / overall, 3);
+        return {
+          label: label(index),
+          averageDemand: round(value.total / value.count),
+          index: seasonalIndex,
+          // The same index as a percentage of average, which is what a chart plots.
+          indexPercent: round(seasonalIndex * 100),
+        };
+      });
 
   const weeklyPattern = toEntries(weekday, (index) => DAYS[index] ?? String(index));
   const indices = weeklyPattern.map((entry) => entry.index);
@@ -327,7 +333,7 @@ export const getSeasonality = async (query: ForecastQuery) => {
   return {
     ...emptyMeta(scope),
     weeklyPattern,
-    monthlyPattern: toEntries(month, (index) => index + 1),
+    monthlyPattern: toEntries(month, (index) => MONTHS[index] ?? String(index + 1)),
     // Peak weekday against the average one - the size of the swing a planner must cover.
     seasonalUpliftPercent: indices.length === 0 ? null : round((Math.max(...indices) - 1) * 100),
   };
@@ -472,7 +478,7 @@ export const getImpact = async (query: ForecastQuery) => {
   const scope = await resolveScope(query);
 
   if (scope.runId === null) {
-    return { ...emptyMeta(scope), totalCost: null, holdingCost: null, stockoutCost: null, transferCost: null, expiryCost: null, expectedWaste: null, serviceLevel: null };
+    return { ...emptyMeta(scope), totalCost: null, holdingCost: null, stockoutCost: null, transferCost: null, expiryCost: null, expectedWaste: null, serviceLevel: null, serviceLevelPercent: null };
   }
 
   const [optimization, simulation] = await Promise.all([
@@ -489,6 +495,8 @@ export const getImpact = async (query: ForecastQuery) => {
     expiryCost: optimization?.expiryCost ?? null,
     expectedWaste: simulation?.expectedWaste ?? null,
     serviceLevel: simulation?.serviceLevel ?? null,
+    serviceLevelPercent:
+      simulation?.serviceLevel === undefined ? null : round(simulation.serviceLevel * 100),
   };
 };
 

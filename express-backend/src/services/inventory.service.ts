@@ -4,6 +4,7 @@ import {
   classifyRisk,
   classifyStock,
   expirySeverity,
+  percentage,
   round,
   supplyUrgency,
 } from "../utils/inventory.js";
@@ -16,6 +17,7 @@ import type {
   ProductSummary,
   RiskLevel,
   SkuInventoryDetail,
+  SkuNetworkPosition,
   StockBatchItem,
 } from "../types.js";
 
@@ -102,6 +104,10 @@ const toItem = (
     inventoryValue: position.inventoryValue,
     expiringUnits: round(expiry?.units ?? 0),
     expiringValue: round(expiry?.value ?? 0),
+    // On-hand against the safety buffer. A position with no buffer configured reads
+    // as fully covered rather than as a division by zero.
+    bufferCoveragePercent:
+      position.safetyStock > 0 ? percentage(position.onHand, position.safetyStock) : 100,
     daysToNearestExpiry,
     status: classifyStock({
       belowSafetyStock,
@@ -125,6 +131,11 @@ const totalsOf = (items: InventoryPositionItem[]): InventoryTotals => ({
     (item) => item.maximumInventory !== null && item.onHand > item.maximumInventory,
   ).length,
   expiringValue: round(items.reduce((total, item) => total + item.expiringValue, 0)),
+  // Positions at or above their reorder point, as a share of all positions.
+  inStockRatePercent: percentage(
+    items.length - items.filter((item) => item.onHand < item.reorderPoint).length,
+    items.length,
+  ),
 });
 
 const matchesSearch = (item: InventoryPositionItem, search: string): boolean => {
@@ -189,6 +200,45 @@ export const listInventory = async (
   };
 };
 
+/**
+ * One SKU's position rolled up across every warehouse holding it.
+ *
+ * `stockScaleUnits` is the ceiling a stock bar should be drawn against: the network
+ * maximum where one is configured, otherwise the largest real figure among the
+ * thresholds. Sent so a chart never has to pad an axis with a made-up multiplier.
+ */
+const networkPositionOf = (items: InventoryPositionItem[]): SkuNetworkPosition => {
+  const sum = (pick: (item: InventoryPositionItem) => number) =>
+    round(items.reduce((total, item) => total + pick(item), 0));
+
+  const worst = items.reduce<InventoryPositionItem | undefined>(
+    (acc, item) => (acc === undefined || item.daysOfSupply < acc.daysOfSupply ? item : acc),
+    undefined,
+  );
+
+  const onHand = sum((item) => item.onHand);
+  const safetyStock = sum((item) => item.safetyStock);
+  const reorderPoint = sum((item) => item.reorderPoint);
+  const maximumInventory = sum((item) => item.maximumInventory ?? 0);
+
+  return {
+    warehouseCount: items.length,
+    onHand,
+    available: sum((item) => item.available),
+    safetyStock,
+    reorderPoint,
+    maximumInventory,
+    avgDailyDemand: sum((item) => item.avgDailyDemand),
+    inventoryValue: sum((item) => item.inventoryValue),
+    expiringUnits: sum((item) => item.expiringUnits),
+    expiringValue: sum((item) => item.expiringValue),
+    leadTimeDays: worst?.leadTimeDays ?? 0,
+    daysOfSupply: worst?.daysOfSupply ?? 0,
+    risk: worst?.risk ?? "low",
+    stockScaleUnits: Math.max(maximumInventory, onHand, reorderPoint, safetyStock),
+  };
+};
+
 export const getSkuInventory = async ({ id }: SkuInventoryParams): Promise<SkuInventoryDetail> => {
   const product = await prisma.product.findFirst({ where: { OR: [{ id }, { sku: id }] } });
   if (!product) throw new NotFoundError(`Product '${id}' not found`);
@@ -243,5 +293,11 @@ export const getSkuInventory = async ({ id }: SkuInventoryParams): Promise<SkuIn
     };
   });
 
-  return { product: summary, totals: totalsOf(items), positions: items, batches: stockBatches };
+  return {
+    product: summary,
+    totals: totalsOf(items),
+    network: networkPositionOf(items),
+    positions: items,
+    batches: stockBatches,
+  };
 };

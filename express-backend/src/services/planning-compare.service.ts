@@ -243,6 +243,10 @@ export const getOptimization = async ({ id }: RunParams) => {
   };
 };
 
+/** Stockout probability -> the band the UI colours by. */
+const gradeStockoutRisk = (probability: number): "low" | "moderate" | "high" | "critical" =>
+  probability >= 0.5 ? "critical" : probability >= 0.25 ? "high" : probability >= 0.1 ? "moderate" : "low";
+
 export const getSimulation = async ({ id }: RunParams) => {
   const run = await prisma.planningRun.findUnique({
     where: { id },
@@ -257,5 +261,15 @@ export const getSimulation = async ({ id }: RunParams) => {
   }
 
   const { planningRunId, createdAt, ...result } = run.simulation;
-  return { planningRunId, ...result, createdAt: createdAt.toISOString() };
+
+  return {
+    planningRunId,
+    ...result,
+    // The same two figures as percentages, so a reader never has to multiply.
+    stockoutProbabilityPercent: round(result.stockoutProbability * 100),
+    serviceLevelPercent: round(result.serviceLevel * 100),
+    // Graded here so every surface reading a simulation shows the same band.
+    riskLevel: gradeStockoutRisk(result.stockoutProbability),
+    createdAt: createdAt.toISOString(),
+  };
 };

@@ -338,6 +338,8 @@ export interface CriticalityHealth {
 
 export interface InventoryHealthReport {
   breakdown: InventoryHealthBreakdown;
+  breakdownPercent: Omit<InventoryHealthBreakdown, "total">;
+  totalInventoryValue: number;
   conditions: InventoryConditionCounts;
   byCategory: CategoryHealth[];
   byCriticality: CriticalityHealth[];
@@ -386,6 +388,7 @@ export interface InventoryPositionItem {
   inventoryValue: number;
   expiringUnits: number;
   expiringValue: number;
+  bufferCoveragePercent: number;
   daysToNearestExpiry: number | null;
   status: InventoryHealthState;
   risk: RiskLevel;
@@ -401,6 +404,7 @@ export interface InventoryTotals {
   belowReorderPointCount: number;
   aboveMaximumCount: number;
   expiringValue: number;
+  inStockRatePercent: number;
 }
 
 export interface InventoryListReport {
@@ -423,9 +427,27 @@ export interface StockBatchItem {
   severity: RiskLevel;
 }
 
+export interface SkuNetworkPosition {
+  warehouseCount: number;
+  onHand: number;
+  available: number;
+  safetyStock: number;
+  reorderPoint: number;
+  maximumInventory: number;
+  avgDailyDemand: number;
+  inventoryValue: number;
+  expiringUnits: number;
+  expiringValue: number;
+  leadTimeDays: number;
+  daysOfSupply: number;
+  risk: RiskLevel;
+  stockScaleUnits: number;
+}
+
 export interface SkuInventoryDetail {
   product: ProductSummary;
   totals: InventoryTotals;
+  network: SkuNetworkPosition;
   positions: InventoryPositionItem[];
   batches: StockBatchItem[];
 }

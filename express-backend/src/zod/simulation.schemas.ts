@@ -10,6 +10,13 @@ const text = z.string().trim().min(1);
 export const simulationParamsSchema = z.strictObject({
   demandShockPercent: z.number().min(-90).max(400).default(0),
   leadTimeChangePercent: z.number().min(-90).max(400).default(0),
+  /**
+   * A day delta instead of a percentage. Supplied so a caller with a days slider
+   * does not have to divide by a nominal lead time it made up; the service converts
+   * against the network's real average. Wins over `leadTimeChangePercent` when both
+   * are present.
+   */
+  leadTimeChangeDays: z.number().min(-60).max(180).optional(),
   capacityChangePercent: z.number().min(-90).max(400).default(0),
   serviceLevelTargetPercent: z.number().min(50).max(99.9).default(95),
 });
