@@ -16,6 +16,8 @@ import {
   writeForecasts,
   writeInventoryPlans,
   writeSupplyPlans,
+  type RecommendationDraft,
+  type SignalDraft,
 } from "../lib/planning-writer.js";
 import { forecastDemand } from "./forecast.service.js";
 import { planTransfers } from "../utils/allocation.js";
@@ -30,6 +32,7 @@ import {
 } from "../utils/inventory.js";
 import { createRng } from "../utils/random.js";
 import type { InventoryPosition } from "./dashboard.service.js";
+import { refreshAlerts } from "./alert-detector.service.js";
 import type { ForecastPointBand } from "../types.js";
 
 const MS_PER_DAY = 86_400_000;
@@ -222,6 +225,21 @@ const wasteUnitsOf = (cell: Cell, inputs: PlanningInputs, days: number): number 
   return projectFefoWaste(batches, daily).reduce((total, units) => total + units, 0);
 };
 
+const units = (value: number) => Math.round(value).toLocaleString("en-US");
+
+/**
+ * The phrase that marks a transfer as an expiry rescue rather than a shortfall cover.
+ * `buildRecommendations` reads the reason back off the DRP plan to decide whether the
+ * recommendation carries an Expiry signal, and a plan carries no other flag for it, so
+ * both sides share the wording rather than repeating a literal that could drift.
+ */
+const EXPIRY_RESCUE = "at risk of expiry";
+
+const transferReason = (unitsRescued: number, sourceCode: string, destinationCode: string) =>
+  unitsRescued > 0
+    ? `Rescues ${Math.round(unitsRescued)} units ${EXPIRY_RESCUE} at ${sourceCode}`
+    : `Covers a shortfall at ${destinationCode} inside its lead time`;
+
 const priorityOf = (
   criticality: string,
   severe: boolean,
@@ -230,12 +248,93 @@ const priorityOf = (
   return criticality === "CRITICAL" ? "HIGH" : "MEDIUM";
 };
 
+/**
+ * Why the planner reached this conclusion, as the rows `/api/recommendations` and
+ * `/recommendations/intelligence` read back.
+ *
+ * `signalsCited` is documented as "the RecommendationSignal rows the executor
+ * attached" and nothing attached any, so the field counted an empty table. These are
+ * drawn from the same cell the recommendation came from - a signal that restated
+ * anything the message did not already justify would be decoration.
+ */
+const signalsFor = {
+  stockout: (cell: Cell, horizonDays: number): SignalDraft[] => {
+    const forecastDaily = cell.demandTotal / Math.max(1, horizonDays);
+    const signals: SignalDraft[] = [
+      {
+        type: "Inventory",
+        label: `${units(cell.onHand)} on hand against a reorder point of ${units(cell.reorderPoint)}`,
+        direction: "down",
+      },
+      {
+        type: "Demand",
+        label: `${units(forecastDaily)} units/day forecast over the horizon`,
+        direction: forecastDaily > cell.position.avgDailyDemand ? "up" : "flat",
+      },
+      {
+        type: "LeadTime",
+        label: `${cell.leadTimeDays}-day replenishment lead time`,
+        direction: "flat",
+      },
+    ];
+
+    if (cell.position.criticality === "CRITICAL" || cell.position.criticality === "HIGH") {
+      signals.push({
+        type: "Risk",
+        label: `${cell.position.criticality} criticality product`,
+        direction: "up",
+      });
+    }
+
+    return signals;
+  },
+
+  excess: (cell: Cell, excess: number): SignalDraft[] => [
+    {
+      type: "Inventory",
+      label: `${units(excess)} units above the maximum inventory level`,
+      direction: "up",
+    },
+    {
+      type: "Demand",
+      label: `${units(cell.position.avgDailyDemand)} units/day of demand to draw it down`,
+      direction: "flat",
+    },
+  ],
+
+  transfer: (destination: Cell, quantity: number, rescuesExpiry: boolean): SignalDraft[] => {
+    const signals: SignalDraft[] = [
+      {
+        type: "Inventory",
+        label: `${units(quantity)} units movable from a location holding above its maximum`,
+        direction: "up",
+      },
+      {
+        type: "LeadTime",
+        label: `${destination.position.daysOfSupply} days of supply against a ${destination.leadTimeDays}-day lead time`,
+        direction: destination.position.daysOfSupply <= destination.leadTimeDays ? "down" : "flat",
+      },
+    ];
+
+    if (rescuesExpiry) {
+      signals.push({
+        type: "Expiry",
+        label: `${units(quantity)} units redirected before they expire unsold`,
+        direction: "down",
+      });
+    }
+
+    return signals;
+  },
+};
+
 const buildRecommendations = (
   runId: string,
   cells: Cell[],
   drpPlans: Prisma.DRPPlanCreateManyInput[],
-): Prisma.RecommendationCreateManyInput[] => {
-  const rows: Prisma.RecommendationCreateManyInput[] = [];
+  horizonDays: number,
+): RecommendationDraft[] => {
+  const rows: RecommendationDraft[] = [];
 
   for (const cell of cells) {
     const { position } = cell;
@@ -251,6 +350,7 @@ const buildRecommendations = (
         message: `${position.sku} at ${position.warehouseCode}: ${Math.round(cell.shortfallUnits)} units of expected shortfall across the horizon`,
         quantity: round(cell.shortfallUnits),
         impactValue: round(cell.shortfallUnits * cell.parameters.stockoutCostPerUnit),
+        signals: signalsFor.stockout(cell, horizonDays),
       });
     }
 
@@ -265,6 +365,7 @@ const buildRecommendations = (
         message: `${position.sku} at ${position.warehouseCode}: ${Math.round(excess)} units above maximum at the end of the horizon`,
         quantity: round(excess),
         impactValue: round(excess * cell.parameters.holdingCostPerUnit),
+        signals: signalsFor.excess(cell, excess),
       });
     }
   }
@@ -286,6 +387,11 @@ const buildRecommendations = (
       message: plan.reason ?? `Transfer ${Math.round(plan.quantity)} units`,
       quantity: plan.quantity,
       impactValue: round(plan.quantity * destination.position.stockoutCostPerUnit),
+      signals: signalsFor.transfer(
+        destination,
+        plan.quantity,
+        (plan.reason ?? "").includes(EXPIRY_RESCUE),
+      ),
     });
   }
 
@@ -488,10 +594,11 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
             toWarehouseId: transfer.destination.position.warehouseId,
             date,
             quantity: round(transfer.quantity),
-            reason:
-              transfer.unitsRescued > 0
-                ? `Rescues ${Math.round(transfer.unitsRescued)} units at risk of expiry at ${transfer.source.position.warehouseCode}`
-                : `Covers a shortfall at ${transfer.destination.position.warehouseCode} inside its lead time`,
+            reason: transferReason(
+              transfer.unitsRescued,
+              transfer.source.position.warehouseCode,
+              transfer.destination.position.warehouseCode,
+            ),
           });
 
           supplyPlans.push({
@@ -635,7 +742,7 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
 
     stage = "recommendations";
     await report("recommendations");
-    const recommendations = buildRecommendations(runId, cells, drpPlans);
+    const recommendations = buildRecommendations(runId, cells, drpPlans, run.horizonDays);
 
     stage = "complete";
     await report("complete");
@@ -666,6 +773,16 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
       },
       recommendations,
     });
+
+    // Detection runs after the run is COMPLETED and its failure is swallowed on
+    // purpose. The run's artefacts are already committed and correct; letting a
+    // detector fault roll that back to FAILED would throw away minutes of planning
+    // over a secondary read surface.
+    try {
+      await refreshAlerts();
+    } catch (error) {
+      console.error("alert detection failed after a completed run", { runId, error });
+    }
 
     return {
       executed: true,

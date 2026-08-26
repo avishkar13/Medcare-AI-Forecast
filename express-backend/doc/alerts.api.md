@@ -106,6 +106,59 @@ The route this replaced reported `99.9%` uptime and `1420` active sensors. There
 
 ---
 
+## Where alerts come from
+
+`src/services/alert-detector.service.ts`, called by the planning executor once a run
+reaches `COMPLETED`. Until it existed all eight routes here read a table nothing wrote,
+so the review surface was permanently empty while `/api/dashboard/summary` reported
+dozens of the same conditions.
+
+Detection reads the **same positions the dashboard reads** (`loadPositions`), so the two
+cannot disagree about the network.
+
+| Type | Raised when | Threshold from settings |
+| --- | --- | --- |
+| `stockout_risk` | Days of supply leaves the lead time uncovered, and the position is below its reorder point | `thresholds.stockoutProbability` |
+| `expiry_risk` | FEFO projection says demand will not consume a batch before it expires | `thresholds.expiryWindow` (days) |
+| `overstock` | On hand above `maximumInventory` | — |
+| `capacity_breach` | A warehouse's total units against its capacity | `thresholds.capacityUtilization` |
+| `demand_spike` | The last 7 days against the preceding 28, where stock cannot absorb the new rate | `thresholds.demandDeviation` |
+
+`types.*` in `/api/settings` gates each detector, and `realTimeMonitoring: false` stops
+detection entirely — alerts already raised stay readable, they just stop being
+reconciled.
+
+**`supplier_delay` and `forecast_anomaly` are never raised.** `DistributorOrder` records
+`requestedDate` but no actual delivery date, so there is no delay to measure, and no
+anomaly signal is wired through from the forecasting engine. Both stay valid filter
+values; they simply never match.
+
+### Reconciliation, not truncation
+
+Every detected condition carries a fingerprint of `type | sku | location`. Each run:
+
+| Condition | Existing alert | Result |
+| --- | --- | --- |
+| Still true | Open, and unchanged | **Left untouched** — no metric churn, no `updatedAt` bump |
+| Still true | Open, and something moved | Updated in place; `status` and `detectedAt` survive, so an acknowledgement is not undone and the age stays honest |
+| Still true | None open | Created as `new`, with a `Condition detected` timeline entry |
+| No longer true | Open | Resolved automatically, with a timeline entry saying so |
+
+`resolved` rows are never matched, so a condition that returns raises a **fresh** alert
+rather than silently reopening a closed one.
+
+Writes are grouped by table into `createMany` batches and chunked. One
+`alert.create` carrying its metrics and timeline costs eight statements, and this
+network raises around ninety alerts — enough to overrun the transaction budget outright
+against a hosted database. The phases are separate transactions on purpose:
+reconciliation is idempotent, so a fault between them is corrected by the next run.
+
+Detection failure is **swallowed by the executor**. The run's artefacts are already
+committed and correct; letting a detector fault roll that back to `FAILED` would throw
+away minutes of planning over a secondary read surface.
+
+---
+
 ## State changes
 
 | Route | Effect |

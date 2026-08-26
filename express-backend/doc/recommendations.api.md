@@ -74,6 +74,12 @@ Ordered by **priority, then impact**: `CRITICAL` first, and within a priority th
 
 `averageConfidence` is the mean of the confidences actually recorded, `null` when none were. `signalsCited` counts the `RecommendationSignal` rows the executor attached — not a fixed set of model weights.
 
+The executor attaches those rows in `writeRecommendationSignals` (`src/lib/planning-writer.ts`), after the run is `COMPLETED` rather than inside its transaction: nesting them under 200 individual `create` calls would replace one batched insert with roughly eight hundred statements.
+
+`completeRun` therefore assigns each recommendation's `id` itself instead of leaving it to the database default, because **there is no natural key to find the row by again**. The day loop can raise a dozen transfers into the same product and warehouse across the horizon and their messages are identical, so `(productId, warehouseId, type)` collides — matching on it piled 51 signals onto one recommendation and left 151 with none.
+
+A failure there leaves a `COMPLETED` run whose recommendations carry no signals, which is the state the surface was in before any existed.
+
 ---
 
 ## `PATCH /:id/execute` and `PATCH /:id/dismiss`

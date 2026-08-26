@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { prisma } from "../config/prisma.js";
 import type { Prisma } from "../../generated/prisma/client.js";
 
@@ -45,12 +46,22 @@ export const clearRunArtifacts = async (planningRunId: string): Promise<void> =>
   await prisma.simulationRun.deleteMany({ where: { planningRunId } });
 };
 
+export interface SignalDraft {
+  type: "Demand" | "Inventory" | "LeadTime" | "Expiry" | "Risk";
+  label: string;
+  direction: "up" | "down" | "flat";
+}
+
+export type RecommendationDraft = Prisma.RecommendationCreateManyInput & {
+  signals: SignalDraft[];
+};
+
 export interface RunCompletion {
   planningRunId: string;
   modelVersion: string;
   optimization: Omit<Prisma.OptimizationResultCreateManyInput, "planningRunId">;
   simulation: Omit<Prisma.SimulationRunCreateManyInput, "planningRunId">;
-  recommendations: Prisma.RecommendationCreateManyInput[];
+  recommendations: RecommendationDraft[];
 }
 
 /**
@@ -61,10 +72,19 @@ export interface RunCompletion {
 export const completeRun = async (completion: RunCompletion): Promise<void> => {
   const { planningRunId, modelVersion, optimization, simulation, recommendations } = completion;
 
+  // The id is assigned here rather than left to the database default so the signals
+  // can be attached without having to find their recommendation again afterwards.
+  // There is no natural key to find it by: the day loop can raise a dozen transfers
+  // into the same product and warehouse across the horizon, and their messages are
+  // identical, so (productId, warehouseId, type) and every variation on it collide.
+  const identified = recommendations.map((row) => ({ ...row, id: randomUUID() }));
+
   await prisma.$transaction([
     prisma.optimizationResult.create({ data: { planningRunId, ...optimization } }),
     prisma.simulationRun.create({ data: { planningRunId, ...simulation } }),
-    prisma.recommendation.createMany({ data: recommendations }),
+    prisma.recommendation.createMany({
+      data: identified.map(({ signals: _signals, ...row }) => row),
+    }),
     prisma.planningRun.update({
       where: { id: planningRunId },
       // progress 100 lands with the status, so a client polling mid-flight can never
@@ -78,4 +98,34 @@ export const completeRun = async (completion: RunCompletion): Promise<void> => {
       },
     }),
   ]);
+
+  // Swallowed on purpose: the run is COMPLETED as of the transaction above, and the
+  // executor's own catch would flip that row to FAILED over a secondary write.
+  try {
+    await writeRecommendationSignals(identified);
+  } catch (error) {
+    console.error("attaching recommendation signals failed", { planningRunId, error });
+  }
+};
+
+/**
+ * Attaches each recommendation's signals, after the run is COMPLETED rather than
+ * inside its transaction.
+ *
+ * Nesting the signals under 200 individual `create` calls would replace one batched
+ * insert with roughly eight hundred statements and overrun the transaction budget, so
+ * they go in as their own batches against the ids assigned above.
+ *
+ * A failure here leaves a COMPLETED run whose recommendations carry no signals, which
+ * is what the surface showed before any of them existed - strictly better than rolling
+ * back a run that is otherwise correct.
+ */
+const writeRecommendationSignals = async (
+  recommendations: (RecommendationDraft & { id: string })[],
+): Promise<void> => {
+  const rows = recommendations.flatMap((row) =>
+    row.signals.map((signal) => ({ recommendationId: row.id, ...signal })),
+  );
+
+  await chunked(rows, (data) => prisma.recommendationSignal.createMany({ data }));
 };

@@ -16,7 +16,13 @@ after(async () => {
 });
 
 interface Summary {
-  kpis: { totalInventoryValue: number; skusMonitored: number; stockoutRiskItems: number; expiryRiskItems: number };
+  kpis: {
+    totalInventoryValue: number;
+    skusMonitored: number;
+    stockoutRiskItems: number;
+    expiryRiskItems: number;
+    pendingRecommendations: number;
+  };
   networkHealth: { atRiskSkuCount: number; excessInventoryValue: number; shortageValue: number; inStockPercentage: number };
 }
 
@@ -168,5 +174,23 @@ describe("the same fact agrees across every route that reports it", () => {
     }
 
     assert.equal(scopedTotal, health.breakdown.total, "the warehouses must partition the network exactly");
+  });
+  test("pending recommendations agree between summary and the recommendations list", async () => {
+    const { summary } = await load();
+    const open = expectEnvelope<unknown[]>(
+      await server.json("/api/recommendations?status=OPEN&pageSize=1"),
+    );
+
+    // Both must mean "open against the latest completed run". Counting the whole
+    // table instead put every superseded run into the KPI, so the dashboard offered
+    // 798 pending actions and the page it links to listed 200.
+    assert.equal(
+      summary.kpis.pendingRecommendations,
+      open.meta?.total ?? 0,
+      "summary reports " +
+        summary.kpis.pendingRecommendations +
+        " pending recommendations but the list totals " +
+        (open.meta?.total ?? 0),
+    );
   });
 });

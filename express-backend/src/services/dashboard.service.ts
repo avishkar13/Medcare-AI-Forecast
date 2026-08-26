@@ -218,6 +218,23 @@ const isBelowReorderPoint = (position: InventoryPosition) => position.onHand < p
 const isAboveMaximum = (position: InventoryPosition) =>
   position.maximumInventory !== null && position.onHand > position.maximumInventory;
 
+/**
+ * Open recommendations belonging to the latest completed run, which is the set
+ * `/api/recommendations` lists. Counting the table outright would add every superseded
+ * run's recommendations to the KPI, so the dashboard claimed 798 pending actions while
+ * the page a planner opens from it showed 200.
+ */
+const countOpenRecommendations = async (): Promise<number> => {
+  const latest = await prisma.planningRun.findFirst({
+    where: { status: "COMPLETED" },
+    orderBy: { completedAt: "desc" },
+    select: { id: true },
+  });
+  if (!latest) return 0;
+
+  return prisma.recommendation.count({ where: { planningRunId: latest.id, status: "OPEN" } });
+};
+
 export const getSummary = async (): Promise<{
   kpis: DashboardKPIs;
   networkHealth: NetworkHealthSummary;
@@ -225,7 +242,7 @@ export const getSummary = async (): Promise<{
   const [positions, expiringBatches, pendingRecommendations, forecastAccuracy] = await Promise.all([
     loadPositions(),
     loadExpiringBatches(EXPIRY_HORIZON_DAYS),
-    prisma.recommendation.count({ where: { status: "OPEN" } }),
+    countOpenRecommendations(),
     currentAccuracyPercent(),
   ]);
 

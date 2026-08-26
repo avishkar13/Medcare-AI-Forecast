@@ -132,10 +132,40 @@ describe("PATCH /api/alerts/:id", () => {
 describe("GET /api/alerts/trends", () => {
   test("includes quiet days rather than skipping them", async () => {
     const body = (await server.json("/api/alerts/trends?days=7")) as {
-      data: { date: string; total: number }[];
+      data: { points: { date: string; total: number }[] };
     };
 
-    assert.equal(body.data.length, 7, "a chart that omits empty days draws through an outage");
-    for (const day of body.data) assert.equal(typeof day.total, "number");
+    assert.equal(body.data.points.length, 7, "a chart that omits empty days draws through an outage");
+    for (const day of body.data.points) assert.equal(typeof day.total, "number");
+  });
+
+  test("carries the period-over-period comparison the chart reports", async () => {
+    const body = (await server.json("/api/alerts/trends?days=14")) as {
+      data: {
+        points: { critical: number }[];
+        comparison: {
+          halfWindowDays: number;
+          currentCritical: number;
+          previousCritical: number;
+          criticalChangePercent: number | null;
+        };
+      };
+    };
+
+    const { points, comparison } = body.data;
+    assert.equal(points.length, 14);
+    assert.equal(comparison.halfWindowDays, 7);
+
+    // the two halves must account for every critical alert in the window, or the
+    // footer and the bars are describing different data
+    const total = points.reduce((sum, point) => sum + point.critical, 0);
+    assert.equal(comparison.currentCritical + comparison.previousCritical, total);
+
+    // a rise from nothing has no percentage
+    if (comparison.previousCritical === 0) {
+      assert.equal(comparison.criticalChangePercent, null);
+    } else {
+      assert.equal(typeof comparison.criticalChangePercent, "number");
+    }
   });
 });

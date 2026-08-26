@@ -132,6 +132,96 @@ describe("GET /api/expiry/timeline", () => {
   });
 });
 
+describe("GET /api/expiry/exposure", () => {
+  test("both cuts reconcile with the overview", async () => {
+    const { data } = expectEnvelope<{
+      totalExposureValue: number;
+      totalUnits: number;
+      byWindow: { label: string; value: number; units: number; sharePercent: number }[];
+      byRisk: { level: string; value: number; units: number; sharePercent: number }[];
+    }>(await server.json("/api/expiry/exposure"));
+
+    const overview = expectEnvelope<{ totalAtRiskValue: number; unitsAtRisk: number }>(
+      await server.json("/api/expiry/overview"),
+    );
+
+    assert.ok(Math.abs(data.totalExposureValue - overview.data.totalAtRiskValue) < 1);
+    assert.ok(Math.abs(data.totalUnits - overview.data.unitsAtRisk) < 1);
+
+    // every batch lands in exactly one window and exactly one risk band, so each cut
+    // has to add back up to the same total
+    for (const cut of [data.byWindow, data.byRisk]) {
+      const value = cut.reduce((total, row) => total + row.value, 0);
+      const units = cut.reduce((total, row) => total + row.units, 0);
+      assert.ok(Math.abs(value - data.totalExposureValue) < 1, "value must partition the total");
+      assert.ok(Math.abs(units - data.totalUnits) < 1, "units must partition the total");
+
+      const share = cut.reduce((total, row) => total + row.sharePercent, 0);
+      assert.ok(Math.abs(share - 100) < 0.5, `shares summed to ${share}, not 100`);
+    }
+  });
+});
+
+describe("GET /api/expiry/demand-coverage", () => {
+  test("the split adds up and matches the batch-level projection", async () => {
+    const { data } = expectEnvelope<{
+      unitsExpiring: number;
+      consumableUnits: number;
+      unusedUnits: number;
+      utilizationPercent: number;
+      wastedSharePercent: number;
+      projectedWasteValue: number;
+      soonestExpiryDays: number | null;
+    }>(await server.json("/api/expiry/demand-coverage"));
+
+    assert.ok(
+      Math.abs(data.consumableUnits + data.unusedUnits - data.unitsExpiring) < 1,
+      "consumable and unused must account for every expiring unit",
+    );
+    assert.ok(Math.abs(data.utilizationPercent + data.wastedSharePercent - 100) < 0.5);
+    assert.ok(data.unusedUnits >= 0 && data.consumableUnits >= 0);
+
+    // the soonest batch on the paginated list is sorted first, so the two views of
+    // "how long have we got" must agree
+    const batches = expectEnvelope<{ daysRemaining: number; projectedWasteUnits: number }[]>(
+      await server.json("/api/expiry/batches?pageSize=1"),
+    );
+    assert.equal(data.soonestExpiryDays, batches.data[0]?.daysRemaining ?? null);
+  });
+});
+
+describe("GET /api/expiry/batches", () => {
+  test("projects waste per batch without exceeding the batch", async () => {
+    const { data } = expectEnvelope<
+      {
+        quantity: number;
+        projectedWasteUnits: number;
+        projectedWasteSharePercent: number;
+        demandCoveragePercent: number;
+        forecastDemand: number;
+        avgDailyDemand: number;
+        daysRemaining: number;
+      }[]
+    >(await server.json("/api/expiry/batches?pageSize=50"));
+
+    assert.ok(data.length > 0);
+    for (const batch of data) {
+      assert.ok(
+        batch.projectedWasteUnits <= batch.quantity + 0.01,
+        "a batch cannot waste more than it holds",
+      );
+      assert.ok(
+        Math.abs(batch.demandCoveragePercent + batch.projectedWasteSharePercent - 100) < 0.5,
+        "coverage and waste share are two sides of one split",
+      );
+      assert.ok(
+        Math.abs(batch.forecastDemand - batch.avgDailyDemand * Math.max(0, batch.daysRemaining)) < 1,
+        "forecast demand is the pair's rate over the days left",
+      );
+    }
+  });
+});
+
 describe("GET /api/expiry/*", () => {
   test("404s on an unknown warehouse", async () => {
     assert.equal((await server.get("/api/expiry/overview?warehouse=NOPE")).status, 404);
