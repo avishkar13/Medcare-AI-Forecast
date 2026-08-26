@@ -1,4 +1,5 @@
 import { prisma } from "../config/prisma.js";
+import { currentAccuracyPercent } from "./forecast-accuracy.service.js";
 import {
   classifyStock,
   percentage,
@@ -221,10 +222,11 @@ export const getSummary = async (): Promise<{
   kpis: DashboardKPIs;
   networkHealth: NetworkHealthSummary;
 }> => {
-  const [positions, expiringBatches, pendingRecommendations] = await Promise.all([
+  const [positions, expiringBatches, pendingRecommendations, forecastAccuracy] = await Promise.all([
     loadPositions(),
     loadExpiringBatches(EXPIRY_HORIZON_DAYS),
     prisma.recommendation.count({ where: { status: "OPEN" } }),
+    currentAccuracyPercent(),
   ]);
 
   const totalInventoryValue = sumBy(positions, (row) => row.inventoryValue);
@@ -247,7 +249,8 @@ export const getSummary = async (): Promise<{
       stockoutRiskItems: belowReorderPoint.length,
       expiryRiskItems: expiringBatches.length,
       onTimeDeliveryRate: null,
-      forecastAccuracy: null,
+      // WP-19. Null when no run has a realised day to score - never a stand-in.
+      forecastAccuracy,
       activeAlerts: belowSafetyStock.length + criticalExpiryItems.length,
       pendingRecommendations,
     },

@@ -55,6 +55,8 @@ export const PLANNING = {
   activeStatuses: ["PENDING", "RUNNING"],
   executor: env.PLANNING_EXECUTOR,
   simulationIterations: env.PLANNING_SIMULATION_ITERATIONS,
+  // How many COMPLETED runs keep their plan artefacts. 0 disables pruning.
+  retentionRuns: env.PLANNING_RETENTION_RUNS,
   // Fixed, so two runs over the same inputs produce the same numbers. A run that
   // cannot be reproduced cannot be compared against another one.
   simulationSeed: 0x5eed_1a4b,
@@ -70,6 +72,7 @@ export const FORECAST = {
   timeoutMs: env.FORECAST_TIMEOUT_MS,
   retries: env.FORECAST_RETRIES,
   fallbackEnabled: env.FORECAST_FALLBACK,
+  trainTimeoutMs: env.FORECAST_TRAIN_TIMEOUT_MS,
   fallbackModelVersion: "naive-seasonal-fallback",
 } as const;
 

@@ -129,3 +129,96 @@ export const isForecastServiceHealthy = async (): Promise<boolean> => {
     return false;
   }
 };
+
+export interface TrainingOutcome {
+  modelVersion: string;
+  trainingRecords: number;
+  testRecords: number;
+  calibrationOk: boolean | null;
+  metrics: { mae: number | null; rmse: number | null; wape: number | null };
+  bias: number | null;
+  coverage: number | null;
+  ms: number;
+}
+
+/**
+ * Asks the engine to refit.
+ *
+ * **Not retried.** Every other engine call is idempotent and cheap; a fit costs
+ * minutes of CPU and rewrites the model artefact, so a retry could stack two
+ * trainings over the same files. A caller that wants another attempt asks again.
+ *
+ * The engine pulls `GET /api/training-data` itself, exactly as inference does, so
+ * one data path serves fit and predict.
+ */
+export const requestTraining = async (modelVersion?: string): Promise<TrainingOutcome> => {
+  const url = FORECAST.serviceUrl;
+  if (!url) throw new ForecastServiceError("no forecast service is configured", { attempts: 0 });
+
+  const startedAt = Date.now();
+  let response: Response;
+
+  try {
+    response = await fetch(`${url.replace(/\/$/, "")}/train`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(modelVersion === undefined ? {} : { modelVersion }),
+      signal: AbortSignal.timeout(FORECAST.trainTimeoutMs),
+    });
+  } catch (error) {
+    throw new ForecastServiceError(
+      `training request failed: ${error instanceof Error ? error.message : String(error)}`,
+      { retryable: false, cause: error },
+    );
+  }
+
+  const payload = (await response.json().catch(() => null)) as
+    | {
+        modelVersion?: string;
+        trainingRecords?: number;
+        testRecords?: number;
+        calibrationOk?: boolean | null;
+        summary?: Record<string, number | null>;
+        error?: { code?: string; message?: string };
+      }
+    | null;
+
+  if (!response.ok) {
+    // The engine's own error envelope carries why. Surfacing it beats "502".
+    const detail = payload?.error?.message ?? `training service answered ${response.status}`;
+    throw new ForecastServiceError(detail, { retryable: false });
+  }
+
+  const summary = payload?.summary ?? {};
+  return {
+    modelVersion: payload?.modelVersion ?? "unknown",
+    trainingRecords: payload?.trainingRecords ?? 0,
+    testRecords: payload?.testRecords ?? 0,
+    calibrationOk: payload?.calibrationOk ?? null,
+    metrics: {
+      mae: summary.mae ?? null,
+      rmse: summary.rmse ?? null,
+      wape: summary.wape ?? null,
+    },
+    bias: summary.bias ?? null,
+    coverage: summary.coverage ?? null,
+    ms: Date.now() - startedAt,
+  };
+};
+
+/** The last fit's full report, straight from the engine. */
+export const fetchModelMetrics = async (): Promise<unknown> => {
+  const url = FORECAST.serviceUrl;
+  if (!url) throw new ForecastServiceError("no forecast service is configured", { attempts: 0 });
+
+  const response = await fetch(`${url.replace(/\/$/, "")}/model/metrics`, {
+    signal: AbortSignal.timeout(Math.min(FORECAST.timeoutMs, 15_000)),
+  });
+
+  if (!response.ok) {
+    throw new ForecastServiceError(`model metrics unavailable (${response.status})`, {
+      retryable: false,
+    });
+  }
+  return response.json();
+};

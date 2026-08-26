@@ -138,6 +138,10 @@ def train_dataframe(raw: pd.DataFrame, artifacts_dir: Path, outputs_dir: Path, s
     }
     (artifacts_dir / "model_metadata.json").write_text(json.dumps(meta, indent=2))
     result = {
+        "training_rows": int(len(tr)),
+        "test_rows": int(len(te)),
+        "unique_skus": int(clean.sku_id.nunique()),
+        "unique_warehouses": int(clean.dc_id.nunique()),
         "baseline_7_day_moving_average": baseline_metrics,
         "xgboost": point_metrics,
         "quantile_forecasting": quantile_metrics,

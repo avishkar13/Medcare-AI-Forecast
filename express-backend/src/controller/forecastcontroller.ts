@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
+import * as accuracy from "../services/forecast-accuracy.service.js";
 import * as forecast from "../services/forecastread.service.js";
 import { ok } from "../utils/response.js";
+import { accuracyQuerySchema } from "../zod/accuracy.schemas.js";
 import {
   forecastChartQuerySchema,
   forecastQuerySchema,
@@ -49,4 +51,8 @@ export const getImpact = async (req: Request, res: Response) => {
 
 export const getInsight = async (req: Request, res: Response) => {
   ok(res, await forecast.getInsight(forecastQuerySchema.parse(req.query)));
+};
+
+export const getAccuracy = async (req: Request, res: Response) => {
+  ok(res, await accuracy.getAccuracy(accuracyQuerySchema.parse(req.query)));
 };

@@ -13,5 +13,7 @@ forecastRouter.get("/seasonality", rateLimiter.read, forecastController.getSeaso
 forecastRouter.get("/network", rateLimiter.read, forecastController.getNetwork);
 forecastRouter.get("/insight", rateLimiter.read, forecastController.getInsight);
 forecastRouter.get("/performance", rateLimiter.read, forecastController.getPerformance);
+// WP-19: scored against realised demand, the read behind DashboardKPIs.forecastAccuracy.
+forecastRouter.get("/accuracy", rateLimiter.read, forecastController.getAccuracy);
 forecastRouter.get("/impact", rateLimiter.read, forecastController.getImpact);
 forecastRouter.get("/skus", rateLimiter.read, forecastController.getSkus);

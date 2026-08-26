@@ -1,6 +1,6 @@
 # Forecast API
 
-Mounted at `/api/forecast` (`src/routes/forecast_route.ts`). Ten `GET` routes, all on the `read` tier.
+Mounted at `/api/forecast` (`src/routes/forecast_route.ts`). Eleven `GET` routes, all on the `read` tier.
 
 Shared conventions — response envelope, error codes, headers and rate limits — are in [`conventions.api.md`](conventions.api.md) and not repeated here.
 
@@ -43,6 +43,7 @@ History-only routes (`main-chart`'s history half, `seasonality`) still answer fr
 | `GET /performance` | Real accuracy of this run's forecasts against realised demand |
 | `GET /impact` | The run's own `OptimizationResult` and `SimulationRun` figures |
 | `GET /insight` | Derived observations, each with its numbers |
+| `GET /accuracy` | Scored error against realised demand, overall or by sku / warehouse / horizon |
 
 ### Two decisions worth knowing
 
@@ -75,6 +76,49 @@ Scores this run's `Forecast.p50` against realised `DemandHistory`, for the forec
 **Accuracy is `100 − WAPE`, weighted by volume** — not the mean of per-row percentages. A single near-zero actual would otherwise dominate the average and report a figure nobody would believe.
 
 **A fresh run forecasts only the future, so it has nothing to score.** `models` is then empty and `note` says why, rather than reporting a flattering number drawn from an empty set.
+
+---
+
+## `GET /accuracy`
+
+WP-19. Scores a past run's `Forecast.p50` against realised `DemandHistory`, and is the read behind `DashboardKPIs.forecastAccuracy`.
+
+| Parameter | Values | Notes |
+| --- | --- | --- |
+| `runId` | string | Defaults to the most recent completed run **that has a realised day**, not simply the latest |
+| `sku`, `warehouse` | string | cuid or code |
+| `groupBy` | `overall` \| `sku` \| `warehouse` \| `horizon` | Default `overall` |
+
+```json
+{ "data": {
+  "planningRunId": "cmt9...", "modelVersion": "medcare-xgb-qrf-v1",
+  "horizonDays": 30, "groupBy": "horizon",
+  "overall": { "scoredPoints": 640, "accuracyPercent": 89.4, "wapePercent": 10.6,
+               "mapePercent": 12.1, "mapeExcludedPoints": 3,
+               "maePerDay": 5.2, "rmse": 7.4, "biasPercent": -3.6 },
+  "groups": [ { "horizonDay": 1, "scoredPoints": 160, "wapePercent": 9.8, "...": "" } ],
+  "note": null,
+  "dataCaveat": "Seeded demand is generated, so these figures measure how well the model recovers a known formula, not forecast skill on real data"
+} }
+```
+
+### Read WAPE, not MAPE
+
+`wapePercent` is `Σ|error| / Σactual` — one division, by the total. `mapePercent` averages a per-day percentage, so a single near-zero day dominates it and can report an error in the thousands of percent. Both are returned because MAPE is what people ask for; WAPE is what should be quoted.
+
+Days with **zero** actual demand are excluded from MAPE (the division is undefined, not large) and counted in `mapeExcludedPoints`. They still count toward WAPE, MAE and RMSE.
+
+`accuracyPercent` is `100 − WAPE`, floored at 0. `biasPercent` is signed: **positive means the forecast ran high**, and the direction matters more than the size — under-forecasting is what causes stockouts.
+
+### What can be scored
+
+Only forecast days that have already happened **and** have a matching `DemandHistory` row. A missing actual is skipped, not treated as zero — "that day is not loaded yet" is not "nobody ordered".
+
+The executor only forecasts forward, so **a freshly created run has nothing to score**. That is why `runId` defaults to the newest run whose horizon has partly elapsed rather than the newest run, and why `groups` is empty with a `note` when nothing can be measured.
+
+### `dataCaveat` is always present
+
+The seeded demand comes from a generator in `prisma/seed.ts`. An oracle that knows that generator floors at about **10.65% WAPE**, and the model already matches it — so these numbers measure how well XGBoost recovers a known formula, not forecast skill. The field is returned on every response so the figure cannot be quoted without it.
 
 ---
 

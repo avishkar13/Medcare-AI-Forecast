@@ -1,4 +1,8 @@
 {
+  "training_rows": 19360,
+  "test_rows": 4960,
+  "unique_skus": 40,
+  "unique_warehouses": 4,
   "baseline_7_day_moving_average": {
     "MAE": 12.85397465437788,
     "RMSE": 17.639045092750017,

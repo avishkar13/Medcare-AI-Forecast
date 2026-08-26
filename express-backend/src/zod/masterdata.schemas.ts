@@ -16,6 +16,25 @@ export const productQuerySchema = z.object({
 
 export const productParamsSchema = z.object({ id: text });
 
+export const warehouseParamsSchema = z.object({ id: text });
+
+export const distributorQuerySchema = z.object({
+  /** Warehouse cuid or `code`. */
+  warehouse: text.optional(),
+  region: text.optional(),
+  isActive: z.stringbool().optional(),
+});
+
+export const promotionQuerySchema = z.object({
+  /**
+   * `true` is still-running or scheduled (`endDate >= today`), not `startDate > now`
+   * - a promotion running right now is the most relevant one there is.
+   */
+  upcoming: z.stringbool().optional(),
+  page,
+  pageSize,
+});
+
 export const warehouseQuerySchema = z.object({
   tier: z.enum(WarehouseTier).optional(),
   region: text.optional(),
@@ -25,3 +44,6 @@ export const warehouseQuerySchema = z.object({
 export type ProductQuery = z.infer<typeof productQuerySchema>;
 export type ProductParams = z.infer<typeof productParamsSchema>;
 export type WarehouseQuery = z.infer<typeof warehouseQuerySchema>;
+export type WarehouseParams = z.infer<typeof warehouseParamsSchema>;
+export type DistributorQuery = z.infer<typeof distributorQuerySchema>;
+export type PromotionQuery = z.infer<typeof promotionQuerySchema>;

@@ -18,6 +18,9 @@ and is not repeated per group.
 | expiry | `/api/expiry` | [expiry.api.md](expiry.api.md) |
 | simulation | `/api/simulation` | [simulation.api.md](simulation.api.md) |
 | settings | `/api/settings` | [settings.api.md](settings.api.md) |
+| parameters | `/api/planning/parameters` | [parameters.api.md](parameters.api.md) |
+| models | `/api/planning/models` | [models.api.md](models.api.md) |
+| plans | `/api/supply-plans`, `/api/drp-plans` | [plans.api.md](plans.api.md) |
 | training | `/api/training-data` | [training.api.md](training.api.md) |
 
 Not route groups:

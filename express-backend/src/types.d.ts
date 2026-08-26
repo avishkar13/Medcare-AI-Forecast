@@ -122,6 +122,10 @@ export interface PlanningRunSummary {
   stale: boolean;
   failureReason: string | null;
   failureStage: string | null;
+  /** Which executor stage the run is in, same vocabulary as `failureStage`. */
+  currentStage: string | null;
+  /** 0-100. Reaches 100 only on COMPLETED. */
+  progress: number | null;
 }
 
 export interface PlanningRunArtifacts {

@@ -162,6 +162,71 @@ describe("executeRun", () => {
     );
   });
 
+  test("progress advances through the stages and ends at 100", async () => {
+    const id = await newRun();
+
+    // Status is sampled alongside progress: a poll issued before the run finished
+    // can resolve after it, so "was this observed mid-flight" has to come from the
+    // row itself rather than from when the sample was taken.
+    const seen: { status: string; stage: string | null; progress: number | null }[] = [];
+    const poll = setInterval(() => {
+      void prisma.planningRun
+        .findUnique({ where: { id }, select: { status: true, currentStage: true, progress: true } })
+        .then((row) => {
+          if (row) seen.push({ status: row.status, stage: row.currentStage, progress: row.progress });
+        });
+    }, 150);
+
+    await executeRun(id);
+    clearInterval(poll);
+
+    const run = await prisma.planningRun.findUniqueOrThrow({
+      where: { id },
+      select: { status: true, currentStage: true, progress: true },
+    });
+
+    assert.equal(run.status, "COMPLETED");
+    assert.equal(run.progress, 100);
+    assert.equal(run.currentStage, "complete");
+
+    const values = seen.map((row) => row.progress ?? 0);
+    for (let i = 1; i < values.length; i += 1) {
+      assert.ok(
+        values[i]! >= values[i - 1]!,
+        `progress went backwards: ${values[i - 1]} then ${values[i]}`,
+      );
+    }
+
+    // 100 belongs to the closing transaction, so it cannot be visible on a RUNNING
+    // run - a client polling mid-flight must never see a finished-looking job.
+    const early = seen.filter((row) => row.status === "RUNNING" && row.progress === 100);
+    assert.equal(early.length, 0, "a RUNNING run reported progress 100");
+
+    assert.ok(
+      seen.some((row) => row.status === "RUNNING" && (row.progress ?? 0) > 0),
+      "the run should have been observed in flight at least once",
+    );
+  });
+
+  test("a failed run's currentStage agrees with its failureStage", async () => {
+    const id = await newRun({ horizonDays: 0 });
+    const outcome = await executeRun(id);
+    assert.equal(outcome.status, "FAILED");
+
+    const run = await prisma.planningRun.findUniqueOrThrow({
+      where: { id },
+      select: { failureStage: true, currentStage: true, progress: true },
+    });
+
+    assert.ok(run.failureStage);
+    assert.equal(
+      run.currentStage,
+      run.failureStage,
+      "two fields describing the same moment must not disagree",
+    );
+    assert.notEqual(run.progress, 100, "a failed run never reports complete");
+  });
+
   test("the same inputs produce the same cost twice", async () => {
     const first = await newRun();
     await executeRun(first);

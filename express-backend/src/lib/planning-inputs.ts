@@ -27,7 +27,11 @@ export interface ScenarioSettings {
   demandMultiplier: number;
   leadTimeMultiplier: number;
   capacityMultiplier: number;
-  serviceLevelTarget: number;
+  /**
+   * An override, not a default. `null` means "use each pair's own
+   * `PlanningParameter.serviceLevel`" - which is the point of storing it per pair.
+   */
+  serviceLevelTarget: number | null;
 }
 
 export interface PlanningInputs {
@@ -48,7 +52,8 @@ export const NEUTRAL_SCENARIO: ScenarioSettings = {
   demandMultiplier: 1,
   leadTimeMultiplier: 1,
   capacityMultiplier: 1,
-  serviceLevelTarget: 0.95,
+  // No scenario means no override: every pair keeps its own configured target.
+  serviceLevelTarget: null,
 };
 
 /**

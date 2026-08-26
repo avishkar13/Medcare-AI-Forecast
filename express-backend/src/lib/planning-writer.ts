@@ -67,7 +67,15 @@ export const completeRun = async (completion: RunCompletion): Promise<void> => {
     prisma.recommendation.createMany({ data: recommendations }),
     prisma.planningRun.update({
       where: { id: planningRunId },
-      data: { status: "COMPLETED", completedAt: new Date(), modelVersion },
+      // progress 100 lands with the status, so a client polling mid-flight can never
+      // see a finished-looking run that is still working.
+      data: {
+        status: "COMPLETED",
+        completedAt: new Date(),
+        modelVersion,
+        currentStage: "complete",
+        progress: 100,
+      },
     }),
   ]);
 };

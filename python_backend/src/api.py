@@ -188,7 +188,27 @@ def train(request: TrainRequest):
         raise EngineError(422, "TRAINING_FAILED", str(error)) from error
     except Exception as error:
         raise EngineError(500, "TRAINING_FAILED", f"{type(error).__name__}: {error}") from error
-    return {"status": "trained", "modelVersion": request.modelVersion, "metrics": result}
+    point = result.get("xgboost", {})
+    quantiles = result.get("quantile_forecasting", {})
+
+    # A flat summary beside the full report: Express publishes these three, and
+    # digging them out of a nested metrics tree in the caller would put knowledge of
+    # this file's shape into another service.
+    return {
+        "status": "trained",
+        "modelVersion": request.modelVersion,
+        "trainingRecords": result.get("training_rows", 0),
+        "testRecords": result.get("test_rows", 0),
+        "calibrationOk": result.get("calibration_ok"),
+        "summary": {
+            "mae": point.get("MAE"),
+            "rmse": point.get("RMSE"),
+            "wape": point.get("wMAPE_percent"),
+            "bias": point.get("bias_percent"),
+            "coverage": quantiles.get("P10_P90_coverage_percent"),
+        },
+        "metrics": result,
+    }
 
 
 @app.get("/health")

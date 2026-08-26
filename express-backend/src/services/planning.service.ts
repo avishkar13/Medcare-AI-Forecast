@@ -28,6 +28,8 @@ interface RunRow {
   completedAt: Date | null;
   failureReason: string | null;
   failureStage: string | null;
+  currentStage: string | null;
+  progress: number | null;
   scenario: { id: string; name: string } | null;
 }
 
@@ -42,6 +44,8 @@ const runSelect = {
   completedAt: true,
   failureReason: true,
   failureStage: true,
+  currentStage: true,
+  progress: true,
   scenario: { select: { id: true, name: true } },
 };
 
@@ -71,6 +75,10 @@ const toSummary = (row: RunRow): PlanningRunSummary => ({
   // executor has always written them.
   failureReason: row.failureReason,
   failureStage: row.failureStage,
+  // WP-10b: where the run has got to, for a client polling a job that takes tens of
+  // seconds. One mapper covers both this and WP-10a's failure fields.
+  currentStage: row.currentStage,
+  progress: row.progress,
 });
 
 export const failAbandonedRuns = (): Promise<{ count: number }> =>

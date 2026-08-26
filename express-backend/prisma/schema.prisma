@@ -266,6 +266,12 @@ model PlanningRun {
   failureReason String?
   failureStage  String?
 
+  // Progress reporting for a client polling a run that takes tens of seconds.
+  // `currentStage` uses the same vocabulary as `failureStage`, so a FAILED run's
+  // two fields agree instead of describing the same moment differently.
+  currentStage String?
+  progress     Int?
+
   scenario  Scenario? @relation(fields: [scenarioId], references: [id])
   createdBy User      @relation(fields: [createdById], references: [id])
 

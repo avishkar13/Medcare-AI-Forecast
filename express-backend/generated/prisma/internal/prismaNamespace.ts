@@ -3722,6 +3722,8 @@ export const PlanningRunScalarFieldEnum = {
   completedAt: 'completedAt',
   failureReason: 'failureReason',
   failureStage: 'failureStage',
+  currentStage: 'currentStage',
+  progress: 'progress',
   createdAt: 'createdAt'
 } as const
 

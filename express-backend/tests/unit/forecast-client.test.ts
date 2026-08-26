@@ -151,3 +151,61 @@ describe("requestForecast", () => {
     assert.equal(calls, 3, "one attempt plus FORECAST_RETRIES");
   });
 });
+
+describe("requestTraining", () => {
+  const trained = {
+    status: "trained",
+    modelVersion: "medcare-xgb-qrf-v1",
+    trainingRecords: 19360,
+    testRecords: 4960,
+    calibrationOk: true,
+    summary: { mae: 4.87, rmse: 6.89, wape: 9.65, bias: -1.26, coverage: 79.8 },
+    metrics: { xgboost: { MAE: 4.87 } },
+  };
+
+  test("flattens the engine's summary into the documented shape", async () => {
+    const { requestTraining } = await withService(async () => jsonResponse(trained));
+    const outcome = await requestTraining();
+
+    assert.equal(outcome.modelVersion, "medcare-xgb-qrf-v1");
+    assert.equal(outcome.trainingRecords, 19360);
+    assert.equal(outcome.testRecords, 4960);
+    assert.equal(outcome.calibrationOk, true);
+    assert.deepEqual(outcome.metrics, { mae: 4.87, rmse: 6.89, wape: 9.65 });
+    assert.equal(outcome.coverage, 79.8);
+    assert.ok(outcome.ms >= 0, "callers want to know how long a fit took");
+  });
+
+  test("passes a requested model version through", async () => {
+    let sent: unknown;
+    const { requestTraining } = await withService(async (_input, init) => {
+      sent = JSON.parse(String(init?.body));
+      return jsonResponse(trained);
+    });
+
+    await requestTraining("experiment-2");
+    assert.deepEqual(sent, { modelVersion: "experiment-2" });
+  });
+
+  test("is never retried", async () => {
+    let calls = 0;
+    const { requestTraining } = await withService(async () => {
+      calls += 1;
+      return jsonResponse({ error: { code: "TRAINING_FAILED", message: "boom" } }, 500);
+    });
+
+    // A fit costs minutes of CPU and rewrites the model artefact. Retrying could
+    // stack two trainings over the same files, so a 5xx fails immediately here
+    // even though requestForecast would retry it.
+    await assert.rejects(() => requestTraining(), /boom/);
+    assert.equal(calls, 1, "training must not be retried");
+  });
+
+  test("surfaces the engine's own error message, not just a status", async () => {
+    const { requestTraining } = await withService(async () =>
+      jsonResponse({ error: { code: "TRAINING_DATA_UNAVAILABLE", message: "export unreachable" } }, 502),
+    );
+
+    await assert.rejects(() => requestTraining(), /export unreachable/);
+  });
+});

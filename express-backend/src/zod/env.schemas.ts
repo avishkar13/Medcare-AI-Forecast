@@ -44,11 +44,15 @@ export const envSchema = z
     PLANNING_IDEMPOTENCY_TTL_MS: durationMs.default(86_400_000),
     PLANNING_EXECUTOR: z.enum(["inline", "disabled"]).default("inline"),
     PLANNING_SIMULATION_ITERATIONS: count.default(500),
+    // 0 disables pruning entirely.
+    PLANNING_RETENTION_RUNS: z.coerce.number().int().min(0).max(1000).default(20),
 
     FORECAST_SERVICE_URL: optionalUrl,
     FORECAST_TIMEOUT_MS: durationMs.default(60_000),
     FORECAST_RETRIES: z.coerce.number().int().min(0).max(10).default(2),
     FORECAST_FALLBACK: stringbool.default(true),
+    // Fitting reads the whole export and trains several models; it is minutes, not seconds.
+    FORECAST_TRAIN_TIMEOUT_MS: durationMs.default(600_000),
   })
   .superRefine((value, ctx) => {
     if (value.NODE_ENV === "production" && !value.REDIS_URL) {

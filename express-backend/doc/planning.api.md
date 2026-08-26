@@ -125,6 +125,8 @@ One run, plus what it produced. This is the poll target.
 | `stale` | `true` when a run is still active but older than `PLANNING_RUN_TIMEOUT_MS` — nobody is executing it any more |
 | `failureReason` | One sentence, `null` unless the run FAILED. At most 500 chars, connection strings redacted, never a stack trace |
 | `failureStage` | Which stage threw: `inputs`, `forecast`, `projection`, `allocation`, `supply`, `optimization`, `simulation`, `recommendations`, `complete`. Also `abandoned` (swept after the run timeout) and `shutdown` (the server stopped mid-run) |
+| `currentStage` | Where the run has got to, same vocabulary as `failureStage`. On a FAILED run the two agree |
+| `progress` | 0–100. Monotonic, and **reaches 100 only on `COMPLETED`** |
 | `artifacts` | Live row counts, so a client can watch the run fill in. Counts belonging to a run that never completes are **not** a plan; see below |
 
 `404` when the id is unknown.
@@ -270,6 +272,21 @@ POST -> 202 PENDING -> (setImmediate) RUNNING -> COMPLETED
 - An idempotency **replay never schedules**. It returns the run the first call created, whatever state that run is now in.
 - **On shutdown**, the server stops listening, then waits for scheduled runs to finish. Anything still running when the budget expires is marked `FAILED` with a reason, so a restart never leaves a run stuck at `RUNNING`.
 - **At boot**, runs left active by a previous process and older than `PLANNING_RUN_TIMEOUT_MS` are swept to `FAILED` — a crashed run does not block the next POST until someone notices.
+
+### Progress while a run is in flight
+
+A run takes tens of seconds, so `currentStage` and `progress` say where it is:
+
+```
+inputs 5  ->  forecast 15  ->  projection 35 .. supply 76  ->  optimization 80
+          ->  simulation 90  ->  recommendations 95  ->  complete 98  ->  COMPLETED 100
+```
+
+The day loop — projection, allocation and supply — is the long stretch, so it spans 35–80 and reports **by day** rather than by sub-stage. Those three assignments happen once per horizon day; writing each one would flap the stage and cost a round trip per day, so progress is throttled and a lower value is never written over a higher one.
+
+**`progress` reaches 100 in the same transaction as the `COMPLETED` flip**, not before it. A client polling mid-flight can never see a finished-looking run that is still working.
+
+A `FAILED` run keeps the progress it reached and sets `currentStage` to its `failureStage` — the two describe the same moment, so they must not disagree.
 
 ### Polling
 

@@ -57,6 +57,31 @@ export type ExecutorStage =
   | "recommendations"
   | "complete";
 
+/**
+ * How far through a run each stage is, as a percentage.
+ *
+ * The day loop (projection -> allocation -> supply) is the long part, so it spans a
+ * wide band and reports by day rather than by sub-stage. 100 is deliberately absent:
+ * it is written by `completeRun`, in the same transaction as the COMPLETED flip, so
+ * a client can never see 100% on a run that is still working.
+ */
+const STAGE_PROGRESS: Record<ExecutorStage, number> = {
+  inputs: 5,
+  forecast: 15,
+  projection: 35,
+  allocation: 45,
+  supply: 55,
+  optimization: 80,
+  simulation: 90,
+  recommendations: 95,
+  complete: 98,
+};
+
+const DAY_LOOP_START = STAGE_PROGRESS.projection;
+const DAY_LOOP_END = STAGE_PROGRESS.optimization;
+// A write per day would be 30 round trips for a 30-day run to move a progress bar.
+const PROGRESS_STEP = 5;
+
 export class PlanningExecutionError extends Error {
   readonly stage: ExecutorStage;
 
@@ -131,7 +156,10 @@ const profileOf = (
     demandStdDev,
     leadTimeDays,
     leadTimeStdDev: parameters.leadTimeStdDev,
-    serviceLevel: scenario.serviceLevelTarget,
+    // The pair's own target unless a scenario overrides it. Reading only the
+    // scenario made PlanningParameter.serviceLevel dead: a critical SKU at a Tier-2
+    // DC planned to the same buffer as a routine one at a metro DC.
+    serviceLevel: scenario.serviceLevelTarget ?? parameters.serviceLevel,
   });
 
   return {
@@ -284,8 +312,25 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
   if (claimed.count === 0) return { executed: false, status: "SKIPPED" };
 
   let stage: ExecutorStage = "inputs";
+  let reported = -1;
+
+  /**
+   * Records where the run has got to. Monotonic by construction: a lower percentage
+   * is dropped, which also stops the day loop flapping between projection,
+   * allocation and supply on every iteration.
+   */
+  const report = async (next: ExecutorStage, percent = STAGE_PROGRESS[next]) => {
+    if (percent < reported + (percent === STAGE_PROGRESS[next] ? 1 : PROGRESS_STEP)) return;
+    reported = percent;
+    // updateMany, so a run deleted mid-flight does not throw on the way past.
+    await prisma.planningRun.updateMany({
+      where: { id: runId },
+      data: { currentStage: next, progress: percent },
+    });
+  };
 
   try {
+    await report("inputs");
     const run = await prisma.planningRun.findUniqueOrThrow({
       where: { id: runId },
       select: { horizonDays: true, scenarioId: true, modelVersion: true },
@@ -311,6 +356,7 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
     }
 
     stage = "forecast";
+    await report("forecast");
     const forecast = await forecastDemand({ runId, horizonDays, asOf, pairs: inputs.pairs });
     const byPair = new Map(
       forecast.series.map((series) => [
@@ -337,6 +383,7 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
     await writeForecasts(forecastRows);
 
     stage = "projection";
+    await report("projection");
     const cells = buildCells(inputs, byPair, scenario);
 
     const byProduct = new Map<string, Cell[]>();
@@ -367,6 +414,11 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
     // every warehouse's position on that same day - so they cannot be three passes.
     for (let day = 1; day <= horizonDays; day += 1) {
       const date = addDays(asOf, day);
+
+      await report(
+        stage,
+        DAY_LOOP_START + Math.round((day / horizonDays) * (DAY_LOOP_END - DAY_LOOP_START)),
+      );
 
       for (const cell of cells) {
         const point = cell.forecast[day - 1] ?? { p10: 0, p50: 0, p90: 0 };
@@ -500,6 +552,7 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
     await writeSupplyPlans(supplyPlans);
 
     stage = "optimization";
+    await report("optimization");
     let holdingCost = 0;
     let stockoutCost = 0;
     let expiryCost = 0;
@@ -518,6 +571,7 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
     const totalCost = holdingCost + stockoutCost + transferCost + expiryCost;
 
     stage = "simulation";
+    await report("simulation");
     const rng = createRng(PLANNING.simulationSeed);
     const iterations = PLANNING.simulationIterations;
     // Measured per cell-day, not once per iteration. A single flag across 160 series
@@ -580,9 +634,11 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
     }
 
     stage = "recommendations";
+    await report("recommendations");
     const recommendations = buildRecommendations(runId, cells, drpPlans);
 
     stage = "complete";
+    await report("complete");
     await completeRun({
       planningRunId: runId,
       modelVersion: run.modelVersion ?? forecast.modelVersion,
@@ -636,6 +692,8 @@ export const executeRun = async (runId: string): Promise<ExecutionOutcome> => {
         completedAt: new Date(),
         failureReason: failureReasonOf(error),
         failureStage,
+        // The two describe the same moment, so they must not disagree.
+        currentStage: failureStage,
       },
     });
 

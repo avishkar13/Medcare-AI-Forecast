@@ -2,6 +2,7 @@ import { PLANNING } from "../config/constants.js";
 import { prisma } from "../config/prisma.js";
 import { RunStatus } from "../../generated/prisma/enums.js";
 import { executeRun } from "../services/planning-executor.service.js";
+import { pruneOldRunArtifacts } from "../services/retention.service.js";
 
 /**
  * Scheduling seam between the route and the executor.
@@ -16,6 +17,15 @@ const inFlight = new Map<string, Promise<void>>();
 const execute = async (runId: string): Promise<void> => {
   try {
     await executeRun(runId);
+
+    // Housekeeping, after the run and never on the request path. A failure here
+    // must not mark a completed run as failed, so it is logged and dropped.
+    try {
+      const pruned = await pruneOldRunArtifacts();
+      if (pruned.prunedRuns > 0) console.log("pruned plan artefacts", pruned);
+    } catch (error) {
+      console.error("artefact pruning failed", error);
+    }
   } catch (error) {
     // executeRun records its own failures on the row; anything here escaped that path.
     console.error("planning run threw outside its failure handler", { runId, error });
