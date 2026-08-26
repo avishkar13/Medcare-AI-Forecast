@@ -6,7 +6,9 @@ import { Activity, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { login } from "@/lib/auth";
+import { useAuthStore } from "@/store/auth.store";
+import { authApi } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/errors";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -22,15 +24,15 @@ export default function AuthPage() {
     setIsPending(true);
 
     try {
-      const result = await login({ email, password, rememberMe: false });
-      
-      if (result.success) {
-        router.push("/dashboard");
+      const result = await authApi.login({ email, password });
+      useAuthStore.getState().login(result.user, result.token);
+      router.push("/dashboard");
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message || "An error occurred during sign in.");
       } else {
-        setError(result.message || "An error occurred during sign in.");
+        setError("Network error. Please try again later.");
       }
-    } catch {
-      setError("Network error. Please try again later.");
     } finally {
       setIsPending(false);
     }

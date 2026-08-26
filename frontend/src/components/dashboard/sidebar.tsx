@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
@@ -11,10 +11,22 @@ import {
   Bell,
   CalendarClock,
   Settings,
-  Activity
+  Activity,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/auth.store";
+
+function getInitials(name?: string) {
+  if (!name) return "U";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+}
 
 const navGroups = [
   {
@@ -45,6 +57,15 @@ const navGroups = [
 
 export function SidebarContent() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/auth");
+  };
+
+  const initials = getInitials(user?.name);
 
   return (
     <div className="flex h-full flex-col bg-sidebar border-r border-sidebar-border">
@@ -105,14 +126,30 @@ export function SidebarContent() {
           <span className="text-xs font-medium text-muted-foreground">AI Engine Online</span>
         </div>
 
-        <div className="flex items-center gap-3 rounded-md border border-sidebar-border p-2 bg-card">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">SA</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-foreground leading-none mb-1">Jane Doe</span>
-            <span className="text-[10px] text-muted-foreground leading-none">Supply Chain Analyst</span>
+        <div className="flex items-center justify-between gap-2 rounded-md border border-sidebar-border p-2 bg-card">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <Avatar className="h-8 w-8 shrink-0">
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">{initials}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="text-sm font-medium text-foreground leading-none mb-1 truncate">
+                {user?.name ?? "User"}
+              </span>
+              <span className="text-[10px] text-muted-foreground leading-none truncate">
+                {user?.role?.name ?? (user?.warehouseId ? `DC: ${user.warehouseId}` : user?.email ?? "Authenticated")}
+              </span>
+            </div>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 cursor-pointer"
+            onClick={handleLogout}
+            title="Log out"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="sr-only">Log out</span>
+          </Button>
         </div>
       </div>
     </div>

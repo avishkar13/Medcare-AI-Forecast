@@ -1,4 +1,5 @@
 import { env } from "@/config/env";
+import { useAuthStore } from "@/store/auth.store";
 import { ApiError, ApiErrorCode, toApiError } from "./errors";
 import type { ApiResult, QueryParams, ResponseMeta } from "./types";
 
@@ -40,6 +41,8 @@ async function request<T>(
   const requestId = newRequestId();
   const hasBody = options.body !== undefined;
 
+  const token = useAuthStore.getState().token;
+
   let response: Response;
   try {
     response = await fetch(buildUrl(path, options.params), {
@@ -47,6 +50,7 @@ async function request<T>(
       headers: {
         accept: "application/json",
         [REQUEST_ID_HEADER]: requestId,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(hasBody ? { "content-type": "application/json" } : {}),
       },
       ...(hasBody ? { body: JSON.stringify(options.body) } : {}),
@@ -71,6 +75,13 @@ async function request<T>(
   }
 
   const payload = await response.json().catch(() => null);
+
+  if (response.status === 401) {
+    const authStore = useAuthStore.getState();
+    if (authStore.isAuthenticated) {
+      authStore.clearAuth();
+    }
+  }
 
   if (!response.ok) throw toApiError(payload, response.status, echoedId);
 
