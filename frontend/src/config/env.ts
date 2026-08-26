@@ -3,7 +3,7 @@ import { z } from "zod";
 const schema = z.object({
   NEXT_PUBLIC_API_URL: z
     .string()
-    .min(1, "NEXT_PUBLIC_API_URL must not be empty")
+    .url("NEXT_PUBLIC_API_URL must be a full url, e.g. http://localhost:4000/api")
     .transform((value) => value.replace(/\/+$/, "")),
 });
 
