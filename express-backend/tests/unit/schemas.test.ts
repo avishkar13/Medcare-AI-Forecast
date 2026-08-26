@@ -246,7 +246,10 @@ describe("idempotencyKeySchema", () => {
 });
 
 describe("envSchema", () => {
-  const base = { DATABASE_URL: "postgresql://localhost:5432/db" };
+  const base = {
+    DATABASE_URL: "postgresql://localhost:5432/db",
+    JWT_SECRET: "a-development-secret-of-at-least-32-chars",
+  };
 
   test("applies server defaults", () => {
     const value = parsed(envSchema.safeParse(base));

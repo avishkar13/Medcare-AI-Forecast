@@ -1,10 +1,13 @@
 import type { Request, Response } from "express";
 import * as alerts from "../services/alert.service.js";
+import * as notifications from "../services/notification.service.js";
+import { refreshAlerts } from "../services/alert-detector.service.js";
 import { ok, paginated } from "../utils/response.js";
 import {
   alertParamsSchema,
   alertQuerySchema,
   alertTrendQuerySchema,
+  deliveryQuerySchema,
 } from "../zod/alert.schemas.js";
 
 import { enforceScopeConflict } from "../middleware/scopeDc.js";
@@ -42,4 +45,25 @@ export const resolve = async (req: Request, res: Response) => {
 
 export const markAllRead = async (_req: Request, res: Response) => {
   ok(res, await alerts.markAllRead());
+};
+
+export const getDeliveries = async (req: Request, res: Response) => {
+  const query = deliveryQuerySchema.parse(req.query);
+  const { items, total } = await notifications.listDeliveries(query);
+  paginated(res, items, query.page, query.pageSize, total);
+};
+
+/**
+ * Detection on demand.
+ *
+ * Answered synchronously rather than 202-and-poll: a cycle is seconds, and the caller
+ * is a planner who pressed Refresh and expects the table to have moved when it
+ * returns. A planning run is the opposite shape and keeps its 202.
+ */
+export const refresh = async (_req: Request, res: Response) => {
+  ok(res, await refreshAlerts());
+};
+
+export const testNotification = async (_req: Request, res: Response) => {
+  ok(res, await notifications.sendTestNotification());
 };

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { AlertsHeader } from "@/components/alerts/alerts-header";
 import { AlertOverview } from "@/components/alerts/alert-overview";
 import { AlertFilters, AlertFilterState } from "@/components/alerts/alert-filters";
@@ -23,175 +24,153 @@ const defaultFilters: AlertFilterState = {
   sortBy: "severity",
 };
 
+const SEVERITY_WEIGHT: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
+
+/**
+ * `useSearchParams` opts a route out of static rendering unless it sits behind a
+ * Suspense boundary. Kept in a child so the shell still prerenders and only the part
+ * that depends on the query string waits.
+ */
 export default function AlertsPage() {
-  const { data, isPending, isError } = useAlerts({ pageSize: 200 });
+  return (
+    <Suspense fallback={<p className="p-6 text-sm text-muted-foreground">Loading alerts…</p>}>
+      <AlertsView />
+    </Suspense>
+  );
+}
+
+function AlertsView() {
+  const params = useSearchParams();
+  // A link from the bell, a toast or an alert detail arrives already scoped.
+  const dc = params.get("dc") ?? undefined;
+  const sku = params.get("sku") ?? undefined;
+
+  const [filters, setFilters] = useState<AlertFilterState>(defaultFilters);
+  const [selectedAlertId, setSelectedAlertId] = useState<string | null>(null);
+
+  /**
+   * Narrowing happens on the server.
+   *
+   * This page used to ask for `pageSize: 200` and filter the result in the browser,
+   * which made paging decorative and meant every filter only ever narrowed whichever
+   * 200 rows came back first. `status: "open"` is the default view because a resolved
+   * alert is history, not something to act on.
+   */
+  const { data, isPending, isError, isFetching } = useAlerts({
+    ...(filters.severity === "all" ? {} : { severity: filters.severity }),
+    ...(filters.type === "all" ? {} : { type: filters.type }),
+    ...(filters.location === "all" ? {} : { location: filters.location }),
+    status: filters.status === "all" ? "open" : filters.status,
+    ...(dc ? { warehouseId: dc } : {}),
+    pageSize: 100,
+  });
+
   const overviewQuery = useAlertOverview();
   const actions = useAlertActions();
 
   const alerts: SystemAlert[] = useMemo(() => data?.data ?? [], [data]);
-  const [filters, setFilters] = useState<AlertFilterState>(defaultFilters);
-  const [selectedAlertId, setSelectedAlertId] = useState<string | null>(null);
-  
-  // Overview derived state
+
   const overviewStats = useMemo(() => {
-    // In a real app, we might recalculate this based on resolved alerts,
-    // but for now we'll start with mock overview and just adjust unresolved/resolved slightly if we want.
-    // To keep it simple and match requirements, we'll return the mock data directly, 
-    // but we can adjust it if alerts are resolved locally.
-    
-    let unresolvedCount = 0;
-    let criticalCount = 0;
-    let highCount = 0;
-
-    alerts.forEach(a => {
-      if (a.status !== "resolved") {
-        unresolvedCount++;
-        if (a.severity === "critical") criticalCount++;
-        if (a.severity === "high") highCount++;
-      }
-    });
-
-    // the api computes these over the whole table, not just the loaded page
     const live = overviewQuery.data;
-    if (live) {
-      // resolvedPercentage is null when there are no alerts at all, which is not 0%
-      return { ...live, resolvedPercentage: live.resolvedPercentage ?? 0 };
-    }
+    if (live) return { ...live, resolvedPercentage: live.resolvedPercentage ?? 0 };
 
-    return ({
-        criticalCount,
-        highCount,
-        unresolvedCount,
-        todayCount: 0,
-        todayDelta: 0,
-        resolvedCount: 0,
-        resolvedPercentage: 0,
-    });
+    // Until the overview lands, count what is on screen rather than showing zeros.
+    return {
+      totalCount: alerts.length,
+      criticalCount: alerts.filter((alert) => alert.severity === "critical").length,
+      highCount: alerts.filter((alert) => alert.severity === "high").length,
+      unresolvedCount: alerts.filter((alert) => alert.status !== "resolved").length,
+      todayCount: 0,
+      todayDelta: 0,
+      resolvedCount: 0,
+      resolvedPercentage: 0,
+    };
   }, [alerts, overviewQuery.data]);
 
-  // Filter & Sort Logic
-  const filteredAlerts = useMemo(() => {
+  /**
+   * Search, the SKU deep link and sort order stay client-side.
+   *
+   * The list route has no free-text search and no sort parameter; adding both is
+   * Phase 2 work. Over one page of results this is honest rather than misleading,
+   * which the 200-row version was not.
+   */
+  const visibleAlerts = useMemo(() => {
     let result = [...alerts];
 
-    // Status filter (Active by default vs Resolved)
-    // Actually the requirement says Status: All, New, Acknowledged, In Progress, Resolved.
-    if (filters.status !== "all") {
-      result = result.filter(a => a.status === filters.status);
-    } else {
-      // If "all" is selected, we might still want to see resolved? 
-      // The prompt says "Removes it from Active Alerts" when resolved. 
-      // Let's hide resolved unless explicitly searching for them or "all" is selected.
-      // We will leave them in if "all" is selected, but maybe default to active?
-      // The user requested: "Removes it from Active Alerts" upon resolving.
-      // So if status is 'all', let's actually just show non-resolved by default to act as an "Active Alerts" list,
-      // but to be perfectly aligned with standard filtering, "all" means all.
-      // I'll show all. The resolved ones will just look resolved.
-      // Wait, "Removes it from Active Alerts" implies the list is Active Alerts.
-      // Let's filter out resolved unless status === 'resolved'
-      result = result.filter(a => a.status !== "resolved"); 
-    }
+    if (sku) result = result.filter((alert) => alert.sku === sku);
 
-    // Search filter
     if (filters.search) {
-      const q = filters.search.toLowerCase();
-      result = result.filter(a => 
-        a.title.toLowerCase().includes(q) || 
-        (a.sku && a.sku.toLowerCase().includes(q)) || 
-        a.location.toLowerCase().includes(q)
+      const needle = filters.search.toLowerCase();
+      result = result.filter(
+        (alert) =>
+          alert.title.toLowerCase().includes(needle) ||
+          alert.sku?.toLowerCase().includes(needle) ||
+          alert.location.toLowerCase().includes(needle),
       );
     }
 
-    // Severity filter
-    if (filters.severity !== "all") {
-      result = result.filter(a => a.severity === filters.severity);
-    }
-
-    // Type filter
-    if (filters.type !== "all") {
-      result = result.filter(a => a.type === filters.type);
-    }
-
-    // Location filter
-    if (filters.location !== "all") {
-      result = result.filter(a => a.location === filters.location);
-    }
-
-    // Time filter (Mocked logic, just returning all for simplicity in mock)
-    // In a real app we'd parse detectedAt.
-
-    // Sorting
-    result.sort((a, b) => {
-      if (filters.sortBy === "severity") {
-        const severityWeight = { critical: 4, high: 3, medium: 2, low: 1 };
-        return severityWeight[b.severity] - severityWeight[a.severity];
-      }
+    return result.sort((left, right) => {
       if (filters.sortBy === "newest") {
-        return new Date(b.detectedAt).getTime() - new Date(a.detectedAt).getTime();
+        return new Date(right.detectedAt).getTime() - new Date(left.detectedAt).getTime();
       }
       if (filters.sortBy === "oldest") {
-        return new Date(a.detectedAt).getTime() - new Date(b.detectedAt).getTime();
+        return new Date(left.detectedAt).getTime() - new Date(right.detectedAt).getTime();
       }
-      return 0; // impact fallback to order
+      return (SEVERITY_WEIGHT[right.severity] ?? 0) - (SEVERITY_WEIGHT[left.severity] ?? 0);
     });
+  }, [alerts, filters.search, filters.sortBy, sku]);
 
-    return result;
-  }, [alerts, filters]);
-
-  // Actions
-  const handleAcknowledge = (id: string) => {
-    actions.acknowledge.mutate(id);
-  };
-
-  const handleResolve = (id: string) => {
-    actions.resolve.mutate(id);
-  };
-
-  const handleMarkAllRead = () => {
-    actions.markAllRead.mutate();
-  };
-
-  const selectedAlert = useMemo(() => alerts.find(a => a.id === selectedAlertId) || null, [alerts, selectedAlertId]);
+  const selectedAlert = useMemo(
+    () => alerts.find((alert) => alert.id === selectedAlertId) ?? null,
+    [alerts, selectedAlertId],
+  );
 
   if (isPending) {
-    return <p className="text-sm text-muted-foreground p-6">Loading alerts…</p>;
+    return <p className="p-6 text-sm text-muted-foreground">Loading alerts…</p>;
   }
 
   if (isError) {
-    return <p className="text-sm text-muted-foreground p-6">Could not load alerts.</p>;
+    return (
+      <div className="p-6">
+        <p className="text-sm font-medium text-foreground">Could not load alerts.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          The alerts service did not answer. Detection may still be running — try again in a moment.
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col gap-5 w-full max-w-7xl mx-auto pb-10 min-h-screen">
-      
-      <AlertsHeader onMarkAllRead={handleMarkAllRead} />
-      
+    <div className="flex min-h-screen w-full max-w-7xl mx-auto flex-col gap-5 pb-10">
+      <AlertsHeader onMarkAllRead={() => actions.markAllRead.mutate()} isFetching={isFetching} />
+
       <AlertOverview data={overviewStats} />
-      
-      <AlertFilters 
-        filters={filters} 
-        onChange={setFilters} 
-        onReset={() => setFilters(defaultFilters)} 
+
+      <AlertFilters
+        filters={filters}
+        onChange={setFilters}
+        onReset={() => setFilters(defaultFilters)}
       />
-      
-      <ActiveAlertList 
-        alerts={filteredAlerts} 
+
+      <ActiveAlertList
+        alerts={visibleAlerts}
         unresolvedCount={overviewStats.unresolvedCount}
         onReview={(alert) => setSelectedAlertId(alert.id)}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-2">
+      <div className="mt-2 grid grid-cols-1 gap-5 lg:grid-cols-2">
         <AlertTrends />
         <MonitoringHealth />
       </div>
 
       <AlertDistribution />
 
-      <AlertDetailsSheet 
-        alert={selectedAlert} 
-        isOpen={!!selectedAlertId} 
+      <AlertDetailsSheet
+        alert={selectedAlert}
+        isOpen={!!selectedAlertId}
         onClose={() => setSelectedAlertId(null)}
-        onAcknowledge={handleAcknowledge}
-        onResolve={handleResolve}
+        onAcknowledge={(id) => actions.acknowledge.mutate(id)}
+        onResolve={(id) => actions.resolve.mutate(id)}
       />
     </div>
   );

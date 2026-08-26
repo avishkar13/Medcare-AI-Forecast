@@ -3,6 +3,8 @@ import { loadPositions, type InventoryPosition } from "./dashboard.service.js";
 import { getSettings } from "./settings.service.js";
 import { projectFefoWaste, round } from "../utils/inventory.js";
 import { OPEN_STATUSES } from "./alert.service.js";
+import { routeAlert, routeAlerts } from "./notification.service.js";
+import { emitAlert } from "../lib/realtime.js";
 
 /**
  * The producer behind `/api/alerts`.
@@ -35,8 +37,10 @@ interface AlertDraft {
   type: string;
   title: string;
   sku: string | null;
-  product: string | null;
+  productName: string | null;
   location: string;
+  productId: string | null;
+  warehouseId: string | null;
   businessImpact: string;
   recommendedAction: string;
   explanation: string;
@@ -46,8 +50,18 @@ interface AlertDraft {
 const units = (value: number) => Math.round(value).toLocaleString("en-US");
 const money = (value: number) => `$${Math.round(value).toLocaleString("en-US")}`;
 
-const fingerprintOf = (type: string, sku: string | null, location: string) =>
-  `${type}|${sku ?? ""}|${location}`;
+/**
+ * Keyed on ids, never on the display name.
+ *
+ * This used to read `${type}|${sku}|${warehouseName}`, which meant renaming a
+ * warehouse changed the identity of every condition detected there: the acknowledged
+ * alert stopped matching, was retired as "no longer detected", and re-raised as new.
+ */
+const fingerprintOf = (
+  type: string,
+  productId: string | null,
+  warehouseId: string | null,
+) => `${type}|${productId ?? ""}|${warehouseId ?? ""}`;
 
 /** Products flagged CRITICAL or HIGH escalate one band - a stockout there is clinical. */
 const escalates = (position: InventoryPosition) =>
@@ -90,13 +104,15 @@ const detectStockoutRisk = (
         : "medium";
 
     drafts.push({
-      fingerprint: fingerprintOf("stockout_risk", position.sku, position.warehouseName),
+      fingerprint: fingerprintOf("stockout_risk", position.productId, position.warehouseId),
       severity,
       type: "stockout_risk",
       title: `${position.productName} is ${probability}% likely to stock out at ${position.warehouseName}`,
       sku: position.sku,
-      product: position.productName,
+      productName: position.productName,
       location: position.warehouseName,
+      productId: position.productId,
+      warehouseId: position.warehouseId,
       businessImpact: `${units(shortfall)} units short of the reorder point, ${money(shortfall * position.stockoutCostPerUnit)} of stockout exposure`,
       recommendedAction: bufferBreached
         ? `Expedite ${units(shortfall)} units — stock is already below the safety buffer`
@@ -168,13 +184,15 @@ const detectExpiryRisk = (
     );
 
     drafts.push({
-      fingerprint: fingerprintOf("expiry_risk", position.sku, position.warehouseName),
+      fingerprint: fingerprintOf("expiry_risk", position.productId, position.warehouseId),
       severity: earliestDays <= 15 ? "critical" : earliestDays <= 30 ? "high" : "medium",
       type: "expiry_risk",
       title: `${units(wasteUnits)} units of ${position.productName} will expire unsold at ${position.warehouseName}`,
       sku: position.sku,
-      product: position.productName,
+      productName: position.productName,
       location: position.warehouseName,
+      productId: position.productId,
+      warehouseId: position.warehouseId,
       businessImpact: `${money(wasteValue)} of stock is projected to be written off`,
       recommendedAction: `Prioritise FEFO dispatch or redistribute ${units(wasteUnits)} units before expiry`,
       explanation: `The earliest batch expires in ${earliestDays} days. At ${round(position.avgDailyDemand)} units of daily demand, consumption clears only part of the stock on hand before that date.`,
@@ -204,13 +222,15 @@ const detectOverstock = (positions: InventoryPosition[]): AlertDraft[] => {
       position.avgDailyDemand > 0 ? Math.round(excess / position.avgDailyDemand) : null;
 
     drafts.push({
-      fingerprint: fingerprintOf("overstock", position.sku, position.warehouseName),
+      fingerprint: fingerprintOf("overstock", position.productId, position.warehouseId),
       severity: position.onHand > position.maximumInventory * 2 ? "medium" : "low",
       type: "overstock",
       title: `${position.productName} is ${units(excess)} units above its maximum at ${position.warehouseName}`,
       sku: position.sku,
-      product: position.productName,
+      productName: position.productName,
       location: position.warehouseName,
+      productId: position.productId,
+      warehouseId: position.warehouseId,
       businessImpact: `${money(excessValue)} of working capital tied up above the maximum level`,
       recommendedAction: `Redistribute ${units(excess)} units to a location that is short, or hold back the next order`,
       explanation:
@@ -233,10 +253,14 @@ const detectCapacityBreach = (
   positions: InventoryPosition[],
   thresholdPercent: number,
 ): AlertDraft[] => {
-  const byWarehouse = new Map<string, { name: string; capacity: number | null; onHand: number }>();
+  const byWarehouse = new Map<
+    string,
+    { id: string; name: string; capacity: number | null; onHand: number }
+  >();
 
   for (const position of positions) {
     const bucket = byWarehouse.get(position.warehouseId) ?? {
+      id: position.warehouseId,
       name: position.warehouseName,
       capacity: position.warehouseCapacity,
       onHand: 0,
@@ -253,13 +277,16 @@ const detectCapacityBreach = (
     if (utilization < thresholdPercent) continue;
 
     drafts.push({
-      fingerprint: fingerprintOf("capacity_breach", null, warehouse.name),
+      // A site-level condition: no product, so identity is the warehouse alone.
+      fingerprint: fingerprintOf("capacity_breach", null, warehouse.id),
       severity: utilization >= 100 ? "critical" : "high",
       type: "capacity_breach",
       title: `${warehouse.name} is at ${utilization}% of storage capacity`,
       sku: null,
-      product: null,
+      productName: null,
       location: warehouse.name,
+      productId: null,
+      warehouseId: warehouse.id,
       businessImpact:
         utilization >= 100
           ? `Stock on hand exceeds the site's capacity — inbound receipts have nowhere to go`
@@ -309,13 +336,15 @@ const detectDemandSpike = (
     if (daysAtNewRate !== null && daysAtNewRate > position.leadTimeDays * 2) continue;
 
     drafts.push({
-      fingerprint: fingerprintOf("demand_spike", position.sku, position.warehouseName),
+      fingerprint: fingerprintOf("demand_spike", position.productId, position.warehouseId),
       severity: deviation >= deviationPercent * 2 ? "high" : "medium",
       type: "demand_spike",
       title: `${position.productName} demand is up ${deviation}% at ${position.warehouseName}`,
       sku: position.sku,
-      product: position.productName,
+      productName: position.productName,
       location: position.warehouseName,
+      productId: position.productId,
+      warehouseId: position.warehouseId,
       businessImpact:
         daysAtNewRate === null
           ? `Demand is accelerating against the planned buffer`
@@ -393,11 +422,30 @@ const chunk = <T>(rows: T[], size: number): T[][] => {
   return chunks;
 };
 
+/** Open counts for the bell, read back from the table so a missed event self-corrects. */
+export const broadcastCounts = async (): Promise<void> => {
+  const bySeverity = await prisma.alert.groupBy({
+    by: ["severity"],
+    where: { status: { in: [...OPEN_STATUSES] } },
+    _count: true,
+  });
+
+  const countOf = (severity: string) =>
+    bySeverity.find((row) => row.severity === severity)?._count ?? 0;
+
+  emitAlert("alert:counts", {
+    unresolved: bySeverity.reduce((total, row) => total + row._count, 0),
+    critical: countOf("critical"),
+    high: countOf("high"),
+  });
+};
+
 export interface DetectionOutcome {
   detected: number;
   created: number;
   retained: number;
   resolved: number;
+  notified: number;
   skipped: boolean;
 }
 
@@ -422,7 +470,7 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
   // The toggle means "stop detecting", not "stop reporting" - alerts already raised
   // stay readable, they just stop being reconciled.
   if (!realTimeMonitoring) {
-    return { detected: 0, created: 0, retained: 0, resolved: 0, skipped: true };
+    return { detected: 0, created: 0, retained: 0, resolved: 0, notified: 0, skipped: true };
   }
 
   const [positions, batches, spikes] = await Promise.all([
@@ -467,8 +515,8 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
     select: {
       id: true,
       type: true,
-      sku: true,
-      location: true,
+      productId: true,
+      warehouseId: true,
       severity: true,
       title: true,
       businessImpact: true,
@@ -479,7 +527,7 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
   });
 
   const openByFingerprint = new Map(
-    open.map((row) => [fingerprintOf(row.type, row.sku, row.location), row]),
+    open.map((row) => [fingerprintOf(row.type, row.productId, row.warehouseId), row]),
   );
 
   const creates: AlertDraft[] = [];
@@ -517,10 +565,11 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
   const stale = open.filter(
     (row) =>
       detecting.has(row.type) &&
-      !byFingerprint.has(fingerprintOf(row.type, row.sku, row.location)),
+      !byFingerprint.has(fingerprintOf(row.type, row.productId, row.warehouseId)),
   );
 
   const now = new Date();
+  let notified = 0;
 
   /**
    * Written as a handful of `createMany` batches rather than nested creates.
@@ -541,8 +590,10 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
         type: draft.type,
         title: draft.title,
         sku: draft.sku,
-        product: draft.product,
+        productName: draft.productName,
         location: draft.location,
+        productId: draft.productId,
+        warehouseId: draft.warehouseId,
         detectedAt: now,
         businessImpact: draft.businessImpact,
         status: "new",
@@ -555,11 +606,11 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
     // one `detectedAt` instant, which reads them back without a second key.
     const inserted = await prisma.alert.findMany({
       where: { detectedAt: now },
-      select: { id: true, type: true, sku: true, location: true },
+      select: { id: true, type: true, productId: true, warehouseId: true },
     });
 
     const idByFingerprint = new Map(
-      inserted.map((row) => [fingerprintOf(row.type, row.sku, row.location), row.id]),
+      inserted.map((row) => [fingerprintOf(row.type, row.productId, row.warehouseId), row.id]),
     );
 
     const children = creates.flatMap((draft) => {
@@ -581,6 +632,29 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
         })),
       }),
     ]);
+
+    // Only after the rows and their children are committed. Notifying first would
+    // push an alert a reader could not then open, and a failure here must not roll
+    // back a reconciliation that already succeeded.
+    notified = await routeAlerts(
+      inserted.map((row) => {
+        const draft = byFingerprint.get(
+          fingerprintOf(row.type, row.productId, row.warehouseId),
+        )!;
+        return {
+          id: row.id,
+          severity: draft.severity,
+          type: draft.type,
+          title: draft.title,
+          sku: draft.sku,
+          location: draft.location,
+          warehouseId: draft.warehouseId,
+          productId: draft.productId,
+          businessImpact: draft.businessImpact,
+          recommendedAction: draft.recommendedAction,
+        };
+      }),
+    );
   }
 
   for (const batch of chunk(updates, WRITE_CHUNK)) {
@@ -615,6 +689,27 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
         }),
       ),
     ]);
+
+    // An escalation is worth interrupting someone for a second time; a figure that
+    // merely drifted is not. `severityChanged` is the whole difference.
+    for (const { id, draft, severityChanged } of batch) {
+      emitAlert("alert:updated", { id, ...draft }, draft.warehouseId);
+      if (!severityChanged) continue;
+      notified += (
+        await routeAlert({
+          id,
+          severity: draft.severity,
+          type: draft.type,
+          title: draft.title,
+          sku: draft.sku,
+          location: draft.location,
+          warehouseId: draft.warehouseId,
+          productId: draft.productId,
+          businessImpact: draft.businessImpact,
+          recommendedAction: draft.recommendedAction,
+        })
+      ).filter((attempt) => attempt.status === "SENT").length;
+    }
   }
 
   if (stale.length > 0) {
@@ -630,13 +725,26 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
         })),
       }),
     ]);
+
+    // Clearing is pushed but never sent: nobody needs an email to say a risk went
+    // away, and the badge has to come down without waiting for a refetch.
+    for (const row of stale) {
+      emitAlert("alert:resolved", { id: row.id, type: row.type }, row.warehouseId);
+    }
   }
+
+  // One counts broadcast per cycle rather than one per row: the badge only needs the
+  // totals, and a client that just received 120 alert:created events should repaint
+  // once. Counted from the table, not from the deltas, so a client that missed an
+  // event still lands on the right number.
+  await broadcastCounts();
 
   return {
     detected: byFingerprint.size,
     created: creates.length,
     retained: updates.length,
     resolved: stale.length,
+    notified,
     skipped: false,
   };
 };

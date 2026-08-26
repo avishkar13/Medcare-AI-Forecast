@@ -75,6 +75,7 @@ export const ModelName = {
   Permission: 'Permission',
   RolePermission: 'RolePermission',
   Alert: 'Alert',
+  NotificationDelivery: 'NotificationDelivery',
   SystemSettings: 'SystemSettings',
   StockMovement: 'StockMovement',
   WastePreventionRecord: 'WastePreventionRecord',
@@ -476,18 +477,35 @@ export const AlertScalarFieldEnum = {
   type: 'type',
   title: 'title',
   sku: 'sku',
-  product: 'product',
+  productName: 'productName',
   location: 'location',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
   detectedAt: 'detectedAt',
   businessImpact: 'businessImpact',
   status: 'status',
   recommendedAction: 'recommendedAction',
   explanation: 'explanation',
+  notifiedAt: 'notifiedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type AlertScalarFieldEnum = (typeof AlertScalarFieldEnum)[keyof typeof AlertScalarFieldEnum]
+
+
+export const NotificationDeliveryScalarFieldEnum = {
+  id: 'id',
+  alertId: 'alertId',
+  channel: 'channel',
+  status: 'status',
+  recipient: 'recipient',
+  error: 'error',
+  attempts: 'attempts',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationDeliveryScalarFieldEnum = (typeof NotificationDeliveryScalarFieldEnum)[keyof typeof NotificationDeliveryScalarFieldEnum]
 
 
 export const SystemSettingsScalarFieldEnum = {

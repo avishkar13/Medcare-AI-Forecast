@@ -33,6 +33,11 @@ export function AlertDetailsSheet({ alert, isOpen, onClose, onAcknowledge, onRes
   if (!alert) return null;
 
   const formattedType = alert.type.split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+
+  const scope = new URLSearchParams();
+  if (alert.warehouseId) scope.set("dc", alert.warehouseId);
+  if (alert.sku) scope.set("sku", alert.sku);
+  const recommendationHref = scope.size > 0 ? `/recommendations?${scope}` : "/recommendations";
   
   const formatTime = (iso: string) => {
     const d = new Date(iso);
@@ -143,7 +148,12 @@ export function AlertDetailsSheet({ alert, isOpen, onClose, onAcknowledge, onRes
                   Acknowledge Alert
                 </Button>
               )}
-              <Link href="/recommendations" passHref className="w-full">
+              {/*
+                Carries the SKU and DC through. A bare `/recommendations` dropped the
+                reader on an unfiltered list and left them to find, by hand, the row
+                they had just been looking at.
+              */}
+              <Link href={recommendationHref} passHref className="w-full">
                 <Button variant="ghost" className="w-full h-10 text-xs font-bold text-muted-foreground hover:text-foreground" onClick={onClose}>
                   <Navigation className="h-3.5 w-3.5 mr-2 opacity-70" />
                   View Full Recommendation Context

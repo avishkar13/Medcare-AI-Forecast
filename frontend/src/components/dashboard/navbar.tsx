@@ -1,9 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Search, Bell, Menu, User, Settings, LogOut } from "lucide-react";
+import { Search, Menu, User, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAlertOverview } from "@/hooks/use-alerts";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -15,13 +14,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { SidebarContent } from "./sidebar";
+import { NotificationCenter } from "./notification-center";
 
 export function Navbar() {
   const pathname = usePathname();
-  const { data: alerts } = useAlertOverview();
-  const unresolved = alerts?.unresolvedCount ?? 0;
 
   // Basic breadcrumb logic based on pathname
   const pathSegments = pathname?.split("/").filter(Boolean) || [];
@@ -64,19 +61,7 @@ export function Navbar() {
           />
         </div>
 
-        {/* Notifications */}
-        <Tooltip>
-          <TooltipTrigger render={<Button variant="ghost" size="icon" className="relative h-9 w-9 cursor-pointer" />}>
-            <Bell className="h-4 w-4 text-muted-foreground" />
-            {unresolved > 0 && (
-              <span className="absolute top-2 right-2.5 h-1.5 w-1.5 rounded-full bg-destructive" />
-            )}
-            <span className="sr-only">Notifications</span>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{unresolved > 0 ? `${unresolved} unresolved alerts` : "No unresolved alerts"}</p>
-          </TooltipContent>
-        </Tooltip>
+        <NotificationCenter />
 
         {/* Avatar Dropdown */}
         <DropdownMenu>

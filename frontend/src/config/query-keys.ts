@@ -52,6 +52,7 @@ export const queryKeys = {
     trends: (params?: QueryParams) => ["alerts", "trends", params ?? {}] as const,
     distribution: () => ["alerts", "distribution"] as const,
     health: () => ["alerts", "health"] as const,
+    deliveries: (params?: QueryParams) => ["alerts", "deliveries", params ?? {}] as const,
   },
 
   expiry: {

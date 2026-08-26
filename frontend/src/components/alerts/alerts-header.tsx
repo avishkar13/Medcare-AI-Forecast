@@ -1,66 +1,89 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, CheckCircle2 } from "lucide-react";
-import { queryKeys } from "@/config/query-keys";
-import { useAlertOverview } from "@/hooks/use-alerts";
+import { RadarIcon, CheckCircle2, Loader2 } from "lucide-react";
+import { useAlertOverview, useRefreshAlerts } from "@/hooks/use-alerts";
 import { useReadiness } from "@/hooks/use-health";
+import { useRealtime } from "@/providers/realtime-provider";
 
 interface AlertsHeaderProps {
   onMarkAllRead: () => void;
+  isFetching?: boolean;
 }
 
-export function AlertsHeader({ onMarkAllRead }: AlertsHeaderProps) {
-  const client = useQueryClient();
+export function AlertsHeader({ onMarkAllRead, isFetching = false }: AlertsHeaderProps) {
   const overview = useAlertOverview();
   const { data: readiness } = useReadiness();
+  const { isLive } = useRealtime();
+  const detect = useRefreshAlerts();
 
   const monitoring = readiness?.dependencies.database === "up";
   const lastUpdated = overview.dataUpdatedAt
-    ? new Date(overview.dataUpdatedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+    ? new Date(overview.dataUpdatedAt).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
     : null;
 
-  const handleRefresh = () => {
-    void client.invalidateQueries({ queryKey: queryKeys.alerts.all });
-  };
-
   return (
-    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pt-4 sm:pt-6 mb-2">
+    <div className="mb-2 flex flex-col justify-between gap-4 pt-4 sm:pt-6 md:flex-row md:items-end">
       <div>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-ai mb-1">
-          Real-Time Monitoring
+        <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-ai">
+          {isLive ? "Live monitoring" : "Real-time monitoring"}
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Alerts &amp; Monitoring</h1>
-        <p className="text-sm text-muted-foreground mt-1 font-medium max-w-2xl">
+        <p className="mt-1 max-w-2xl text-sm font-medium text-muted-foreground">
           Monitor inventory, demand, expiry, and supply-chain risks requiring immediate attention.
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-4">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-background border border-border/50 rounded-full shadow-sm">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center md:gap-4">
+        <div className="flex items-center gap-2 rounded-full border border-border/50 bg-background px-3 py-1.5 shadow-sm">
           <div className="relative flex h-2 w-2">
             {monitoring && (
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
             )}
-            <span className={`relative inline-flex rounded-full h-2 w-2 ${monitoring ? "bg-success" : "bg-destructive"}`}></span>
+            <span
+              className={`relative inline-flex h-2 w-2 rounded-full ${monitoring ? "bg-success" : "bg-destructive"}`}
+            />
           </div>
           <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-            {monitoring ? "Monitoring Active" : "Monitoring Down"}
+            {/* Three states, not two: the backend can be up while the push channel is not. */}
+            {!monitoring ? "Monitoring down" : isLive ? "Live" : "Polling"}
           </span>
         </div>
-        
-        <p className="text-[11px] font-semibold text-muted-foreground whitespace-nowrap hidden sm:block">
+
+        <p className="hidden whitespace-nowrap text-[11px] font-semibold text-muted-foreground sm:block">
           {lastUpdated ? `Last updated: ${lastUpdated}` : "Not loaded"}
         </p>
-        
+
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="bg-background text-xs font-semibold h-8" onClick={handleRefresh} disabled={overview.isFetching}>
-            <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${overview.isFetching ? "animate-spin" : ""}`} />
-            Refresh
+          {/*
+            Runs a real detection cycle rather than refetching the cache. A refetch
+            only re-reads rows that nothing has re-derived, which is why the table
+            could sit unchanged however many times it was pressed.
+          */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 cursor-pointer bg-background text-xs font-semibold"
+            onClick={() => detect.mutate()}
+            disabled={detect.isPending || isFetching}
+          >
+            {detect.isPending ? (
+              <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <RadarIcon className="mr-1.5 h-3.5 w-3.5" />
+            )}
+            {detect.isPending ? "Detecting…" : "Run detection"}
           </Button>
-          <Button variant="outline" size="sm" className="bg-background text-xs font-semibold h-8" onClick={onMarkAllRead}>
-            <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 cursor-pointer bg-background text-xs font-semibold"
+            onClick={onMarkAllRead}
+          >
+            <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
             Mark All Read
           </Button>
         </div>

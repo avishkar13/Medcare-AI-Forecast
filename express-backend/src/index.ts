@@ -4,6 +4,8 @@ import { SERVER } from "./config/constants.js";
 import { disconnectPrisma } from "./config/prisma.js";
 import { disconnectRedis } from "./config/redis.js";
 import { drainPlanning } from "./lib/planning-runner.js";
+import { startAlertScheduler, stopAlertScheduler } from "./lib/alert-scheduler.js";
+import { attachRealtime, closeRealtime } from "./lib/realtime.js";
 import { failAbandonedRuns } from "./services/planning.service.js";
 import { rateLimitStoreKind } from "./middleware/rateLimiter.js";
 
@@ -18,6 +20,9 @@ const server = app.listen(SERVER.port, SERVER.host, () => {
     rateLimitStore: storeKind,
   });
 });
+
+attachRealtime(server);
+startAlertScheduler();
 
 // A crash or a kill leaves runs stuck at PENDING/RUNNING. Sweep them at boot rather
 // than waiting for the next POST to notice.
@@ -43,13 +48,21 @@ const shutdown = async (reason: string, exitCode: number) => {
     process.exit(1);
   }, SERVER.shutdownTimeoutMs).unref();
 
+  // Sockets are long-lived by design, so `server.close` would wait on every open one.
+  // Closing them first is what lets the http server actually finish closing.
+  await closeRealtime();
+
   server.closeIdleConnections();
   await new Promise<void>((resolve, reject) => {
     server.close((err) => (err ? reject(err) : resolve()));
   });
 
-  // Between closing the socket and dropping the connections: a run still needs Prisma.
-  await drainPlanning(SERVER.planningDrainTimeoutMs);
+  // Between closing the socket and dropping the connections: both a run and a
+  // detection cycle still need Prisma.
+  await Promise.all([
+    drainPlanning(SERVER.planningDrainTimeoutMs),
+    stopAlertScheduler(SERVER.planningDrainTimeoutMs),
+  ]);
 
   for (const result of await Promise.allSettled([disconnectPrisma(), disconnectRedis()])) {
     if (result.status === "rejected") console.error("teardown failed", result.reason);

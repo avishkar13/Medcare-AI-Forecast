@@ -24,6 +24,10 @@ export interface SystemAlert {
   sku?: string;
   product?: string;
   location: string;
+  // `location` and `product` are the display copy the detector wrote; these are what
+  // identity and every scoped link are keyed on. Null for a site-level alert.
+  productId?: string | null;
+  warehouseId?: string | null;
   detectedAt: string; // ISO string
   businessImpact: string;
   status: AlertStatus;

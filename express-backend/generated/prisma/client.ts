@@ -158,9 +158,22 @@ export type Permission = Prisma.PermissionModel
 export type RolePermission = Prisma.RolePermissionModel
 /**
  * Model Alert
- * 
+ * *
+ *  * `sku`, `productName` and `location` are the display copy a detector wrote at the
+ *  * moment it fired. `productId` and `warehouseId` are what identity is keyed on -
+ *  * the fingerprint, every scoped filter, and every deep link. Renaming a warehouse
+ *  * must not orphan an alert a planner already acknowledged.
  */
 export type Alert = Prisma.AlertModel
+/**
+ * Model NotificationDelivery
+ * *
+ *  * One row per channel per attempt, written whether or not the send succeeded.
+ *  * `SKIPPED` is the load-bearing status: a channel the rules disabled and a channel
+ *  * whose provider is not configured both record a row, so the settings page can show
+ *  * why nothing arrived instead of showing an empty log.
+ */
+export type NotificationDelivery = Prisma.NotificationDeliveryModel
 /**
  * Model SystemSettings
  * 

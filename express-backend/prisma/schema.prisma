@@ -51,6 +51,7 @@ model Product {
   promotionEvents    PromotionEvent[]
   demandSignals      DemandSignal[]
   distributorOrders  DistributorOrder[]
+  alerts             Alert[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -82,6 +83,7 @@ model Warehouse {
   promotionEvents    PromotionEvent[]
   distributors       Distributor[]
   distributorOrders  DistributorOrder[]
+  alerts             Alert[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -539,24 +541,65 @@ enum RecommendationStatus {
   COMPLETED
 }
 
+/**
+ * `sku`, `productName` and `location` are the display copy a detector wrote at the
+ * moment it fired. `productId` and `warehouseId` are what identity is keyed on -
+ * the fingerprint, every scoped filter, and every deep link. Renaming a warehouse
+ * must not orphan an alert a planner already acknowledged.
+ */
 model Alert {
-  id                String               @id @default(cuid())
+  id                String                 @id @default(cuid())
   severity          String
   type              String
   title             String
   sku               String?
-  product           String?
+  productName       String?
   location          String
+  productId         String?
+  warehouseId       String?
   detectedAt        DateTime
   businessImpact    String
   status            String
   recommendedAction String
   explanation       String
+  notifiedAt        DateTime?
   metrics           AlertMetric[]
   timeline          AlertTimelineEvent[]
+  deliveries        NotificationDelivery[]
+
+  product   Product?   @relation(fields: [productId], references: [id])
+  warehouse Warehouse? @relation(fields: [warehouseId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([warehouseId])
+  @@index([productId])
+  @@index([status, severity])
+}
+
+/**
+ * One row per channel per attempt, written whether or not the send succeeded.
+ * `SKIPPED` is the load-bearing status: a channel the rules disabled and a channel
+ * whose provider is not configured both record a row, so the settings page can show
+ * why nothing arrived instead of showing an empty log.
+ */
+model NotificationDelivery {
+  id        String  @id @default(cuid())
+  alertId   String
+  channel   String
+  status    String
+  recipient String?
+  error     String?
+  attempts  Int     @default(1)
+
+  alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([alertId])
+  @@index([channel, status])
+  @@index([createdAt])
 }
 
 model SystemSettings {

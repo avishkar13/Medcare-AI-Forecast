@@ -2,6 +2,7 @@ import { prisma } from "../src/config/prisma.js";
 import bcrypt from "bcryptjs";
 import type { Criticality, WarehouseTier } from "../generated/prisma/enums.js";
 import { createRng, between as betweenOf, intBetween as intBetweenOf } from "../src/utils/random.js";
+import { refreshAlerts } from "../src/services/alert-detector.service.js";
 
 const SEED = 0x2f6e2b1;
 
@@ -495,6 +496,14 @@ const main = async () => {
   }
   await chunked(orderRows, 5_000, (batch) => prisma.distributorOrder.createMany({ data: batch }));
 
+  /**
+   * Alerts are derived, never seeded as literals - they have to agree with the
+   * positions above or the review surface contradicts the dashboard reading the same
+   * rows. Running detection here is what gives a fresh database a populated bell
+   * without first requiring a planning run, which is how it used to come up empty.
+   */
+  const detection = await refreshAlerts();
+
   const counts = {
     warehouses: warehouses.length,
     products: products.length,
@@ -505,6 +514,7 @@ const main = async () => {
     demandSignals: signalRows.length,
     distributors: distributors.length,
     distributorOrders: orderRows.length,
+    alerts: detection.created,
   };
 
   console.log("seed complete", counts);

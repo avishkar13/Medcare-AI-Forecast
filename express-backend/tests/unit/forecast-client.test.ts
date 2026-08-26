@@ -84,6 +84,9 @@ const withService = async (
 ) => {
   process.env.FORECAST_SERVICE_URL = "http://engine.test";
   process.env.FORECAST_RETRIES = "2";
+  // Importing the client pulls in config/env, which validates the whole environment.
+  process.env.DATABASE_URL ??= "postgresql://localhost:5432/test";
+  process.env.JWT_SECRET ??= "test-secret-at-least-thirty-two-chars";
   globalThis.fetch = handler as typeof fetch;
   return import("../../src/lib/forecast-client.js");
 };

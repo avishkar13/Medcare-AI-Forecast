@@ -14,7 +14,11 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model Alert
- * 
+ * *
+ *  * `sku`, `productName` and `location` are the display copy a detector wrote at the
+ *  * moment it fired. `productId` and `warehouseId` are what identity is keyed on -
+ *  * the fingerprint, every scoped filter, and every deep link. Renaming a warehouse
+ *  * must not orphan an alert a planner already acknowledged.
  */
 export type AlertModel = runtime.Types.Result.DefaultSelection<Prisma.$AlertPayload>
 
@@ -30,13 +34,16 @@ export type AlertMinAggregateOutputType = {
   type: string | null
   title: string | null
   sku: string | null
-  product: string | null
+  productName: string | null
   location: string | null
+  productId: string | null
+  warehouseId: string | null
   detectedAt: Date | null
   businessImpact: string | null
   status: string | null
   recommendedAction: string | null
   explanation: string | null
+  notifiedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -47,13 +54,16 @@ export type AlertMaxAggregateOutputType = {
   type: string | null
   title: string | null
   sku: string | null
-  product: string | null
+  productName: string | null
   location: string | null
+  productId: string | null
+  warehouseId: string | null
   detectedAt: Date | null
   businessImpact: string | null
   status: string | null
   recommendedAction: string | null
   explanation: string | null
+  notifiedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -64,13 +74,16 @@ export type AlertCountAggregateOutputType = {
   type: number
   title: number
   sku: number
-  product: number
+  productName: number
   location: number
+  productId: number
+  warehouseId: number
   detectedAt: number
   businessImpact: number
   status: number
   recommendedAction: number
   explanation: number
+  notifiedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -83,13 +96,16 @@ export type AlertMinAggregateInputType = {
   type?: true
   title?: true
   sku?: true
-  product?: true
+  productName?: true
   location?: true
+  productId?: true
+  warehouseId?: true
   detectedAt?: true
   businessImpact?: true
   status?: true
   recommendedAction?: true
   explanation?: true
+  notifiedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,13 +116,16 @@ export type AlertMaxAggregateInputType = {
   type?: true
   title?: true
   sku?: true
-  product?: true
+  productName?: true
   location?: true
+  productId?: true
+  warehouseId?: true
   detectedAt?: true
   businessImpact?: true
   status?: true
   recommendedAction?: true
   explanation?: true
+  notifiedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -117,13 +136,16 @@ export type AlertCountAggregateInputType = {
   type?: true
   title?: true
   sku?: true
-  product?: true
+  productName?: true
   location?: true
+  productId?: true
+  warehouseId?: true
   detectedAt?: true
   businessImpact?: true
   status?: true
   recommendedAction?: true
   explanation?: true
+  notifiedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -207,13 +229,16 @@ export type AlertGroupByOutputType = {
   type: string
   title: string
   sku: string | null
-  product: string | null
+  productName: string | null
   location: string
+  productId: string | null
+  warehouseId: string | null
   detectedAt: Date
   businessImpact: string
   status: string
   recommendedAction: string
   explanation: string
+  notifiedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: AlertCountAggregateOutputType | null
@@ -245,17 +270,23 @@ export type AlertWhereInput = {
   type?: Prisma.StringFilter<"Alert"> | string
   title?: Prisma.StringFilter<"Alert"> | string
   sku?: Prisma.StringNullableFilter<"Alert"> | string | null
-  product?: Prisma.StringNullableFilter<"Alert"> | string | null
+  productName?: Prisma.StringNullableFilter<"Alert"> | string | null
   location?: Prisma.StringFilter<"Alert"> | string
+  productId?: Prisma.StringNullableFilter<"Alert"> | string | null
+  warehouseId?: Prisma.StringNullableFilter<"Alert"> | string | null
   detectedAt?: Prisma.DateTimeFilter<"Alert"> | Date | string
   businessImpact?: Prisma.StringFilter<"Alert"> | string
   status?: Prisma.StringFilter<"Alert"> | string
   recommendedAction?: Prisma.StringFilter<"Alert"> | string
   explanation?: Prisma.StringFilter<"Alert"> | string
+  notifiedAt?: Prisma.DateTimeNullableFilter<"Alert"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Alert"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Alert"> | Date | string
   metrics?: Prisma.AlertMetricListRelationFilter
   timeline?: Prisma.AlertTimelineEventListRelationFilter
+  deliveries?: Prisma.NotificationDeliveryListRelationFilter
+  product?: Prisma.XOR<Prisma.ProductNullableScalarRelationFilter, Prisma.ProductWhereInput> | null
+  warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
 }
 
 export type AlertOrderByWithRelationInput = {
@@ -264,17 +295,23 @@ export type AlertOrderByWithRelationInput = {
   type?: Prisma.SortOrder
   title?: Prisma.SortOrder
   sku?: Prisma.SortOrderInput | Prisma.SortOrder
-  product?: Prisma.SortOrderInput | Prisma.SortOrder
+  productName?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrder
+  productId?: Prisma.SortOrderInput | Prisma.SortOrder
+  warehouseId?: Prisma.SortOrderInput | Prisma.SortOrder
   detectedAt?: Prisma.SortOrder
   businessImpact?: Prisma.SortOrder
   status?: Prisma.SortOrder
   recommendedAction?: Prisma.SortOrder
   explanation?: Prisma.SortOrder
+  notifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   metrics?: Prisma.AlertMetricOrderByRelationAggregateInput
   timeline?: Prisma.AlertTimelineEventOrderByRelationAggregateInput
+  deliveries?: Prisma.NotificationDeliveryOrderByRelationAggregateInput
+  product?: Prisma.ProductOrderByWithRelationInput
+  warehouse?: Prisma.WarehouseOrderByWithRelationInput
 }
 
 export type AlertWhereUniqueInput = Prisma.AtLeast<{
@@ -286,17 +323,23 @@ export type AlertWhereUniqueInput = Prisma.AtLeast<{
   type?: Prisma.StringFilter<"Alert"> | string
   title?: Prisma.StringFilter<"Alert"> | string
   sku?: Prisma.StringNullableFilter<"Alert"> | string | null
-  product?: Prisma.StringNullableFilter<"Alert"> | string | null
+  productName?: Prisma.StringNullableFilter<"Alert"> | string | null
   location?: Prisma.StringFilter<"Alert"> | string
+  productId?: Prisma.StringNullableFilter<"Alert"> | string | null
+  warehouseId?: Prisma.StringNullableFilter<"Alert"> | string | null
   detectedAt?: Prisma.DateTimeFilter<"Alert"> | Date | string
   businessImpact?: Prisma.StringFilter<"Alert"> | string
   status?: Prisma.StringFilter<"Alert"> | string
   recommendedAction?: Prisma.StringFilter<"Alert"> | string
   explanation?: Prisma.StringFilter<"Alert"> | string
+  notifiedAt?: Prisma.DateTimeNullableFilter<"Alert"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Alert"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Alert"> | Date | string
   metrics?: Prisma.AlertMetricListRelationFilter
   timeline?: Prisma.AlertTimelineEventListRelationFilter
+  deliveries?: Prisma.NotificationDeliveryListRelationFilter
+  product?: Prisma.XOR<Prisma.ProductNullableScalarRelationFilter, Prisma.ProductWhereInput> | null
+  warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
 }, "id">
 
 export type AlertOrderByWithAggregationInput = {
@@ -305,13 +348,16 @@ export type AlertOrderByWithAggregationInput = {
   type?: Prisma.SortOrder
   title?: Prisma.SortOrder
   sku?: Prisma.SortOrderInput | Prisma.SortOrder
-  product?: Prisma.SortOrderInput | Prisma.SortOrder
+  productName?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrder
+  productId?: Prisma.SortOrderInput | Prisma.SortOrder
+  warehouseId?: Prisma.SortOrderInput | Prisma.SortOrder
   detectedAt?: Prisma.SortOrder
   businessImpact?: Prisma.SortOrder
   status?: Prisma.SortOrder
   recommendedAction?: Prisma.SortOrder
   explanation?: Prisma.SortOrder
+  notifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.AlertCountOrderByAggregateInput
@@ -328,13 +374,16 @@ export type AlertScalarWhereWithAggregatesInput = {
   type?: Prisma.StringWithAggregatesFilter<"Alert"> | string
   title?: Prisma.StringWithAggregatesFilter<"Alert"> | string
   sku?: Prisma.StringNullableWithAggregatesFilter<"Alert"> | string | null
-  product?: Prisma.StringNullableWithAggregatesFilter<"Alert"> | string | null
+  productName?: Prisma.StringNullableWithAggregatesFilter<"Alert"> | string | null
   location?: Prisma.StringWithAggregatesFilter<"Alert"> | string
+  productId?: Prisma.StringNullableWithAggregatesFilter<"Alert"> | string | null
+  warehouseId?: Prisma.StringNullableWithAggregatesFilter<"Alert"> | string | null
   detectedAt?: Prisma.DateTimeWithAggregatesFilter<"Alert"> | Date | string
   businessImpact?: Prisma.StringWithAggregatesFilter<"Alert"> | string
   status?: Prisma.StringWithAggregatesFilter<"Alert"> | string
   recommendedAction?: Prisma.StringWithAggregatesFilter<"Alert"> | string
   explanation?: Prisma.StringWithAggregatesFilter<"Alert"> | string
+  notifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Alert"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Alert"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Alert"> | Date | string
 }
@@ -345,17 +394,21 @@ export type AlertCreateInput = {
   type: string
   title: string
   sku?: string | null
-  product?: string | null
+  productName?: string | null
   location: string
   detectedAt: Date | string
   businessImpact: string
   status: string
   recommendedAction: string
   explanation: string
+  notifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   metrics?: Prisma.AlertMetricCreateNestedManyWithoutAlertInput
   timeline?: Prisma.AlertTimelineEventCreateNestedManyWithoutAlertInput
+  deliveries?: Prisma.NotificationDeliveryCreateNestedManyWithoutAlertInput
+  product?: Prisma.ProductCreateNestedOneWithoutAlertsInput
+  warehouse?: Prisma.WarehouseCreateNestedOneWithoutAlertsInput
 }
 
 export type AlertUncheckedCreateInput = {
@@ -364,17 +417,21 @@ export type AlertUncheckedCreateInput = {
   type: string
   title: string
   sku?: string | null
-  product?: string | null
+  productName?: string | null
   location: string
+  productId?: string | null
+  warehouseId?: string | null
   detectedAt: Date | string
   businessImpact: string
   status: string
   recommendedAction: string
   explanation: string
+  notifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   metrics?: Prisma.AlertMetricUncheckedCreateNestedManyWithoutAlertInput
   timeline?: Prisma.AlertTimelineEventUncheckedCreateNestedManyWithoutAlertInput
+  deliveries?: Prisma.NotificationDeliveryUncheckedCreateNestedManyWithoutAlertInput
 }
 
 export type AlertUpdateInput = {
@@ -383,17 +440,21 @@ export type AlertUpdateInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   metrics?: Prisma.AlertMetricUpdateManyWithoutAlertNestedInput
   timeline?: Prisma.AlertTimelineEventUpdateManyWithoutAlertNestedInput
+  deliveries?: Prisma.NotificationDeliveryUpdateManyWithoutAlertNestedInput
+  product?: Prisma.ProductUpdateOneWithoutAlertsNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneWithoutAlertsNestedInput
 }
 
 export type AlertUncheckedUpdateInput = {
@@ -402,17 +463,21 @@ export type AlertUncheckedUpdateInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   metrics?: Prisma.AlertMetricUncheckedUpdateManyWithoutAlertNestedInput
   timeline?: Prisma.AlertTimelineEventUncheckedUpdateManyWithoutAlertNestedInput
+  deliveries?: Prisma.NotificationDeliveryUncheckedUpdateManyWithoutAlertNestedInput
 }
 
 export type AlertCreateManyInput = {
@@ -421,13 +486,16 @@ export type AlertCreateManyInput = {
   type: string
   title: string
   sku?: string | null
-  product?: string | null
+  productName?: string | null
   location: string
+  productId?: string | null
+  warehouseId?: string | null
   detectedAt: Date | string
   businessImpact: string
   status: string
   recommendedAction: string
   explanation: string
+  notifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -438,13 +506,14 @@ export type AlertUpdateManyMutationInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -455,15 +524,28 @@ export type AlertUncheckedUpdateManyInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AlertListRelationFilter = {
+  every?: Prisma.AlertWhereInput
+  some?: Prisma.AlertWhereInput
+  none?: Prisma.AlertWhereInput
+}
+
+export type AlertOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type AlertCountOrderByAggregateInput = {
@@ -472,13 +554,16 @@ export type AlertCountOrderByAggregateInput = {
   type?: Prisma.SortOrder
   title?: Prisma.SortOrder
   sku?: Prisma.SortOrder
-  product?: Prisma.SortOrder
+  productName?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  productId?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   detectedAt?: Prisma.SortOrder
   businessImpact?: Prisma.SortOrder
   status?: Prisma.SortOrder
   recommendedAction?: Prisma.SortOrder
   explanation?: Prisma.SortOrder
+  notifiedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -489,13 +574,16 @@ export type AlertMaxOrderByAggregateInput = {
   type?: Prisma.SortOrder
   title?: Prisma.SortOrder
   sku?: Prisma.SortOrder
-  product?: Prisma.SortOrder
+  productName?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  productId?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   detectedAt?: Prisma.SortOrder
   businessImpact?: Prisma.SortOrder
   status?: Prisma.SortOrder
   recommendedAction?: Prisma.SortOrder
   explanation?: Prisma.SortOrder
+  notifiedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -506,13 +594,16 @@ export type AlertMinOrderByAggregateInput = {
   type?: Prisma.SortOrder
   title?: Prisma.SortOrder
   sku?: Prisma.SortOrder
-  product?: Prisma.SortOrder
+  productName?: Prisma.SortOrder
   location?: Prisma.SortOrder
+  productId?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   detectedAt?: Prisma.SortOrder
   businessImpact?: Prisma.SortOrder
   status?: Prisma.SortOrder
   recommendedAction?: Prisma.SortOrder
   explanation?: Prisma.SortOrder
+  notifiedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -520,6 +611,104 @@ export type AlertMinOrderByAggregateInput = {
 export type AlertScalarRelationFilter = {
   is?: Prisma.AlertWhereInput
   isNot?: Prisma.AlertWhereInput
+}
+
+export type AlertCreateNestedManyWithoutProductInput = {
+  create?: Prisma.XOR<Prisma.AlertCreateWithoutProductInput, Prisma.AlertUncheckedCreateWithoutProductInput> | Prisma.AlertCreateWithoutProductInput[] | Prisma.AlertUncheckedCreateWithoutProductInput[]
+  connectOrCreate?: Prisma.AlertCreateOrConnectWithoutProductInput | Prisma.AlertCreateOrConnectWithoutProductInput[]
+  createMany?: Prisma.AlertCreateManyProductInputEnvelope
+  connect?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+}
+
+export type AlertUncheckedCreateNestedManyWithoutProductInput = {
+  create?: Prisma.XOR<Prisma.AlertCreateWithoutProductInput, Prisma.AlertUncheckedCreateWithoutProductInput> | Prisma.AlertCreateWithoutProductInput[] | Prisma.AlertUncheckedCreateWithoutProductInput[]
+  connectOrCreate?: Prisma.AlertCreateOrConnectWithoutProductInput | Prisma.AlertCreateOrConnectWithoutProductInput[]
+  createMany?: Prisma.AlertCreateManyProductInputEnvelope
+  connect?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+}
+
+export type AlertUpdateManyWithoutProductNestedInput = {
+  create?: Prisma.XOR<Prisma.AlertCreateWithoutProductInput, Prisma.AlertUncheckedCreateWithoutProductInput> | Prisma.AlertCreateWithoutProductInput[] | Prisma.AlertUncheckedCreateWithoutProductInput[]
+  connectOrCreate?: Prisma.AlertCreateOrConnectWithoutProductInput | Prisma.AlertCreateOrConnectWithoutProductInput[]
+  upsert?: Prisma.AlertUpsertWithWhereUniqueWithoutProductInput | Prisma.AlertUpsertWithWhereUniqueWithoutProductInput[]
+  createMany?: Prisma.AlertCreateManyProductInputEnvelope
+  set?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  disconnect?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  delete?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  connect?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  update?: Prisma.AlertUpdateWithWhereUniqueWithoutProductInput | Prisma.AlertUpdateWithWhereUniqueWithoutProductInput[]
+  updateMany?: Prisma.AlertUpdateManyWithWhereWithoutProductInput | Prisma.AlertUpdateManyWithWhereWithoutProductInput[]
+  deleteMany?: Prisma.AlertScalarWhereInput | Prisma.AlertScalarWhereInput[]
+}
+
+export type AlertUncheckedUpdateManyWithoutProductNestedInput = {
+  create?: Prisma.XOR<Prisma.AlertCreateWithoutProductInput, Prisma.AlertUncheckedCreateWithoutProductInput> | Prisma.AlertCreateWithoutProductInput[] | Prisma.AlertUncheckedCreateWithoutProductInput[]
+  connectOrCreate?: Prisma.AlertCreateOrConnectWithoutProductInput | Prisma.AlertCreateOrConnectWithoutProductInput[]
+  upsert?: Prisma.AlertUpsertWithWhereUniqueWithoutProductInput | Prisma.AlertUpsertWithWhereUniqueWithoutProductInput[]
+  createMany?: Prisma.AlertCreateManyProductInputEnvelope
+  set?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  disconnect?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  delete?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  connect?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  update?: Prisma.AlertUpdateWithWhereUniqueWithoutProductInput | Prisma.AlertUpdateWithWhereUniqueWithoutProductInput[]
+  updateMany?: Prisma.AlertUpdateManyWithWhereWithoutProductInput | Prisma.AlertUpdateManyWithWhereWithoutProductInput[]
+  deleteMany?: Prisma.AlertScalarWhereInput | Prisma.AlertScalarWhereInput[]
+}
+
+export type AlertCreateNestedManyWithoutWarehouseInput = {
+  create?: Prisma.XOR<Prisma.AlertCreateWithoutWarehouseInput, Prisma.AlertUncheckedCreateWithoutWarehouseInput> | Prisma.AlertCreateWithoutWarehouseInput[] | Prisma.AlertUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.AlertCreateOrConnectWithoutWarehouseInput | Prisma.AlertCreateOrConnectWithoutWarehouseInput[]
+  createMany?: Prisma.AlertCreateManyWarehouseInputEnvelope
+  connect?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+}
+
+export type AlertUncheckedCreateNestedManyWithoutWarehouseInput = {
+  create?: Prisma.XOR<Prisma.AlertCreateWithoutWarehouseInput, Prisma.AlertUncheckedCreateWithoutWarehouseInput> | Prisma.AlertCreateWithoutWarehouseInput[] | Prisma.AlertUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.AlertCreateOrConnectWithoutWarehouseInput | Prisma.AlertCreateOrConnectWithoutWarehouseInput[]
+  createMany?: Prisma.AlertCreateManyWarehouseInputEnvelope
+  connect?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+}
+
+export type AlertUpdateManyWithoutWarehouseNestedInput = {
+  create?: Prisma.XOR<Prisma.AlertCreateWithoutWarehouseInput, Prisma.AlertUncheckedCreateWithoutWarehouseInput> | Prisma.AlertCreateWithoutWarehouseInput[] | Prisma.AlertUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.AlertCreateOrConnectWithoutWarehouseInput | Prisma.AlertCreateOrConnectWithoutWarehouseInput[]
+  upsert?: Prisma.AlertUpsertWithWhereUniqueWithoutWarehouseInput | Prisma.AlertUpsertWithWhereUniqueWithoutWarehouseInput[]
+  createMany?: Prisma.AlertCreateManyWarehouseInputEnvelope
+  set?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  disconnect?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  delete?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  connect?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  update?: Prisma.AlertUpdateWithWhereUniqueWithoutWarehouseInput | Prisma.AlertUpdateWithWhereUniqueWithoutWarehouseInput[]
+  updateMany?: Prisma.AlertUpdateManyWithWhereWithoutWarehouseInput | Prisma.AlertUpdateManyWithWhereWithoutWarehouseInput[]
+  deleteMany?: Prisma.AlertScalarWhereInput | Prisma.AlertScalarWhereInput[]
+}
+
+export type AlertUncheckedUpdateManyWithoutWarehouseNestedInput = {
+  create?: Prisma.XOR<Prisma.AlertCreateWithoutWarehouseInput, Prisma.AlertUncheckedCreateWithoutWarehouseInput> | Prisma.AlertCreateWithoutWarehouseInput[] | Prisma.AlertUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.AlertCreateOrConnectWithoutWarehouseInput | Prisma.AlertCreateOrConnectWithoutWarehouseInput[]
+  upsert?: Prisma.AlertUpsertWithWhereUniqueWithoutWarehouseInput | Prisma.AlertUpsertWithWhereUniqueWithoutWarehouseInput[]
+  createMany?: Prisma.AlertCreateManyWarehouseInputEnvelope
+  set?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  disconnect?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  delete?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  connect?: Prisma.AlertWhereUniqueInput | Prisma.AlertWhereUniqueInput[]
+  update?: Prisma.AlertUpdateWithWhereUniqueWithoutWarehouseInput | Prisma.AlertUpdateWithWhereUniqueWithoutWarehouseInput[]
+  updateMany?: Prisma.AlertUpdateManyWithWhereWithoutWarehouseInput | Prisma.AlertUpdateManyWithWhereWithoutWarehouseInput[]
+  deleteMany?: Prisma.AlertScalarWhereInput | Prisma.AlertScalarWhereInput[]
+}
+
+export type AlertCreateNestedOneWithoutDeliveriesInput = {
+  create?: Prisma.XOR<Prisma.AlertCreateWithoutDeliveriesInput, Prisma.AlertUncheckedCreateWithoutDeliveriesInput>
+  connectOrCreate?: Prisma.AlertCreateOrConnectWithoutDeliveriesInput
+  connect?: Prisma.AlertWhereUniqueInput
+}
+
+export type AlertUpdateOneRequiredWithoutDeliveriesNestedInput = {
+  create?: Prisma.XOR<Prisma.AlertCreateWithoutDeliveriesInput, Prisma.AlertUncheckedCreateWithoutDeliveriesInput>
+  connectOrCreate?: Prisma.AlertCreateOrConnectWithoutDeliveriesInput
+  upsert?: Prisma.AlertUpsertWithoutDeliveriesInput
+  connect?: Prisma.AlertWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AlertUpdateToOneWithWhereWithoutDeliveriesInput, Prisma.AlertUpdateWithoutDeliveriesInput>, Prisma.AlertUncheckedUpdateWithoutDeliveriesInput>
 }
 
 export type AlertCreateNestedOneWithoutMetricsInput = {
@@ -550,22 +739,293 @@ export type AlertUpdateOneRequiredWithoutTimelineNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AlertUpdateToOneWithWhereWithoutTimelineInput, Prisma.AlertUpdateWithoutTimelineInput>, Prisma.AlertUncheckedUpdateWithoutTimelineInput>
 }
 
-export type AlertCreateWithoutMetricsInput = {
+export type AlertCreateWithoutProductInput = {
   id?: string
   severity: string
   type: string
   title: string
   sku?: string | null
-  product?: string | null
+  productName?: string | null
   location: string
   detectedAt: Date | string
   businessImpact: string
   status: string
   recommendedAction: string
   explanation: string
+  notifiedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  metrics?: Prisma.AlertMetricCreateNestedManyWithoutAlertInput
+  timeline?: Prisma.AlertTimelineEventCreateNestedManyWithoutAlertInput
+  deliveries?: Prisma.NotificationDeliveryCreateNestedManyWithoutAlertInput
+  warehouse?: Prisma.WarehouseCreateNestedOneWithoutAlertsInput
+}
+
+export type AlertUncheckedCreateWithoutProductInput = {
+  id?: string
+  severity: string
+  type: string
+  title: string
+  sku?: string | null
+  productName?: string | null
+  location: string
+  warehouseId?: string | null
+  detectedAt: Date | string
+  businessImpact: string
+  status: string
+  recommendedAction: string
+  explanation: string
+  notifiedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  metrics?: Prisma.AlertMetricUncheckedCreateNestedManyWithoutAlertInput
+  timeline?: Prisma.AlertTimelineEventUncheckedCreateNestedManyWithoutAlertInput
+  deliveries?: Prisma.NotificationDeliveryUncheckedCreateNestedManyWithoutAlertInput
+}
+
+export type AlertCreateOrConnectWithoutProductInput = {
+  where: Prisma.AlertWhereUniqueInput
+  create: Prisma.XOR<Prisma.AlertCreateWithoutProductInput, Prisma.AlertUncheckedCreateWithoutProductInput>
+}
+
+export type AlertCreateManyProductInputEnvelope = {
+  data: Prisma.AlertCreateManyProductInput | Prisma.AlertCreateManyProductInput[]
+  skipDuplicates?: boolean
+}
+
+export type AlertUpsertWithWhereUniqueWithoutProductInput = {
+  where: Prisma.AlertWhereUniqueInput
+  update: Prisma.XOR<Prisma.AlertUpdateWithoutProductInput, Prisma.AlertUncheckedUpdateWithoutProductInput>
+  create: Prisma.XOR<Prisma.AlertCreateWithoutProductInput, Prisma.AlertUncheckedCreateWithoutProductInput>
+}
+
+export type AlertUpdateWithWhereUniqueWithoutProductInput = {
+  where: Prisma.AlertWhereUniqueInput
+  data: Prisma.XOR<Prisma.AlertUpdateWithoutProductInput, Prisma.AlertUncheckedUpdateWithoutProductInput>
+}
+
+export type AlertUpdateManyWithWhereWithoutProductInput = {
+  where: Prisma.AlertScalarWhereInput
+  data: Prisma.XOR<Prisma.AlertUpdateManyMutationInput, Prisma.AlertUncheckedUpdateManyWithoutProductInput>
+}
+
+export type AlertScalarWhereInput = {
+  AND?: Prisma.AlertScalarWhereInput | Prisma.AlertScalarWhereInput[]
+  OR?: Prisma.AlertScalarWhereInput[]
+  NOT?: Prisma.AlertScalarWhereInput | Prisma.AlertScalarWhereInput[]
+  id?: Prisma.StringFilter<"Alert"> | string
+  severity?: Prisma.StringFilter<"Alert"> | string
+  type?: Prisma.StringFilter<"Alert"> | string
+  title?: Prisma.StringFilter<"Alert"> | string
+  sku?: Prisma.StringNullableFilter<"Alert"> | string | null
+  productName?: Prisma.StringNullableFilter<"Alert"> | string | null
+  location?: Prisma.StringFilter<"Alert"> | string
+  productId?: Prisma.StringNullableFilter<"Alert"> | string | null
+  warehouseId?: Prisma.StringNullableFilter<"Alert"> | string | null
+  detectedAt?: Prisma.DateTimeFilter<"Alert"> | Date | string
+  businessImpact?: Prisma.StringFilter<"Alert"> | string
+  status?: Prisma.StringFilter<"Alert"> | string
+  recommendedAction?: Prisma.StringFilter<"Alert"> | string
+  explanation?: Prisma.StringFilter<"Alert"> | string
+  notifiedAt?: Prisma.DateTimeNullableFilter<"Alert"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"Alert"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Alert"> | Date | string
+}
+
+export type AlertCreateWithoutWarehouseInput = {
+  id?: string
+  severity: string
+  type: string
+  title: string
+  sku?: string | null
+  productName?: string | null
+  location: string
+  detectedAt: Date | string
+  businessImpact: string
+  status: string
+  recommendedAction: string
+  explanation: string
+  notifiedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  metrics?: Prisma.AlertMetricCreateNestedManyWithoutAlertInput
+  timeline?: Prisma.AlertTimelineEventCreateNestedManyWithoutAlertInput
+  deliveries?: Prisma.NotificationDeliveryCreateNestedManyWithoutAlertInput
+  product?: Prisma.ProductCreateNestedOneWithoutAlertsInput
+}
+
+export type AlertUncheckedCreateWithoutWarehouseInput = {
+  id?: string
+  severity: string
+  type: string
+  title: string
+  sku?: string | null
+  productName?: string | null
+  location: string
+  productId?: string | null
+  detectedAt: Date | string
+  businessImpact: string
+  status: string
+  recommendedAction: string
+  explanation: string
+  notifiedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  metrics?: Prisma.AlertMetricUncheckedCreateNestedManyWithoutAlertInput
+  timeline?: Prisma.AlertTimelineEventUncheckedCreateNestedManyWithoutAlertInput
+  deliveries?: Prisma.NotificationDeliveryUncheckedCreateNestedManyWithoutAlertInput
+}
+
+export type AlertCreateOrConnectWithoutWarehouseInput = {
+  where: Prisma.AlertWhereUniqueInput
+  create: Prisma.XOR<Prisma.AlertCreateWithoutWarehouseInput, Prisma.AlertUncheckedCreateWithoutWarehouseInput>
+}
+
+export type AlertCreateManyWarehouseInputEnvelope = {
+  data: Prisma.AlertCreateManyWarehouseInput | Prisma.AlertCreateManyWarehouseInput[]
+  skipDuplicates?: boolean
+}
+
+export type AlertUpsertWithWhereUniqueWithoutWarehouseInput = {
+  where: Prisma.AlertWhereUniqueInput
+  update: Prisma.XOR<Prisma.AlertUpdateWithoutWarehouseInput, Prisma.AlertUncheckedUpdateWithoutWarehouseInput>
+  create: Prisma.XOR<Prisma.AlertCreateWithoutWarehouseInput, Prisma.AlertUncheckedCreateWithoutWarehouseInput>
+}
+
+export type AlertUpdateWithWhereUniqueWithoutWarehouseInput = {
+  where: Prisma.AlertWhereUniqueInput
+  data: Prisma.XOR<Prisma.AlertUpdateWithoutWarehouseInput, Prisma.AlertUncheckedUpdateWithoutWarehouseInput>
+}
+
+export type AlertUpdateManyWithWhereWithoutWarehouseInput = {
+  where: Prisma.AlertScalarWhereInput
+  data: Prisma.XOR<Prisma.AlertUpdateManyMutationInput, Prisma.AlertUncheckedUpdateManyWithoutWarehouseInput>
+}
+
+export type AlertCreateWithoutDeliveriesInput = {
+  id?: string
+  severity: string
+  type: string
+  title: string
+  sku?: string | null
+  productName?: string | null
+  location: string
+  detectedAt: Date | string
+  businessImpact: string
+  status: string
+  recommendedAction: string
+  explanation: string
+  notifiedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  metrics?: Prisma.AlertMetricCreateNestedManyWithoutAlertInput
+  timeline?: Prisma.AlertTimelineEventCreateNestedManyWithoutAlertInput
+  product?: Prisma.ProductCreateNestedOneWithoutAlertsInput
+  warehouse?: Prisma.WarehouseCreateNestedOneWithoutAlertsInput
+}
+
+export type AlertUncheckedCreateWithoutDeliveriesInput = {
+  id?: string
+  severity: string
+  type: string
+  title: string
+  sku?: string | null
+  productName?: string | null
+  location: string
+  productId?: string | null
+  warehouseId?: string | null
+  detectedAt: Date | string
+  businessImpact: string
+  status: string
+  recommendedAction: string
+  explanation: string
+  notifiedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  metrics?: Prisma.AlertMetricUncheckedCreateNestedManyWithoutAlertInput
+  timeline?: Prisma.AlertTimelineEventUncheckedCreateNestedManyWithoutAlertInput
+}
+
+export type AlertCreateOrConnectWithoutDeliveriesInput = {
+  where: Prisma.AlertWhereUniqueInput
+  create: Prisma.XOR<Prisma.AlertCreateWithoutDeliveriesInput, Prisma.AlertUncheckedCreateWithoutDeliveriesInput>
+}
+
+export type AlertUpsertWithoutDeliveriesInput = {
+  update: Prisma.XOR<Prisma.AlertUpdateWithoutDeliveriesInput, Prisma.AlertUncheckedUpdateWithoutDeliveriesInput>
+  create: Prisma.XOR<Prisma.AlertCreateWithoutDeliveriesInput, Prisma.AlertUncheckedCreateWithoutDeliveriesInput>
+  where?: Prisma.AlertWhereInput
+}
+
+export type AlertUpdateToOneWithWhereWithoutDeliveriesInput = {
+  where?: Prisma.AlertWhereInput
+  data: Prisma.XOR<Prisma.AlertUpdateWithoutDeliveriesInput, Prisma.AlertUncheckedUpdateWithoutDeliveriesInput>
+}
+
+export type AlertUpdateWithoutDeliveriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
+  explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metrics?: Prisma.AlertMetricUpdateManyWithoutAlertNestedInput
+  timeline?: Prisma.AlertTimelineEventUpdateManyWithoutAlertNestedInput
+  product?: Prisma.ProductUpdateOneWithoutAlertsNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneWithoutAlertsNestedInput
+}
+
+export type AlertUncheckedUpdateWithoutDeliveriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
+  explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metrics?: Prisma.AlertMetricUncheckedUpdateManyWithoutAlertNestedInput
+  timeline?: Prisma.AlertTimelineEventUncheckedUpdateManyWithoutAlertNestedInput
+}
+
+export type AlertCreateWithoutMetricsInput = {
+  id?: string
+  severity: string
+  type: string
+  title: string
+  sku?: string | null
+  productName?: string | null
+  location: string
+  detectedAt: Date | string
+  businessImpact: string
+  status: string
+  recommendedAction: string
+  explanation: string
+  notifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   timeline?: Prisma.AlertTimelineEventCreateNestedManyWithoutAlertInput
+  deliveries?: Prisma.NotificationDeliveryCreateNestedManyWithoutAlertInput
+  product?: Prisma.ProductCreateNestedOneWithoutAlertsInput
+  warehouse?: Prisma.WarehouseCreateNestedOneWithoutAlertsInput
 }
 
 export type AlertUncheckedCreateWithoutMetricsInput = {
@@ -574,16 +1034,20 @@ export type AlertUncheckedCreateWithoutMetricsInput = {
   type: string
   title: string
   sku?: string | null
-  product?: string | null
+  productName?: string | null
   location: string
+  productId?: string | null
+  warehouseId?: string | null
   detectedAt: Date | string
   businessImpact: string
   status: string
   recommendedAction: string
   explanation: string
+  notifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   timeline?: Prisma.AlertTimelineEventUncheckedCreateNestedManyWithoutAlertInput
+  deliveries?: Prisma.NotificationDeliveryUncheckedCreateNestedManyWithoutAlertInput
 }
 
 export type AlertCreateOrConnectWithoutMetricsInput = {
@@ -608,16 +1072,20 @@ export type AlertUpdateWithoutMetricsInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeline?: Prisma.AlertTimelineEventUpdateManyWithoutAlertNestedInput
+  deliveries?: Prisma.NotificationDeliveryUpdateManyWithoutAlertNestedInput
+  product?: Prisma.ProductUpdateOneWithoutAlertsNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneWithoutAlertsNestedInput
 }
 
 export type AlertUncheckedUpdateWithoutMetricsInput = {
@@ -626,16 +1094,20 @@ export type AlertUncheckedUpdateWithoutMetricsInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeline?: Prisma.AlertTimelineEventUncheckedUpdateManyWithoutAlertNestedInput
+  deliveries?: Prisma.NotificationDeliveryUncheckedUpdateManyWithoutAlertNestedInput
 }
 
 export type AlertCreateWithoutTimelineInput = {
@@ -644,16 +1116,20 @@ export type AlertCreateWithoutTimelineInput = {
   type: string
   title: string
   sku?: string | null
-  product?: string | null
+  productName?: string | null
   location: string
   detectedAt: Date | string
   businessImpact: string
   status: string
   recommendedAction: string
   explanation: string
+  notifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   metrics?: Prisma.AlertMetricCreateNestedManyWithoutAlertInput
+  deliveries?: Prisma.NotificationDeliveryCreateNestedManyWithoutAlertInput
+  product?: Prisma.ProductCreateNestedOneWithoutAlertsInput
+  warehouse?: Prisma.WarehouseCreateNestedOneWithoutAlertsInput
 }
 
 export type AlertUncheckedCreateWithoutTimelineInput = {
@@ -662,16 +1138,20 @@ export type AlertUncheckedCreateWithoutTimelineInput = {
   type: string
   title: string
   sku?: string | null
-  product?: string | null
+  productName?: string | null
   location: string
+  productId?: string | null
+  warehouseId?: string | null
   detectedAt: Date | string
   businessImpact: string
   status: string
   recommendedAction: string
   explanation: string
+  notifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   metrics?: Prisma.AlertMetricUncheckedCreateNestedManyWithoutAlertInput
+  deliveries?: Prisma.NotificationDeliveryUncheckedCreateNestedManyWithoutAlertInput
 }
 
 export type AlertCreateOrConnectWithoutTimelineInput = {
@@ -696,16 +1176,20 @@ export type AlertUpdateWithoutTimelineInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   metrics?: Prisma.AlertMetricUpdateManyWithoutAlertNestedInput
+  deliveries?: Prisma.NotificationDeliveryUpdateManyWithoutAlertNestedInput
+  product?: Prisma.ProductUpdateOneWithoutAlertsNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneWithoutAlertsNestedInput
 }
 
 export type AlertUncheckedUpdateWithoutTimelineInput = {
@@ -714,16 +1198,184 @@ export type AlertUncheckedUpdateWithoutTimelineInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  product?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
+  explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metrics?: Prisma.AlertMetricUncheckedUpdateManyWithoutAlertNestedInput
+  deliveries?: Prisma.NotificationDeliveryUncheckedUpdateManyWithoutAlertNestedInput
+}
+
+export type AlertCreateManyProductInput = {
+  id?: string
+  severity: string
+  type: string
+  title: string
+  sku?: string | null
+  productName?: string | null
+  location: string
+  warehouseId?: string | null
+  detectedAt: Date | string
+  businessImpact: string
+  status: string
+  recommendedAction: string
+  explanation: string
+  notifiedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AlertUpdateWithoutProductInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.StringFieldUpdateOperationsInput | string
   detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metrics?: Prisma.AlertMetricUpdateManyWithoutAlertNestedInput
+  timeline?: Prisma.AlertTimelineEventUpdateManyWithoutAlertNestedInput
+  deliveries?: Prisma.NotificationDeliveryUpdateManyWithoutAlertNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneWithoutAlertsNestedInput
+}
+
+export type AlertUncheckedUpdateWithoutProductInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
+  explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   metrics?: Prisma.AlertMetricUncheckedUpdateManyWithoutAlertNestedInput
+  timeline?: Prisma.AlertTimelineEventUncheckedUpdateManyWithoutAlertNestedInput
+  deliveries?: Prisma.NotificationDeliveryUncheckedUpdateManyWithoutAlertNestedInput
+}
+
+export type AlertUncheckedUpdateManyWithoutProductInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
+  explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AlertCreateManyWarehouseInput = {
+  id?: string
+  severity: string
+  type: string
+  title: string
+  sku?: string | null
+  productName?: string | null
+  location: string
+  productId?: string | null
+  detectedAt: Date | string
+  businessImpact: string
+  status: string
+  recommendedAction: string
+  explanation: string
+  notifiedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AlertUpdateWithoutWarehouseInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
+  explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metrics?: Prisma.AlertMetricUpdateManyWithoutAlertNestedInput
+  timeline?: Prisma.AlertTimelineEventUpdateManyWithoutAlertNestedInput
+  deliveries?: Prisma.NotificationDeliveryUpdateManyWithoutAlertNestedInput
+  product?: Prisma.ProductUpdateOneWithoutAlertsNestedInput
+}
+
+export type AlertUncheckedUpdateWithoutWarehouseInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
+  explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metrics?: Prisma.AlertMetricUncheckedUpdateManyWithoutAlertNestedInput
+  timeline?: Prisma.AlertTimelineEventUncheckedUpdateManyWithoutAlertNestedInput
+  deliveries?: Prisma.NotificationDeliveryUncheckedUpdateManyWithoutAlertNestedInput
+}
+
+export type AlertUncheckedUpdateManyWithoutWarehouseInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
+  explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -734,11 +1386,13 @@ export type AlertUncheckedUpdateWithoutTimelineInput = {
 export type AlertCountOutputType = {
   metrics: number
   timeline: number
+  deliveries: number
 }
 
 export type AlertCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   metrics?: boolean | AlertCountOutputTypeCountMetricsArgs
   timeline?: boolean | AlertCountOutputTypeCountTimelineArgs
+  deliveries?: boolean | AlertCountOutputTypeCountDeliveriesArgs
 }
 
 /**
@@ -765,6 +1419,13 @@ export type AlertCountOutputTypeCountTimelineArgs<ExtArgs extends runtime.Types.
   where?: Prisma.AlertTimelineEventWhereInput
 }
 
+/**
+ * AlertCountOutputType without action
+ */
+export type AlertCountOutputTypeCountDeliveriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationDeliveryWhereInput
+}
+
 
 export type AlertSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -772,17 +1433,23 @@ export type AlertSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   type?: boolean
   title?: boolean
   sku?: boolean
-  product?: boolean
+  productName?: boolean
   location?: boolean
+  productId?: boolean
+  warehouseId?: boolean
   detectedAt?: boolean
   businessImpact?: boolean
   status?: boolean
   recommendedAction?: boolean
   explanation?: boolean
+  notifiedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   metrics?: boolean | Prisma.Alert$metricsArgs<ExtArgs>
   timeline?: boolean | Prisma.Alert$timelineArgs<ExtArgs>
+  deliveries?: boolean | Prisma.Alert$deliveriesArgs<ExtArgs>
+  product?: boolean | Prisma.Alert$productArgs<ExtArgs>
+  warehouse?: boolean | Prisma.Alert$warehouseArgs<ExtArgs>
   _count?: boolean | Prisma.AlertCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["alert"]>
 
@@ -792,15 +1459,20 @@ export type AlertSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   type?: boolean
   title?: boolean
   sku?: boolean
-  product?: boolean
+  productName?: boolean
   location?: boolean
+  productId?: boolean
+  warehouseId?: boolean
   detectedAt?: boolean
   businessImpact?: boolean
   status?: boolean
   recommendedAction?: boolean
   explanation?: boolean
+  notifiedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  product?: boolean | Prisma.Alert$productArgs<ExtArgs>
+  warehouse?: boolean | Prisma.Alert$warehouseArgs<ExtArgs>
 }, ExtArgs["result"]["alert"]>
 
 export type AlertSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -809,15 +1481,20 @@ export type AlertSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   type?: boolean
   title?: boolean
   sku?: boolean
-  product?: boolean
+  productName?: boolean
   location?: boolean
+  productId?: boolean
+  warehouseId?: boolean
   detectedAt?: boolean
   businessImpact?: boolean
   status?: boolean
   recommendedAction?: boolean
   explanation?: boolean
+  notifiedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  product?: boolean | Prisma.Alert$productArgs<ExtArgs>
+  warehouse?: boolean | Prisma.Alert$warehouseArgs<ExtArgs>
 }, ExtArgs["result"]["alert"]>
 
 export type AlertSelectScalar = {
@@ -826,31 +1503,46 @@ export type AlertSelectScalar = {
   type?: boolean
   title?: boolean
   sku?: boolean
-  product?: boolean
+  productName?: boolean
   location?: boolean
+  productId?: boolean
+  warehouseId?: boolean
   detectedAt?: boolean
   businessImpact?: boolean
   status?: boolean
   recommendedAction?: boolean
   explanation?: boolean
+  notifiedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AlertOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "severity" | "type" | "title" | "sku" | "product" | "location" | "detectedAt" | "businessImpact" | "status" | "recommendedAction" | "explanation" | "createdAt" | "updatedAt", ExtArgs["result"]["alert"]>
+export type AlertOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "severity" | "type" | "title" | "sku" | "productName" | "location" | "productId" | "warehouseId" | "detectedAt" | "businessImpact" | "status" | "recommendedAction" | "explanation" | "notifiedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["alert"]>
 export type AlertInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   metrics?: boolean | Prisma.Alert$metricsArgs<ExtArgs>
   timeline?: boolean | Prisma.Alert$timelineArgs<ExtArgs>
+  deliveries?: boolean | Prisma.Alert$deliveriesArgs<ExtArgs>
+  product?: boolean | Prisma.Alert$productArgs<ExtArgs>
+  warehouse?: boolean | Prisma.Alert$warehouseArgs<ExtArgs>
   _count?: boolean | Prisma.AlertCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type AlertIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type AlertIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type AlertIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  product?: boolean | Prisma.Alert$productArgs<ExtArgs>
+  warehouse?: boolean | Prisma.Alert$warehouseArgs<ExtArgs>
+}
+export type AlertIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  product?: boolean | Prisma.Alert$productArgs<ExtArgs>
+  warehouse?: boolean | Prisma.Alert$warehouseArgs<ExtArgs>
+}
 
 export type $AlertPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Alert"
   objects: {
     metrics: Prisma.$AlertMetricPayload<ExtArgs>[]
     timeline: Prisma.$AlertTimelineEventPayload<ExtArgs>[]
+    deliveries: Prisma.$NotificationDeliveryPayload<ExtArgs>[]
+    product: Prisma.$ProductPayload<ExtArgs> | null
+    warehouse: Prisma.$WarehousePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -858,13 +1550,16 @@ export type $AlertPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     type: string
     title: string
     sku: string | null
-    product: string | null
+    productName: string | null
     location: string
+    productId: string | null
+    warehouseId: string | null
     detectedAt: Date
     businessImpact: string
     status: string
     recommendedAction: string
     explanation: string
+    notifiedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["alert"]>
@@ -1263,6 +1958,9 @@ export interface Prisma__AlertClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   metrics<T extends Prisma.Alert$metricsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Alert$metricsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AlertMetricPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   timeline<T extends Prisma.Alert$timelineArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Alert$timelineArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AlertTimelineEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  deliveries<T extends Prisma.Alert$deliveriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Alert$deliveriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationDeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  product<T extends Prisma.Alert$productArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Alert$productArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  warehouse<T extends Prisma.Alert$warehouseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Alert$warehouseArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1297,13 +1995,16 @@ export interface AlertFieldRefs {
   readonly type: Prisma.FieldRef<"Alert", 'String'>
   readonly title: Prisma.FieldRef<"Alert", 'String'>
   readonly sku: Prisma.FieldRef<"Alert", 'String'>
-  readonly product: Prisma.FieldRef<"Alert", 'String'>
+  readonly productName: Prisma.FieldRef<"Alert", 'String'>
   readonly location: Prisma.FieldRef<"Alert", 'String'>
+  readonly productId: Prisma.FieldRef<"Alert", 'String'>
+  readonly warehouseId: Prisma.FieldRef<"Alert", 'String'>
   readonly detectedAt: Prisma.FieldRef<"Alert", 'DateTime'>
   readonly businessImpact: Prisma.FieldRef<"Alert", 'String'>
   readonly status: Prisma.FieldRef<"Alert", 'String'>
   readonly recommendedAction: Prisma.FieldRef<"Alert", 'String'>
   readonly explanation: Prisma.FieldRef<"Alert", 'String'>
+  readonly notifiedAt: Prisma.FieldRef<"Alert", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Alert", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Alert", 'DateTime'>
 }
@@ -1560,6 +2261,10 @@ export type AlertCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    */
   data: Prisma.AlertCreateManyInput | Prisma.AlertCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AlertIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1630,6 +2335,10 @@ export type AlertUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many Alerts to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AlertIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1744,6 +2453,68 @@ export type Alert$timelineArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.AlertTimelineEventScalarFieldEnum | Prisma.AlertTimelineEventScalarFieldEnum[]
+}
+
+/**
+ * Alert.deliveries
+ */
+export type Alert$deliveriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the NotificationDelivery
+   */
+  select?: Prisma.NotificationDeliverySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the NotificationDelivery
+   */
+  omit?: Prisma.NotificationDeliveryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationDeliveryInclude<ExtArgs> | null
+  where?: Prisma.NotificationDeliveryWhereInput
+  orderBy?: Prisma.NotificationDeliveryOrderByWithRelationInput | Prisma.NotificationDeliveryOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationDeliveryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationDeliveryScalarFieldEnum | Prisma.NotificationDeliveryScalarFieldEnum[]
+}
+
+/**
+ * Alert.product
+ */
+export type Alert$productArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Product
+   */
+  select?: Prisma.ProductSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Product
+   */
+  omit?: Prisma.ProductOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
+  where?: Prisma.ProductWhereInput
+}
+
+/**
+ * Alert.warehouse
+ */
+export type Alert$warehouseArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Warehouse
+   */
+  select?: Prisma.WarehouseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Warehouse
+   */
+  omit?: Prisma.WarehouseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WarehouseInclude<ExtArgs> | null
+  where?: Prisma.WarehouseWhereInput
 }
 
 /**

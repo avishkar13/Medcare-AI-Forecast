@@ -12,6 +12,16 @@ export const alertQuerySchema = z.object({
   severity: text.optional(),
   type: text.optional(),
   location: text.optional(),
+  warehouseId: text.optional(),
+  productId: text.optional(),
+  status: text.optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(200).default(50),
+});
+
+export const deliveryQuerySchema = z.object({
+  alertId: text.optional(),
+  channel: text.optional(),
   status: text.optional(),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(200).default(50),
@@ -24,5 +34,6 @@ export const alertTrendQuerySchema = z.object({
 export const alertParamsSchema = z.object({ id: text });
 
 export type AlertQuery = z.infer<typeof alertQuerySchema>;
+export type DeliveryQuery = z.infer<typeof deliveryQuerySchema>;
 export type AlertTrendQuery = z.infer<typeof alertTrendQuerySchema>;
 export type AlertParams = z.infer<typeof alertParamsSchema>;

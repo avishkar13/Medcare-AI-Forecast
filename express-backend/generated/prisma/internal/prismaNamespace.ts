@@ -421,6 +421,7 @@ export const ModelName = {
   Permission: 'Permission',
   RolePermission: 'RolePermission',
   Alert: 'Alert',
+  NotificationDelivery: 'NotificationDelivery',
   SystemSettings: 'SystemSettings',
   StockMovement: 'StockMovement',
   WastePreventionRecord: 'WastePreventionRecord',
@@ -456,7 +457,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "product" | "warehouse" | "demandHistory" | "inventory" | "inventoryBatch" | "planningParameter" | "promotionEvent" | "demandSignal" | "distributor" | "distributorOrder" | "scenario" | "planningRun" | "forecast" | "inventoryPlan" | "supplyPlan" | "dRPPlan" | "optimizationResult" | "simulationRun" | "recommendation" | "role" | "permission" | "rolePermission" | "alert" | "systemSettings" | "stockMovement" | "wastePreventionRecord" | "alertMetric" | "alertTimelineEvent" | "recommendationSignal" | "simulationMetric" | "scenarioDCImpact" | "scenarioSKUImpact" | "scenarioRiskIndicator" | "generalSettings" | "forecastSettings" | "inventorySettings" | "alertSettings" | "notificationSettings" | "notificationRule" | "aISettings" | "integrationSettings" | "integrationSource" | "securitySettings"
+    modelProps: "user" | "product" | "warehouse" | "demandHistory" | "inventory" | "inventoryBatch" | "planningParameter" | "promotionEvent" | "demandSignal" | "distributor" | "distributorOrder" | "scenario" | "planningRun" | "forecast" | "inventoryPlan" | "supplyPlan" | "dRPPlan" | "optimizationResult" | "simulationRun" | "recommendation" | "role" | "permission" | "rolePermission" | "alert" | "notificationDelivery" | "systemSettings" | "stockMovement" | "wastePreventionRecord" | "alertMetric" | "alertTimelineEvent" | "recommendationSignal" | "simulationMetric" | "scenarioDCImpact" | "scenarioSKUImpact" | "scenarioRiskIndicator" | "generalSettings" | "forecastSettings" | "inventorySettings" | "alertSettings" | "notificationSettings" | "notificationRule" | "aISettings" | "integrationSettings" | "integrationSource" | "securitySettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2233,6 +2234,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AlertCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AlertCountAggregateOutputType> | number
+        }
+      }
+    }
+    NotificationDelivery: {
+      payload: Prisma.$NotificationDeliveryPayload<ExtArgs>
+      fields: Prisma.NotificationDeliveryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NotificationDeliveryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDeliveryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NotificationDeliveryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDeliveryPayload>
+        }
+        findFirst: {
+          args: Prisma.NotificationDeliveryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDeliveryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NotificationDeliveryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDeliveryPayload>
+        }
+        findMany: {
+          args: Prisma.NotificationDeliveryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDeliveryPayload>[]
+        }
+        create: {
+          args: Prisma.NotificationDeliveryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDeliveryPayload>
+        }
+        createMany: {
+          args: Prisma.NotificationDeliveryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.NotificationDeliveryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDeliveryPayload>[]
+        }
+        delete: {
+          args: Prisma.NotificationDeliveryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDeliveryPayload>
+        }
+        update: {
+          args: Prisma.NotificationDeliveryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDeliveryPayload>
+        }
+        deleteMany: {
+          args: Prisma.NotificationDeliveryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NotificationDeliveryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.NotificationDeliveryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDeliveryPayload>[]
+        }
+        upsert: {
+          args: Prisma.NotificationDeliveryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationDeliveryPayload>
+        }
+        aggregate: {
+          args: Prisma.NotificationDeliveryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotificationDelivery>
+        }
+        groupBy: {
+          args: Prisma.NotificationDeliveryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationDeliveryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NotificationDeliveryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationDeliveryCountAggregateOutputType> | number
         }
       }
     }
@@ -4118,18 +4193,35 @@ export const AlertScalarFieldEnum = {
   type: 'type',
   title: 'title',
   sku: 'sku',
-  product: 'product',
+  productName: 'productName',
   location: 'location',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
   detectedAt: 'detectedAt',
   businessImpact: 'businessImpact',
   status: 'status',
   recommendedAction: 'recommendedAction',
   explanation: 'explanation',
+  notifiedAt: 'notifiedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type AlertScalarFieldEnum = (typeof AlertScalarFieldEnum)[keyof typeof AlertScalarFieldEnum]
+
+
+export const NotificationDeliveryScalarFieldEnum = {
+  id: 'id',
+  alertId: 'alertId',
+  channel: 'channel',
+  status: 'status',
+  recipient: 'recipient',
+  error: 'error',
+  attempts: 'attempts',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationDeliveryScalarFieldEnum = (typeof NotificationDeliveryScalarFieldEnum)[keyof typeof NotificationDeliveryScalarFieldEnum]
 
 
 export const SystemSettingsScalarFieldEnum = {
@@ -4828,6 +4920,7 @@ export type GlobalOmitConfig = {
   permission?: Prisma.PermissionOmit
   rolePermission?: Prisma.RolePermissionOmit
   alert?: Prisma.AlertOmit
+  notificationDelivery?: Prisma.NotificationDeliveryOmit
   systemSettings?: Prisma.SystemSettingsOmit
   stockMovement?: Prisma.StockMovementOmit
   wastePreventionRecord?: Prisma.WastePreventionRecordOmit

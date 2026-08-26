@@ -280,6 +280,7 @@ export type ProductWhereInput = {
   promotionEvents?: Prisma.PromotionEventListRelationFilter
   demandSignals?: Prisma.DemandSignalListRelationFilter
   distributorOrders?: Prisma.DistributorOrderListRelationFilter
+  alerts?: Prisma.AlertListRelationFilter
 }
 
 export type ProductOrderByWithRelationInput = {
@@ -306,6 +307,7 @@ export type ProductOrderByWithRelationInput = {
   promotionEvents?: Prisma.PromotionEventOrderByRelationAggregateInput
   demandSignals?: Prisma.DemandSignalOrderByRelationAggregateInput
   distributorOrders?: Prisma.DistributorOrderOrderByRelationAggregateInput
+  alerts?: Prisma.AlertOrderByRelationAggregateInput
 }
 
 export type ProductWhereUniqueInput = Prisma.AtLeast<{
@@ -335,6 +337,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   promotionEvents?: Prisma.PromotionEventListRelationFilter
   demandSignals?: Prisma.DemandSignalListRelationFilter
   distributorOrders?: Prisma.DistributorOrderListRelationFilter
+  alerts?: Prisma.AlertListRelationFilter
 }, "id" | "sku">
 
 export type ProductOrderByWithAggregationInput = {
@@ -397,6 +400,7 @@ export type ProductCreateInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateInput = {
@@ -423,6 +427,7 @@ export type ProductUncheckedCreateInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductUpdateInput = {
@@ -449,6 +454,7 @@ export type ProductUpdateInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateInput = {
@@ -475,6 +481,7 @@ export type ProductUncheckedUpdateInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateManyInput = {
@@ -773,6 +780,22 @@ export type ProductUpdateOneRequiredWithoutRecommendationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutRecommendationsInput, Prisma.ProductUpdateWithoutRecommendationsInput>, Prisma.ProductUncheckedUpdateWithoutRecommendationsInput>
 }
 
+export type ProductCreateNestedOneWithoutAlertsInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutAlertsInput, Prisma.ProductUncheckedCreateWithoutAlertsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutAlertsInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneWithoutAlertsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutAlertsInput, Prisma.ProductUncheckedCreateWithoutAlertsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutAlertsInput
+  upsert?: Prisma.ProductUpsertWithoutAlertsInput
+  disconnect?: Prisma.ProductWhereInput | boolean
+  delete?: Prisma.ProductWhereInput | boolean
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutAlertsInput, Prisma.ProductUpdateWithoutAlertsInput>, Prisma.ProductUncheckedUpdateWithoutAlertsInput>
+}
+
 export type ProductCreateWithoutDemandHistoryInput = {
   id?: string
   sku: string
@@ -796,6 +819,7 @@ export type ProductCreateWithoutDemandHistoryInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutDemandHistoryInput = {
@@ -821,6 +845,7 @@ export type ProductUncheckedCreateWithoutDemandHistoryInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutDemandHistoryInput = {
@@ -862,6 +887,7 @@ export type ProductUpdateWithoutDemandHistoryInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutDemandHistoryInput = {
@@ -887,6 +913,7 @@ export type ProductUncheckedUpdateWithoutDemandHistoryInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutInventoryInput = {
@@ -912,6 +939,7 @@ export type ProductCreateWithoutInventoryInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutInventoryInput = {
@@ -937,6 +965,7 @@ export type ProductUncheckedCreateWithoutInventoryInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutInventoryInput = {
@@ -978,6 +1007,7 @@ export type ProductUpdateWithoutInventoryInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutInventoryInput = {
@@ -1003,6 +1033,7 @@ export type ProductUncheckedUpdateWithoutInventoryInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutBatchesInput = {
@@ -1028,6 +1059,7 @@ export type ProductCreateWithoutBatchesInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutBatchesInput = {
@@ -1053,6 +1085,7 @@ export type ProductUncheckedCreateWithoutBatchesInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutBatchesInput = {
@@ -1094,6 +1127,7 @@ export type ProductUpdateWithoutBatchesInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutBatchesInput = {
@@ -1119,6 +1153,7 @@ export type ProductUncheckedUpdateWithoutBatchesInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutPlanningParametersInput = {
@@ -1144,6 +1179,7 @@ export type ProductCreateWithoutPlanningParametersInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutPlanningParametersInput = {
@@ -1169,6 +1205,7 @@ export type ProductUncheckedCreateWithoutPlanningParametersInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutPlanningParametersInput = {
@@ -1210,6 +1247,7 @@ export type ProductUpdateWithoutPlanningParametersInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutPlanningParametersInput = {
@@ -1235,6 +1273,7 @@ export type ProductUncheckedUpdateWithoutPlanningParametersInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutPromotionEventsInput = {
@@ -1260,6 +1299,7 @@ export type ProductCreateWithoutPromotionEventsInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutPromotionEventsInput = {
@@ -1285,6 +1325,7 @@ export type ProductUncheckedCreateWithoutPromotionEventsInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutPromotionEventsInput = {
@@ -1326,6 +1367,7 @@ export type ProductUpdateWithoutPromotionEventsInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutPromotionEventsInput = {
@@ -1351,6 +1393,7 @@ export type ProductUncheckedUpdateWithoutPromotionEventsInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutDemandSignalsInput = {
@@ -1376,6 +1419,7 @@ export type ProductCreateWithoutDemandSignalsInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutDemandSignalsInput = {
@@ -1401,6 +1445,7 @@ export type ProductUncheckedCreateWithoutDemandSignalsInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutDemandSignalsInput = {
@@ -1442,6 +1487,7 @@ export type ProductUpdateWithoutDemandSignalsInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutDemandSignalsInput = {
@@ -1467,6 +1513,7 @@ export type ProductUncheckedUpdateWithoutDemandSignalsInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutDistributorOrdersInput = {
@@ -1492,6 +1539,7 @@ export type ProductCreateWithoutDistributorOrdersInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutDistributorOrdersInput = {
@@ -1517,6 +1565,7 @@ export type ProductUncheckedCreateWithoutDistributorOrdersInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutDistributorOrdersInput = {
@@ -1558,6 +1607,7 @@ export type ProductUpdateWithoutDistributorOrdersInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutDistributorOrdersInput = {
@@ -1583,6 +1633,7 @@ export type ProductUncheckedUpdateWithoutDistributorOrdersInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutForecastsInput = {
@@ -1608,6 +1659,7 @@ export type ProductCreateWithoutForecastsInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutForecastsInput = {
@@ -1633,6 +1685,7 @@ export type ProductUncheckedCreateWithoutForecastsInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutForecastsInput = {
@@ -1674,6 +1727,7 @@ export type ProductUpdateWithoutForecastsInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutForecastsInput = {
@@ -1699,6 +1753,7 @@ export type ProductUncheckedUpdateWithoutForecastsInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutInventoryPlansInput = {
@@ -1724,6 +1779,7 @@ export type ProductCreateWithoutInventoryPlansInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutInventoryPlansInput = {
@@ -1749,6 +1805,7 @@ export type ProductUncheckedCreateWithoutInventoryPlansInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutInventoryPlansInput = {
@@ -1790,6 +1847,7 @@ export type ProductUpdateWithoutInventoryPlansInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutInventoryPlansInput = {
@@ -1815,6 +1873,7 @@ export type ProductUncheckedUpdateWithoutInventoryPlansInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutSupplyPlansInput = {
@@ -1840,6 +1899,7 @@ export type ProductCreateWithoutSupplyPlansInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutSupplyPlansInput = {
@@ -1865,6 +1925,7 @@ export type ProductUncheckedCreateWithoutSupplyPlansInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutSupplyPlansInput = {
@@ -1906,6 +1967,7 @@ export type ProductUpdateWithoutSupplyPlansInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutSupplyPlansInput = {
@@ -1931,6 +1993,7 @@ export type ProductUncheckedUpdateWithoutSupplyPlansInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutDrpPlansInput = {
@@ -1956,6 +2019,7 @@ export type ProductCreateWithoutDrpPlansInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutDrpPlansInput = {
@@ -1981,6 +2045,7 @@ export type ProductUncheckedCreateWithoutDrpPlansInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutDrpPlansInput = {
@@ -2022,6 +2087,7 @@ export type ProductUpdateWithoutDrpPlansInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutDrpPlansInput = {
@@ -2047,6 +2113,7 @@ export type ProductUncheckedUpdateWithoutDrpPlansInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutRecommendationsInput = {
@@ -2072,6 +2139,7 @@ export type ProductCreateWithoutRecommendationsInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutRecommendationsInput = {
@@ -2097,6 +2165,7 @@ export type ProductUncheckedCreateWithoutRecommendationsInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
   demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutRecommendationsInput = {
@@ -2138,6 +2207,7 @@ export type ProductUpdateWithoutRecommendationsInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutRecommendationsInput = {
@@ -2163,6 +2233,127 @@ export type ProductUncheckedUpdateWithoutRecommendationsInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
   demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutAlertsInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutAlertsInput = {
+  id?: string
+  sku: string
+  name: string
+  category?: string | null
+  unit?: string
+  unitCost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: number | null
+  criticality?: $Enums.Criticality
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutProductInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutProductInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutProductInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutProductInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutProductInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutProductInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutProductInput
+  drpPlans?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutProductInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutProductInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutProductInput
+  demandSignals?: Prisma.DemandSignalUncheckedCreateNestedManyWithoutProductInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutAlertsInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutAlertsInput, Prisma.ProductUncheckedCreateWithoutAlertsInput>
+}
+
+export type ProductUpsertWithoutAlertsInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutAlertsInput, Prisma.ProductUncheckedUpdateWithoutAlertsInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutAlertsInput, Prisma.ProductUncheckedCreateWithoutAlertsInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutAlertsInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutAlertsInput, Prisma.ProductUncheckedUpdateWithoutAlertsInput>
+}
+
+export type ProductUpdateWithoutAlertsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutAlertsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  unitCost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  shelfLifeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  criticality?: Prisma.EnumCriticalityFieldUpdateOperationsInput | $Enums.Criticality
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutProductNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutProductNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutProductNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutProductNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutProductNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutProductNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutProductNestedInput
+  drpPlans?: Prisma.DRPPlanUncheckedUpdateManyWithoutProductNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutProductNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutProductNestedInput
+  demandSignals?: Prisma.DemandSignalUncheckedUpdateManyWithoutProductNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutProductNestedInput
 }
 
 
@@ -2183,6 +2374,7 @@ export type ProductCountOutputType = {
   promotionEvents: number
   demandSignals: number
   distributorOrders: number
+  alerts: number
 }
 
 export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2198,6 +2390,7 @@ export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   promotionEvents?: boolean | ProductCountOutputTypeCountPromotionEventsArgs
   demandSignals?: boolean | ProductCountOutputTypeCountDemandSignalsArgs
   distributorOrders?: boolean | ProductCountOutputTypeCountDistributorOrdersArgs
+  alerts?: boolean | ProductCountOutputTypeCountAlertsArgs
 }
 
 /**
@@ -2294,6 +2487,13 @@ export type ProductCountOutputTypeCountDistributorOrdersArgs<ExtArgs extends run
   where?: Prisma.DistributorOrderWhereInput
 }
 
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountAlertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AlertWhereInput
+}
+
 
 export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2319,6 +2519,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   promotionEvents?: boolean | Prisma.Product$promotionEventsArgs<ExtArgs>
   demandSignals?: boolean | Prisma.Product$demandSignalsArgs<ExtArgs>
   distributorOrders?: boolean | Prisma.Product$distributorOrdersArgs<ExtArgs>
+  alerts?: boolean | Prisma.Product$alertsArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -2378,6 +2579,7 @@ export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   promotionEvents?: boolean | Prisma.Product$promotionEventsArgs<ExtArgs>
   demandSignals?: boolean | Prisma.Product$demandSignalsArgs<ExtArgs>
   distributorOrders?: boolean | Prisma.Product$distributorOrdersArgs<ExtArgs>
+  alerts?: boolean | Prisma.Product$alertsArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProductIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2398,6 +2600,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     promotionEvents: Prisma.$PromotionEventPayload<ExtArgs>[]
     demandSignals: Prisma.$DemandSignalPayload<ExtArgs>[]
     distributorOrders: Prisma.$DistributorOrderPayload<ExtArgs>[]
+    alerts: Prisma.$AlertPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2817,6 +3020,7 @@ export interface Prisma__ProductClient<T, Null = never, ExtArgs extends runtime.
   promotionEvents<T extends Prisma.Product$promotionEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$promotionEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PromotionEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   demandSignals<T extends Prisma.Product$demandSignalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$demandSignalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DemandSignalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   distributorOrders<T extends Prisma.Product$distributorOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$distributorOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DistributorOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  alerts<T extends Prisma.Product$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3535,6 +3739,30 @@ export type Product$distributorOrdersArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.DistributorOrderScalarFieldEnum | Prisma.DistributorOrderScalarFieldEnum[]
+}
+
+/**
+ * Product.alerts
+ */
+export type Product$alertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Alert
+   */
+  select?: Prisma.AlertSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Alert
+   */
+  omit?: Prisma.AlertOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AlertInclude<ExtArgs> | null
+  where?: Prisma.AlertWhereInput
+  orderBy?: Prisma.AlertOrderByWithRelationInput | Prisma.AlertOrderByWithRelationInput[]
+  cursor?: Prisma.AlertWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AlertScalarFieldEnum | Prisma.AlertScalarFieldEnum[]
 }
 
 /**

@@ -1,6 +1,7 @@
 import { AppSettings } from "@/types/settings";
 import { SettingsSection, SettingsCard, SettingsRow, SettingsToggle } from "./settings-ui";
 import { Input } from "@/components/ui/input";
+import { NotificationDeliveryLog } from "./notification-delivery-log";
 
 export function NotificationSettings({
   data,
@@ -94,6 +95,8 @@ export function NotificationSettings({
           </ul>
         </div>
       </SettingsCard>
+
+      <NotificationDeliveryLog />
     </SettingsSection>
   );
 }

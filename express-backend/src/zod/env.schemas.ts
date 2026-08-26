@@ -9,6 +9,8 @@ const optionalUrl = z
   .trim()
   .optional()
   .transform((value) => (value === undefined || value === "" ? undefined : value));
+// An empty string in a .env file means "unset", not "set to nothing".
+const optionalText = optionalUrl;
 
 export const envSchema = z
   .object({
@@ -56,6 +58,25 @@ export const envSchema = z
     FORECAST_FALLBACK: stringbool.default(true),
     // Fitting reads the whole export and trains several models; it is minutes, not seconds.
     FORECAST_TRAIN_TIMEOUT_MS: durationMs.default(600_000),
+
+    // Detection cadence. 0 disables the scheduler; the manual route still works.
+    ALERT_DETECTION_INTERVAL_MS: z.coerce.number().int().min(0).default(300_000),
+    // Every provider credential is optional. An unconfigured channel records SKIPPED
+    // rather than failing the run, so a deploy with no mail account still detects.
+    RESEND_API_KEY: optionalText,
+    EMAIL_FROM: optionalText,
+    ALERT_EMAIL_RECIPIENTS: z.string().default(""),
+    AWS_REGION: optionalText,
+    AWS_ACCESS_KEY_ID: optionalText,
+    AWS_SECRET_ACCESS_KEY: optionalText,
+    // Set a topic and SNS fans out to its subscribers; otherwise each number is
+    // published to individually. One or the other, topic wins.
+    AWS_SNS_TOPIC_ARN: optionalText,
+    AWS_SNS_SENDER_ID: optionalText,
+    ALERT_SMS_RECIPIENTS: z.string().default(""),
+    // Which severities are worth interrupting someone for. In-app always gets all.
+    NOTIFY_MIN_SEVERITY: z.enum(["critical", "high", "medium", "low"]).default("high"),
+    NOTIFY_TIMEOUT_MS: durationMs.default(10_000),
   })
   .superRefine((value, ctx) => {
     if (value.NODE_ENV === "production" && !value.REDIS_URL) {

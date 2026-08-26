@@ -23,6 +23,7 @@
     "test:integration": "node --import tsx --test --test-concurrency=1 \"tests/integration/**/*.test.ts\""
   },
   "dependencies": {
+    "@aws-sdk/client-sns": "^3.1119.0",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "bcryptjs": "^3.0.3",
@@ -36,6 +37,7 @@
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.23.0",
     "rate-limit-redis": "^6.0.1",
+    "socket.io": "^4.8.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {

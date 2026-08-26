@@ -76,6 +76,27 @@ export const FORECAST = {
   fallbackModelVersion: "naive-seasonal-fallback",
 } as const;
 
+export const SEVERITY_RANK = { critical: 0, high: 1, medium: 2, low: 3 } as const;
+
+export const NOTIFY = {
+  detectionIntervalMs: env.ALERT_DETECTION_INTERVAL_MS,
+  timeoutMs: env.NOTIFY_TIMEOUT_MS,
+  minSeverity: env.NOTIFY_MIN_SEVERITY,
+  email: {
+    apiKey: env.RESEND_API_KEY,
+    from: env.EMAIL_FROM,
+    recipients: list(env.ALERT_EMAIL_RECIPIENTS),
+  },
+  sms: {
+    region: env.AWS_REGION,
+    accessKeyId: env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+    topicArn: env.AWS_SNS_TOPIC_ARN,
+    senderId: env.AWS_SNS_SENDER_ID,
+    recipients: list(env.ALERT_SMS_RECIPIENTS),
+  },
+} as const;
+
 export const DATABASE_URL = env.DATABASE_URL;
 export const REDIS_URL = env.REDIS_URL;
 export const NODE_ENV = env.NODE_ENV;

@@ -18,18 +18,29 @@ const isoDay = (date: Date) => date.toISOString().slice(0, 10);
 export const OPEN_STATUSES = ["new", "acknowledged", "in_progress"] as const;
 const SEVERITY_ORDER = ["critical", "high", "medium", "low"] as const;
 
-const whereOf = async (query: Partial<AlertQuery>, scope?: { warehouseId?: string | null }): Promise<Prisma.AlertWhereInput> => {
-  let scopeLocation: string | undefined = undefined;
-  if (scope?.warehouseId) {
-    const warehouse = await prisma.warehouse.findUnique({ where: { id: scope.warehouseId }, select: { name: true } });
-    if (!warehouse) throw new NotFoundError(`Warehouse '${scope.warehouseId}' not found`);
-    scopeLocation = warehouse.name;
+/**
+ * Scoping resolves against `warehouseId`, not the display name it used to match on.
+ * The warehouse is still looked up first so an unknown id is a 404 rather than an
+ * empty list, which reads as "no alerts here" and hides the typo.
+ */
+const whereOf = async (
+  query: Partial<AlertQuery>,
+  scope?: { warehouseId?: string | null },
+): Promise<Prisma.AlertWhereInput> => {
+  const warehouseId = scope?.warehouseId ?? query.warehouseId;
+
+  if (warehouseId !== undefined && warehouseId !== null) {
+    const exists = await prisma.warehouse.count({ where: { id: warehouseId } });
+    if (exists === 0) throw new NotFoundError(`Warehouse '${warehouseId}' not found`);
   }
 
   return {
     ...(query.severity === undefined ? {} : { severity: query.severity }),
     ...(query.type === undefined ? {} : { type: query.type }),
-    ...(scopeLocation ? { location: scopeLocation } : query.location === undefined ? {} : { location: query.location }),
+    ...(warehouseId === undefined || warehouseId === null ? {} : { warehouseId }),
+    ...(query.productId === undefined ? {} : { productId: query.productId }),
+    // `location` stays an open text filter for callers that only have the display name.
+    ...(warehouseId || query.location === undefined ? {} : { location: query.location }),
     ...(query.status === undefined
       ? {}
       : query.status === "open"
@@ -44,8 +55,10 @@ const alertSelect = {
   type: true,
   title: true,
   sku: true,
-  product: true,
+  productName: true,
   location: true,
+  productId: true,
+  warehouseId: true,
   detectedAt: true,
   businessImpact: true,
   status: true,
@@ -64,8 +77,12 @@ const toAlert = (row: AlertRow) => ({
   type: row.type,
   title: row.title,
   sku: row.sku,
-  product: row.product,
+  // The wire name stays `product`: it is the display string, and the id travels
+  // beside it so a link can be built without a second lookup.
+  product: row.productName,
   location: row.location,
+  productId: row.productId,
+  warehouseId: row.warehouseId,
   status: row.status,
   businessImpact: row.businessImpact,
   recommendedAction: row.recommendedAction,
