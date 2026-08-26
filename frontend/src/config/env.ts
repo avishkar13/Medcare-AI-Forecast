@@ -1,9 +1,14 @@
 import { z } from "zod";
 
+const isFullUrl = (value: string) => z.string().url().safeParse(value).success;
+
 const schema = z.object({
   NEXT_PUBLIC_API_URL: z
     .string()
-    .url("NEXT_PUBLIC_API_URL must be a full url, e.g. http://localhost:4000/api")
+    .refine(
+      (value) => value.startsWith("/") || isFullUrl(value),
+      "NEXT_PUBLIC_API_URL must be a full url or a same-origin path, e.g. http://localhost:4000/api or /api",
+    )
     .transform((value) => value.replace(/\/+$/, "")),
 });
 

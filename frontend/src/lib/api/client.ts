@@ -4,8 +4,12 @@ import type { ApiResult, QueryParams, ResponseMeta } from "./types";
 
 const REQUEST_ID_HEADER = "x-request-id";
 
+// env.apiUrl is a same-origin path when the app proxies the backend through next,
+// and URL() needs a base to resolve one. every caller runs in the browser.
+const apiBase = () => (env.apiUrl.startsWith("/") ? window.location.origin : undefined);
+
 const buildUrl = (path: string, params?: QueryParams) => {
-  const url = new URL(`${env.apiUrl}${path.startsWith("/") ? path : `/${path}`}`);
+  const url = new URL(`${env.apiUrl}${path.startsWith("/") ? path : `/${path}`}`, apiBase());
 
   for (const [key, value] of Object.entries(params ?? {})) {
     if (value === undefined || value === null || value === "") continue;
