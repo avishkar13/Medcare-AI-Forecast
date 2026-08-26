@@ -62,7 +62,7 @@ export function AIRecommendations() {
   };
 
   return (
-    <Card className="flex flex-col shadow-sm">
+    <Card className="flex flex-col shadow-sm h-full">
       <CardHeader className="pb-4 border-b border-border/50">
         <div className="flex items-center justify-between">
           <div>
@@ -83,7 +83,7 @@ export function AIRecommendations() {
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent className="p-0 flex-1 overflow-y-auto min-h-0">
         <div className="flex flex-col divide-y divide-border/50">
           {recommendations.map((rec) => (
             <div key={rec.id} className="px-4 py-4 flex flex-col gap-4 transition-colors hover:bg-muted/20">

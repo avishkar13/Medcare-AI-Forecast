@@ -46,8 +46,8 @@ export function ActiveAlertList({ alerts, unresolvedCount, onReview }: ActiveAle
         <div className="text-right pr-2">Action</div>
       </div>
 
-      {/* List content: removing fixed scrolling container to allow natural page scrolling */}
-      <div className="flex flex-col divide-y divide-border/30">
+      {/* List content with definite height and scrolling */}
+      <div className="flex flex-col divide-y divide-border/30 max-h-[600px] overflow-y-auto">
         {alerts.map((alert) => (
           <AlertRow key={alert.id} alert={alert} onReview={() => onReview(alert)} />
         ))}
