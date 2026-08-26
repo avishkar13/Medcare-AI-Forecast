@@ -3,10 +3,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Clock, PackageX, TrendingDown, DollarSign } from "lucide-react";
 import { useExpiryOverview } from "@/hooks/use-expiry";
-import { formatCompactCurrency, formatNumber } from "@/lib/utils";
+import { useFormatters } from "@/hooks/use-formatters";
 
 export function ExpiryOverview() {
   const { data: overview, isPending } = useExpiryOverview();
+  const { formatCompactCurrency, formatNumber } = useFormatters();
 
   if (isPending || !overview) return null;
 

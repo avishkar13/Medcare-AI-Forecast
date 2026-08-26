@@ -3,9 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, TrendingDown } from "lucide-react";
 import { useExpiryDemandCoverage } from "@/hooks/use-expiry";
-import { formatCompactCurrency, formatNumber } from "@/lib/utils";
+import { useFormatters } from "@/hooks/use-formatters";
 
 export function DemandExpiryAnalysis() {
+  const { formatCompactCurrency, formatNumber } = useFormatters();
   const { data, isPending } = useExpiryDemandCoverage();
 
   if (isPending || !data) return null;

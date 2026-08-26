@@ -1,7 +1,16 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import { Sidebar } from "./sidebar";
 import { Navbar } from "./navbar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isAuth = pathname?.startsWith("/auth");
+
+  if (isAuth) {
+    return <>{children}</>;
+  }
   return (
     <div className="flex min-h-screen w-full bg-background">
       <Sidebar />

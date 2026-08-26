@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Zap, Navigation, ArrowRightLeft, Star, Clock } from "lucide-react";
 import Link from "next/link";
+import { useFormatters } from "@/hooks/use-formatters";
 
 interface BatchDetailsSheetProps {
   batch: ExpiryBatch | null;
@@ -15,6 +16,8 @@ interface BatchDetailsSheetProps {
 }
 
 export function BatchDetailsSheet({ batch, isOpen, onClose, onPrioritize }: BatchDetailsSheetProps) {
+  const { formatCurrency } = useFormatters();
+
   if (!batch) return null;
 
   const getRiskColor = (risk: string) => {
@@ -26,8 +29,6 @@ export function BatchDetailsSheet({ batch, isOpen, onClose, onPrioritize }: Batc
       default: return "border-border text-foreground";
     }
   };
-
-  const formatCurrency = (val: number) => "$" + val.toLocaleString();
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>

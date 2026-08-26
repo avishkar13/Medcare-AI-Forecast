@@ -3,9 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useDashboardNetwork } from "@/hooks/use-dashboard";
-import { formatCompactCurrency } from "@/lib/utils";
+import { useFormatters } from "@/hooks/use-formatters";
 
 export function InventoryNetwork() {
+  const { formatCompactCurrency } = useFormatters();
   const { data, isPending } = useDashboardNetwork();
 
   const dcs = (data ?? []).map((dc) => ({

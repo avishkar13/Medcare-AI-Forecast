@@ -129,7 +129,7 @@ export interface OptimizationMetrics {
 }
 
 export type InventoryRisk = "critical" | "high" | "medium" | "low";
-export type InventoryDetailStatus = "healthy" | "reorder_required" | "overstocked" | "at_risk" | "expiring";
+export type InventoryDetailStatus = "healthy" | "belowReorderPoint" | "excessStock" | "criticalStock" | "expiringSoon";
 
 export interface InventoryTableItem {
   id: string;

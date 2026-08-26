@@ -4,9 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
 import { useInventory, useInventoryHealth } from "@/hooks/use-inventory";
 import { Info, BarChart2 } from "lucide-react";
+import { useFormatters } from "@/hooks/use-formatters";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function InventoryHealthChart() {
+  const { formatCompactCurrency, formatCurrency } = useFormatters();
   const { data, isPending } = useInventory();
   const { data: health } = useInventoryHealth();
   const positions = data?.items ?? [];
@@ -59,7 +61,7 @@ export function InventoryHealthChart() {
               <BarChart data={items} margin={{ top: 20, right: 10, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
                 <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} tickMargin={10} />
-                <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val/1000}k`} />
+                <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => formatCompactCurrency(val)} />
                 <RechartsTooltip 
                   cursor={{ fill: 'var(--muted)', opacity: 0.4 }}
                   contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
@@ -81,13 +83,13 @@ export function InventoryHealthChart() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart layout="vertical" data={catChartData} margin={{ top: 0, right: 10, left: 30, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
-                  <XAxis type="number" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val/1000}k`} />
+                  <XAxis type="number" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => formatCompactCurrency(val)} />
                   <YAxis dataKey="name" type="category" fontSize={12} tickLine={false} axisLine={false} tickMargin={10} />
                   <RechartsTooltip 
                     cursor={{ fill: 'var(--muted)', opacity: 0.2 }}
                     contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    formatter={(val: any) => `$${(val as number).toLocaleString()}`}
+                    formatter={(val: any) => formatCurrency(val as number)}
                   />
                   <Bar dataKey="value" fill="var(--ai)" radius={[0, 4, 4, 0]} barSize={20} name="Inventory Value" opacity={0.8} />
                 </BarChart>

@@ -3,8 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RecommendationImpact as ImpactType } from "@/types/recommendation";
 import { DollarSign, ShieldCheck, TrendingDown, ArrowDown } from "lucide-react";
+import { useFormatters } from "@/hooks/use-formatters";
 
 export function RecommendationImpact({ data }: { data: ImpactType }) {
+  const { formatCompactCurrency } = useFormatters();
   return (
     <Card className="shadow-sm">
       <CardHeader className="pb-3 border-b border-border/50 bg-muted/10">
@@ -17,11 +19,11 @@ export function RecommendationImpact({ data }: { data: ImpactType }) {
         <div className="flex justify-between items-end mb-4">
           <div>
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Current Cost</p>
-            <p className="text-xl font-bold text-foreground/80">${(data.currentSupplyChainCost / 1000).toFixed(1)}K</p>
+            <p className="text-xl font-bold text-foreground/80">{formatCompactCurrency(data.currentSupplyChainCost)}</p>
           </div>
           <div className="text-right">
             <p className="text-xs font-bold text-ai uppercase tracking-wider mb-1">AI Optimized</p>
-            <p className="text-2xl font-black text-ai">${(data.aiOptimizedCost / 1000).toFixed(1)}K</p>
+            <p className="text-2xl font-black text-ai">{formatCompactCurrency(data.aiOptimizedCost)}</p>
           </div>
         </div>
 
@@ -33,7 +35,7 @@ export function RecommendationImpact({ data }: { data: ImpactType }) {
             <span className="text-sm font-bold text-success-foreground">Projected Savings</span>
           </div>
           <div className="text-right flex flex-col items-end">
-            <p className="text-xl font-black text-success-foreground tracking-tight">${(data.projectedSavings / 1000).toFixed(1)}K</p>
+            <p className="text-xl font-black text-success-foreground tracking-tight">{formatCompactCurrency(data.projectedSavings)}</p>
             <div className="flex items-center gap-1 bg-success/20 px-1.5 py-0.5 rounded text-[10px] font-bold text-success-foreground mt-0.5">
               <ArrowDown className="h-2.5 w-2.5" />
               {data.costReductionPercentage}%

@@ -34,6 +34,7 @@ COPY --from=builder /app/prisma/migrations ./prisma/migrations
 COPY prisma.config.runtime.js ./prisma.config.js
 
 COPY --chmod=0755 docker-entrypoint.sh ./
+RUN sed -i 's/\r$//' docker-entrypoint.sh
 
 ENV NODE_ENV=production
 EXPOSE 4000

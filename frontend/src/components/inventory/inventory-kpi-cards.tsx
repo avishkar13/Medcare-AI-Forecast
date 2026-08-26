@@ -3,9 +3,10 @@
 import { DollarSign, Package, ShieldCheck, AlertTriangle, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useInventory } from "@/hooks/use-inventory";
-import { formatCompactCurrency, formatNumber } from "@/lib/utils";
+import { useFormatters } from "@/hooks/use-formatters";
 
 export function InventoryKpiCards() {
+  const { formatCompactCurrency, formatNumber } = useFormatters();
   const { data, isPending } = useInventory();
   const totals = data?.totals;
 

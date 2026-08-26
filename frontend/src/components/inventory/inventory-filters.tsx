@@ -23,10 +23,10 @@ interface InventoryFiltersProps {
 const statusOptions = [
   { value: "all", label: "All Status" },
   { value: "healthy", label: "Healthy" },
-  { value: "reorder_required", label: "Reorder Required" },
-  { value: "overstocked", label: "Overstocked" },
-  { value: "at_risk", label: "At Risk" },
-  { value: "expiring", label: "Expiring" },
+  { value: "belowReorderPoint", label: "Reorder Required" },
+  { value: "excessStock", label: "Overstocked" },
+  { value: "criticalStock", label: "At Risk" },
+  { value: "expiringSoon", label: "Expiring" },
 ];
 
 const riskOptions = [

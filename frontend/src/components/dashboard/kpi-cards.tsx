@@ -11,19 +11,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDashboardSummary } from "@/hooks/use-dashboard";
 import { useWarehouses } from "@/hooks/use-masterdata";
+import { useFormatters } from "@/hooks/use-formatters";
 
 export function KpiCards() {
   const { data, isPending, isError } = useDashboardSummary();
   const { data: warehouses } = useWarehouses();
+  const { formatCurrency, formatNumber } = useFormatters();
   const kpis = data?.kpis;
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
-  };
-
-  const formatNumber = (value: number) => {
-    return new Intl.NumberFormat('en-US').format(value);
-  };
 
   // the backend returns null where a figure has nothing to measure against
   const percent = (value: number | null | undefined) =>

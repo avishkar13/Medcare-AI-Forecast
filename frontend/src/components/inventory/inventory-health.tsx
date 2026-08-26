@@ -14,7 +14,7 @@ import {
   Tooltip as RechartsTooltip,
 } from "recharts";
 import { useInventoryHealth } from "@/hooks/use-inventory";
-import { formatCompactCurrency } from "@/lib/utils";
+import { useFormatters } from "@/hooks/use-formatters";
 
 const COLORS = [
   "var(--success)",
@@ -26,6 +26,7 @@ const COLORS = [
 
 export function InventoryHealth() {
   const { data, isPending } = useInventoryHealth();
+  const { formatCompactCurrency } = useFormatters();
   const health = data?.breakdown;
 
   if (isPending || !health || !data) return null;
@@ -143,7 +144,7 @@ export function InventoryHealth() {
                   fontSize={10}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(v) => `$${v / 1000}k`}
+                  tickFormatter={(v) => formatCompactCurrency(v)}
                 />
                 <YAxis
                   dataKey="name"
