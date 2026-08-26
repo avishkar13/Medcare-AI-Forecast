@@ -5,7 +5,10 @@ declare global {
   namespace Express {
     interface AuthenticatedUser {
       id: string;
-      roles?: string[];
+      name: string;
+      email: string;
+      roleId: string;
+      warehouseId?: string | null;
     }
 
     interface Request {
@@ -20,6 +23,7 @@ declare global {
        */
       userId?: string;
       rateLimit?: RateLimitInfo;
+      warehouseScope: string | null;
     }
   }
 }

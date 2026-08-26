@@ -581,10 +581,6 @@ export type ProductNullableScalarRelationFilter = {
   isNot?: Prisma.ProductWhereInput | null
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type DecimalFieldUpdateOperationsInput = {
   set?: runtime.Decimal | runtime.DecimalJsLike | number | string
   increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -603,10 +599,6 @@ export type NullableIntFieldUpdateOperationsInput = {
 
 export type EnumCriticalityFieldUpdateOperationsInput = {
   set?: $Enums.Criticality
-}
-
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
 }
 
 export type ProductCreateNestedOneWithoutDemandHistoryInput = {

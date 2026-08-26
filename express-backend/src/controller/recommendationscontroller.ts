@@ -6,26 +6,37 @@ import {
   recommendationQuerySchema,
 } from "../zod/recommendation.schemas.js";
 
+import { enforceScopeConflict } from "../middleware/scopeDc.js";
+
 export const getList = async (req: Request, res: Response) => {
   const query = recommendationQuerySchema.parse(req.query);
-  const { items, total } = await recommendations.listRecommendations(query);
+  enforceScopeConflict(query.warehouse, req);
+  const { items, total } = await recommendations.listRecommendations(query, { warehouseId: req.warehouseScope });
   paginated(res, items, query.page, query.pageSize, total);
 };
 
 export const getKpi = async (req: Request, res: Response) => {
-  ok(res, await recommendations.getKpi(recommendationQuerySchema.parse(req.query)));
+  const query = recommendationQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await recommendations.getKpi(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getSummary = async (req: Request, res: Response) => {
-  ok(res, await recommendations.getSummary(recommendationQuerySchema.parse(req.query)));
+  const query = recommendationQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await recommendations.getSummary(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getImpact = async (req: Request, res: Response) => {
-  ok(res, await recommendations.getImpact(recommendationQuerySchema.parse(req.query)));
+  const query = recommendationQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await recommendations.getImpact(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getIntelligence = async (req: Request, res: Response) => {
-  ok(res, await recommendations.getIntelligence(recommendationQuerySchema.parse(req.query)));
+  const query = recommendationQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await recommendations.getIntelligence(query, { warehouseId: req.warehouseScope }));
 };
 
 export const execute = async (req: Request, res: Response) => {

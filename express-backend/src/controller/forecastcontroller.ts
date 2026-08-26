@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import * as accuracy from "../services/forecast-accuracy.service.js";
 import * as forecast from "../services/forecastread.service.js";
 import { ok } from "../utils/response.js";
+import { enforceScopeConflict } from "../middleware/scopeDc.js";
 import { accuracyQuerySchema } from "../zod/accuracy.schemas.js";
 import {
   forecastChartQuerySchema,
@@ -14,43 +15,63 @@ import {
  */
 
 export const getKpi = async (req: Request, res: Response) => {
-  ok(res, await forecast.getKpi(forecastQuerySchema.parse(req.query)));
+  const query = forecastQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await forecast.getKpi(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getSummary = async (req: Request, res: Response) => {
-  ok(res, await forecast.getSummary(forecastQuerySchema.parse(req.query)));
+  const query = forecastQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await forecast.getSummary(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getMainChart = async (req: Request, res: Response) => {
-  ok(res, await forecast.getMainChart(forecastChartQuerySchema.parse(req.query)));
+  const query = forecastChartQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await forecast.getMainChart(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getTrend = async (req: Request, res: Response) => {
-  ok(res, await forecast.getTrend(forecastQuerySchema.parse(req.query)));
+  const query = forecastQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await forecast.getTrend(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getSeasonality = async (req: Request, res: Response) => {
-  ok(res, await forecast.getSeasonality(forecastQuerySchema.parse(req.query)));
+  const query = forecastQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await forecast.getSeasonality(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getNetwork = async (req: Request, res: Response) => {
-  ok(res, await forecast.getNetwork(forecastQuerySchema.parse(req.query)));
+  const query = forecastQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await forecast.getNetwork(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getSkus = async (req: Request, res: Response) => {
-  ok(res, await forecast.getSkus(forecastQuerySchema.parse(req.query)));
+  const query = forecastQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await forecast.getSkus(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getPerformance = async (req: Request, res: Response) => {
-  ok(res, await forecast.getPerformance(forecastQuerySchema.parse(req.query)));
+  const query = forecastQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await forecast.getPerformance(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getImpact = async (req: Request, res: Response) => {
-  ok(res, await forecast.getImpact(forecastQuerySchema.parse(req.query)));
+  const query = forecastQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await forecast.getImpact(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getInsight = async (req: Request, res: Response) => {
-  ok(res, await forecast.getInsight(forecastQuerySchema.parse(req.query)));
+  const query = forecastQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await forecast.getInsight(query, { warehouseId: req.warehouseScope }));
 };
 
 export const getAccuracy = async (req: Request, res: Response) => {

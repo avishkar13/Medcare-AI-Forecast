@@ -225,10 +225,11 @@ const groupBy = <K>(points: Point[], key: (point: Point) => K) => {
   return groups;
 };
 
-export const getAccuracy = async (query: AccuracyQuery) => {
+export const getAccuracy = async (query: AccuracyQuery, authScope?: { warehouseId?: string | null }) => {
+  const effectiveWarehouse = query.warehouse ?? authScope?.warehouseId;
   const [productId, warehouseId] = await Promise.all([
     query.sku === undefined ? undefined : resolveProduct(query.sku),
-    query.warehouse === undefined ? undefined : resolveWarehouse(query.warehouse),
+    effectiveWarehouse === undefined || effectiveWarehouse === null ? undefined : resolveWarehouse(effectiveWarehouse),
   ]);
 
   let runId: string | null;

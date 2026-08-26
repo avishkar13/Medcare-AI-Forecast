@@ -1,4 +1,5 @@
 import { prisma } from "../src/config/prisma.js";
+import bcrypt from "bcryptjs";
 import type { Criticality, WarehouseTier } from "../generated/prisma/enums.js";
 import { createRng, between as betweenOf, intBetween as intBetweenOf } from "../src/utils/random.js";
 
@@ -120,18 +121,92 @@ const clear = async () => {
   await prisma.warehouse.deleteMany();
   await prisma.product.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.rolePermission.deleteMany();
+  await prisma.permission.deleteMany();
+  await prisma.role.deleteMany();
 };
 
 const main = async () => {
   await clear();
 
+  const permissionsData = [
+    { key: "dashboard:view", name: "View Dashboard", module: "dashboard", action: "view" },
+    { key: "inventory:view", name: "View Inventory", module: "inventory", action: "view" },
+    { key: "inventory:adjust", name: "Adjust Inventory", module: "inventory", action: "adjust" },
+    { key: "forecast:view", name: "View Forecasts", module: "forecast", action: "view" },
+    { key: "recommendations:view", name: "View Recommendations", module: "recommendations", action: "view" },
+    { key: "recommendations:execute", name: "Execute Recommendations", module: "recommendations", action: "execute" },
+    { key: "recommendations:dismiss", name: "Dismiss Recommendations", module: "recommendations", action: "dismiss" },
+    { key: "simulation:view", name: "View Simulations", module: "simulation", action: "view" },
+    { key: "simulation:run", name: "Run Simulations", module: "simulation", action: "run" },
+    { key: "alerts:view", name: "View Alerts", module: "alerts", action: "view" },
+    { key: "alerts:manage", name: "Manage Alerts", module: "alerts", action: "manage" },
+    { key: "expiry:view", name: "View Expiry Risks", module: "expiry", action: "view" },
+    { key: "settings:view", name: "View Settings", module: "settings", action: "view" },
+    { key: "settings:update", name: "Update Settings", module: "settings", action: "update" },
+    { key: "users:view", name: "View Users", module: "users", action: "view" },
+    { key: "users:create", name: "Create Users", module: "users", action: "create" },
+    { key: "users:update", name: "Update Users", module: "users", action: "update" },
+    { key: "users:deactivate", name: "Deactivate Users", module: "users", action: "deactivate" },
+    { key: "roles:view", name: "View Roles", module: "roles", action: "view" },
+    { key: "roles:create", name: "Create Roles", module: "roles", action: "create" },
+    { key: "roles:update", name: "Update Roles", module: "roles", action: "update" },
+    { key: "roles:delete", name: "Delete Roles", module: "roles", action: "delete" },
+  ];
+
+  await prisma.permission.createMany({ data: permissionsData });
+  const permissions = await prisma.permission.findMany();
+
+  const adminRole = await prisma.role.create({
+    data: { name: "ADMIN", description: "Global Administrator", isSystemRole: true }
+  });
+  const plannerRole = await prisma.role.create({
+    data: { name: "PLANNER", description: "Supply Chain Planner", isSystemRole: true }
+  });
+  const viewerRole = await prisma.role.create({
+    data: { name: "VIEWER", description: "Read-only Viewer", isSystemRole: true }
+  });
+
+  const adminPerms = permissions.map(p => ({ roleId: adminRole.id, permissionId: p.id }));
+  const plannerPermKeys = new Set(["dashboard:view", "inventory:view", "inventory:adjust", "forecast:view", "recommendations:view", "recommendations:execute", "recommendations:dismiss", "simulation:view", "simulation:run", "alerts:view", "alerts:manage", "expiry:view"]);
+  const plannerPerms = permissions.filter(p => plannerPermKeys.has(p.key)).map(p => ({ roleId: plannerRole.id, permissionId: p.id }));
+  const viewerPermKeys = new Set(["dashboard:view", "inventory:view", "forecast:view", "recommendations:view", "simulation:view", "alerts:view", "expiry:view"]);
+  const viewerPerms = permissions.filter(p => viewerPermKeys.has(p.key)).map(p => ({ roleId: viewerRole.id, permissionId: p.id }));
+
+  await prisma.rolePermission.createMany({ data: [...adminPerms, ...plannerPerms, ...viewerPerms] });
+
+  const defaultPasswordHash = await bcrypt.hash("!", 10);
+
   const systemUser = await prisma.user.create({
     data: {
       name: "System",
       email: "system@medcare.local",
-      passwordHash: "!",
-      role: "ADMIN",
+      passwordHash: defaultPasswordHash,
+      roleId: adminRole.id,
+      warehouseId: null,
     },
+  });
+
+  await prisma.warehouse.createMany({ data: WAREHOUSES.map((warehouse) => ({ ...warehouse })) });
+
+  await prisma.user.create({
+    data: {
+      name: "DC1 Planner",
+      email: "planner@medcare.local",
+      passwordHash: defaultPasswordHash,
+      roleId: plannerRole.id,
+      warehouseId: (await prisma.warehouse.findFirst({ where: { code: "DC-01" } }))?.id || null,
+    }
+  });
+
+  await prisma.user.create({
+    data: {
+      name: "DC2 Viewer",
+      email: "viewer@medcare.local",
+      passwordHash: defaultPasswordHash,
+      roleId: viewerRole.id,
+      warehouseId: (await prisma.warehouse.findFirst({ where: { code: "DC-02" } }))?.id || null,
+    }
   });
 
   await prisma.scenario.create({
@@ -145,7 +220,6 @@ const main = async () => {
     },
   });
 
-  await prisma.warehouse.createMany({ data: WAREHOUSES.map((warehouse) => ({ ...warehouse })) });
   await prisma.product.createMany({ data: PRODUCTS });
 
   const warehouses = await prisma.warehouse.findMany({ orderBy: { code: "asc" } });

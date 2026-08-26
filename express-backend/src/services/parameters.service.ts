@@ -76,10 +76,11 @@ const toParameter = (row: ParameterRow) => ({
   expiryCostPerUnit: row.expiryCostPerUnit,
 });
 
-export const listParameters = async (query: ParametersQuery) => {
+export const listParameters = async (query: ParametersQuery, authScope?: { warehouseId?: string | null }) => {
+  const effectiveWarehouse = query.warehouse ?? authScope?.warehouseId;
   const [productId, warehouseId] = await Promise.all([
     query.sku === undefined ? undefined : resolveProduct(query.sku),
-    query.warehouse === undefined ? undefined : resolveWarehouse(query.warehouse),
+    effectiveWarehouse === undefined || effectiveWarehouse === null ? undefined : resolveWarehouse(effectiveWarehouse),
   ]);
 
   const where: Prisma.PlanningParameterWhereInput = {

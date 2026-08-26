@@ -1,15 +1,16 @@
 import { Router } from "express";
 import * as planningController from "../controller/planningcontroller.js";
 import { rateLimiter } from "../middleware/rateLimiter.js";
+import { authorize } from "../middleware/authorize.js";
 
 export const planningRouter = Router();
 
 // The expensive tier, not write: a run schedules ~10,000 rows of work behind the 202.
-planningRouter.post("/runs", rateLimiter.expensive, planningController.createRun);
-planningRouter.get("/runs", rateLimiter.read, planningController.listRuns);
+planningRouter.post("/runs", rateLimiter.expensive, authorize("simulation:run"), planningController.createRun);
+planningRouter.get("/runs", rateLimiter.read, authorize("simulation:view"), planningController.listRuns);
 // Before /runs/:id is irrelevant to matching - the paths differ in segment count -
 // but keeping the pair together reads better than splitting them.
-planningRouter.get("/runs/:id", rateLimiter.read, planningController.getRun);
-planningRouter.get("/runs/:id/compare", rateLimiter.read, planningController.compareRuns);
-planningRouter.get("/runs/:id/optimization", rateLimiter.read, planningController.getOptimization);
-planningRouter.get("/runs/:id/simulation", rateLimiter.read, planningController.getSimulation);
+planningRouter.get("/runs/:id", rateLimiter.read, authorize("simulation:view"), planningController.getRun);
+planningRouter.get("/runs/:id/compare", rateLimiter.read, authorize("simulation:view"), planningController.compareRuns);
+planningRouter.get("/runs/:id/optimization", rateLimiter.read, authorize("simulation:view"), planningController.getOptimization);
+planningRouter.get("/runs/:id/simulation", rateLimiter.read, authorize("simulation:view"), planningController.getSimulation);

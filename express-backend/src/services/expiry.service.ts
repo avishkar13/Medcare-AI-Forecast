@@ -58,10 +58,11 @@ const resolveProduct = async (sku: string) => {
   return product.id;
 };
 
-const whereOf = async (query: ExpiryQuery): Promise<Prisma.InventoryBatchWhereInput> => {
+const whereOf = async (query: ExpiryQuery, authScope?: { warehouseId?: string | null }): Promise<Prisma.InventoryBatchWhereInput> => {
+  const effectiveWarehouse = query.warehouse ?? authScope?.warehouseId;
   const [productId, warehouseId] = await Promise.all([
     query.sku === undefined ? undefined : resolveProduct(query.sku),
-    query.warehouse === undefined ? undefined : resolveWarehouse(query.warehouse),
+    effectiveWarehouse === undefined || effectiveWarehouse === null ? undefined : resolveWarehouse(effectiveWarehouse),
   ]);
 
   return {
@@ -162,8 +163,8 @@ const projectPairWaste = async (where: Prisma.InventoryBatchWhereInput, now: num
   return waste;
 };
 
-export const listBatches = async (query: ExpiryBatchQuery) => {
-  const where = await whereOf(query);
+export const listBatches = async (query: ExpiryBatchQuery, authScope?: { warehouseId?: string | null }) => {
+  const where = await whereOf(query, authScope);
   const now = Date.now();
 
   const [total, rows, waste] = await Promise.all([
@@ -202,8 +203,8 @@ export const listBatches = async (query: ExpiryBatchQuery) => {
   };
 };
 
-export const getOverview = async (query: ExpiryQuery) => {
-  const where = await whereOf(query);
+export const getOverview = async (query: ExpiryQuery, authScope?: { warehouseId?: string | null }) => {
+  const where = await whereOf(query, authScope);
 
   const [rows, prevented] = await Promise.all([
     prisma.inventoryBatch.findMany({
@@ -249,8 +250,8 @@ export const getOverview = async (query: ExpiryQuery) => {
 };
 
 /** Value expiring per calendar month, soonest first. */
-export const getTimeline = async (query: ExpiryQuery) => {
-  const where = await whereOf(query);
+export const getTimeline = async (query: ExpiryQuery, authScope?: { warehouseId?: string | null }) => {
+  const where = await whereOf(query, authScope);
   const rows = await prisma.inventoryBatch.findMany({
     where,
     select: { quantity: true, expiryDate: true, product: { select: { unitCost: true } } },
@@ -284,8 +285,8 @@ export const getTimeline = async (query: ExpiryQuery) => {
  * Both cuts used to be done in the browser from a page of raw batches, which was
  * wrong as soon as the network held more batches than one page.
  */
-export const getExposure = async (query: ExpiryQuery) => {
-  const where = await whereOf(query);
+export const getExposure = async (query: ExpiryQuery, authScope?: { warehouseId?: string | null }) => {
+  const where = await whereOf(query, authScope);
   const rows = await prisma.inventoryBatch.findMany({
     where,
     select: { quantity: true, expiryDate: true, product: { select: { unitCost: true } } },
@@ -349,8 +350,8 @@ export const getExposure = async (query: ExpiryQuery) => {
  * Network roll-up of the same FEFO projection `listBatches` reports per batch, so
  * the headline and the table can never disagree.
  */
-export const getDemandCoverage = async (query: ExpiryQuery) => {
-  const where = await whereOf(query);
+export const getDemandCoverage = async (query: ExpiryQuery, authScope?: { warehouseId?: string | null }) => {
+  const where = await whereOf(query, authScope);
   const now = Date.now();
 
   const [rows, waste] = await Promise.all([
@@ -399,8 +400,8 @@ export const getDemandCoverage = async (query: ExpiryQuery) => {
   };
 };
 
-export const getDcExposure = async (query: ExpiryQuery) => {
-  const where = await whereOf(query);
+export const getDcExposure = async (query: ExpiryQuery, authScope?: { warehouseId?: string | null }) => {
+  const where = await whereOf(query, authScope);
 
   const [rows, warehouses] = await Promise.all([
     prisma.inventoryBatch.findMany({
@@ -493,11 +494,11 @@ export const listWastePrevention = async () => {
  * The route this replaces returned a fixed sentence naming a warehouse and a product
  * that had nothing to do with the data.
  */
-export const getAssessment = async (query: ExpiryQuery) => {
+export const getAssessment = async (query: ExpiryQuery, authScope?: { warehouseId?: string | null }) => {
   const [overview, exposure, timeline] = await Promise.all([
-    getOverview(query),
-    getDcExposure(query),
-    getTimeline(query),
+    getOverview(query, authScope),
+    getDcExposure(query, authScope),
+    getTimeline(query, authScope),
   ]);
 
   const worst = exposure[0];

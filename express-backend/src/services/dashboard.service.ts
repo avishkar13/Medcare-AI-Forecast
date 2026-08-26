@@ -1,3 +1,4 @@
+import { Prisma } from "../../generated/prisma/client.js";
 import { prisma } from "../config/prisma.js";
 import { currentAccuracyPercent } from "./forecast-accuracy.service.js";
 import {
@@ -107,10 +108,17 @@ const groupBy = <T>(rows: T[], key: (row: T) => string): Map<string, T[]> => {
   return groups;
 };
 
-export const loadPositions = async (): Promise<InventoryPosition[]> => {
+export const loadPositions = async (scope?: { warehouseId?: string | null }): Promise<InventoryPosition[]> => {
+  const warehouseCondition = scope?.warehouseId ? Prisma.sql`AND "warehouseId" = ${scope.warehouseId}` : Prisma.empty;
+
   const [rows, parameters, demandStats] = await Promise.all([
-    prisma.inventory.findMany({ include: { product: true, warehouse: true } }),
-    prisma.planningParameter.findMany(),
+    prisma.inventory.findMany({ 
+      ...(scope?.warehouseId ? { where: { warehouseId: scope.warehouseId } } : {}),
+      include: { product: true, warehouse: true } 
+    }),
+    prisma.planningParameter.findMany({
+      ...(scope?.warehouseId ? { where: { warehouseId: scope.warehouseId } } : {}),
+    }),
     prisma.$queryRaw<DemandStat[]>`
       SELECT "productId",
              "warehouseId",
@@ -118,6 +126,7 @@ export const loadPositions = async (): Promise<InventoryPosition[]> => {
              COALESCE(STDDEV_SAMP("orderedQuantity"), 0)::float8 AS "stdDev"
       FROM "DemandHistory"
       WHERE "date" >= ${daysAgo(DEMAND_WINDOW_DAYS)}
+      ${warehouseCondition}
       GROUP BY "productId", "warehouseId"
     `,
   ]);
@@ -168,9 +177,13 @@ export const loadPositions = async (): Promise<InventoryPosition[]> => {
   });
 };
 
-export const loadExpiringBatches = async (horizonDays: number): Promise<ExpiringBatch[]> => {
+export const loadExpiringBatches = async (horizonDays: number, scope?: { warehouseId?: string | null }): Promise<ExpiringBatch[]> => {
   const batches = await prisma.inventoryBatch.findMany({
-    where: { expiryDate: { lte: horizon(horizonDays) }, quantity: { gt: 0 } },
+    where: { 
+      expiryDate: { lte: horizon(horizonDays) }, 
+      quantity: { gt: 0 },
+      ...(scope?.warehouseId ? { warehouseId: scope.warehouseId } : {})
+    },
     select: {
       productId: true,
       warehouseId: true,
@@ -235,13 +248,13 @@ const countOpenRecommendations = async (): Promise<number> => {
   return prisma.recommendation.count({ where: { planningRunId: latest.id, status: "OPEN" } });
 };
 
-export const getSummary = async (): Promise<{
+export const getSummary = async (scope?: { warehouseId?: string | null }): Promise<{
   kpis: DashboardKPIs;
   networkHealth: NetworkHealthSummary;
 }> => {
   const [positions, expiringBatches, pendingRecommendations, forecastAccuracy] = await Promise.all([
-    loadPositions(),
-    loadExpiringBatches(EXPIRY_HORIZON_DAYS),
+    loadPositions(scope),
+    loadExpiringBatches(EXPIRY_HORIZON_DAYS, scope),
     countOpenRecommendations(),
     currentAccuracyPercent(),
   ]);
@@ -281,14 +294,17 @@ export const getSummary = async (): Promise<{
   };
 };
 
-export const getNetwork = async (query: NetworkQuery): Promise<WarehouseStats[]> => {
+export const getNetwork = async (query: NetworkQuery, scope?: { warehouseId?: string | null }): Promise<WarehouseStats[]> => {
   const [positions, warehouses, expiringBatches] = await Promise.all([
-    loadPositions(),
+    loadPositions(scope),
     prisma.warehouse.findMany({
-      where: { ...(query.tier === undefined ? {} : { tier: query.tier }) },
+      where: { 
+        ...(query.tier === undefined ? {} : { tier: query.tier }),
+        ...(scope?.warehouseId ? { id: scope.warehouseId } : {})
+      },
       orderBy: { code: "asc" },
     }),
-    loadExpiringBatches(EXPIRY_HORIZON_DAYS),
+    loadExpiringBatches(EXPIRY_HORIZON_DAYS, scope),
   ]);
 
   const positionsByWarehouse = groupBy(positions, (position) => position.warehouseId);
@@ -320,19 +336,21 @@ export const getNetwork = async (query: NetworkQuery): Promise<WarehouseStats[]>
   });
 };
 
-export const getExpiryRisk = async (query: ExpiryRiskQuery): Promise<ExpiryRiskReport> => {
-  if (query.warehouseId !== undefined) {
-    const exists = await prisma.warehouse.count({ where: { id: query.warehouseId } });
-    if (exists === 0) throw new NotFoundError(`Warehouse '${query.warehouseId}' not found`);
+export const getExpiryRisk = async (query: ExpiryRiskQuery, scope?: { warehouseId?: string | null }): Promise<ExpiryRiskReport> => {
+  const effectiveWarehouseId = query.warehouseId ?? scope?.warehouseId;
+  
+  if (effectiveWarehouseId !== undefined && effectiveWarehouseId !== null) {
+    const exists = await prisma.warehouse.count({ where: { id: effectiveWarehouseId } });
+    if (exists === 0) throw new NotFoundError(`Warehouse '${effectiveWarehouseId}' not found`);
   }
 
   const [positions, batches] = await Promise.all([
-    loadPositions(),
+    loadPositions(scope),
     prisma.inventoryBatch.findMany({
       where: {
         expiryDate: { lte: horizon(query.withinDays) },
         quantity: { gt: 0 },
-        ...(query.warehouseId === undefined ? {} : { warehouseId: query.warehouseId }),
+        ...(effectiveWarehouseId ? { warehouseId: effectiveWarehouseId } : {}),
         ...(query.sku === undefined ? {} : { product: { sku: query.sku } }),
       },
       include: { product: true, warehouse: true },
@@ -423,16 +441,23 @@ const units = (value: number) => Math.round(value).toLocaleString("en-US");
 
 export const getPriorityActions = async (
   query: PriorityActionsQuery,
+  scope?: { warehouseId?: string | null }
 ): Promise<PriorityActionsReport> => {
-  if (query.warehouseId !== undefined) {
-    const exists = await prisma.warehouse.count({ where: { id: query.warehouseId } });
-    if (exists === 0) throw new NotFoundError(`Warehouse '${query.warehouseId}' not found`);
+  const effectiveWarehouseId = query.warehouseId ?? scope?.warehouseId;
+  
+  if (effectiveWarehouseId !== undefined && effectiveWarehouseId !== null) {
+    const exists = await prisma.warehouse.count({ where: { id: effectiveWarehouseId } });
+    if (exists === 0) throw new NotFoundError(`Warehouse '${effectiveWarehouseId}' not found`);
   }
 
   const [positions, batches] = await Promise.all([
-    loadPositions(),
+    loadPositions(scope),
     prisma.inventoryBatch.findMany({
-      where: { expiryDate: { lte: horizon(EXPIRY_HORIZON_DAYS) }, quantity: { gt: 0 } },
+      where: { 
+        expiryDate: { lte: horizon(EXPIRY_HORIZON_DAYS) }, 
+        quantity: { gt: 0 },
+        ...(scope?.warehouseId ? { warehouseId: scope.warehouseId } : {})
+      },
       select: {
         productId: true,
         warehouseId: true,
@@ -614,19 +639,24 @@ export const getPriorityActions = async (
 
 export const getInventoryHealth = async (
   query: InventoryHealthQuery,
+  scope?: { warehouseId?: string | null }
 ): Promise<InventoryHealthReport> => {
-  if (query.warehouseId !== undefined) {
-    const exists = await prisma.warehouse.count({ where: { id: query.warehouseId } });
-    if (exists === 0) throw new NotFoundError(`Warehouse '${query.warehouseId}' not found`);
+  const effectiveWarehouseId = query.warehouseId ?? scope?.warehouseId;
+  
+  if (effectiveWarehouseId !== undefined && effectiveWarehouseId !== null) {
+    const exists = await prisma.warehouse.count({ where: { id: effectiveWarehouseId } });
+    if (exists === 0) throw new NotFoundError(`Warehouse '${effectiveWarehouseId}' not found`);
   }
 
   const [allPositions, allBatches] = await Promise.all([
-    loadPositions(),
-    loadExpiringBatches(EXPIRY_HORIZON_DAYS),
+    loadPositions(scope),
+    loadExpiringBatches(EXPIRY_HORIZON_DAYS, scope),
   ]);
 
   const inScope = <T extends { warehouseId: string }>(rows: T[]) =>
-    query.warehouseId === undefined ? rows : rows.filter((row) => row.warehouseId === query.warehouseId);
+    effectiveWarehouseId === undefined || effectiveWarehouseId === null 
+      ? rows 
+      : rows.filter((row) => row.warehouseId === effectiveWarehouseId);
 
   const positions = inScope(allPositions);
   const batches = inScope(allBatches);

@@ -8,7 +8,7 @@ const text = z.string().trim().min(1);
 export const productQuerySchema = z.object({
   search: text.optional(),
   category: text.optional(),
-  criticality: z.enum(Criticality).optional(),
+  criticality: z.nativeEnum(Criticality).optional(),
   isActive: z.stringbool().optional(),
   page,
   pageSize,
@@ -36,7 +36,7 @@ export const promotionQuerySchema = z.object({
 });
 
 export const warehouseQuerySchema = z.object({
-  tier: z.enum(WarehouseTier).optional(),
+  tier: z.nativeEnum(WarehouseTier).optional(),
   region: text.optional(),
   isActive: z.stringbool().optional(),
 });

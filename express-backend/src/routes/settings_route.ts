@@ -1,12 +1,13 @@
 import { Router } from "express";
 import * as settingsController from "../controller/settingscontroller.js";
 import { rateLimiter } from "../middleware/rateLimiter.js";
+import { authorize } from "../middleware/authorize.js";
 
 export const settingsRouter = Router();
 
-settingsRouter.get("/", rateLimiter.read, settingsController.getSettings);
-settingsRouter.patch("/", rateLimiter.write, settingsController.updateSettings);
-settingsRouter.put("/", rateLimiter.write, settingsController.replaceSettings);
+settingsRouter.get("/", rateLimiter.read, authorize("settings:view"), settingsController.getSettings);
+settingsRouter.patch("/", rateLimiter.write, authorize("settings:update"), settingsController.updateSettings);
+settingsRouter.put("/", rateLimiter.write, authorize("settings:update"), settingsController.replaceSettings);
 
 // POST /integrations/test and POST /security/reset-password are deliberately not
 // re-implemented. They returned "Connection successful, latencyMs: 145" and

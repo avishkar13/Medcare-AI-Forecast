@@ -18,16 +18,25 @@ const isoDay = (date: Date) => date.toISOString().slice(0, 10);
 export const OPEN_STATUSES = ["new", "acknowledged", "in_progress"] as const;
 const SEVERITY_ORDER = ["critical", "high", "medium", "low"] as const;
 
-const whereOf = (query: AlertQuery): Prisma.AlertWhereInput => ({
-  ...(query.severity === undefined ? {} : { severity: query.severity }),
-  ...(query.type === undefined ? {} : { type: query.type }),
-  ...(query.location === undefined ? {} : { location: query.location }),
-  ...(query.status === undefined
-    ? {}
-    : query.status === "open"
-      ? { status: { in: [...OPEN_STATUSES] } }
-      : { status: query.status }),
-});
+const whereOf = async (query: Partial<AlertQuery>, scope?: { warehouseId?: string | null }): Promise<Prisma.AlertWhereInput> => {
+  let scopeLocation: string | undefined = undefined;
+  if (scope?.warehouseId) {
+    const warehouse = await prisma.warehouse.findUnique({ where: { id: scope.warehouseId }, select: { name: true } });
+    if (!warehouse) throw new NotFoundError(`Warehouse '${scope.warehouseId}' not found`);
+    scopeLocation = warehouse.name;
+  }
+
+  return {
+    ...(query.severity === undefined ? {} : { severity: query.severity }),
+    ...(query.type === undefined ? {} : { type: query.type }),
+    ...(scopeLocation ? { location: scopeLocation } : query.location === undefined ? {} : { location: query.location }),
+    ...(query.status === undefined
+      ? {}
+      : query.status === "open"
+        ? { status: { in: [...OPEN_STATUSES] } }
+        : { status: query.status }),
+  };
+};
 
 const alertSelect = {
   id: true,
@@ -72,8 +81,8 @@ const toAlert = (row: AlertRow) => ({
   })),
 });
 
-export const listAlerts = async (query: AlertQuery) => {
-  const where = whereOf(query);
+export const listAlerts = async (query: AlertQuery, scope?: { warehouseId?: string | null }) => {
+  const where = await whereOf(query, scope);
 
   const [total, rows] = await Promise.all([
     prisma.alert.count({ where }),
@@ -89,18 +98,20 @@ export const listAlerts = async (query: AlertQuery) => {
   return { items: rows.map(toAlert), total };
 };
 
-export const getOverview = async () => {
+export const getOverview = async (scope?: { warehouseId?: string | null }) => {
   const startOfToday = new Date();
   startOfToday.setUTCHours(0, 0, 0, 0);
   const startOfYesterday = new Date(startOfToday.getTime() - MS_PER_DAY);
 
+  const where = await whereOf({}, scope);
+
   const [total, bySeverity, byStatus, today, yesterday] = await Promise.all([
-    prisma.alert.count(),
-    prisma.alert.groupBy({ by: ["severity"], _count: true }),
-    prisma.alert.groupBy({ by: ["status"], _count: true }),
-    prisma.alert.count({ where: { detectedAt: { gte: startOfToday } } }),
+    prisma.alert.count({ where }),
+    prisma.alert.groupBy({ by: ["severity"], where, _count: true }),
+    prisma.alert.groupBy({ by: ["status"], where, _count: true }),
+    prisma.alert.count({ where: { ...where, detectedAt: { gte: startOfToday } } }),
     prisma.alert.count({
-      where: { detectedAt: { gte: startOfYesterday, lt: startOfToday } },
+      where: { ...where, detectedAt: { gte: startOfYesterday, lt: startOfToday } },
     }),
   ]);
 
@@ -134,12 +145,14 @@ interface AlertTrendPoint {
   low: number;
 }
 
-export const getTrends = async (query: AlertTrendQuery) => {
+export const getTrends = async (query: AlertTrendQuery, scope?: { warehouseId?: string | null }) => {
   const since = new Date(Date.now() - query.days * MS_PER_DAY);
   since.setUTCHours(0, 0, 0, 0);
 
+  const where = await whereOf({}, scope);
+
   const rows = await prisma.alert.findMany({
-    where: { detectedAt: { gte: since } },
+    where: { ...where, detectedAt: { gte: since } },
     select: { detectedAt: true, severity: true },
     orderBy: { detectedAt: "asc" },
   });
@@ -187,13 +200,15 @@ export const getTrends = async (query: AlertTrendQuery) => {
   };
 };
 
-export const getDistribution = async () => {
+export const getDistribution = async (scope?: { warehouseId?: string | null }) => {
   // Grouped in the database. The route this replaces loaded every alert into memory
   // and reduced in JavaScript, which grows with the table for a result of a few rows.
+  const where = await whereOf({}, scope);
+
   const [byLocation, byType, bySeverity] = await Promise.all([
-    prisma.alert.groupBy({ by: ["location"], _count: true }),
-    prisma.alert.groupBy({ by: ["type"], _count: true }),
-    prisma.alert.groupBy({ by: ["severity"], _count: true }),
+    prisma.alert.groupBy({ by: ["location"], where, _count: true }),
+    prisma.alert.groupBy({ by: ["type"], where, _count: true }),
+    prisma.alert.groupBy({ by: ["severity"], where, _count: true }),
   ]);
 
   const sorted = <T extends { _count: number }>(rows: T[]) =>
@@ -229,16 +244,18 @@ export const getDistribution = async () => {
  * no sensors in this system and nothing measures uptime, so both were decoration.
  * These are facts about the alert table that a reader can verify.
  */
-export const getHealth = async () => {
+export const getHealth = async (scope?: { warehouseId?: string | null }) => {
+  const where = await whereOf({}, scope);
+
   const [total, latest, oldestOpen, openCount] = await Promise.all([
-    prisma.alert.count(),
-    prisma.alert.findFirst({ orderBy: { detectedAt: "desc" }, select: { detectedAt: true } }),
+    prisma.alert.count({ where }),
+    prisma.alert.findFirst({ where, orderBy: { detectedAt: "desc" }, select: { detectedAt: true } }),
     prisma.alert.findFirst({
-      where: { status: { in: [...OPEN_STATUSES] } },
+      where: { ...where, status: { in: [...OPEN_STATUSES] } },
       orderBy: { detectedAt: "asc" },
       select: { detectedAt: true, id: true },
     }),
-    prisma.alert.count({ where: { status: { in: [...OPEN_STATUSES] } } }),
+    prisma.alert.count({ where: { ...where, status: { in: [...OPEN_STATUSES] } } }),
   ]);
 
   return {

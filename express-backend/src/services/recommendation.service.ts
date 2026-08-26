@@ -58,11 +58,14 @@ const resolveWarehouse = async (warehouse: string) => {
 
 const whereOf = async (
   query: RecommendationQuery,
+  scope?: { warehouseId?: string | null }
 ): Promise<{ where: Prisma.RecommendationWhereInput; runId: string | null }> => {
+  const effectiveWarehouse = query.warehouse ?? scope?.warehouseId;
+
   const [runId, productId, warehouseId] = await Promise.all([
     resolveRunId(query.runId),
     query.sku === undefined ? undefined : resolveProduct(query.sku),
-    query.warehouse === undefined ? undefined : resolveWarehouse(query.warehouse),
+    effectiveWarehouse === undefined || effectiveWarehouse === null ? undefined : resolveWarehouse(effectiveWarehouse),
   ]);
 
   return {
@@ -136,8 +139,8 @@ const toItem = (row: ListedRow) => ({
   createdAt: row.createdAt.toISOString(),
 });
 
-export const listRecommendations = async (query: RecommendationQuery) => {
-  const { where, runId } = await whereOf(query);
+export const listRecommendations = async (query: RecommendationQuery, scope?: { warehouseId?: string | null }) => {
+  const { where, runId } = await whereOf(query, scope);
 
   const [total, rows] = await Promise.all([
     prisma.recommendation.count({ where }),
@@ -159,8 +162,8 @@ export const listRecommendations = async (query: RecommendationQuery) => {
   return { items, total, planningRunId: runId };
 };
 
-export const getKpi = async (query: RecommendationQuery) => {
-  const { where, runId } = await whereOf(query);
+export const getKpi = async (query: RecommendationQuery, scope?: { warehouseId?: string | null }) => {
+  const { where, runId } = await whereOf(query, scope);
 
   const [total, byStatus, impact] = await Promise.all([
     prisma.recommendation.count({ where }),
@@ -184,8 +187,8 @@ export const getKpi = async (query: RecommendationQuery) => {
   };
 };
 
-export const getSummary = async (query: RecommendationQuery) => {
-  const { where, runId } = await whereOf(query);
+export const getSummary = async (query: RecommendationQuery, scope?: { warehouseId?: string | null }) => {
+  const { where, runId } = await whereOf(query, scope);
 
   const [byType, byPriority, byStatus] = await Promise.all([
     prisma.recommendation.groupBy({
@@ -214,8 +217,8 @@ export const getSummary = async (query: RecommendationQuery) => {
   };
 };
 
-export const getImpact = async (query: RecommendationQuery) => {
-  const { where, runId } = await whereOf(query);
+export const getImpact = async (query: RecommendationQuery, scope?: { warehouseId?: string | null }) => {
+  const { where, runId } = await whereOf(query, scope);
 
   const [byType, optimization] = await Promise.all([
     prisma.recommendation.groupBy({
@@ -256,8 +259,8 @@ export const getImpact = async (query: RecommendationQuery) => {
   };
 };
 
-export const getIntelligence = async (query: RecommendationQuery) => {
-  const { where, runId } = await whereOf(query);
+export const getIntelligence = async (query: RecommendationQuery, scope?: { warehouseId?: string | null }) => {
+  const { where, runId } = await whereOf(query, scope);
 
   const [confidence, signals, run] = await Promise.all([
     prisma.recommendation.aggregate({ where, _avg: { confidence: true }, _count: true }),

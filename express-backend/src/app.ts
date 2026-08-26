@@ -6,8 +6,11 @@ import { CORS, IS_PRODUCTION, SERVER } from "./config/constants.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { notFound } from "./middleware/notFound.js";
 import { rateLimiter } from "./middleware/rateLimiter.js";
+import { authenticate } from "./middleware/authenticate.js";
+import { scopeDc } from "./middleware/scopeDc.js";
 import { currentUser } from "./middleware/currentUser.js";
 import { requestContext } from "./middleware/requestContext.js";
+import { authRouter } from "./routes/auth.route.js";
 import { dashboardRouter } from "./routes/dashboard_route.js";
 import { healthRouter } from "./routes/health_route.js";
 import { inventoryRouter } from "./routes/inventory_route.js";
@@ -24,6 +27,8 @@ import { forecastRouter } from "./routes/forecast_route.js";
 import { recommendationsRouter } from "./routes/recommendations_route.js";
 import { settingsRouter } from "./routes/settings_route.js";
 import { simulationRouter } from "./routes/simulation_route.js";
+import { roleRoutes } from "./routes/admin/role.routes.js";
+import { userRoutes } from "./routes/admin/user.routes.js";
 
 export const app = express();
 
@@ -42,14 +47,18 @@ app.use(compression());
 app.use(express.json({ limit: SERVER.bodyLimit }));
 app.use(express.urlencoded({ extended: true, limit: SERVER.bodyLimit }));
 
-// After the parsers, before the routes: everything downstream reads req.userId.
-app.use(currentUser);
-
 app.get("/", (_req, res) => {
   res.json({ status: "working", api: SERVER.apiPrefix });
 });
 
 app.use(`${SERVER.apiPrefix}/health`, healthRouter);
+app.use(`${SERVER.apiPrefix}/auth`, authRouter);
+
+// After the parsers and public routes, before the protected routes:
+app.use(SERVER.apiPrefix, authenticate);
+app.use(SERVER.apiPrefix, scopeDc);
+app.use(SERVER.apiPrefix, currentUser);
+
 app.use(SERVER.apiPrefix, masterDataRouter);
 app.use(`${SERVER.apiPrefix}/dashboard`, dashboardRouter);
 app.use(`${SERVER.apiPrefix}/planning/parameters`, parametersRouter);
@@ -65,6 +74,9 @@ app.use(`${SERVER.apiPrefix}/forecast`, forecastRouter);
 app.use(`${SERVER.apiPrefix}/recommendations`, recommendationsRouter);
 app.use(`${SERVER.apiPrefix}/settings`, settingsRouter);
 app.use(`${SERVER.apiPrefix}/simulation`, simulationRouter);
+
+app.use(`${SERVER.apiPrefix}/admin/roles`, roleRoutes);
+app.use(`${SERVER.apiPrefix}/admin/users`, userRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

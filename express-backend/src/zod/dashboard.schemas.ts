@@ -4,7 +4,7 @@ import { WarehouseTier } from "../../generated/prisma/enums.js";
 const identifier = z.string().trim().min(1);
 
 export const networkQuerySchema = z.object({
-  tier: z.enum(WarehouseTier).optional(),
+  tier: z.nativeEnum(WarehouseTier).optional(),
 });
 
 export const inventoryHealthQuerySchema = z.object({

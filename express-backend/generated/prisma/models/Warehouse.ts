@@ -269,6 +269,7 @@ export type WarehouseWhereInput = {
   promotionEvents?: Prisma.PromotionEventListRelationFilter
   distributors?: Prisma.DistributorListRelationFilter
   distributorOrders?: Prisma.DistributorOrderListRelationFilter
+  users?: Prisma.UserListRelationFilter
 }
 
 export type WarehouseOrderByWithRelationInput = {
@@ -295,6 +296,7 @@ export type WarehouseOrderByWithRelationInput = {
   promotionEvents?: Prisma.PromotionEventOrderByRelationAggregateInput
   distributors?: Prisma.DistributorOrderByRelationAggregateInput
   distributorOrders?: Prisma.DistributorOrderOrderByRelationAggregateInput
+  users?: Prisma.UserOrderByRelationAggregateInput
 }
 
 export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
@@ -324,6 +326,7 @@ export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
   promotionEvents?: Prisma.PromotionEventListRelationFilter
   distributors?: Prisma.DistributorListRelationFilter
   distributorOrders?: Prisma.DistributorOrderListRelationFilter
+  users?: Prisma.UserListRelationFilter
 }, "id" | "code">
 
 export type WarehouseOrderByWithAggregationInput = {
@@ -384,6 +387,7 @@ export type WarehouseCreateInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateInput = {
@@ -410,6 +414,7 @@ export type WarehouseUncheckedCreateInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUpdateInput = {
@@ -436,6 +441,7 @@ export type WarehouseUpdateInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateInput = {
@@ -462,6 +468,7 @@ export type WarehouseUncheckedUpdateInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateManyInput = {
@@ -501,6 +508,11 @@ export type WarehouseUncheckedUpdateManyInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type WarehouseNullableScalarRelationFilter = {
+  is?: Prisma.WarehouseWhereInput | null
+  isNot?: Prisma.WarehouseWhereInput | null
 }
 
 export type WarehouseCountOrderByAggregateInput = {
@@ -555,9 +567,20 @@ export type WarehouseScalarRelationFilter = {
   isNot?: Prisma.WarehouseWhereInput
 }
 
-export type WarehouseNullableScalarRelationFilter = {
-  is?: Prisma.WarehouseWhereInput | null
-  isNot?: Prisma.WarehouseWhereInput | null
+export type WarehouseCreateNestedOneWithoutUsersInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutUsersInput, Prisma.WarehouseUncheckedCreateWithoutUsersInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutUsersInput
+  connect?: Prisma.WarehouseWhereUniqueInput
+}
+
+export type WarehouseUpdateOneWithoutUsersNestedInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutUsersInput, Prisma.WarehouseUncheckedCreateWithoutUsersInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutUsersInput
+  upsert?: Prisma.WarehouseUpsertWithoutUsersInput
+  disconnect?: Prisma.WarehouseWhereInput | boolean
+  delete?: Prisma.WarehouseWhereInput | boolean
+  connect?: Prisma.WarehouseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutUsersInput, Prisma.WarehouseUpdateWithoutUsersInput>, Prisma.WarehouseUncheckedUpdateWithoutUsersInput>
 }
 
 export type EnumWarehouseTierFieldUpdateOperationsInput = {
@@ -750,6 +773,126 @@ export type WarehouseUpdateOneRequiredWithoutRecommendationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutRecommendationsInput, Prisma.WarehouseUpdateWithoutRecommendationsInput>, Prisma.WarehouseUncheckedUpdateWithoutRecommendationsInput>
 }
 
+export type WarehouseCreateWithoutUsersInput = {
+  id?: string
+  code: string
+  name: string
+  region?: string | null
+  tier: $Enums.WarehouseTier
+  location?: string | null
+  capacity?: number | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutWarehouseInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutWarehouseInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutWarehouseInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutWarehouseInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutWarehouseInput
+  drpFrom?: Prisma.DRPPlanCreateNestedManyWithoutFromWarehouseInput
+  drpTo?: Prisma.DRPPlanCreateNestedManyWithoutToWarehouseInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutWarehouseInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
+  distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseUncheckedCreateWithoutUsersInput = {
+  id?: string
+  code: string
+  name: string
+  region?: string | null
+  tier: $Enums.WarehouseTier
+  location?: string | null
+  capacity?: number | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutWarehouseInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutWarehouseInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutWarehouseInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutWarehouseInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutWarehouseInput
+  drpFrom?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutFromWarehouseInput
+  drpTo?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutToWarehouseInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutWarehouseInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
+  distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseCreateOrConnectWithoutUsersInput = {
+  where: Prisma.WarehouseWhereUniqueInput
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutUsersInput, Prisma.WarehouseUncheckedCreateWithoutUsersInput>
+}
+
+export type WarehouseUpsertWithoutUsersInput = {
+  update: Prisma.XOR<Prisma.WarehouseUpdateWithoutUsersInput, Prisma.WarehouseUncheckedUpdateWithoutUsersInput>
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutUsersInput, Prisma.WarehouseUncheckedCreateWithoutUsersInput>
+  where?: Prisma.WarehouseWhereInput
+}
+
+export type WarehouseUpdateToOneWithWhereWithoutUsersInput = {
+  where?: Prisma.WarehouseWhereInput
+  data: Prisma.XOR<Prisma.WarehouseUpdateWithoutUsersInput, Prisma.WarehouseUncheckedUpdateWithoutUsersInput>
+}
+
+export type WarehouseUpdateWithoutUsersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.EnumWarehouseTierFieldUpdateOperationsInput | $Enums.WarehouseTier
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutWarehouseNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutWarehouseNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutWarehouseNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutWarehouseNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutWarehouseNestedInput
+  drpFrom?: Prisma.DRPPlanUpdateManyWithoutFromWarehouseNestedInput
+  drpTo?: Prisma.DRPPlanUpdateManyWithoutToWarehouseNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutWarehouseNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
+  distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseUncheckedUpdateWithoutUsersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.EnumWarehouseTierFieldUpdateOperationsInput | $Enums.WarehouseTier
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutWarehouseNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutWarehouseNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutWarehouseNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutWarehouseNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutWarehouseNestedInput
+  drpFrom?: Prisma.DRPPlanUncheckedUpdateManyWithoutFromWarehouseNestedInput
+  drpTo?: Prisma.DRPPlanUncheckedUpdateManyWithoutToWarehouseNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutWarehouseNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
+  distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+}
+
 export type WarehouseCreateWithoutDemandHistoryInput = {
   id?: string
   code: string
@@ -773,6 +916,7 @@ export type WarehouseCreateWithoutDemandHistoryInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutDemandHistoryInput = {
@@ -798,6 +942,7 @@ export type WarehouseUncheckedCreateWithoutDemandHistoryInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutDemandHistoryInput = {
@@ -839,6 +984,7 @@ export type WarehouseUpdateWithoutDemandHistoryInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutDemandHistoryInput = {
@@ -864,6 +1010,7 @@ export type WarehouseUncheckedUpdateWithoutDemandHistoryInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutInventoryInput = {
@@ -889,6 +1036,7 @@ export type WarehouseCreateWithoutInventoryInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutInventoryInput = {
@@ -914,6 +1062,7 @@ export type WarehouseUncheckedCreateWithoutInventoryInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutInventoryInput = {
@@ -955,6 +1104,7 @@ export type WarehouseUpdateWithoutInventoryInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutInventoryInput = {
@@ -980,6 +1130,7 @@ export type WarehouseUncheckedUpdateWithoutInventoryInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutBatchesInput = {
@@ -1005,6 +1156,7 @@ export type WarehouseCreateWithoutBatchesInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutBatchesInput = {
@@ -1030,6 +1182,7 @@ export type WarehouseUncheckedCreateWithoutBatchesInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutBatchesInput = {
@@ -1071,6 +1224,7 @@ export type WarehouseUpdateWithoutBatchesInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutBatchesInput = {
@@ -1096,6 +1250,7 @@ export type WarehouseUncheckedUpdateWithoutBatchesInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutPlanningParametersInput = {
@@ -1121,6 +1276,7 @@ export type WarehouseCreateWithoutPlanningParametersInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutPlanningParametersInput = {
@@ -1146,6 +1302,7 @@ export type WarehouseUncheckedCreateWithoutPlanningParametersInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutPlanningParametersInput = {
@@ -1187,6 +1344,7 @@ export type WarehouseUpdateWithoutPlanningParametersInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutPlanningParametersInput = {
@@ -1212,6 +1370,7 @@ export type WarehouseUncheckedUpdateWithoutPlanningParametersInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutPromotionEventsInput = {
@@ -1237,6 +1396,7 @@ export type WarehouseCreateWithoutPromotionEventsInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutPromotionEventsInput = {
@@ -1262,6 +1422,7 @@ export type WarehouseUncheckedCreateWithoutPromotionEventsInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutPromotionEventsInput = {
@@ -1303,6 +1464,7 @@ export type WarehouseUpdateWithoutPromotionEventsInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutPromotionEventsInput = {
@@ -1328,6 +1490,7 @@ export type WarehouseUncheckedUpdateWithoutPromotionEventsInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutDistributorsInput = {
@@ -1353,6 +1516,7 @@ export type WarehouseCreateWithoutDistributorsInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutWarehouseInput
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutDistributorsInput = {
@@ -1378,6 +1542,7 @@ export type WarehouseUncheckedCreateWithoutDistributorsInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutWarehouseInput
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutDistributorsInput = {
@@ -1419,6 +1584,7 @@ export type WarehouseUpdateWithoutDistributorsInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutWarehouseNestedInput
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutDistributorsInput = {
@@ -1444,6 +1610,7 @@ export type WarehouseUncheckedUpdateWithoutDistributorsInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutWarehouseNestedInput
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutDistributorOrdersInput = {
@@ -1469,6 +1636,7 @@ export type WarehouseCreateWithoutDistributorOrdersInput = {
   recommendations?: Prisma.RecommendationCreateNestedManyWithoutWarehouseInput
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutDistributorOrdersInput = {
@@ -1494,6 +1662,7 @@ export type WarehouseUncheckedCreateWithoutDistributorOrdersInput = {
   recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutWarehouseInput
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutDistributorOrdersInput = {
@@ -1535,6 +1704,7 @@ export type WarehouseUpdateWithoutDistributorOrdersInput = {
   recommendations?: Prisma.RecommendationUpdateManyWithoutWarehouseNestedInput
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutDistributorOrdersInput = {
@@ -1560,6 +1730,7 @@ export type WarehouseUncheckedUpdateWithoutDistributorOrdersInput = {
   recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutWarehouseNestedInput
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutForecastsInput = {
@@ -1585,6 +1756,7 @@ export type WarehouseCreateWithoutForecastsInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutForecastsInput = {
@@ -1610,6 +1782,7 @@ export type WarehouseUncheckedCreateWithoutForecastsInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutForecastsInput = {
@@ -1651,6 +1824,7 @@ export type WarehouseUpdateWithoutForecastsInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutForecastsInput = {
@@ -1676,6 +1850,7 @@ export type WarehouseUncheckedUpdateWithoutForecastsInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutInventoryPlansInput = {
@@ -1701,6 +1876,7 @@ export type WarehouseCreateWithoutInventoryPlansInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutInventoryPlansInput = {
@@ -1726,6 +1902,7 @@ export type WarehouseUncheckedCreateWithoutInventoryPlansInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutInventoryPlansInput = {
@@ -1767,6 +1944,7 @@ export type WarehouseUpdateWithoutInventoryPlansInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutInventoryPlansInput = {
@@ -1792,6 +1970,7 @@ export type WarehouseUncheckedUpdateWithoutInventoryPlansInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutSupplyPlansInput = {
@@ -1817,6 +1996,7 @@ export type WarehouseCreateWithoutSupplyPlansInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutSupplyPlansInput = {
@@ -1842,6 +2022,7 @@ export type WarehouseUncheckedCreateWithoutSupplyPlansInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutSupplyPlansInput = {
@@ -1883,6 +2064,7 @@ export type WarehouseUpdateWithoutSupplyPlansInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutSupplyPlansInput = {
@@ -1908,6 +2090,7 @@ export type WarehouseUncheckedUpdateWithoutSupplyPlansInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutDrpFromInput = {
@@ -1933,6 +2116,7 @@ export type WarehouseCreateWithoutDrpFromInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutDrpFromInput = {
@@ -1958,6 +2142,7 @@ export type WarehouseUncheckedCreateWithoutDrpFromInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutDrpFromInput = {
@@ -1988,6 +2173,7 @@ export type WarehouseCreateWithoutDrpToInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutDrpToInput = {
@@ -2013,6 +2199,7 @@ export type WarehouseUncheckedCreateWithoutDrpToInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutDrpToInput = {
@@ -2054,6 +2241,7 @@ export type WarehouseUpdateWithoutDrpFromInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutDrpFromInput = {
@@ -2079,6 +2267,7 @@ export type WarehouseUncheckedUpdateWithoutDrpFromInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUpsertWithoutDrpToInput = {
@@ -2115,6 +2304,7 @@ export type WarehouseUpdateWithoutDrpToInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutDrpToInput = {
@@ -2140,6 +2330,7 @@ export type WarehouseUncheckedUpdateWithoutDrpToInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutRecommendationsInput = {
@@ -2165,6 +2356,7 @@ export type WarehouseCreateWithoutRecommendationsInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutRecommendationsInput = {
@@ -2190,6 +2382,7 @@ export type WarehouseUncheckedCreateWithoutRecommendationsInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutRecommendationsInput = {
@@ -2231,6 +2424,7 @@ export type WarehouseUpdateWithoutRecommendationsInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutRecommendationsInput = {
@@ -2256,6 +2450,7 @@ export type WarehouseUncheckedUpdateWithoutRecommendationsInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 
@@ -2277,6 +2472,7 @@ export type WarehouseCountOutputType = {
   promotionEvents: number
   distributors: number
   distributorOrders: number
+  users: number
 }
 
 export type WarehouseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2293,6 +2489,7 @@ export type WarehouseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   promotionEvents?: boolean | WarehouseCountOutputTypeCountPromotionEventsArgs
   distributors?: boolean | WarehouseCountOutputTypeCountDistributorsArgs
   distributorOrders?: boolean | WarehouseCountOutputTypeCountDistributorOrdersArgs
+  users?: boolean | WarehouseCountOutputTypeCountUsersArgs
 }
 
 /**
@@ -2396,6 +2593,13 @@ export type WarehouseCountOutputTypeCountDistributorOrdersArgs<ExtArgs extends r
   where?: Prisma.DistributorOrderWhereInput
 }
 
+/**
+ * WarehouseCountOutputType without action
+ */
+export type WarehouseCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserWhereInput
+}
+
 
 export type WarehouseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2421,6 +2625,7 @@ export type WarehouseSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   promotionEvents?: boolean | Prisma.Warehouse$promotionEventsArgs<ExtArgs>
   distributors?: boolean | Prisma.Warehouse$distributorsArgs<ExtArgs>
   distributorOrders?: boolean | Prisma.Warehouse$distributorOrdersArgs<ExtArgs>
+  users?: boolean | Prisma.Warehouse$usersArgs<ExtArgs>
   _count?: boolean | Prisma.WarehouseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["warehouse"]>
 
@@ -2478,6 +2683,7 @@ export type WarehouseInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   promotionEvents?: boolean | Prisma.Warehouse$promotionEventsArgs<ExtArgs>
   distributors?: boolean | Prisma.Warehouse$distributorsArgs<ExtArgs>
   distributorOrders?: boolean | Prisma.Warehouse$distributorOrdersArgs<ExtArgs>
+  users?: boolean | Prisma.Warehouse$usersArgs<ExtArgs>
   _count?: boolean | Prisma.WarehouseCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type WarehouseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2499,6 +2705,7 @@ export type $WarehousePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     promotionEvents: Prisma.$PromotionEventPayload<ExtArgs>[]
     distributors: Prisma.$DistributorPayload<ExtArgs>[]
     distributorOrders: Prisma.$DistributorOrderPayload<ExtArgs>[]
+    users: Prisma.$UserPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2918,6 +3125,7 @@ export interface Prisma__WarehouseClient<T, Null = never, ExtArgs extends runtim
   promotionEvents<T extends Prisma.Warehouse$promotionEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$promotionEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PromotionEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   distributors<T extends Prisma.Warehouse$distributorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$distributorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DistributorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   distributorOrders<T extends Prisma.Warehouse$distributorOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$distributorOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DistributorOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  users<T extends Prisma.Warehouse$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3659,6 +3867,30 @@ export type Warehouse$distributorOrdersArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.DistributorOrderScalarFieldEnum | Prisma.DistributorOrderScalarFieldEnum[]
+}
+
+/**
+ * Warehouse.users
+ */
+export type Warehouse$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
+  cursor?: Prisma.UserWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
 }
 
 /**

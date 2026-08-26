@@ -169,8 +169,9 @@ const sorters: Record<
 
 export const listInventory = async (
   query: InventoryQuery,
+  authScope?: { warehouseId?: string | null }
 ): Promise<{ report: InventoryListReport; total: number }> => {
-  const [positions, expiry] = await Promise.all([loadPositions(), loadExpirySummaries()]);
+  const [positions, expiry] = await Promise.all([loadPositions(authScope), loadExpirySummaries()]);
 
   const items = positions.map((position) =>
     toItem(position, expiry.get(pairKey(position.productId, position.warehouseId))),
@@ -239,15 +240,19 @@ const networkPositionOf = (items: InventoryPositionItem[]): SkuNetworkPosition =
   };
 };
 
-export const getSkuInventory = async ({ id }: SkuInventoryParams): Promise<SkuInventoryDetail> => {
+export const getSkuInventory = async ({ id }: SkuInventoryParams, authScope?: { warehouseId?: string | null }): Promise<SkuInventoryDetail> => {
   const product = await prisma.product.findFirst({ where: { OR: [{ id }, { sku: id }] } });
   if (!product) throw new NotFoundError(`Product '${id}' not found`);
 
   const [positions, expiry, batches] = await Promise.all([
-    loadPositions(),
+    loadPositions(authScope),
     loadExpirySummaries(),
     prisma.inventoryBatch.findMany({
-      where: { productId: product.id, quantity: { gt: 0 } },
+      where: {
+        productId: product.id,
+        quantity: { gt: 0 },
+        ...(authScope?.warehouseId ? { warehouseId: authScope.warehouseId } : {})
+      },
       include: { warehouse: { select: { code: true, name: true } } },
       orderBy: { expiryDate: "asc" },
     }),

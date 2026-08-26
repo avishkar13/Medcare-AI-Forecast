@@ -71,12 +71,13 @@ export const getProduct = async ({ id }: ProductParams): Promise<ProductSummary>
   return toProductSummary(product);
 };
 
-export const listWarehouses = async (query: WarehouseQuery): Promise<WarehouseSummary[]> => {
+export const listWarehouses = async (query: WarehouseQuery, authScope?: { warehouseId?: string | null }): Promise<WarehouseSummary[]> => {
   const rows = await prisma.warehouse.findMany({
     where: {
       ...(query.tier === undefined ? {} : { tier: query.tier }),
       ...(query.region === undefined ? {} : { region: query.region }),
       ...(query.isActive === undefined ? {} : { isActive: query.isActive }),
+      ...(authScope?.warehouseId ? { id: authScope.warehouseId } : {}),
     },
     orderBy: { code: "asc" },
   });
@@ -121,19 +122,20 @@ export const getWarehouse = async ({ id }: WarehouseParams) => {
   };
 };
 
-export const listDistributors = async (query: DistributorQuery) => {
+export const listDistributors = async (query: DistributorQuery, authScope?: { warehouseId?: string | null }) => {
+  const effectiveWarehouse = query.warehouse ?? authScope?.warehouseId;
   const warehouseId =
-    query.warehouse === undefined
+    effectiveWarehouse === undefined || effectiveWarehouse === null
       ? undefined
       : (
           await prisma.warehouse.findFirst({
-            where: { OR: [{ id: query.warehouse }, { code: query.warehouse }] },
+            where: { OR: [{ id: effectiveWarehouse }, { code: effectiveWarehouse }] },
             select: { id: true },
           })
         )?.id;
 
-  if (query.warehouse !== undefined && warehouseId === undefined) {
-    throw new NotFoundError(`Warehouse '${query.warehouse}' not found`);
+  if (effectiveWarehouse !== undefined && effectiveWarehouse !== null && warehouseId === undefined) {
+    throw new NotFoundError(`Warehouse '${effectiveWarehouse}' not found`);
   }
 
   const rows = await prisma.distributor.findMany({
@@ -166,16 +168,17 @@ export const listDistributors = async (query: DistributorQuery) => {
  * running right now counts as upcoming - it is still affecting demand. The same rule
  * the training export uses.
  */
-export const listPromotions = async (query: PromotionQuery) => {
+export const listPromotions = async (query: PromotionQuery, authScope?: { warehouseId?: string | null }) => {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
 
-  const where = {
+  const where: Prisma.PromotionEventWhereInput = {
     ...(query.upcoming === undefined
       ? {}
       : query.upcoming
         ? { endDate: { gte: today } }
         : { endDate: { lt: today } }),
+    ...(authScope?.warehouseId ? { OR: [{ warehouseId: authScope.warehouseId }, { warehouseId: null }] } : {}),
   };
 
   const [total, rows] = await Promise.all([

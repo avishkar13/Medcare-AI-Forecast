@@ -54,10 +54,11 @@ const resolveWarehouse = async (warehouse: string): Promise<string> => {
  * An unknown `runId` is a 404, but *no completed run at all* is not an error - it is
  * the honest state of a system nobody has run yet, and each route answers with nulls.
  */
-const resolveScope = async (query: ForecastQuery): Promise<Scope> => {
+const resolveScope = async (query: ForecastQuery, authScope?: { warehouseId?: string | null }): Promise<Scope> => {
+  const effectiveWarehouse = query.warehouse ?? authScope?.warehouseId;
   const [productId, warehouseId] = await Promise.all([
     query.sku === undefined ? undefined : resolveProduct(query.sku),
-    query.warehouse === undefined ? undefined : resolveWarehouse(query.warehouse),
+    effectiveWarehouse === undefined || effectiveWarehouse === null ? undefined : resolveWarehouse(effectiveWarehouse),
   ]);
 
   const run = query.runId
@@ -145,8 +146,8 @@ const horizonLength = async (where: Prisma.ForecastWhereInput): Promise<number> 
 const mean = (values: number[]) =>
   values.length === 0 ? 0 : values.reduce((total, value) => total + value, 0) / values.length;
 
-export const getKpi = async (query: ForecastQuery) => {
-  const scope = await resolveScope(query);
+export const getKpi = async (query: ForecastQuery, authScope?: { warehouseId?: string | null }) => {
+  const scope = await resolveScope(query, authScope);
   const where = await withHorizon(scope, query.days);
 
   if (scope.runId === null) {
@@ -183,8 +184,8 @@ export const getKpi = async (query: ForecastQuery) => {
   };
 };
 
-export const getSummary = async (query: ForecastQuery) => {
-  const scope = await resolveScope(query);
+export const getSummary = async (query: ForecastQuery, authScope?: { warehouseId?: string | null }) => {
+  const scope = await resolveScope(query, authScope);
   const days = scope.runId === null ? [] : await dailyForecast(await withHorizon(scope, query.days));
 
   if (days.length === 0) {
@@ -215,8 +216,8 @@ export const getSummary = async (query: ForecastQuery) => {
   };
 };
 
-export const getMainChart = async (query: ForecastChartQuery) => {
-  const scope = await resolveScope(query);
+export const getMainChart = async (query: ForecastChartQuery, authScope?: { warehouseId?: string | null }) => {
+  const scope = await resolveScope(query, authScope);
   const predicted = scope.runId === null ? [] : await dailyForecast(await withHorizon(scope, query.days));
 
   const since = new Date(Date.now() - query.historyDays * MS_PER_DAY);
@@ -247,8 +248,8 @@ export const getMainChart = async (query: ForecastChartQuery) => {
   };
 };
 
-export const getTrend = async (query: ForecastQuery) => {
-  const scope = await resolveScope(query);
+export const getTrend = async (query: ForecastQuery, authScope?: { warehouseId?: string | null }) => {
+  const scope = await resolveScope(query, authScope);
   const days = scope.runId === null ? [] : await dailyForecast(await withHorizon(scope, query.days));
 
   if (days.length === 0) {
@@ -283,8 +284,8 @@ export const getTrend = async (query: ForecastQuery) => {
 };
 
 /** Weekday and month indices measured from realised demand, centred on 1.0. */
-export const getSeasonality = async (query: ForecastQuery) => {
-  const scope = await resolveScope(query);
+export const getSeasonality = async (query: ForecastQuery, authScope?: { warehouseId?: string | null }) => {
+  const scope = await resolveScope(query, authScope);
 
   const rows = await prisma.demandHistory.findMany({
     where: scope.historyWhere,
@@ -350,8 +351,8 @@ const groupedForecast = async (
     _count: true,
   });
 
-export const getNetwork = async (query: ForecastQuery) => {
-  const scope = await resolveScope(query);
+export const getNetwork = async (query: ForecastQuery, authScope?: { warehouseId?: string | null }) => {
+  const scope = await resolveScope(query, authScope);
   const where = await withHorizon(scope, query.days);
 
   const [warehouses, forecast, history, horizonDays] = await Promise.all([
@@ -396,8 +397,8 @@ export const getNetwork = async (query: ForecastQuery) => {
   };
 };
 
-export const getSkus = async (query: ForecastQuery) => {
-  const scope = await resolveScope(query);
+export const getSkus = async (query: ForecastQuery, authScope?: { warehouseId?: string | null }) => {
+  const scope = await resolveScope(query, authScope);
   const where = await withHorizon(scope, query.days);
 
   const [forecast, products, horizonDays] = await Promise.all([
@@ -445,8 +446,8 @@ const accuracyOf = async (scope: Scope) => {
   return metricsOf(points);
 };
 
-export const getPerformance = async (query: ForecastQuery) => {
-  const scope = await resolveScope(query);
+export const getPerformance = async (query: ForecastQuery, authScope?: { warehouseId?: string | null }) => {
+  const scope = await resolveScope(query, authScope);
   const accuracy = await accuracyOf(scope);
 
   return {
@@ -474,8 +475,8 @@ export const getPerformance = async (query: ForecastQuery) => {
   };
 };
 
-export const getImpact = async (query: ForecastQuery) => {
-  const scope = await resolveScope(query);
+export const getImpact = async (query: ForecastQuery, authScope?: { warehouseId?: string | null }) => {
+  const scope = await resolveScope(query, authScope);
 
   if (scope.runId === null) {
     return { ...emptyMeta(scope), totalCost: null, holdingCost: null, stockoutCost: null, transferCost: null, expiryCost: null, expectedWaste: null, serviceLevel: null, serviceLevelPercent: null };
@@ -507,13 +508,13 @@ export const getImpact = async (query: ForecastQuery) => {
  * true of no particular dataset. These are facts with the numbers attached, so a
  * reader can check them.
  */
-export const getInsight = async (query: ForecastQuery) => {
-  const scope = await resolveScope(query);
+export const getInsight = async (query: ForecastQuery, authScope?: { warehouseId?: string | null }) => {
+  const scope = await resolveScope(query, authScope);
   if (scope.runId === null) return { ...emptyMeta(scope), observations: [] };
 
   const [trend, network, accuracy] = await Promise.all([
-    getTrend(query),
-    getNetwork(query),
+    getTrend(query, authScope),
+    getNetwork(query, authScope),
     accuracyOf(scope),
   ]);
 

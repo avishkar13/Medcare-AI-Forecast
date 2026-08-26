@@ -22,6 +22,9 @@ export const envSchema = z
     DATABASE_URL: z.string().min(1),
     REDIS_URL: z.string().min(1).optional(),
 
+    JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters in production"),
+    JWT_EXPIRES_IN: z.string().default("1d"),
+
     CORS_ORIGINS: z.string().default("http://localhost:3000"),
     CORS_CREDENTIALS: stringbool.default(true),
 

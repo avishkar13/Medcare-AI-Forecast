@@ -27,8 +27,8 @@ import type {
  * network's demand-weighted average lead time, read from the positions rather than
  * assumed, so no caller has to carry a nominal figure of its own.
  */
-export const averageLeadTimeDays = async () => {
-  const positions = await loadPositions();
+export const averageLeadTimeDays = async (authScope?: { warehouseId?: string | null }) => {
+  const positions = await loadPositions(authScope);
   if (positions.length === 0) return 0;
   return round(
     positions.reduce((total, position) => total + position.leadTimeDays, 0) / positions.length,
@@ -36,9 +36,9 @@ export const averageLeadTimeDays = async () => {
   );
 };
 
-const resolveLeadTimePercent = async (params: SimulationParams) => {
+const resolveLeadTimePercent = async (params: SimulationParams, authScope?: { warehouseId?: string | null }) => {
   if (params.leadTimeChangeDays === undefined) return params.leadTimeChangePercent;
-  const base = await averageLeadTimeDays();
+  const base = await averageLeadTimeDays(authScope);
   return base === 0 ? 0 : round((params.leadTimeChangeDays / base) * 100, 2);
 };
 
@@ -110,12 +110,12 @@ const toScenario = (row: {
  * single-active-run guard, the idempotency path and the executor scheduling all
  * apply exactly as they do to a normal run.
  */
-export const runWhatIf = async (body: WhatIfBody, actorId?: string) => {
+export const runWhatIf = async (body: WhatIfBody, actorId?: string, authScope?: { warehouseId?: string | null }) => {
   const scenario = await prisma.scenario.create({
     data: {
       name: body.name,
       ...(body.description === undefined ? {} : { description: body.description }),
-      ...toMultipliers(body.params, await resolveLeadTimePercent(body.params)),
+      ...toMultipliers(body.params, await resolveLeadTimePercent(body.params, authScope)),
       createdById: await resolveActorId(actorId),
     },
     select: scenarioSelect,
@@ -178,12 +178,12 @@ export const listSaved = async (limit: number) => {
   return rows.map(toScenario);
 };
 
-export const saveScenario = async (body: SaveScenarioBody, actorId?: string) => {
+export const saveScenario = async (body: SaveScenarioBody, actorId?: string, authScope?: { warehouseId?: string | null }) => {
   const row = await prisma.scenario.create({
     data: {
       name: body.name,
       ...(body.description === undefined ? {} : { description: body.description }),
-      ...toMultipliers(body.params, await resolveLeadTimePercent(body.params)),
+      ...toMultipliers(body.params, await resolveLeadTimePercent(body.params, authScope)),
       createdById: await resolveActorId(actorId),
     },
     select: scenarioSelect,

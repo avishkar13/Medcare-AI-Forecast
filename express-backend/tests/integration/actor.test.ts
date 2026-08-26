@@ -13,6 +13,13 @@ const { startServer } = await import("../helpers/server.js");
 const { expectEnvelope } = await import("../helpers/assertions.js");
 
 import type { TestServer } from "../helpers/server.js";
+import jwt from "jsonwebtoken";
+import { env } from "../../src/config/env.js";
+
+const generateToken = (userId: string) => {
+  const secret = (env as any).JWT_SECRET || "super_secret_jwt_key_for_development_purposes_only";
+  return jwt.sign({ sub: userId }, secret, { expiresIn: "1d" });
+};
 
 /**
  * The seam auth will plug into.
@@ -54,10 +61,11 @@ before(async () => {
   const system = await prisma.user.findFirstOrThrow({ select: { id: true } });
   systemUserId = system.id;
 
+  const adminRole = await prisma.role.findFirst({ where: { name: "ADMIN" } });
   const other = await prisma.user.upsert({
     where: { email: "actor-test@medcare.local" },
     update: {},
-    create: { email: "actor-test@medcare.local", name: "Actor Test", passwordHash: "!" },
+    create: { email: "actor-test@medcare.local", name: "Actor Test", passwordHash: "!", roleId: adminRole!.id },
     select: { id: true },
   });
   otherUserId = other.id;
@@ -86,23 +94,22 @@ const openRecommendation = async () => {
 };
 
 describe("the acting user", () => {
-  test("defaults to a real user so the foreign key holds", async () => {
+  test("rejects unauthenticated requests", async () => {
     const id = await openRecommendation();
     const response = await fetch(`${server.url}/api/recommendations/${id}/execute`, {
       method: "PATCH",
     });
 
-    const { data } = expectEnvelope<{ actedById: string | null }>(await response.json());
-    assert.equal(data.actedById, systemUserId, "with nobody authenticated, the stand-in acts");
+    assert.equal(response.status, 401, "unauthenticated requests must be rejected");
   });
 
-  test("whatever req.userId holds is what lands on the row", async () => {
+  test("whatever req.user.id holds is what lands on the row", async () => {
     const id = await openRecommendation();
 
-    // Stands in for what an auth middleware will do: put a user on the request.
+    const token = generateToken(otherUserId);
     const response = await fetch(`${server.url}/api/recommendations/${id}/dismiss`, {
       method: "PATCH",
-      headers: { "x-user-id": otherUserId },
+      headers: { authorization: `Bearer ${token}` },
     });
 
     const { data } = expectEnvelope<{ actedById: string | null; status: string }>(
@@ -112,32 +119,28 @@ describe("the acting user", () => {
     assert.equal(
       data.actedById,
       otherUserId,
-      "the recorded actor must follow req.userId, or auth will not change who acts",
+      "the recorded actor must follow the JWT subject",
     );
   });
 
-  test("an id that is not a real user falls back instead of failing the write", async () => {
+  test("an id that is not a real user is rejected", async () => {
     const id = await openRecommendation();
 
+    const token = generateToken("not-a-real-user");
     const response = await fetch(`${server.url}/api/recommendations/${id}/execute`, {
       method: "PATCH",
-      headers: { "x-user-id": "not-a-real-user" },
+      headers: { authorization: `Bearer ${token}` },
     });
 
-    assert.equal(response.status, 200, "a bad actor id must not break the transition");
-    const { data } = expectEnvelope<{ actedById: string | null }>(await response.json());
-    assert.equal(
-      data.actedById,
-      systemUserId,
-      "an unknown id would violate the foreign key, so it falls back",
-    );
+    assert.equal(response.status, 401, "a fake user id must be rejected by auth");
   });
 
   test("a created run records who created it", async () => {
+    const token = generateToken(otherUserId);
     const response = await server.post(
       "/api/planning/runs",
       { horizonDays: 3 },
-      { "x-user-id": otherUserId },
+      { authorization: `Bearer ${token}` },
     );
 
     const { data } = expectEnvelope<{ id: string; createdById: string }>(await response.json());
@@ -147,10 +150,11 @@ describe("the acting user", () => {
   });
 
   test("a created scenario records who created it", async () => {
+    const token = generateToken(otherUserId);
     const response = await server.post(
       "/api/scenarios",
       { name: `actor-test-${Date.now()}` },
-      { "x-user-id": otherUserId },
+      { authorization: `Bearer ${token}` },
     );
 
     const { data } = expectEnvelope<{ id: string; createdById: string }>(await response.json());

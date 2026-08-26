@@ -7,26 +7,29 @@ import {
   alertTrendQuerySchema,
 } from "../zod/alert.schemas.js";
 
+import { enforceScopeConflict } from "../middleware/scopeDc.js";
+
 export const getAlerts = async (req: Request, res: Response) => {
   const query = alertQuerySchema.parse(req.query);
-  const { items, total } = await alerts.listAlerts(query);
+  enforceScopeConflict(query.location, req); // We can't strictly compare name vs ID here, but if the frontend sends the ID by mistake it throws. The service enforces the real scope.
+  const { items, total } = await alerts.listAlerts(query, { warehouseId: req.warehouseScope });
   paginated(res, items, query.page, query.pageSize, total);
 };
 
-export const getOverview = async (_req: Request, res: Response) => {
-  ok(res, await alerts.getOverview());
+export const getOverview = async (req: Request, res: Response) => {
+  ok(res, await alerts.getOverview({ warehouseId: req.warehouseScope }));
 };
 
 export const getTrends = async (req: Request, res: Response) => {
-  ok(res, await alerts.getTrends(alertTrendQuerySchema.parse(req.query)));
+  ok(res, await alerts.getTrends(alertTrendQuerySchema.parse(req.query), { warehouseId: req.warehouseScope }));
 };
 
-export const getDistribution = async (_req: Request, res: Response) => {
-  ok(res, await alerts.getDistribution());
+export const getDistribution = async (req: Request, res: Response) => {
+  ok(res, await alerts.getDistribution({ warehouseId: req.warehouseScope }));
 };
 
-export const getHealth = async (_req: Request, res: Response) => {
-  ok(res, await alerts.getHealth());
+export const getHealth = async (req: Request, res: Response) => {
+  ok(res, await alerts.getHealth({ warehouseId: req.warehouseScope }));
 };
 
 export const acknowledge = async (req: Request, res: Response) => {

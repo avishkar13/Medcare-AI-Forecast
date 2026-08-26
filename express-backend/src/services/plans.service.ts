@@ -88,11 +88,12 @@ const toSupplyPlan = (row: SupplyRow) => ({
   status: row.status,
 });
 
-export const listSupplyPlans = async (query: SupplyPlanQuery) => {
+export const listSupplyPlans = async (query: SupplyPlanQuery, authScope?: { warehouseId?: string | null }) => {
+  const effectiveWarehouse = query.warehouse ?? authScope?.warehouseId;
   const [runId, productId, warehouseId] = await Promise.all([
     resolveRunId(query.runId),
     query.sku === undefined ? undefined : resolveProduct(query.sku),
-    query.warehouse === undefined ? undefined : resolveWarehouse(query.warehouse),
+    effectiveWarehouse === undefined || effectiveWarehouse === null ? undefined : resolveWarehouse(effectiveWarehouse),
   ]);
 
   const where: Prisma.SupplyPlanWhereInput = {
@@ -161,11 +162,12 @@ const drpSelect = {
   toWarehouse: { select: { code: true, name: true } },
 } satisfies Prisma.DRPPlanSelect;
 
-export const listDrpPlans = async (query: DrpQuery) => {
+export const listDrpPlans = async (query: DrpQuery, authScope?: { warehouseId?: string | null }) => {
+  const effectiveWarehouse = query.warehouse ?? authScope?.warehouseId;
   const [runId, productId, warehouseId] = await Promise.all([
     resolveRunId(query.runId),
     query.sku === undefined ? undefined : resolveProduct(query.sku),
-    query.warehouse === undefined ? undefined : resolveWarehouse(query.warehouse),
+    effectiveWarehouse === undefined || effectiveWarehouse === null ? undefined : resolveWarehouse(effectiveWarehouse),
   ]);
 
   const where: Prisma.DRPPlanWhereInput = {

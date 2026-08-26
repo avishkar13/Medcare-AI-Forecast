@@ -142,6 +142,21 @@ export type SimulationRun = Prisma.SimulationRunModel
  */
 export type Recommendation = Prisma.RecommendationModel
 /**
+ * Model Role
+ * 
+ */
+export type Role = Prisma.RoleModel
+/**
+ * Model Permission
+ * 
+ */
+export type Permission = Prisma.PermissionModel
+/**
+ * Model RolePermission
+ * 
+ */
+export type RolePermission = Prisma.RolePermissionModel
+/**
  * Model Alert
  * 
  */
