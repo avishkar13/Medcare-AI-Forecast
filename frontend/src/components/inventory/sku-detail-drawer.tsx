@@ -45,13 +45,9 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
   const product = data?.product;
   // one row per warehouse; the drawer shows the network position for the sku
   const positions = data?.positions ?? [];
-  const worst = positions.reduce<(typeof positions)[number] | undefined>(
-    (acc, p) => (acc === undefined || p.daysOfSupply < acc.daysOfSupply ? p : acc),
-    undefined,
-  );
-
-  const sum = (pick: (p: (typeof positions)[number]) => number) =>
-    positions.reduce((total, p) => total + pick(p), 0);
+  // the api rolls the sku up across warehouses, including the scale a stock bar
+  // should be drawn against
+  const network = data?.network;
 
   const item = product
     ? {
@@ -59,16 +55,16 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
         name: product.name,
         category: product.category,
         location: positions.length === 1 ? positions[0]!.warehouseName : `${positions.length} DCs`,
-        onHand: sum((p) => p.onHand),
-        safetyStock: sum((p) => p.safetyStock),
-        reorderPoint: sum((p) => p.reorderPoint),
-        maximumStock: sum((p) => p.maximumInventory ?? 0),
-        avgDailyDemand: sum((p) => p.avgDailyDemand),
-        leadTimeDays: worst?.leadTimeDays ?? 0,
-        daysOfSupply: worst?.daysOfSupply ?? 0,
+        onHand: network?.onHand ?? 0,
+        safetyStock: network?.safetyStock ?? 0,
+        reorderPoint: network?.reorderPoint ?? 0,
+        maximumStock: network?.maximumInventory ?? 0,
+        avgDailyDemand: network?.avgDailyDemand ?? 0,
+        leadTimeDays: network?.leadTimeDays ?? 0,
+        daysOfSupply: network?.daysOfSupply ?? 0,
         unitValue: product.unitCost,
-        inventoryValue: sum((p) => p.inventoryValue),
-        risk: (worst?.risk ?? "low") as InventoryRisk,
+        inventoryValue: network?.inventoryValue ?? 0,
+        risk: (network?.risk ?? "low") as InventoryRisk,
         batches: (data?.batches ?? []).map((b) => ({
           id: b.batchId,
           sku: product.sku,
@@ -98,7 +94,7 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
         })(),
         expiryRiskLevel: (data?.batches[0]?.severity ?? "low") as InventoryRisk,
         expiryRiskReason: null as string | null,
-        stockoutRiskLevel: (worst?.risk ?? "low") as InventoryRisk,
+        stockoutRiskLevel: (network?.risk ?? "low") as InventoryRisk,
         stockoutRiskReason: null as string | null,
       }
     : null;
@@ -131,10 +127,10 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
     }
   };
 
-  const maxTrack = Math.max(item.maximumStock, item.onHand * 1.15, item.reorderPoint * 1.2);
-  const onHandPct = Math.min(100, Math.round((item.onHand / maxTrack) * 100));
-  const safetyPct = Math.min(100, Math.round((item.safetyStock / maxTrack) * 100));
-  const reorderPct = Math.min(100, Math.round((item.reorderPoint / maxTrack) * 100));
+  const maxTrack = network?.stockScaleUnits || 1;
+  const onHandPct = Math.min(100, (item.onHand / maxTrack) * 100);
+  const safetyPct = Math.min(100, (item.safetyStock / maxTrack) * 100);
+  const reorderPct = Math.min(100, (item.reorderPoint / maxTrack) * 100);
 
   const handleReplenish = () => {
     setReplenishSuccess(true);

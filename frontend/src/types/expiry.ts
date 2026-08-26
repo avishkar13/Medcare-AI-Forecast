@@ -16,7 +16,8 @@ export interface ExpiryBatch {
   demandCoverage: number;
   inventoryValue: number;
   riskLevel: ExpiryRiskLevel;
-  wasteProbability: number;
+  wasteSharePercent: number;
+  projectedWasteUnits: number;
   wasteValue: number;
   status: ExpiryStatus;
 }

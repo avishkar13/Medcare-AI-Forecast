@@ -1,8 +1,7 @@
 import { AppSettings } from "@/types/settings";
 import { SettingsSection, SettingsCard, SettingsRow, SettingsToggle } from "./settings-ui";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { ShieldCheck, MonitorSmartphone, KeySquare } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 export function SecuritySettings({
   data,
@@ -53,48 +52,10 @@ export function SecuritySettings({
       </SettingsCard>
 
       <SettingsCard title="Active Sessions" description="Manage devices currently logged into your account.">
-        <div className="flex flex-col gap-3 mt-3">
-          
-          <div className="flex items-center justify-between p-4 bg-muted/30 border border-border/80 shadow-sm rounded-xl transition-all hover:bg-muted/50">
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-success/10 rounded-full flex items-center justify-center shrink-0 border border-success/20">
-                <MonitorSmartphone className="h-5 w-5 text-success" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm text-foreground">Chrome / Windows</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-success bg-success/10 px-1.5 py-0.5 rounded border border-success/20 shadow-sm">Active now</span>
-                </div>
-                <span className="text-xs text-muted-foreground">Kolkata, India • IP: 103.45.XX.XX</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between p-4 bg-background border border-border/50 rounded-xl transition-all hover:bg-muted/30">
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-muted/60 rounded-full flex items-center justify-center shrink-0 border border-border/50">
-                <MonitorSmartphone className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm text-foreground/80">Safari / macOS</span>
-                </div>
-                <span className="text-xs text-muted-foreground">Recent (2 days ago) • IP: 49.206.XX.XX</span>
-              </div>
-            </div>
-            <Button variant="ghost" size="sm" className="h-8 text-xs font-semibold text-destructive hover:bg-destructive/10 hover:text-destructive shrink-0">
-              Revoke
-            </Button>
-          </div>
-
-          <div className="mt-2 flex justify-end">
-            <Button variant="outline" size="sm" className="text-xs font-semibold h-9">
-              <KeySquare className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
-              Sign out other sessions
-            </Button>
-          </div>
-
-        </div>
+        <p className="text-sm text-muted-foreground mt-3">
+          Session tracking becomes available once authentication is in place. There is no
+          session store to read from yet.
+        </p>
       </SettingsCard>
 
       <SettingsCard title="Audit Logging">

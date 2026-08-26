@@ -2,12 +2,13 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
-import { useInventory } from "@/hooks/use-inventory";
+import { useInventory, useInventoryHealth } from "@/hooks/use-inventory";
 import { Info, BarChart2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function InventoryHealthChart() {
   const { data, isPending } = useInventory();
+  const { data: health } = useInventoryHealth();
   const positions = data?.items ?? [];
 
   // the five positions closest to running out say more than the first five
@@ -22,15 +23,10 @@ export function InventoryHealthChart() {
       status: row.status,
     }));
 
-  const categoryData = positions.reduce((acc, row) => {
-    acc[row.category] = (acc[row.category] || 0) + row.inventoryValue;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const catChartData = Object.entries(categoryData)
-    .map(([name, value]) => ({ name, value }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 4);
+  // the health route already groups value by category, sorted
+  const catChartData = (health?.byCategory ?? [])
+    .slice(0, 4)
+    .map((row) => ({ name: row.category, value: row.inventoryValue }));
 
   if (isPending || positions.length === 0) {
     return (

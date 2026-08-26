@@ -2,15 +2,24 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { ListTodo, AlertTriangle, DollarSign, TrendingUp, Zap, BrainCircuit } from "lucide-react";
+import {
+  useRecommendationIntelligence,
+  useRecommendationKpi,
+  useRecommendationSummary,
+} from "@/hooks/use-recommendations";
+import { formatNumber } from "@/lib/utils";
 
 export function RecommendationsKpiCards() {
-  const metrics = {
-    pendingCount: 5,
-    executedCount: 12,
-    criticalCount: 2,
-    totalSavings: 17800,
-    avgConfidence: 89.4
-  };
+  const { data: kpi, isPending } = useRecommendationKpi();
+  const { data: summary } = useRecommendationSummary();
+  const { data: intelligence } = useRecommendationIntelligence();
+
+  // the kpi route counts by status, not priority, so the critical count comes from
+  // the summary breakdown
+  const criticalCount =
+    summary?.byPriority.find((row) => row.priority === "CRITICAL")?.count ?? 0;
+
+  if (isPending || !kpi) return null;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -24,9 +33,9 @@ export function RecommendationsKpiCards() {
               <ListTodo className="h-4 w-4 text-ai" />
             </div>
           </div>
-          <p className="text-2xl font-black text-foreground">{metrics.pendingCount}</p>
+          <p className="text-2xl font-black text-foreground">{formatNumber(kpi.open)}</p>
           <div className="mt-2 text-[11px] font-semibold text-muted-foreground flex items-center gap-1">
-            <span className="text-foreground/80">{metrics.executedCount}</span> executed today
+            <span className="text-foreground/80">{formatNumber(kpi.completed)}</span> completed
           </div>
         </CardContent>
       </Card>
@@ -41,7 +50,7 @@ export function RecommendationsKpiCards() {
               <AlertTriangle className="h-4 w-4 text-destructive" />
             </div>
           </div>
-          <p className="text-2xl font-black text-foreground">{metrics.criticalCount}</p>
+          <p className="text-2xl font-black text-foreground">{formatNumber(criticalCount)}</p>
           <div className="mt-2 text-[11px] font-semibold text-destructive flex items-center gap-1 bg-destructive/10 w-fit px-1.5 py-0.5 rounded">
             Requires immediate review
           </div>
@@ -57,7 +66,7 @@ export function RecommendationsKpiCards() {
               <DollarSign className="h-4 w-4 text-success" />
             </div>
           </div>
-          <p className="text-2xl font-black text-success-foreground tracking-tight">${(metrics.totalSavings / 1000).toFixed(1)}K</p>
+          <p className="text-2xl font-black text-success-foreground tracking-tight">${(kpi.potentialSavings / 1000).toFixed(1)}K</p>
           <div className="mt-2 text-[11px] font-semibold text-success flex items-center gap-1">
             <TrendingUp className="h-3 w-3" />
             Optimized via AI
@@ -75,11 +84,14 @@ export function RecommendationsKpiCards() {
             </div>
           </div>
           <p className="text-2xl font-black text-ai flex items-baseline gap-0.5">
-            {metrics.avgConfidence}<span className="text-base font-bold opacity-80">%</span>
+            {intelligence?.averageConfidence === null || intelligence?.averageConfidence === undefined
+              ? "—"
+              : intelligence.averageConfidence}
+            <span className="text-base font-bold opacity-80">%</span>
           </p>
           <div className="mt-2 text-[11px] font-semibold text-muted-foreground flex items-center gap-1">
             <BrainCircuit className="h-3 w-3 text-ai" />
-            Based on {metrics.pendingCount + metrics.executedCount} predictions
+            Based on {formatNumber(intelligence?.recommendationCount ?? 0)} recommendations
           </div>
         </CardContent>
       </Card>

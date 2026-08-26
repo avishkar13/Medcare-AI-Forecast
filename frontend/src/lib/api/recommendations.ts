@@ -92,3 +92,26 @@ export const toRecommendationItem = (rec: Recommendation) => ({
   status: STATUS[rec.status] ?? "Pending",
   createdAt: rec.createdAt,
 });
+
+export interface RecommendationKpi {
+  planningRunId: string | null;
+  totalRecommendations: number;
+  open: number;
+  accepted: number;
+  completed: number;
+  rejected: number;
+  potentialSavings: number;
+  executionRatePercent: number;
+}
+
+export interface RecommendationSummaryPayload {
+  planningRunId: string | null;
+  byType: { type: string; count: number; impactValue: number | null }[];
+  byPriority: { priority: Recommendation["priority"]; count: number }[];
+  byStatus: { status: Recommendation["status"]; count: number }[];
+}
+
+export const getKpi = () => api.get<RecommendationKpi>("/recommendations/kpi");
+
+export const getSummary = () =>
+  api.get<RecommendationSummaryPayload>("/recommendations/summary");

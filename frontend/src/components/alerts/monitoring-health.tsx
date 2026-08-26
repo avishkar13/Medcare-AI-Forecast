@@ -1,16 +1,36 @@
 "use client";
 
+import { useAlertHealth } from "@/hooks/use-alerts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity } from "lucide-react";
 
+const relativeTime = (iso: string) => {
+  const minutes = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (minutes < 60) return `${minutes} minutes ago`;
+  if (minutes < 60 * 24) return `${Math.round(minutes / 60)} hours ago`;
+  return `${Math.round(minutes / 1440)} days ago`;
+};
+
 export function MonitoringHealth() {
-  const monitors = [
-    { name: "Inventory Monitoring", active: true },
-    { name: "Demand Monitoring", active: true },
-    { name: "Expiry Monitoring", active: true },
-    { name: "Forecast Monitoring", active: true },
-    { name: "Supplier Monitoring", active: true },
-    { name: "Alert Engine", active: true },
+  const { data, isPending } = useAlertHealth();
+
+  if (isPending || !data) return null;
+
+  // the api reports the alert pipeline itself, not a list of subsystems, so these
+  // are the four facts it can actually vouch for
+  const stats = [
+    { label: "Alerts tracked", value: String(data.alertsTracked) },
+    { label: "Open", value: String(data.openAlerts) },
+    {
+      label: "Oldest open",
+      value: data.oldestOpenAgeDays === null ? "none" : `${data.oldestOpenAgeDays}d`,
+    },
+    {
+      label: "Last detected",
+      value: data.lastDetectedAt
+        ? new Date(data.lastDetectedAt).toLocaleDateString()
+        : "never",
+    },
   ];
 
   return (
@@ -23,20 +43,21 @@ export function MonitoringHealth() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-y-3 gap-x-4">
-          {monitors.map((m, idx) => (
-            <div key={idx} className="flex items-center justify-between">
-              <span className="text-xs font-medium text-foreground">{m.name}</span>
-              <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-success shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-                <span className="text-[9px] font-bold uppercase tracking-wider text-success">Active</span>
-              </div>
+          {stats.map((stat) => (
+            <div key={stat.label} className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">{stat.label}</span>
+              <span className="text-xs font-bold tabular-nums text-foreground">{stat.value}</span>
             </div>
           ))}
         </div>
 
         <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
           <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Last System Event</p>
-          <p className="text-xs font-semibold text-foreground">Stockout risk detected &mdash; 8 minutes ago</p>
+          <p className="text-xs font-semibold text-foreground">
+            {data.lastDetectedAt
+              ? `Alert detected ${relativeTime(data.lastDetectedAt)}`
+              : "No alerts have been detected yet"}
+          </p>
         </div>
       </CardContent>
     </Card>

@@ -1,18 +1,28 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RecommendationItem } from "@/types/recommendation";
 import { ListChecks, AlertCircle, AlertTriangle, Info, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { useRecommendationSummary } from "@/hooks/use-recommendations";
 
-export function RecommendationSummary({ items }: { items: RecommendationItem[] }) {
-  const critical = items.filter(i => i.priority === "Critical").length;
-  const high = items.filter(i => i.priority === "High").length;
-  const medium = items.filter(i => i.priority === "Medium").length;
-  const low = items.filter(i => i.priority === "Low").length;
+export function RecommendationSummary() {
+  const { data, isPending } = useRecommendationSummary();
 
-  const pending = items.filter(i => i.status === "Pending").length;
-  const executed = items.filter(i => i.status === "Executed").length;
-  const dismissed = items.filter(i => i.status === "Dismissed").length;
+  // counted over the whole run by the api, not over whatever page is on screen
+  const priority = (level: string) =>
+    data?.byPriority.find((row) => row.priority === level)?.count ?? 0;
+  const status = (state: string) =>
+    data?.byStatus.find((row) => row.status === state)?.count ?? 0;
+
+  const critical = priority("CRITICAL");
+  const high = priority("HIGH");
+  const medium = priority("MEDIUM");
+  const low = priority("LOW");
+
+  const pending = status("OPEN");
+  const executed = status("COMPLETED") + status("ACCEPTED");
+  const dismissed = status("REJECTED");
+
+  if (isPending) return null;
 
   return (
     <Card className="shadow-sm">
@@ -55,7 +65,7 @@ export function RecommendationSummary({ items }: { items: RecommendationItem[] }
         </div>
 
         <div>
-          <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2.5 border-b border-border/50 pb-1.5">Today&apos;s Status</h4>
+          <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2.5 border-b border-border/50 pb-1.5">By Status</h4>
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="p-2 bg-background border border-border/60 rounded-lg shadow-sm">
               <Clock className="h-3.5 w-3.5 mx-auto mb-1 text-muted-foreground" />

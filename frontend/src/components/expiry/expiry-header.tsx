@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Activity, RefreshCcw } from "lucide-react";
+import { queryKeys } from "@/config/query-keys";
+import { useExpiryOverview } from "@/hooks/use-expiry";
+import { useReadiness } from "@/hooks/use-health";
 
 interface ExpiryHeaderProps {
   fefoActive: boolean;
@@ -11,11 +14,14 @@ interface ExpiryHeaderProps {
 }
 
 export function ExpiryHeader({ fefoActive, onFefoToggle }: ExpiryHeaderProps) {
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const client = useQueryClient();
+  const overview = useExpiryOverview();
+  const { data: readiness } = useReadiness();
+
+  const monitoring = readiness?.dependencies.database === "up";
 
   const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 1000);
+    void client.invalidateQueries({ queryKey: queryKeys.expiry.all });
   };
 
   return (
@@ -35,14 +41,20 @@ export function ExpiryHeader({ fefoActive, onFefoToggle }: ExpiryHeaderProps) {
 
       <div className="flex items-center gap-4 bg-background border border-border/60 px-4 py-2.5 rounded-xl shadow-sm">
         <div className="flex items-center gap-2 pr-4 border-r border-border/50">
-          <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
-          <span className="text-xs font-bold text-muted-foreground">Monitoring Active</span>
+          <div className={`h-2 w-2 rounded-full ${monitoring ? "bg-success animate-pulse" : "bg-destructive"}`} />
+          <span className="text-xs font-bold text-muted-foreground">
+            {monitoring ? "Monitoring Active" : "Monitoring Down"}
+          </span>
         </div>
         
         <div className="flex items-center gap-2 pr-4 border-r border-border/50 text-xs text-muted-foreground">
-          <span>Updated 02:08 AM</span>
+          <span>
+            {overview.dataUpdatedAt
+              ? `Updated ${new Date(overview.dataUpdatedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}`
+              : "Not loaded"}
+          </span>
           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleRefresh}>
-            <RefreshCcw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <RefreshCcw className={`h-3 w-3 ${overview.isFetching ? "animate-spin" : ""}`} />
           </Button>
         </div>
 

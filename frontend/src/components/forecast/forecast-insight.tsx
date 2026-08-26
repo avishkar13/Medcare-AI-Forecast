@@ -1,11 +1,27 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockForecastInsights } from "@/lib/mockData";
+import { useForecastInsight } from "@/hooks/use-forecast";
 import { BrainCircuit, AlertTriangle, Lightbulb } from "lucide-react";
+import { useForecastScope } from "@/store/filters.store";
 
 export function ForecastInsight() {
-  const insight = mockForecastInsights;
+  const scope = useForecastScope();
+  const { data, isPending } = useForecastInsight(scope);
+
+  // the api returns observations with their numbers rather than written prose
+  const by = (kind: string) =>
+    data?.observations.find((o) => o.kind === kind)?.detail ?? "";
+
+  const insight = {
+    keyDriver: by("trend") || by("network"),
+    riskImplication: by("uncertainty"),
+    confidence: "Medium" as const,
+    recommendedAttention: by("network"),
+    detailedInsight: (data?.observations ?? []).map((o) => o.detail).join(" "),
+  };
+
+  if (isPending) return null;
 
   return (
     <Card className="h-full border-ai/50 shadow-sm bg-gradient-to-br from-background to-ai/5">

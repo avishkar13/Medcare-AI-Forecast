@@ -27,7 +27,6 @@ export function BatchDetailsSheet({ batch, isOpen, onClose, onPrioritize }: Batc
     }
   };
 
-  const expectedRemaining = Math.max(0, batch.quantity - batch.forecastDemand);
   const formatCurrency = (val: number) => "$" + val.toLocaleString();
 
   return (
@@ -93,7 +92,7 @@ export function BatchDetailsSheet({ batch, isOpen, onClose, onPrioritize }: Batc
                   </div>
                   <div className="flex flex-col text-right">
                     <span className="text-[10px] text-muted-foreground font-medium">Expected Remaining</span>
-                    <span className={`text-sm font-bold ${expectedRemaining > 0 ? 'text-warning' : 'text-success'}`}>{expectedRemaining.toLocaleString()} units</span>
+                    <span className={`text-sm font-bold ${batch.projectedWasteUnits > 0 ? 'text-warning' : 'text-success'}`}>{batch.projectedWasteUnits.toLocaleString()} units</span>
                   </div>
                 </div>
                 <div className="w-full bg-muted/20 h-1.5 rounded-full overflow-hidden mt-1 relative">
@@ -109,7 +108,7 @@ export function BatchDetailsSheet({ batch, isOpen, onClose, onPrioritize }: Batc
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-background border border-border/50 rounded-lg p-3">
                   <span className="text-[10px] text-muted-foreground font-medium mb-1 block">Waste Probability</span>
-                  <span className="text-sm font-bold">{Math.round(batch.wasteProbability * 100)}%</span>
+                  <span className="text-sm font-bold">{batch.wasteSharePercent}%</span>
                 </div>
                 <div className="bg-background border border-border/50 rounded-lg p-3">
                   <span className="text-[10px] text-muted-foreground font-medium mb-1 block">Potential Waste Value</span>
@@ -125,7 +124,7 @@ export function BatchDetailsSheet({ batch, isOpen, onClose, onPrioritize }: Batc
                 <div className="absolute top-0 left-0 w-1 h-full bg-ai" />
                 <p className="text-sm font-medium text-foreground leading-relaxed">
                   {batch.status === "prioritized" 
-                    ? <><span className="font-bold">Prioritize this batch for fulfillment</span> over newer inventory. If demand remains unchanged, approximately <span className="font-bold text-warning">{expectedRemaining.toLocaleString()} units</span> may remain unused before expiry.</>
+                    ? <><span className="font-bold">Prioritize this batch for fulfillment</span> over newer inventory. If demand remains unchanged, approximately <span className="font-bold text-warning">{batch.projectedWasteUnits.toLocaleString()} units</span> may remain unused before expiry.</>
                     : batch.status === "transfer"
                     ? <><span className="font-bold">Transfer excess inventory to another DC.</span> Current demand at {batch.location} is insufficient to consume this batch before expiry.</>
                     : <><span className="font-bold">Monitor consumption closely.</span> Demand coverage is currently tracking at {batch.demandCoverage}%, meaning most of the batch should be consumed.</>}
@@ -155,7 +154,7 @@ export function BatchDetailsSheet({ batch, isOpen, onClose, onPrioritize }: Batc
                 <div className="relative">
                   <div className="absolute -left-[19px] top-1.5 h-2 w-2 rounded-full border-2 border-background bg-destructive" />
                   <p className="text-[9px] font-bold text-destructive mb-0.5 uppercase tracking-widest">Risk Detected</p>
-                  <p className="text-[10px] font-bold text-foreground">{Math.round(batch.wasteProbability * 100)}% waste probability flagged</p>
+                  <p className="text-[10px] font-bold text-foreground">{batch.wasteSharePercent}% waste probability flagged</p>
                 </div>
               </div>
             </section>

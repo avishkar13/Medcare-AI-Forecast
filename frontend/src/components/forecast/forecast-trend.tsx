@@ -1,11 +1,29 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockForecastTrends } from "@/lib/mockData";
+import { useForecastSeasonality, useForecastTrend } from "@/hooks/use-forecast";
 import { BarChart3, TrendingUp, Calendar, Zap } from "lucide-react";
+import { useForecastScope } from "@/store/filters.store";
 
 export function ForecastTrend() {
-  const trends = mockForecastTrends;
+  const scope = useForecastScope();
+  const { data, isPending } = useForecastTrend(scope);
+  const seasonality = useForecastSeasonality(scope);
+
+  // the peak weekday, taken from the measured index rather than described in prose
+  const peak = (seasonality.data?.weeklyPattern ?? []).reduce<
+    { label: string | number; index: number } | null
+  >((best, day) => (best === null || day.index > best.index ? day : best), null);
+
+  const trends = {
+    sevenDayTrend: data?.sevenDayTrend ?? null,
+    thirtyDayTrend: data?.thirtyDayTrend ?? null,
+    seasonalPattern: peak ? `Weekly (${peak.label} peak)` : "",
+    growthRate: data?.thirtyDayTrend ?? null,
+    demandVolatility: data?.demandVolatility ?? "",
+  };
+
+  if (isPending) return null;
 
   return (
     <Card className="h-full">

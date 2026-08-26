@@ -142,6 +142,7 @@ export interface InventoryTableItem {
   daysOfSupply: number;
   unitValue: number;
   inventoryValue: number;
+  bufferCoveragePercent: number;
   risk: InventoryRisk;
   status: InventoryDetailStatus;
 }

@@ -24,6 +24,7 @@ export interface InventoryPosition {
   inventoryValue: number;
   expiringUnits: number;
   expiringValue: number;
+  bufferCoveragePercent: number;
   daysToNearestExpiry: number | null;
   status: string;
   risk: "critical" | "high" | "medium" | "low";
@@ -39,6 +40,7 @@ export interface InventoryTotals {
   belowReorderPointCount: number;
   aboveMaximumCount: number;
   expiringValue: number;
+  inStockRatePercent: number;
 }
 
 export interface InventoryList {
@@ -58,6 +60,14 @@ export interface InventoryHealth {
     healthy: number;
     total: number;
   };
+  breakdownPercent: {
+    criticalStock: number;
+    belowReorderPoint: number;
+    expiringSoon: number;
+    excessStock: number;
+    healthy: number;
+  };
+  totalInventoryValue: number;
   conditions: Record<string, number>;
   byCategory: {
     category: string;
@@ -85,6 +95,23 @@ export interface InventoryBatch {
   severity: "critical" | "high" | "medium" | "low";
 }
 
+export interface SkuNetworkPosition {
+  warehouseCount: number;
+  onHand: number;
+  available: number;
+  safetyStock: number;
+  reorderPoint: number;
+  maximumInventory: number;
+  avgDailyDemand: number;
+  inventoryValue: number;
+  expiringUnits: number;
+  expiringValue: number;
+  leadTimeDays: number;
+  daysOfSupply: number;
+  risk: "critical" | "high" | "medium" | "low";
+  stockScaleUnits: number;
+}
+
 export interface InventoryDetail {
   product: {
     id: string;
@@ -97,6 +124,7 @@ export interface InventoryDetail {
     criticality: string;
   };
   totals: InventoryTotals;
+  network: SkuNetworkPosition;
   positions: InventoryPosition[];
   batches: InventoryBatch[];
 }

@@ -2,12 +2,32 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { mockModelPerformances, mockForecastPageKPIs } from "@/lib/mockData";
+import { useForecastKpi, useForecastPerformance } from "@/hooks/use-forecast";
 import { Target, CheckCircle2 } from "lucide-react";
+import { useForecastScope } from "@/store/filters.store";
 
 export function ForecastPerformance() {
-  const models = mockModelPerformances;
-  const kpis = mockForecastPageKPIs;
+  const scope = useForecastScope();
+  const { data, isPending } = useForecastPerformance(scope);
+  const kpi = useForecastKpi(scope);
+
+  // one model produced these rows, so one row comes back. bias is not scored yet.
+  const models = (data?.models ?? []).map((m) => ({
+    modelName: m.modelVersion ?? "unknown",
+    mape: m.wapePercent ?? 0,
+    mae: m.mae ?? 0,
+    rmse: m.rmse ?? 0,
+    accuracy: m.accuracyPercent ?? 0,
+    bias: 0,
+    isPrimary: m.isPrimary,
+  }));
+
+  const kpis = {
+    forecastAccuracy: kpi.data?.forecastAccuracy ?? null,
+    accuracyChange: null,
+  };
+
+  if (isPending) return null;
 
   return (
     <Card className="h-full">
@@ -21,7 +41,7 @@ export function ForecastPerformance() {
             <p className="text-xs text-muted-foreground mb-1">Overall Accuracy</p>
             <div className="flex items-center gap-1.5">
               <Target className="h-4 w-4 text-success" />
-              <p className="text-xl font-bold">{kpis.forecastAccuracy}%</p>
+              <p className="text-xl font-bold">{kpis.forecastAccuracy === null ? "—" : `${kpis.forecastAccuracy}%`}</p>
             </div>
           </div>
           <div className="p-3 bg-muted/50 rounded-lg border border-border">

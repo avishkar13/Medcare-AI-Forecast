@@ -1,5 +1,5 @@
 import type { RunComparison, RunOptimization, RunSimulation } from "@/lib/api/planning";
-import type { WhatIfParams } from "@/lib/api/simulation";
+import type { WhatIfRequestParams } from "@/lib/api/simulation";
 import type {
   MetricDirection,
   SimulationMetric,
@@ -14,17 +14,12 @@ import type {
  *   inventoryAvailability - the executor plans from the real inventory position
  *   transportationCost    - there is no per-lane cost model, only a flat rate
  *
- * supplierLeadTime is a days delta while the backend wants a percent, and a percent
- * needs a base. it converts against a nominal 10 day lead time, close to the
- * seeded average.
+ * supplierLeadTime goes over as a day delta; the server converts it against the
+ * network's own average lead time.
  */
-const NOMINAL_LEAD_TIME_DAYS = 10;
-
-export const toWhatIfParams = (params: SimulationParams): WhatIfParams => ({
+export const toWhatIfParams = (params: SimulationParams): WhatIfRequestParams => ({
   demandShockPercent: params.demandShock,
-  leadTimeChangePercent: Math.round(
-    (params.supplierLeadTime / NOMINAL_LEAD_TIME_DAYS) * 100,
-  ),
+  leadTimeChangeDays: params.supplierLeadTime,
   capacityChangePercent: params.distributionCapacity - 100,
   serviceLevelTargetPercent: params.serviceLevelTarget,
 });
@@ -55,15 +50,6 @@ const metric = (
   format,
 });
 
-const risk = (probability: number): "low" | "moderate" | "high" | "critical" =>
-  probability >= 0.5
-    ? "critical"
-    : probability >= 0.25
-      ? "high"
-      : probability >= 0.1
-        ? "moderate"
-        : "low";
-
 /**
  * builds what the page renders from a completed run.
  *
@@ -84,17 +70,17 @@ export const toSimulationOutput = (
   const cost = comparison?.cost;
   const risks = comparison?.risk;
 
-  const serviceNow = risks ? risks.serviceLevel.baseline * 100 : simulation.serviceLevel * 100;
+  const serviceNow = risks ? risks.serviceLevel.baseline * 100 : simulation.serviceLevelPercent;
   const stockoutNow = risks
     ? risks.stockoutProbability.baseline * 100
-    : simulation.stockoutProbability * 100;
+    : simulation.stockoutProbabilityPercent;
   const wasteNow = risks ? risks.expectedWaste.baseline : simulation.expectedWaste;
   const costNow = cost ? cost.total.baseline : optimization.totalCost;
 
   return {
     metrics: [
-      metric("Service Level", round1(serviceNow), round1(simulation.serviceLevel * 100), "%", "percent", false),
-      metric("Stockout Risk", round1(stockoutNow), round1(simulation.stockoutProbability * 100), "%", "percent", true),
+      metric("Service Level", round1(serviceNow), simulation.serviceLevelPercent, "%", "percent", false),
+      metric("Stockout Risk", round1(stockoutNow), simulation.stockoutProbabilityPercent, "%", "percent", true),
       metric("Expected Waste", Math.round(wasteNow), Math.round(simulation.expectedWaste), "units", "number", true),
       metric("Total Cost", Math.round(costNow), Math.round(optimization.totalCost), "$", "currency", true),
     ],
@@ -119,10 +105,10 @@ export const toSimulationOutput = (
       },
     },
     aiInsight: {
-      overallRisk: risk(simulation.stockoutProbability),
+      overallRisk: simulation.riskLevel,
       confidence: 0,
       insights: [
-        `${(simulation.serviceLevel * 100).toFixed(1)}% of simulated demand met from stock over ${simulation.iterations} iterations.`,
+        `${simulation.serviceLevelPercent}% of simulated demand met from stock over ${simulation.iterations} iterations.`,
         `${Math.round(simulation.expectedWaste)} units of expected waste, ${Math.round(optimization.expiryCost)} of it as expiry cost.`,
         ...(comparison ? comparison.warnings : ["No baseline run to compare against."]),
       ],

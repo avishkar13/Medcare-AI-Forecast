@@ -1,15 +1,23 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { queryKeys } from "@/config/query-keys";
+import { useCompletedRuns } from "@/hooks/use-planning";
+import { useRecommendationKpi } from "@/hooks/use-recommendations";
 
 export function RecommendationsHeader() {
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const client = useQueryClient();
+  const kpi = useRecommendationKpi();
+  const runs = useCompletedRuns(1);
+
+  // recommendations come out of a planning run, so "last analyzed" is when that run
+  // finished rather than when this page fetched
+  const analyzedAt = runs.data?.data[0]?.completedAt ?? null;
 
   const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 1000);
+    void client.invalidateQueries({ queryKey: queryKeys.recommendations.all });
   };
 
   return (
@@ -23,16 +31,18 @@ export function RecommendationsHeader() {
 
       <div className="flex items-center gap-3">
         <p className="text-xs font-medium text-muted-foreground whitespace-nowrap">
-          Last analyzed: 02:05 AM
+          {analyzedAt
+            ? `Last analyzed: ${new Date(analyzedAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}`
+            : "No completed run yet"}
         </p>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="sm"
           className="bg-background"
           onClick={handleRefresh}
-          disabled={isRefreshing}
+          disabled={kpi.isFetching}
         >
-          <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+          <RefreshCw className={`h-4 w-4 mr-2 ${kpi.isFetching ? "animate-spin" : ""}`} />
           Refresh
         </Button>
       </div>

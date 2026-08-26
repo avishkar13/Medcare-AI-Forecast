@@ -2,10 +2,29 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from "recharts";
-import { mockSeasonalityData } from "@/lib/mockData";
+import { useForecastSeasonality, useForecastTrend } from "@/hooks/use-forecast";
+import { useForecastScope } from "@/store/filters.store";
 
 export function ForecastSeasonality() {
-  const data = mockSeasonalityData;
+  const scope = useForecastScope();
+  const { data: raw, isPending } = useForecastSeasonality(scope);
+  const { data: trend } = useForecastTrend(scope);
+
+  const data = {
+    // the index is centred on 1, so 100 reads as an average day
+    weeklyPattern: (raw?.weeklyPattern ?? []).map((d) => ({
+      day: String(d.label),
+      value: d.indexPercent,
+    })),
+    monthlyTrend: (raw?.monthlyPattern ?? []).map((m) => ({
+      month: String(m.label),
+      value: m.indexPercent,
+    })),
+    seasonalUplift: raw?.seasonalUpliftPercent ?? null,
+    volatility: trend?.demandVolatility ?? "—",
+  };
+
+  if (isPending) return null;
 
   return (
     <Card className="h-full">
@@ -63,7 +82,9 @@ export function ForecastSeasonality() {
         <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-border">
           <div>
             <p className="text-xs text-muted-foreground">Seasonal Uplift</p>
-            <p className="text-lg font-bold text-foreground">+{data.seasonalUplift}%</p>
+            <p className="text-lg font-bold text-foreground">
+              {data.seasonalUplift === null ? "—" : `+${data.seasonalUplift}%`}
+            </p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Volatility</p>

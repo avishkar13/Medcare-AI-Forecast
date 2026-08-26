@@ -279,7 +279,6 @@ export function InventoryTable({ items, onResetFilters }: InventoryTableProps) {
                   </TableHeader>
                   <TableBody>
                     {paginatedItems.map((item) => {
-                      const stockRatio = item.safetyStock > 0 ? item.onHand / item.safetyStock : 1;
                       const hasAiAction = item.risk === "critical" || item.risk === "high";
 
                       return (
@@ -321,7 +320,7 @@ export function InventoryTable({ items, onResetFilters }: InventoryTableProps) {
                                 {formatNumber(item.onHand)}
                               </span>
                               <span className="text-[10px] text-muted-foreground tabular-nums">
-                                {Math.round(stockRatio * 100)}% of buffer
+                                {item.bufferCoveragePercent}% of buffer
                               </span>
                             </div>
                           </TableCell>

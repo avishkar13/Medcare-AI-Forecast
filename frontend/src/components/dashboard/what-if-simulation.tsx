@@ -6,30 +6,39 @@ import { Button } from "@/components/ui/button";
 import { Activity, Play, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
+import { useWhatIf } from "@/hooks/use-simulation";
+import { useLatestRunOutcome } from "@/hooks/use-planning";
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
 
 export function WhatIfSimulation() {
   const [demandChange, setDemandChange] = useState(0);
   const [leadTimeChange, setLeadTimeChange] = useState(0);
-  const [simulating, setSimulating] = useState(false);
-  const [hasSimulated, setHasSimulated] = useState(false);
 
-  // Mock calculation based on inputs
-  const currentRisk = 4.2;
-  const simulatedRisk = Math.max(0.1, currentRisk + (demandChange * 0.15) + (leadTimeChange * 1.2));
-  
-  const currentCost = 49300;
-  const simulatedCost = currentCost * (1 + (demandChange * 0.008)) * (1 + (leadTimeChange * 0.05));
+  const baseline = useLatestRunOutcome();
+  const whatIf = useWhatIf();
+
+  const currentRisk = baseline.simulation?.stockoutProbabilityPercent ?? 0;
+  const currentCost = baseline.optimization?.totalCost ?? 0;
+
+  const simulatedRisk = whatIf.simulation?.stockoutProbabilityPercent ?? 0;
+  const simulatedCost = whatIf.optimization?.totalCost ?? 0;
+  const hasSimulated = Boolean(whatIf.simulation && whatIf.optimization);
 
   const handleSimulate = () => {
-    setSimulating(true);
-    setTimeout(() => {
-      setSimulating(false);
-      setHasSimulated(true);
-    }, 800);
-  };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+    whatIf.start.mutate({
+      name: `Dashboard what-if ${new Date().toISOString()}`,
+      params: {
+        demandShockPercent: demandChange,
+        // sent as days; the server converts against the real average lead time
+        leadTimeChangeDays: leadTimeChange,
+      },
+    });
   };
 
   return (
@@ -41,7 +50,7 @@ export function WhatIfSimulation() {
           <Tooltip>
             <TooltipTrigger render={<Info className="h-4 w-4 text-muted-foreground cursor-help" />} />
             <TooltipContent>
-              <p className="max-w-xs">Stress-test the network. Adjust macroeconomic variables to instantly simulate the impact on stockout risk and holding costs.</p>
+              <p className="max-w-xs">Stress-test the network. Adjust the inputs to run a planning scenario and compare its stockout risk and cost against the latest plan.</p>
             </TooltipContent>
           </Tooltip>
         </CardTitle>
@@ -52,13 +61,13 @@ export function WhatIfSimulation() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium">Demand Shock (%)</label>
-              <span className="text-sm font-semibold font-mono">{demandChange > 0 ? '+' : ''}{demandChange}%</span>
+              <span className="text-sm font-semibold font-mono">{demandChange > 0 ? "+" : ""}{demandChange}%</span>
             </div>
-            <input 
-              type="range" 
-              min="-50" max="100" step="5" 
-              value={demandChange} 
-              onChange={(e) => { setDemandChange(parseInt(e.target.value)); setHasSimulated(false); }}
+            <input
+              type="range"
+              min="-50" max="100" step="5"
+              value={demandChange}
+              onChange={(e) => setDemandChange(parseInt(e.target.value))}
               className="w-full accent-primary"
             />
             <div className="flex justify-between text-[10px] text-muted-foreground uppercase">
@@ -71,13 +80,13 @@ export function WhatIfSimulation() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium">Supplier Lead Time (Days)</label>
-              <span className="text-sm font-semibold font-mono">{leadTimeChange > 0 ? '+' : ''}{leadTimeChange}d</span>
+              <span className="text-sm font-semibold font-mono">{leadTimeChange > 0 ? "+" : ""}{leadTimeChange}d</span>
             </div>
-            <input 
-              type="range" 
-              min="-5" max="14" step="1" 
-              value={leadTimeChange} 
-              onChange={(e) => { setLeadTimeChange(parseInt(e.target.value)); setHasSimulated(false); }}
+            <input
+              type="range"
+              min="-5" max="14" step="1"
+              value={leadTimeChange}
+              onChange={(e) => setLeadTimeChange(parseInt(e.target.value))}
               className="w-full accent-primary"
             />
             <div className="flex justify-between text-[10px] text-muted-foreground uppercase">
@@ -92,65 +101,77 @@ export function WhatIfSimulation() {
           <div className="absolute -top-3 left-4 bg-background px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Output Projection
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4 mt-2">
             <div className="flex flex-col gap-2 p-3 bg-muted/50 rounded-lg">
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Current State</span>
               <div className="flex flex-col gap-0.5">
                 <span className="text-[11px] text-muted-foreground">Stockout Risk</span>
-                <span className="text-lg font-bold">{currentRisk.toFixed(1)}%</span>
+                <span className="text-lg font-bold">{baseline.hasRun ? `${currentRisk}%` : "-"}</span>
               </div>
               <div className="flex flex-col gap-0.5 mt-1">
                 <span className="text-[11px] text-muted-foreground">Total Cost</span>
-                <span className="text-lg font-bold">{formatCurrency(currentCost)}</span>
+                <span className="text-lg font-bold">{baseline.hasRun ? formatCurrency(currentCost) : "-"}</span>
               </div>
             </div>
 
-            <div className={`flex flex-col gap-2 p-3 rounded-lg border transition-all ${hasSimulated ? 'bg-primary/5 border-primary/20' : 'bg-muted/10 border-transparent opacity-60'}`}>
-              <span className={`text-xs font-medium uppercase tracking-wider ${hasSimulated ? 'text-primary' : 'text-muted-foreground'}`}>Simulated</span>
+            <div className={`flex flex-col gap-2 p-3 rounded-lg border transition-all ${hasSimulated ? "bg-primary/5 border-primary/20" : "bg-muted/10 border-transparent opacity-60"}`}>
+              <span className={`text-xs font-medium uppercase tracking-wider ${hasSimulated ? "text-primary" : "text-muted-foreground"}`}>Simulated</span>
               <div className="flex flex-col gap-0.5">
                 <span className="text-[11px] text-muted-foreground">Stockout Risk</span>
-                <span className={`text-lg font-bold tabular-nums ${hasSimulated ? (simulatedRisk > 10 ? 'text-destructive' : simulatedRisk > 5 ? 'text-warning' : 'text-success') : ''}`}>
-                  {hasSimulated ? `${simulatedRisk.toFixed(1)}%` : '-'}
+                <span className={`text-lg font-bold tabular-nums ${hasSimulated ? (simulatedRisk > 10 ? "text-destructive" : simulatedRisk > 5 ? "text-warning" : "text-success") : ""}`}>
+                  {hasSimulated ? `${simulatedRisk}%` : "-"}
                 </span>
               </div>
               <div className="flex flex-col gap-0.5 mt-1">
                 <span className="text-[11px] text-muted-foreground">Total Cost</span>
-                <span className={`text-lg font-bold tabular-nums ${hasSimulated ? (simulatedCost > currentCost * 1.2 ? 'text-destructive' : 'text-foreground') : ''}`}>
-                  {hasSimulated ? formatCurrency(simulatedCost) : '-'}
+                <span className={`text-lg font-bold tabular-nums ${hasSimulated && simulatedCost > currentCost ? "text-destructive" : ""}`}>
+                  {hasSimulated ? formatCurrency(simulatedCost) : "-"}
                 </span>
               </div>
             </div>
           </div>
 
           <div className="mt-4">
-            {hasSimulated && simulatedRisk > 15 && (
+            {whatIf.failed && (
               <div className="flex items-center justify-between p-3 bg-destructive/10 border border-destructive/20 rounded-md">
-                <span className="text-xs font-medium text-destructive">Capacity expansion required.</span>
-                <Badge variant="destructive" className="bg-destructive text-white border-transparent">Critical</Badge>
+                <span className="text-xs font-medium text-destructive">
+                  {whatIf.failureReason ?? "The run failed."}
+                </span>
+                <Badge variant="destructive" className="bg-destructive text-white border-transparent">Failed</Badge>
               </div>
             )}
-            {hasSimulated && simulatedRisk <= 15 && simulatedRisk > currentRisk && (
+            {hasSimulated && simulatedRisk > currentRisk && (
               <div className="flex items-center justify-between p-3 bg-warning/10 border border-warning/20 rounded-md">
-                <span className="text-xs font-medium text-warning">Increase safety stock by 15% recommended.</span>
+                <span className="text-xs font-medium text-warning">
+                  Stockout risk is {simulatedRisk}% against {currentRisk}% on the latest plan.
+                </span>
                 <Badge variant="outline" className="bg-warning text-white border-transparent">Warning</Badge>
+              </div>
+            )}
+            {hasSimulated && simulatedRisk <= currentRisk && (
+              <div className="flex items-center justify-between p-3 bg-success/10 border border-success/20 rounded-md">
+                <span className="text-xs font-medium text-success">
+                  Stockout risk holds at or below the latest plan.
+                </span>
+                <Badge variant="outline" className="bg-success text-white border-transparent">Stable</Badge>
               </div>
             )}
           </div>
         </div>
       </CardContent>
       <CardFooter className="pt-0 pb-6 px-6">
-        <Button 
-          className="w-full gap-2 cursor-pointer transition-all" 
+        <Button
+          className="w-full gap-2 cursor-pointer transition-all"
           onClick={handleSimulate}
-          disabled={simulating}
+          disabled={whatIf.isRunning}
         >
-          {simulating ? (
+          {whatIf.isRunning ? (
             <div className="h-4 w-4 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground animate-spin" />
           ) : (
             <Play className="h-4 w-4" />
           )}
-          {simulating ? "Simulating Network..." : "Run Simulation"}
+          {whatIf.isRunning ? "Simulating Network..." : "Run Simulation"}
         </Button>
       </CardFooter>
     </Card>

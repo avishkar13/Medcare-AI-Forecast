@@ -1,17 +1,26 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { mockForecastImpact } from "@/lib/mockData";
+import { useForecastImpact } from "@/hooks/use-forecast";
 import { TrendingDown, ShieldCheck, DollarSign, PackageMinus } from "lucide-react";
+import { useForecastScope } from "@/store/filters.store";
 
 export function ForecastImpact() {
-  const impact = mockForecastImpact;
+  const scope = useForecastScope();
+  const { data, isPending } = useForecastImpact(scope);
+
+  // the card was framed as reductions, which needs a baseline. the api reports one
+  // run's actual cost and risk, so the tiles show those instead of a made-up delta.
+  const money = (value: number | null) =>
+    value === null ? "—" : `$${(value / 1000).toFixed(1)}K`;
+
+  if (isPending) return null;
 
   return (
     <Card className="h-full bg-gradient-to-br from-background to-success/5 border-success/30">
       <CardHeader>
         <CardTitle>Business Impact</CardTitle>
-        <CardDescription>Estimated supply chain value from AI forecast</CardDescription>
+        <CardDescription>What this plan costs, from the run that produced the forecast</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -20,8 +29,12 @@ export function ForecastImpact() {
               <ShieldCheck className="h-4 w-4 text-success" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-medium">Stockout Exposure</p>
-              <p className="text-lg font-bold text-foreground">-{impact.stockoutRiskReduction}%</p>
+              <p className="text-xs text-muted-foreground font-medium">Service Level</p>
+              <p className="text-lg font-bold text-foreground">
+                {data?.serviceLevelPercent === null || data?.serviceLevelPercent === undefined
+                  ? "—"
+                  : `${data.serviceLevelPercent}%`}
+              </p>
             </div>
           </div>
           
@@ -30,10 +43,8 @@ export function ForecastImpact() {
               <DollarSign className="h-4 w-4 text-success" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-medium">Excess Inv. Reduction</p>
-              <p className="text-lg font-bold text-foreground">
-                ${(impact.excessInventoryReduction / 1000).toFixed(1)}K
-              </p>
+              <p className="text-xs text-muted-foreground font-medium">Expiry Cost</p>
+              <p className="text-lg font-bold text-foreground">{money(data?.expiryCost ?? null)}</p>
             </div>
           </div>
 
@@ -42,8 +53,8 @@ export function ForecastImpact() {
               <TrendingDown className="h-4 w-4 text-muted-foreground" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-medium">Safety Stock Target</p>
-              <p className="text-lg font-bold text-foreground">-{impact.safetyStockOptimization}%</p>
+              <p className="text-xs text-muted-foreground font-medium">Holding Cost</p>
+              <p className="text-lg font-bold text-foreground">{money(data?.holdingCost ?? null)}</p>
             </div>
           </div>
 
@@ -52,14 +63,16 @@ export function ForecastImpact() {
               <PackageMinus className="h-4 w-4 text-muted-foreground" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-medium">Reorder Quantities</p>
-              <p className="text-lg font-bold text-foreground">{impact.reorderQuantityChange}%</p>
+              <p className="text-xs text-muted-foreground font-medium">Transfer Cost</p>
+              <p className="text-lg font-bold text-foreground">{money(data?.transferCost ?? null)}</p>
             </div>
           </div>
         </div>
 
         <div className="p-4 rounded-lg bg-success/10 border border-success/20 text-sm leading-relaxed text-success-foreground">
-          <strong>Insight:</strong> {impact.insightText}
+          <strong>Insight:</strong> {data?.totalCost === null || data?.totalCost === undefined
+              ? "No completed planning run yet."
+              : `Total plan cost ${money(data.totalCost)}, of which ${money(data.expiryCost)} is expiry.`}
         </div>
       </CardContent>
     </Card>

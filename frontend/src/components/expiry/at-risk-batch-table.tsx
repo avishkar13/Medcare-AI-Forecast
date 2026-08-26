@@ -126,7 +126,7 @@ export function AtRiskBatchTable({ batches, onBatchClick, onActionClick }: AtRis
                   <TableCell className="text-right">
                     <div className="flex flex-col items-end">
                       <span className="font-black text-foreground text-xs leading-tight">${batch.inventoryValue.toLocaleString()}</span>
-                      <span className="text-[10px] font-medium text-muted-foreground mt-0.5">{Math.round(batch.wasteProbability * 100)}% prob.</span>
+                      <span className="text-[10px] font-medium text-muted-foreground mt-0.5">{batch.wasteSharePercent}% prob.</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-right pr-4">

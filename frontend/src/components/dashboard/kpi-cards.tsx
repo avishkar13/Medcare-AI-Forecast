@@ -10,9 +10,11 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDashboardSummary } from "@/hooks/use-dashboard";
+import { useWarehouses } from "@/hooks/use-masterdata";
 
 export function KpiCards() {
   const { data, isPending, isError } = useDashboardSummary();
+  const { data: warehouses } = useWarehouses();
   const kpis = data?.kpis;
 
   const formatCurrency = (value: number) => {
@@ -65,7 +67,7 @@ export function KpiCards() {
         <CardContent>
           <div className="text-2xl font-bold text-foreground">{formatCurrency(kpis.totalInventoryValue)}</div>
           <p className="text-xs text-muted-foreground mt-1">
-            <span className="text-success font-medium">+2.1%</span> from last month
+            Across {formatNumber(kpis.skusMonitored)} SKUs
           </p>
         </CardContent>
       </Card>
@@ -79,7 +81,7 @@ export function KpiCards() {
         <CardContent>
           <div className="text-2xl font-bold text-foreground">{formatNumber(kpis.skusMonitored)}</div>
           <p className="text-xs text-muted-foreground mt-1">
-            Active tracking across 4 locations
+            Active tracking across {warehouses?.length ?? 0} locations
           </p>
         </CardContent>
       </Card>
@@ -121,7 +123,7 @@ export function KpiCards() {
         <CardContent>
           <div className="text-2xl font-bold text-foreground">{percent(kpis.forecastAccuracy)}</div>
           <p className="text-xs text-muted-foreground mt-1">
-            <span className="text-success font-medium">+1.2%</span> improvement (30d)
+            {kpis.forecastAccuracy === null ? "No forecast day realised yet" : "From the latest scored run"}
           </p>
         </CardContent>
       </Card>

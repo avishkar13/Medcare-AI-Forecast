@@ -46,6 +46,9 @@ export const compareRuns = (id: string, baseline: string) =>
   api.get<RunComparison>(`/planning/runs/${id}/compare`, { baseline });
 
 export interface RunSimulation {
+  riskLevel: "low" | "moderate" | "high" | "critical";
+  stockoutProbabilityPercent: number;
+  serviceLevelPercent: number;
   planningRunId: string;
   iterations: number;
   serviceLevel: number;

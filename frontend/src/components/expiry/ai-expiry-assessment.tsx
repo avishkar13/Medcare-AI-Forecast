@@ -4,8 +4,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Zap, Navigation, ArrowRightLeft, ShieldAlert } from "lucide-react";
 import Link from "next/link";
+import { useExpiryAssessment } from "@/hooks/use-expiry";
+
+const RISK_TONE = {
+  high: "text-destructive",
+  moderate: "text-warning-foreground",
+  low: "text-success",
+} as const;
 
 export function AIExpiryAssessment() {
+  const { data, isPending } = useExpiryAssessment();
+
+  const findings = data?.findings ?? [];
+
+  if (isPending) return null;
+
   return (
     <Card className="border-ai/30 shadow-sm bg-ai/5  flex flex-col relative overflow-hidden">
       <div className="absolute top-0 left-0 w-1 h-full bg-ai" />
@@ -15,49 +28,30 @@ export function AIExpiryAssessment() {
             <Zap className="h-4 w-4 fill-ai/20" />
             AI Expiry Assessment
           </span>
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col text-right">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Confidence</span>
-              <span className="text-xs font-black text-foreground">91%</span>
-            </div>
-            <div className="h-6 w-px bg-border/50" />
-            <div className="flex flex-col text-right">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Overall Risk</span>
-              <span className="text-xs font-black text-destructive flex items-center gap-1"><ShieldAlert className="h-3 w-3" /> HIGH</span>
-            </div>
+          <div className="flex flex-col text-right">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Overall Risk</span>
+            <span className={`text-xs font-black flex items-center gap-1 ${data ? RISK_TONE[data.riskLevel] : ""}`}>
+              <ShieldAlert className="h-3 w-3" /> {data?.riskLevel.toUpperCase() ?? "-"}
+            </span>
           </div>
         </CardTitle>
       </CardHeader>
       
       <CardContent className="p-6 flex- flex flex-col">
         <div className="space-y-2 mb-6 flex-1">
-          <div className="flex gap-3 items-start">
-            <div className="h-5 w-5 rounded-full bg-ai/20 text-ai flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">1</div>
-            <p className="text-sm text-foreground font-medium leading-relaxed">
-              <span className="font-bold">5,000 units of Cetirizine</span> are projected to expire before forecast demand can consume the full batch.
+          {findings.length === 0 && (
+            <p className="text-sm font-medium text-muted-foreground">
+              Nothing to assess: no unexpired batches are tracked.
             </p>
-          </div>
-          <div className="flex gap-3 items-start">
-            <div className="h-5 w-5 rounded-full bg-ai/20 text-ai flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">2</div>
-            <p className="text-sm text-foreground font-medium leading-relaxed">
-              <span className="font-bold">West Coast DC</span> has the highest expiry exposure due to excess inventory across multiple categories.
-            </p>
-          </div>
-          <div className="flex gap-3 items-start">
-            <div className="h-5 w-5 rounded-full bg-ai/20 text-ai flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">3</div>
-            <p className="text-sm text-foreground font-medium leading-relaxed">
-              Transferring <span className="font-bold">1,500 units to South DC</span> could reduce projected waste by approximately $5.2K.
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-background border border-border/50 px-5 py-2 rounded-xl mb-6 shadow-sm transition-all hover:border-ai/30 group">
-          <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-1.5 group-hover:text-ai transition-colors">
-            Recommended Strategy
-          </h4>
-          <p className="text-sm font-bold text-foreground leading-relaxed">
-            Prioritize FEFO fulfillment globally and execute internal transfers of excess stock to locations with stronger localized forecast demand.
-          </p>
+          )}
+          {findings.map((finding, index) => (
+            <div key={finding.kind} className="flex gap-3 items-start">
+              <div className="h-5 w-5 rounded-full bg-ai/20 text-ai flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">
+                {index + 1}
+              </div>
+              <p className="text-sm text-foreground font-medium leading-relaxed">{finding.detail}</p>
+            </div>
+          ))}
         </div>
 
         <div className="grid grid-cols-2 gap-2 mt-auto">

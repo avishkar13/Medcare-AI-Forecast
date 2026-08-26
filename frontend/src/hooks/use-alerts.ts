@@ -5,7 +5,10 @@ import { queryKeys } from "@/config/query-keys";
 import { STALE_TIME } from "@/config/constants";
 import {
   acknowledgeAlert,
+  getDistribution,
+  getHealth,
   getOverview,
+  getTrends,
   listAlerts,
   markAllRead,
   resolveAlert,
@@ -36,4 +39,28 @@ export function useAlertActions() {
     resolve: useMutation({ mutationFn: resolveAlert, onSuccess: settle }),
     markAllRead: useMutation({ mutationFn: markAllRead, onSuccess: settle }),
   };
+}
+
+export function useAlertDistribution() {
+  return useQuery({
+    queryKey: queryKeys.alerts.distribution(),
+    queryFn: getDistribution,
+    staleTime: STALE_TIME.dashboard,
+  });
+}
+
+export function useAlertTrends(days = 14) {
+  return useQuery({
+    queryKey: queryKeys.alerts.trends({ days }),
+    queryFn: () => getTrends(days),
+    staleTime: STALE_TIME.dashboard,
+  });
+}
+
+export function useAlertHealth() {
+  return useQuery({
+    queryKey: queryKeys.alerts.health(),
+    queryFn: getHealth,
+    staleTime: STALE_TIME.dashboard,
+  });
 }

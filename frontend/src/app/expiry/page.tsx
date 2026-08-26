@@ -23,8 +23,6 @@ export default function ExpiryRiskPage() {
   const exposure = useDcExposure();
   const waste = useWastePrevention();
 
-  // the api reports risk and value; forecastDemand and wasteProbability have no
-  // source on a batch, so they stay at zero rather than being invented.
   const batches: ExpiryBatch[] = useMemo(
     () =>
       (batchQuery.data?.data ?? []).map((b) => ({
@@ -38,12 +36,13 @@ export default function ExpiryRiskPage() {
     unitCost: b.unitCost,
     expiryDate: b.expiryDate,
     daysRemaining: b.daysRemaining,
-    forecastDemand: 0,
-    demandCoverage: 0,
+    forecastDemand: b.forecastDemand,
+    demandCoverage: b.demandCoveragePercent,
     inventoryValue: b.inventoryValue,
     riskLevel: b.riskLevel,
-    wasteProbability: 0,
-    wasteValue: 0,
+    wasteSharePercent: b.projectedWasteSharePercent,
+    projectedWasteUnits: b.projectedWasteUnits,
+    wasteValue: b.projectedWasteValue,
         status: "at-risk" as ExpiryBatch["status"],
       })),
     [batchQuery.data],
@@ -206,7 +205,10 @@ export default function ExpiryRiskPage() {
           />
         </div>
         <div className="lg:col-span-1 h-[400px]">
-          <PreventedWaste records={waste.data?.items ?? []} />
+          <PreventedWaste
+            records={waste.data?.items ?? []}
+            totalValueSaved={waste.data?.totalValueSaved ?? 0}
+          />
         </div>
       </div>
 

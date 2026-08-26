@@ -28,6 +28,7 @@ export default function InventoryPage() {
         daysOfSupply: row.daysOfSupply,
         unitValue: row.unitCost,
         inventoryValue: row.inventoryValue,
+        bufferCoveragePercent: row.bufferCoveragePercent,
         risk: row.risk as InventoryTableItem["risk"],
         status: row.status as InventoryTableItem["status"],
       })),

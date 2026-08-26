@@ -1,12 +1,20 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Cpu, CheckCircle2 } from "lucide-react";
+import { Cpu, CheckCircle2, XCircle } from "lucide-react";
+import { useReadiness } from "@/hooks/use-health";
 
 export function AIEngineStatus() {
+  const { data, isPending } = useReadiness();
+
+  if (isPending || !data) return null;
+
+  // the readiness probe reports the three dependencies the planner needs, which is
+  // the only engine state anything actually knows
   const engines = [
-    { name: "Forecast Engine", status: "Online" },
-    { name: "Inventory Engine", status: "Online" },
-    { name: "Optimization Engine", status: "Online" },
-    { name: "Simulation Engine", status: "Ready" },
+    { name: "Forecast Engine", up: data.dependencies.forecast === "up" },
+    { name: "Database", up: data.dependencies.database === "up" },
+    { name: "Cache", up: data.dependencies.redis === "up" },
   ];
 
   return (
@@ -23,11 +31,23 @@ export function AIEngineStatus() {
             <div key={engine.name} className="flex items-center justify-between">
               <span className="text-sm font-medium text-muted-foreground">{engine.name}</span>
               <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-success" />
-                <span className="text-sm font-semibold text-foreground">{engine.status}</span>
+                {engine.up ? (
+                  <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+                ) : (
+                  <XCircle className="h-3.5 w-3.5 text-destructive" />
+                )}
+                <span className={`text-sm font-semibold ${engine.up ? "text-foreground" : "text-destructive"}`}>
+                  {engine.up ? "Online" : "Offline"}
+                </span>
               </div>
             </div>
           ))}
+          <div className="flex items-center justify-between border-t border-border/50 pt-3">
+            <span className="text-sm font-medium text-muted-foreground">Uptime</span>
+            <span className="text-sm font-semibold text-foreground tabular-nums">
+              {Math.floor(data.uptimeSeconds / 3600)}h {Math.floor((data.uptimeSeconds % 3600) / 60)}m
+            </span>
+          </div>
         </div>
       </CardContent>
     </Card>

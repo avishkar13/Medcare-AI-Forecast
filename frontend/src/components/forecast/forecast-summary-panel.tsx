@@ -1,7 +1,8 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { mockForecastSummary } from "@/lib/mockData";
+import { useForecastKpi, useForecastSummary } from "@/hooks/use-forecast";
+import { useForecastScope } from "@/store/filters.store";
 import {
   Activity,
   ArrowDown,
@@ -21,7 +22,22 @@ import {
 } from "@/components/ui/tooltip";
 
 export function ForecastSummaryPanel() {
-  const summary = mockForecastSummary;
+  const scope = useForecastScope();
+  const { data, isPending } = useForecastSummary(scope);
+  const kpi = useForecastKpi(scope);
+
+  const summary = {
+    predictedPeak: kpi.data?.expectedPeakDemand ?? 0,
+    peakDate: kpi.data?.peakDate ?? "",
+    avgDailyDemand: data?.averageDailyDemand ?? 0,
+    minExpectedDemand: data?.minExpectedDemand ?? 0,
+    maxExpectedDemand: data?.maxExpectedDemand ?? 0,
+    confidenceRange: data?.confidenceRange ?? ([0, 0] as [number, number]),
+    historicalAccuracy: kpi.data?.forecastAccuracy ?? null,
+    expectedTrend: data?.expectedTrend ?? "",
+  };
+
+  if (isPending) return null;
 
   const formatPeakDate = (value: string) => {
     try {
@@ -220,7 +236,7 @@ export function ForecastSummaryPanel() {
                   </p>
 
                   <p className="mt-0.5 text-[10px] text-muted-foreground">
-                    95% expected demand interval
+                    p10-p90 band, an 80% interval
                   </p>
                 </div>
 
@@ -237,8 +253,8 @@ export function ForecastSummaryPanel() {
                   />
 
                   <TooltipContent>
-                    There is a 95% probability that actual demand will fall
-                    within this range.
+                    The model publishes a p10-p90 band, so actual demand falls in this
+                    range about 80% of the time.
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -313,7 +329,7 @@ export function ForecastSummaryPanel() {
 
                   <div>
                     <p className="text-base font-bold text-foreground">
-                      {summary.historicalAccuracy}%
+                      {summary.historicalAccuracy === null ? "—" : `${summary.historicalAccuracy}%`}
                     </p>
 
                     <p className="text-[9px] text-muted-foreground">
@@ -394,17 +410,19 @@ export function ForecastSummaryPanel() {
         <div className="flex shrink-0 items-center justify-between border-t border-border/60 bg-muted/[0.12] px-5 py-2.5">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ai/60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-ai" />
+              {data?.planningRunId && (
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ai/60" />
+              )}
+              <span className={`relative inline-flex h-2 w-2 rounded-full ${data?.planningRunId ? "bg-ai" : "bg-muted-foreground"}`} />
             </span>
 
             <span className="text-[10px] font-medium text-muted-foreground">
-              AI forecast active
+              {data?.modelVersion ?? "No forecast run"}
             </span>
           </div>
 
           <span className="text-[10px] font-medium text-muted-foreground">
-            95% confidence
+            80% interval
           </span>
         </div>
       </CardContent>

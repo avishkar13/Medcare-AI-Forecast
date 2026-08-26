@@ -3,15 +3,24 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExpiryTimelineGroup } from "@/types/expiry";
 import { CalendarClock } from "lucide-react";
+import { useExpiryTimeline } from "@/hooks/use-expiry";
+
+// the api buckets by calendar month, so the nodes are months rather than day windows
+const monthLabel = (month: string) =>
+  new Date(`${month}-01T00:00:00Z`).toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 
 export function ExpiryTimeline() {
-  const timelineData: ExpiryTimelineGroup[] = [
-    { label: "0–15 Days", batches: 3, value: 14200 },
-    { label: "16–30 Days", batches: 5, value: 18200 },
-    { label: "31–45 Days", batches: 4, value: 21600 },
-    { label: "46–60 Days", batches: 5, value: 23200 },
-    { label: "61–90 Days", batches: 20, value: 51200 },
-  ];
+  const { data, isPending } = useExpiryTimeline();
+
+  const timelineData: ExpiryTimelineGroup[] = (data ?? []).slice(0, 5).map((point) => ({
+    label: monthLabel(point.month),
+    batches: point.batchCount,
+    value: point.valueExpiring,
+  }));
 
   const formatCurrency = (val: number) => {
     return "$" + (val / 1000).toFixed(1) + "K";
@@ -23,6 +32,8 @@ export function ExpiryTimeline() {
     if (idx === 2) return "bg-warning/80 border-warning/80 text-warning-foreground";
     return "bg-primary border-primary text-primary-foreground";
   };
+
+  if (isPending) return null;
 
   return (
     <Card className="border-border/60 shadow-sm mb-6 bg-background">
@@ -39,6 +50,11 @@ export function ExpiryTimeline() {
           <div className="absolute top-8 left-0 w-full h-1 bg-muted/30 rounded-full" />
           
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {timelineData.length === 0 && (
+              <p className="col-span-full text-xs font-medium text-muted-foreground">
+                No batches are approaching expiry.
+              </p>
+            )}
             {timelineData.map((node, idx) => (
               <div key={idx} className="relative flex flex-col items-center">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-4">

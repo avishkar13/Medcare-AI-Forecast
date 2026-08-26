@@ -2,11 +2,30 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, ComposedChart, Line, ReferenceLine } from "recharts";
-import { mockForecastData } from "@/lib/mockData";
+import { useForecastChart } from "@/hooks/use-forecast";
+import { useForecastScope } from "@/store/filters.store";
 
 export function ForecastMainChart() {
-  const sku = "SKU-LIS-10"; // Defaulting to one of the mock SKUs
-  const data = mockForecastData[sku] || [];
+  const scope = useForecastScope();
+  const { data: chart, isPending } = useForecastChart({ ...scope, historyDays: 30 });
+
+  // history stops where the prediction starts, so they concatenate
+  const data = [
+    ...(chart?.history ?? []).map((h) => ({
+      date: h.date,
+      actualDemand: h.actualDemand,
+      predictedDemand: undefined as number | undefined,
+      lowerBound: undefined as number | undefined,
+      upperBound: undefined as number | undefined,
+    })),
+    ...(chart?.prediction ?? []).map((p) => ({
+      date: p.date,
+      actualDemand: undefined as number | undefined,
+      predictedDemand: p.predictedDemand,
+      lowerBound: p.lowerBound,
+      upperBound: p.upperBound,
+    })),
+  ];
   
   const chartData = data.map((d) => ({
     date: new Date(d.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
@@ -16,6 +35,24 @@ export function ForecastMainChart() {
   }));
 
   const todayStr = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+  if (isPending) {
+    return (
+      <Card>
+        <CardContent className="py-10 text-sm text-muted-foreground">Loading forecast…</CardContent>
+      </Card>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-10 text-sm text-muted-foreground">
+          No forecast yet. Run the planner to generate one.
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="h-full">
@@ -51,7 +88,7 @@ export function ForecastMainChart() {
                 dataKey="bounds" 
                 stroke="none" 
                 fill="url(#colorBoundsLarge)" 
-                name="95% Confidence Interval" 
+                name="p10-p90 Band" 
               />
               
               {/* Historical Actual */}
@@ -90,7 +127,7 @@ export function ForecastMainChart() {
           </div>
           <div className="flex items-center gap-2">
             <div className="h-3 w-3 rounded-sm bg-ai/20"></div>
-            <span className="text-sm text-muted-foreground">95% Confidence Range</span>
+            <span className="text-sm text-muted-foreground">p10-p90 Band</span>
           </div>
         </div>
       </CardContent>

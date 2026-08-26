@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { AppSettings, defaultSettings } from "@/types/settings";
+import { AppSettings } from "@/types/settings";
+import { useSaveSettings, useSettings } from "@/hooks/use-settings";
 import { SettingsSectionKey, SettingsNavigation } from "@/components/settings/settings-navigation";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, RotateCcw, Save } from "lucide-react";
@@ -20,39 +21,39 @@ import { SecuritySettings } from "@/components/settings/security-settings";
 export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState<SettingsSectionKey>("general");
   
-  // Manage settings state
-  const [savedSettings, setSavedSettings] = useState<AppSettings>(defaultSettings);
-  const [draftSettings, setDraftSettings] = useState<AppSettings>(defaultSettings);
-  
-  const [isSaving, setIsSaving] = useState(false);
+  const { data: savedSettings, isPending, isError } = useSettings();
+  const save = useSaveSettings();
+
+  // null means untouched, so the server copy shows through without a sync effect
+  const [draft, setDraft] = useState<AppSettings | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Check if draft differs from saved
-  const hasUnsavedChanges = JSON.stringify(savedSettings) !== JSON.stringify(draftSettings);
+  const isSaving = save.isPending;
+  const hasUnsavedChanges =
+    draft !== null &&
+    savedSettings !== undefined &&
+    JSON.stringify(draft) !== JSON.stringify(savedSettings);
 
   const handleUpdate = <K extends keyof AppSettings>(section: K, updates: Partial<AppSettings[K]>) => {
-    setDraftSettings((prev) => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        ...updates,
-      },
-    }));
+    setDraft((prev) => {
+      const base = prev ?? savedSettings;
+      if (!base) return prev;
+      return { ...base, [section]: { ...base[section], ...updates } };
+    });
   };
 
   const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      setSavedSettings(draftSettings);
-      setIsSaving(false);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-    }, 600);
+    if (draft === null) return;
+    save.mutate(draft, {
+      onSuccess: () => {
+        setDraft(null);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      },
+    });
   };
 
-  const handleDiscard = () => {
-    setDraftSettings(savedSettings);
-  };
+  const handleDiscard = () => setDraft(null);
 
   const renderActiveSection = () => {
     switch (activeSection) {
@@ -76,6 +77,17 @@ export default function SettingsPage() {
         return null;
     }
   };
+
+  if (isPending) {
+    return <p className="text-sm text-muted-foreground p-6">Loading settings…</p>;
+  }
+
+  if (isError || !savedSettings) {
+    return <p className="text-sm text-muted-foreground p-6">Could not load settings.</p>;
+  }
+
+  // nothing renders before the server copy arrives, so no invented defaults are needed
+  const draftSettings = draft ?? savedSettings;
 
   return (
     <div className="flex-1 w-full p-4 md:p-8 max-w-[1200px] mx-auto overflow-y-auto no-scrollbar pb-24">

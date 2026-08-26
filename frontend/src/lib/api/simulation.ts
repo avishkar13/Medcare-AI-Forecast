@@ -7,6 +7,18 @@ export interface WhatIfParams {
   serviceLevelTargetPercent: number;
 }
 
+// a day delta the server converts against the network's real average lead time, so
+// nothing here has to carry a nominal figure of its own
+export interface LeadTimeDays {
+  leadTimeChangeDays?: number;
+}
+
+// the server fills capacity and service level from its own defaults, so a caller that
+// only moves demand and lead time does not have to restate them
+export type WhatIfRequestParams = Pick<WhatIfParams, "demandShockPercent"> &
+  Partial<WhatIfParams> &
+  LeadTimeDays;
+
 export interface SavedScenarioRow {
   id: string;
   name: string;
@@ -33,7 +45,7 @@ export const runWhatIf = (body: {
   name: string;
   description?: string;
   horizonDays?: number;
-  params: WhatIfParams;
+  params: WhatIfRequestParams;
 }) => api.post<WhatIfAccepted>("/simulation/run", body);
 
 export const listHistory = (limit = 20) =>
@@ -45,7 +57,7 @@ export const listSaved = (limit = 20) =>
 export const saveScenario = (body: {
   name: string;
   description?: string;
-  params: WhatIfParams;
+  params: WhatIfRequestParams;
 }) => api.post<SavedScenarioRow>("/simulation/save", body);
 
 export const deleteScenario = (id: string) =>

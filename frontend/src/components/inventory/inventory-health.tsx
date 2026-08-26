@@ -24,27 +24,24 @@ const COLORS = [
   "#7C3AED",
 ];
 
-const categoryData = [
-  { name: "Cardiovascular", value: 385000, skus: 210 },
-  { name: "Antibiotics", value: 295000, skus: 185 },
-  { name: "Antidiabetics", value: 220000, skus: 140 },
-  { name: "Analgesics", value: 165000, skus: 120 },
-  { name: "Respiratory", value: 115000, skus: 95 },
-  { name: "Antihistamines", value: 65000, skus: 95 },
-];
-
 export function InventoryHealth() {
   const { data, isPending } = useInventoryHealth();
   const health = data?.breakdown;
 
-  if (isPending || !health) return null;
+  if (isPending || !health || !data) return null;
+
+  const categoryData = data.byCategory.map((row) => ({
+    name: row.category,
+    value: row.inventoryValue,
+    skus: row.skuCount,
+  }));
 
   const segments = [
-    { name: "Healthy", value: health.healthy },
-    { name: "Below Reorder", value: health.belowReorderPoint },
-    { name: "Critical", value: health.criticalStock },
-    { name: "Excess", value: health.excessStock },
-    { name: "Expiring", value: health.expiringSoon },
+    { name: "Healthy", value: health.healthy, percent: data.breakdownPercent.healthy },
+    { name: "Below Reorder", value: health.belowReorderPoint, percent: data.breakdownPercent.belowReorderPoint },
+    { name: "Critical", value: health.criticalStock, percent: data.breakdownPercent.criticalStock },
+    { name: "Excess", value: health.excessStock, percent: data.breakdownPercent.excessStock },
+    { name: "Expiring", value: health.expiringSoon, percent: data.breakdownPercent.expiringSoon },
   ];
 
   const dotColors = [
@@ -112,7 +109,7 @@ export function InventoryHealth() {
                   <div className="flex items-center gap-2">
                     <span className="font-semibold tabular-nums text-foreground">{seg.value}</span>
                     <span className="text-muted-foreground tabular-nums w-10 text-right">
-                      {((seg.value / health.total) * 100).toFixed(1)}%
+                      {seg.percent}%
                     </span>
                   </div>
                 </div>
@@ -130,7 +127,7 @@ export function InventoryHealth() {
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Inventory Value by Category
             </span>
-            <span className="text-xs font-medium text-muted-foreground">Total: $1.25M</span>
+            <span className="text-xs font-medium text-muted-foreground">Total: {formatCompactCurrency(data.totalInventoryValue)}</span>
           </div>
 
           <div className="h-[170px] w-full">

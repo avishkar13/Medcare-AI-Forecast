@@ -12,19 +12,10 @@ export function InventoryKpiCards() {
   const kpis = {
     totalInventoryValue: totals?.inventoryValue ?? 0,
     totalSkus: totals?.skuCount ?? 0,
-    inStockRate:
-      totals && totals.positionCount > 0
-        ? Number(
-            (
-              ((totals.positionCount - totals.belowReorderPointCount) /
-                totals.positionCount) *
-              100
-            ).toFixed(1),
-          )
-        : 0,
+    inStockRate: totals?.inStockRatePercent ?? 0,
     atRiskSkus: totals?.belowReorderPointCount ?? 0,
     atRiskCritical: totals?.belowSafetyStockCount ?? 0,
-    excessInventoryValue: totals?.expiringValue ?? 0,
+    expiringValue: totals?.expiringValue ?? 0,
   };
 
   if (isPending || !totals) return null;
@@ -33,7 +24,7 @@ export function InventoryKpiCards() {
     {
       title: "Total Inventory Value",
       value: formatCompactCurrency(kpis.totalInventoryValue),
-      sub: <><span className="text-success font-medium">+2.1%</span> vs last month</>,
+      sub: `${formatNumber(totals.onHandUnits)} units on hand`,
       icon: DollarSign,
       iconColor: "text-muted-foreground",
       valueColor: "text-foreground",
@@ -41,7 +32,7 @@ export function InventoryKpiCards() {
     {
       title: "Total SKUs",
       value: formatNumber(kpis.totalSkus),
-      sub: "Across 4 distribution centers",
+      sub: `Across ${totals.warehouseCount} distribution centers`,
       icon: Package,
       iconColor: "text-muted-foreground",
       valueColor: "text-foreground",
@@ -49,7 +40,7 @@ export function InventoryKpiCards() {
     {
       title: "In-Stock Rate",
       value: `${kpis.inStockRate}%`,
-      sub: <><span className="text-success font-medium">+0.3%</span> improvement</>,
+      sub: `${formatNumber(totals.positionCount - totals.belowReorderPointCount)} of ${formatNumber(totals.positionCount)} positions`,
       icon: ShieldCheck,
       iconColor: "text-success",
       valueColor: "text-success",
@@ -63,9 +54,9 @@ export function InventoryKpiCards() {
       valueColor: "text-destructive",
     },
     {
-      title: "Excess Inventory",
-      value: formatCompactCurrency(kpis.excessInventoryValue),
-      sub: "Potential optimization target",
+      title: "Expiring Value",
+      value: formatCompactCurrency(kpis.expiringValue),
+      sub: `${formatNumber(totals.aboveMaximumCount)} positions above maximum`,
       icon: TrendingDown,
       iconColor: "text-warning",
       valueColor: "text-warning",

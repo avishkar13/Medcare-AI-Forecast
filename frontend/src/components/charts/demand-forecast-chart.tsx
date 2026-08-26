@@ -3,16 +3,22 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, ComposedChart, Line } from "recharts";
-import { useForecastAccuracy, useForecastChart } from "@/hooks/use-forecast";
+import { useForecastAccuracy, useForecastChart, useForecastSummary } from "@/hooks/use-forecast";
+import { useProducts, useWarehouses } from "@/hooks/use-masterdata";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function DemandForecastChart() {
-  const [sku, setSku] = useState("SKU-LIS-10");
+  const [sku, setSku] = useState<string | undefined>(undefined);
+  const [warehouse, setWarehouse] = useState<string | undefined>(undefined);
   const [horizon, setHorizon] = useState(14);
-  
-  const { data: chart, isPending } = useForecastChart({ sku, days: horizon, historyDays: horizon });
-  const { data: accuracy } = useForecastAccuracy({ sku });
+
+  const { data: products } = useProducts();
+  const { data: warehouses } = useWarehouses();
+
+  const { data: chart, isPending } = useForecastChart({ sku, warehouse, days: horizon, historyDays: horizon });
+  const { data: accuracy } = useForecastAccuracy({ sku, warehouse });
+  const { data: summary } = useForecastSummary({ sku, warehouse });
 
   // history and prediction do not overlap in time, so they concatenate rather than merge
   const data = [
@@ -73,7 +79,7 @@ export function DemandForecastChart() {
             <Tooltip>
               <TooltipTrigger render={<Info className="h-4 w-4 text-muted-foreground cursor-help" />} />
               <TooltipContent>
-                <p className="max-w-xs">AI-driven predictions based on historical consumption, seasonality, and external risk factors. The shaded region represents the 95% confidence interval.</p>
+                <p className="max-w-xs">AI-driven predictions based on historical consumption, seasonality, and external risk factors. The shaded region is the p10-p90 band the model publishes, an 80% interval.</p>
               </TooltipContent>
             </Tooltip>
           </CardTitle>
@@ -82,17 +88,23 @@ export function DemandForecastChart() {
         <div className="flex flex-wrap items-center gap-2">
           <select 
             className="h-8 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            value={sku}
-            onChange={(e) => setSku(e.target.value)}
+            value={sku ?? ""}
+            onChange={(e) => setSku(e.target.value || undefined)}
           >
-            <option value="SKU-LIS-10">Lisinopril 10mg</option>
-            <option value="SKU-OME-20">Omeprazole 20mg</option>
+            <option value="">All Products</option>
+            {(products ?? []).map((product) => (
+              <option key={product.sku} value={product.sku}>{product.name}</option>
+            ))}
           </select>
-          <select className="h-8 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-            <option>All Distribution Centers</option>
-            <option>Northeast DC</option>
-            <option>South DC</option>
-            <option>West Coast DC</option>
+          <select
+            className="h-8 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            value={warehouse ?? ""}
+            onChange={(e) => setWarehouse(e.target.value || undefined)}
+          >
+            <option value="">All Distribution Centers</option>
+            {(warehouses ?? []).map((row) => (
+              <option key={row.code} value={row.code}>{row.name}</option>
+            ))}
           </select>
           <div className="flex items-center rounded-md border border-input p-0.5 ml-2">
             {[7, 14, 30].map(h => (
@@ -132,7 +144,7 @@ export function DemandForecastChart() {
                   dataKey="bounds" 
                   stroke="none" 
                   fill="url(#colorBounds)" 
-                  name="95% Confidence Interval" 
+                  name="p10-p90 Band" 
                 />
                 
                 {/* Historical Actual */}
@@ -175,22 +187,30 @@ export function DemandForecastChart() {
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">Confidence Range</p>
               <p className="text-xl font-semibold text-foreground">{lastLower} - {lastUpper}</p>
-              <p className="text-xs text-ai font-medium">95% Confidence Level</p>
+              <p className="text-xs text-ai font-medium">p10-p90 Band</p>
             </div>
             
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">Historical Accuracy</p>
               <p className="text-xl font-semibold text-foreground">{accuracy?.overall.accuracyPercent === null || accuracy?.overall.accuracyPercent === undefined ? "—" : `${accuracy.overall.accuracyPercent}%`}</p>
-              <p className="text-xs text-success font-medium">+1.2% (last 30d)</p>
+              <p className="text-xs text-muted-foreground font-medium">
+                {accuracy?.overall.scoredPoints
+                  ? `${accuracy.overall.scoredPoints} scored days`
+                  : "No forecast day realised yet"}
+              </p>
             </div>
             
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">Expected Trend</p>
               <div className="flex items-center gap-2">
-                <span className="text-xl font-semibold text-foreground">Growing</span>
-                <div className="h-6 w-6 rounded-full bg-success/20 flex items-center justify-center">
-                  <span className="text-success text-xs font-bold">↗</span>
-                </div>
+                <span className="text-xl font-semibold text-foreground">{summary?.expectedTrend ?? "—"}</span>
+                {summary?.expectedTrend && summary.expectedTrend !== "Stable" && (
+                  <div className={`h-6 w-6 rounded-full flex items-center justify-center ${summary.expectedTrend === "Growing" ? "bg-success/20" : "bg-destructive/20"}`}>
+                    <span className={`text-xs font-bold ${summary.expectedTrend === "Growing" ? "text-success" : "text-destructive"}`}>
+                      {summary.expectedTrend === "Growing" ? "↗" : "↘"}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

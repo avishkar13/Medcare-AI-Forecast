@@ -5,17 +5,38 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { mockForecastTableItems } from "@/lib/mockData";
+import { useForecastSkus } from "@/hooks/use-forecast";
+import type { ForecastTableItem } from "@/types/forecast";
 import { Search, TrendingUp, TrendingDown, Minus, FilterX } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useForecastScope } from "@/store/filters.store";
 
 export function ForecastSkuTable() {
+  const scope = useForecastScope();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all categories");
   const [trend, setTrend] = useState("all trends");
   const [risk, setRisk] = useState("all risks");
 
-  const items = mockForecastTableItems;
+  const { data, isPending } = useForecastSkus(scope);
+
+  // per-sku accuracy, confidence and trend are not broken out by the api
+  const items = (data?.items ?? []).map((row) => ({
+    id: row.sku,
+    product: row.name,
+    category: row.category,
+    currentDemand: 0,
+    forecastDemand: row.forecastDemand,
+    growth: 0,
+    accuracy: 0,
+    confidence: 0,
+    trend: "stable" as ForecastTableItem["trend"],
+    risk: (row.criticality === "CRITICAL"
+      ? "critical"
+      : row.criticality === "HIGH"
+        ? "high"
+        : "low") as ForecastTableItem["risk"],
+  }));
 
   const filteredItems = useMemo(() => {
     return items.filter(item => {
@@ -26,6 +47,8 @@ export function ForecastSkuTable() {
       return matchSearch && matchCategory && matchTrend && matchRisk;
     });
   }, [items, search, category, trend, risk]);
+
+  if (isPending) return null;
 
   const resetFilters = () => {
     setSearch("");

@@ -10,7 +10,7 @@ import {
   listSaved,
   runWhatIf,
   saveScenario,
-  type WhatIfParams,
+  type WhatIfRequestParams,
 } from "@/lib/api/simulation";
 import {
   compareRuns,
@@ -55,7 +55,7 @@ export function useWhatIf() {
   const [runId, setRunId] = useState<string | null>(null);
 
   const start = useMutation({
-    mutationFn: (body: { name: string; horizonDays?: number; params: WhatIfParams }) =>
+    mutationFn: (body: { name: string; horizonDays?: number; params: WhatIfRequestParams }) =>
       runWhatIf(body),
     onSuccess: (accepted) => {
       setRunId(accepted.run.id);

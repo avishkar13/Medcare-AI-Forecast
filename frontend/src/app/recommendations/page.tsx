@@ -155,7 +155,7 @@ export default function RecommendationsPage() {
                 : "No completed planning run yet.",
             }}
           />
-          <RecommendationSummary items={items} />
+          <RecommendationSummary />
         </div>
 
       </div>

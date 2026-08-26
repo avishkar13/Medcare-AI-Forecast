@@ -69,11 +69,15 @@ export function IntegrationSettings({
           <div className="py-4 grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
               <span className="text-xs text-muted-foreground">Last Successful Sync</span>
-              <span className="text-sm font-bold text-foreground">02:07 AM</span>
+              <span className="text-sm font-bold text-foreground">
+                {data.sources[0]?.lastSync ?? "Never"}
+              </span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-xs text-muted-foreground">Next Scheduled Sync</span>
-              <span className="text-sm font-bold text-foreground">02:22 AM</span>
+              <span className="text-xs text-muted-foreground">Records Synced</span>
+              <span className="text-sm font-bold text-foreground">
+                {data.totalRecords.toLocaleString()}
+              </span>
             </div>
           </div>
         </div>

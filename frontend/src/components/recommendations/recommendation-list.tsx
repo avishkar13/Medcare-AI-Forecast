@@ -10,8 +10,6 @@ interface RecommendationListProps {
 }
 
 export function RecommendationList({ recommendations, onExecute, onDismiss }: RecommendationListProps) {
-  const pendingCount = recommendations.filter(r => r.status === "Pending").length;
-
   return (
     <div className="flex flex-col h-full bg-background border border-border/50 rounded-2xl shadow-sm overflow-hidden">
       <div className="p-4 sm:p-5 border-b border-border/50 flex items-center justify-between bg-muted/10 shrink-0">
@@ -25,7 +23,7 @@ export function RecommendationList({ recommendations, onExecute, onDismiss }: Re
         </div>
         <div className="bg-ai/10 text-ai border border-ai/20 font-semibold px-2.5 py-1 rounded-md text-xs uppercase tracking-wider shrink-0 flex items-center gap-1.5">
           <span className="flex h-2 w-2 rounded-full bg-ai animate-pulse"></span>
-          {pendingCount} Pending
+          {recommendations.length} Shown
         </div>
       </div>
 

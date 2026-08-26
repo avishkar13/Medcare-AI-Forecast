@@ -2,17 +2,24 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingDown, Coins } from "lucide-react";
+import { useExpiryOverview, useWastePrevention } from "@/hooks/use-expiry";
+import { formatNumber } from "@/lib/utils";
+
+const BAR_SHADES = ["bg-success", "bg-success/80", "bg-success/60", "bg-success/40"];
 
 export function WastePreventionImpact() {
-  const breakdown = [
-    { label: "FEFO Optimization", value: 28400, color: "bg-success" },
-    { label: "Internal Transfers", value: 21700, color: "bg-success/80" },
-    { label: "Demand Prioritization", value: 14200, color: "bg-success/60" },
-    { label: "Replenishment Adjustment", value: 11900, color: "bg-success/40" },
-  ];
+  const { data: prevention, isPending } = useWastePrevention();
+  const { data: overview } = useExpiryOverview();
 
-  const maxValue = Math.max(...breakdown.map(d => d.value));
+  const breakdown = (prevention?.byAction ?? []).slice(0, 4).map((row, index) => ({
+    label: row.actionTaken,
+    value: row.valueSaved,
+    sharePercent: row.sharePercent,
+    color: BAR_SHADES[index]!,
+  }));
   const formatCurrency = (val: number) => "$" + (val / 1000).toFixed(1) + "K";
+
+  if (isPending) return null;
 
   return (
     <Card className="border-border/60 shadow-sm bg-background h-full flex flex-col">
@@ -27,20 +34,20 @@ export function WastePreventionImpact() {
         {/* Top Summary Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="flex flex-col">
-            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Projected Waste</span>
-            <span className="text-lg font-black text-foreground">$128.4K</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Value at Risk</span>
+            <span className="text-lg font-black text-foreground">{formatCurrency(overview?.totalAtRiskValue ?? 0)}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-1">AI Preventable</span>
-            <span className="text-lg font-black text-success flex items-center gap-1"><TrendingDown className="h-4 w-4" /> $76.2K</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Value Saved</span>
+            <span className="text-lg font-black text-success flex items-center gap-1"><TrendingDown className="h-4 w-4" /> {formatCurrency(prevention?.totalValueSaved ?? 0)}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Remaining Exposure</span>
-            <span className="text-lg font-black text-destructive">$52.2K</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Units Saved</span>
+            <span className="text-lg font-black text-foreground">{formatNumber(prevention?.totalUnitsSaved ?? 0)}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Waste Reduction</span>
-            <span className="text-lg font-black text-foreground">59.3%</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Critical Exposure</span>
+            <span className="text-lg font-black text-destructive">{formatCurrency(overview?.criticalAtRiskValue ?? 0)}</span>
           </div>
         </div>
 
@@ -48,10 +55,15 @@ export function WastePreventionImpact() {
 
         {/* Breakdown Bars */}
         <div className="flex-1 flex flex-col justify-center">
-          <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4">Preventable Waste Breakdown</h4>
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4">Savings by Action</h4>
+          {breakdown.length === 0 && (
+            <p className="text-xs font-medium text-muted-foreground">
+              No waste prevention has been recorded yet.
+            </p>
+          )}
           <div className="space-y-4">
             {breakdown.map((item, idx) => {
-              const widthPct = (item.value / maxValue) * 100;
+              const widthPct = item.sharePercent;
               return (
                 <div key={idx} className="flex items-center gap-3">
                   <div className="w-32 text-xs font-semibold text-foreground truncate">

@@ -1,11 +1,36 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { mockForecastPageKPIs } from "@/lib/mockData";
+import { useForecastKpi, useForecastSummary } from "@/hooks/use-forecast";
+import { useModelMetrics } from "@/hooks/use-models";
 import { LineChart, Target, ShieldCheck, ArrowUpRight, Activity } from "lucide-react";
+import { useForecastScope } from "@/store/filters.store";
 
 export function ForecastKpiCards() {
-  const kpis = mockForecastPageKPIs;
+  const scope = useForecastScope();
+  const { data, isPending } = useForecastKpi(scope);
+  const { data: summary } = useForecastSummary(scope);
+  const { data: metrics } = useModelMetrics();
+
+  const kpis = {
+    forecastedDemand: data?.forecastedDemand ?? 0,
+    forecastHorizonDays: data?.forecastHorizonDays ?? 0,
+    forecastAccuracy: data?.forecastAccuracy ?? null,
+    // there is no prior scoring period to compare an accuracy figure against
+    accuracyChange: null,
+    // what the band is actually worth: how often p10-p90 covered the holdout
+    confidenceLevel: metrics?.quantile_forecasting.P10_P90_coverage_percent ?? null,
+    expectedPeakDemand: data?.expectedPeakDemand ?? 0,
+    peakDate: data?.peakDate ?? "",
+    demandGrowth: summary?.trendChangePercent ?? null,
+  };
+
+  // a null figure has no backend source yet; a dash beats "null%"
+  const pct = (value: number | null) => (value === null ? "—" : `${value}%`);
+  const signed = (value: number | null) =>
+    value === null ? "—" : `${value >= 0 ? "+" : ""}${value}%`;
+
+  if (isPending) return null;
   
   const cards = [
     {
@@ -17,15 +42,15 @@ export function ForecastKpiCards() {
     },
     {
       title: "Forecast Accuracy",
-      value: `${kpis.forecastAccuracy}%`,
-      sub: `+${kpis.accuracyChange}% vs previous period`,
+      value: pct(kpis.forecastAccuracy),
+      sub: kpis.accuracyChange === null ? "no prior period to compare" : `${signed(kpis.accuracyChange)} vs previous period`,
       icon: <Target className="h-5 w-5 text-success" />,
       highlight: false
     },
     {
-      title: "Confidence Level",
-      value: `${kpis.confidenceLevel}%`,
-      sub: "High confidence",
+      title: "Band Coverage",
+      value: kpis.confidenceLevel === null ? "—" : `${kpis.confidenceLevel.toFixed(1)}%`,
+      sub: "p10-p90 covered on holdout",
       icon: <ShieldCheck className="h-5 w-5 text-ai" />,
       highlight: false
     },
@@ -38,8 +63,8 @@ export function ForecastKpiCards() {
     },
     {
       title: "Demand Growth",
-      value: `+${kpis.demandGrowth}%`,
-      sub: "vs previous period",
+      value: signed(kpis.demandGrowth),
+      sub: "second half of horizon vs first",
       icon: <ArrowUpRight className="h-5 w-5 text-destructive" />, // using destructive color to imply growing demand might cause stockout risk, or just success. Let's stick to standard colors.
       highlight: false
     }

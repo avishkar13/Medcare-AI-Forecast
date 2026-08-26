@@ -59,6 +59,8 @@ export const queryKeys = {
     batches: (params?: QueryParams) => list("expiry", params),
     overview: (params?: QueryParams) => ["expiry", "overview", params ?? {}] as const,
     timeline: (params?: QueryParams) => ["expiry", "timeline", params ?? {}] as const,
+    exposure: () => ["expiry", "exposure"] as const,
+    demandCoverage: () => ["expiry", "demand-coverage"] as const,
     dcExposure: (params?: QueryParams) => ["expiry", "dc-exposure", params ?? {}] as const,
     wastePrevention: () => ["expiry", "waste-prevention"] as const,
     assessment: (params?: QueryParams) => ["expiry", "assessment", params ?? {}] as const,
@@ -113,5 +115,10 @@ export const queryKeys = {
 
   settings: {
     all: ["settings"] as const,
+  },
+
+  health: {
+    all: ["health"] as const,
+    readiness: () => ["health", "readiness"] as const,
   },
 } as const;

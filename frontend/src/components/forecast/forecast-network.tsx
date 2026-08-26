@@ -1,11 +1,27 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { mockNetworkForecasts } from "@/lib/mockData";
+import { useForecastNetwork } from "@/hooks/use-forecast";
 import { MapPin, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
+import { useForecastScope } from "@/store/filters.store";
 
 export function ForecastNetwork() {
-  const networks = mockNetworkForecasts;
+  const scope = useForecastScope();
+  const { data, isPending } = useForecastNetwork(scope);
+
+  // confidence and a per-dc peak are not exposed per warehouse
+  const networks = (data?.items ?? []).map((dc) => ({
+    id: dc.code,
+    dcName: dc.name,
+    currentDemand: dc.recentDemand30d ?? 0,
+    forecastDemand: dc.forecastDemand ?? 0,
+    growth: dc.growthPercent ?? 0,
+    confidence: 0,
+    peakDemand: 0,
+    peakDate: "",
+  }));
+
+  if (isPending) return null;
 
   return (
     <Card className="col-span-full">

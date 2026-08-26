@@ -8,6 +8,8 @@ import {
   executeRecommendation,
   getImpact,
   getIntelligence,
+  getKpi,
+  getSummary,
   listRecommendations,
 } from "@/lib/api/recommendations";
 
@@ -46,4 +48,20 @@ export function useRecommendationAction() {
   const dismiss = useMutation({ mutationFn: dismissRecommendation, onSuccess: settle });
 
   return { execute, dismiss };
+}
+
+export function useRecommendationKpi() {
+  return useQuery({
+    queryKey: queryKeys.recommendations.kpi(),
+    queryFn: getKpi,
+    staleTime: STALE_TIME.dashboard,
+  });
+}
+
+export function useRecommendationSummary() {
+  return useQuery({
+    queryKey: queryKeys.recommendations.summary(),
+    queryFn: getSummary,
+    staleTime: STALE_TIME.dashboard,
+  });
 }
