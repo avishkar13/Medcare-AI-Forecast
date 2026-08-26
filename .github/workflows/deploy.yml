@@ -57,6 +57,8 @@ jobs:
             -e RUN_SEED="false" \
             -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
             -e REDIS_URL="${{ secrets.REDIS_URL }}" \
+            -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            -e JWT_EXPIRES_IN="7d" \
             -e CORS_ORIGINS="${{ secrets.CORS_ORIGINS }}" \
             -e CORS_CREDENTIALS="true" \
             aniketjha4518/medcare-backend:latest
