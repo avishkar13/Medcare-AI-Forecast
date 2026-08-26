@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -22,7 +21,7 @@ import {
   LineChart,
 } from "lucide-react";
 import { useInventoryDetail } from "@/hooks/use-inventory";
-import { useRecommendations } from "@/hooks/use-recommendations";
+import { useRecommendationAction, useRecommendations } from "@/hooks/use-recommendations";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import type { StockBatch, StockMovement, MovementType, InventoryRisk } from "@/types/inventory";
 import Link from "next/link";
@@ -34,11 +33,9 @@ interface SkuDetailDrawerProps {
 }
 
 export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps) {
-  const [replenishSuccess, setReplenishSuccess] = useState(false);
-  const [transferSuccess, setTransferSuccess] = useState(false);
-
   const { data, isPending } = useInventoryDetail(skuId);
   const { data: recs } = useRecommendations({ pageSize: 200 });
+  const { execute, dismiss } = useRecommendationAction();
 
   if (!skuId) return null;
 
@@ -84,6 +81,8 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
           const match = (recs?.data ?? []).find((r) => r.sku === product.sku);
           return match
             ? {
+                id: match.id,
+                status: match.status,
                 action: match.actionType ?? match.type,
                 confidence: match.confidence ?? 0,
                 expectedImpact: match.expectedImpact ?? "",
@@ -131,16 +130,6 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
   const onHandPct = Math.min(100, (item.onHand / maxTrack) * 100);
   const safetyPct = Math.min(100, (item.safetyStock / maxTrack) * 100);
   const reorderPct = Math.min(100, (item.reorderPoint / maxTrack) * 100);
-
-  const handleReplenish = () => {
-    setReplenishSuccess(true);
-    setTimeout(() => setReplenishSuccess(false), 3000);
-  };
-
-  const handleTransfer = () => {
-    setTransferSuccess(true);
-    setTimeout(() => setTransferSuccess(false), 3000);
-  };
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -510,16 +499,16 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
           </Tabs>
 
           {/* Toast Notification Banner */}
-          {replenishSuccess && (
+          {execute.isSuccess && (
             <div className="p-3.5 bg-success/15 border border-success/30 rounded-lg flex items-center gap-2 text-xs font-semibold text-success shadow-xs">
               <CheckCircle2 className="h-4 w-4 shrink-0" />
-              <span>Purchase order drafted for {formatNumber(item.aiRecommendation?.suggestedQuantity ?? 0)} units of {item.name}!</span>
+              <span>Recommendation marked completed for {item.name}.</span>
             </div>
           )}
-          {transferSuccess && (
-            <div className="p-3.5 bg-primary/15 border border-primary/30 rounded-lg flex items-center gap-2 text-xs font-semibold text-primary shadow-xs">
+          {dismiss.isSuccess && (
+            <div className="p-3.5 bg-muted border border-border rounded-lg flex items-center gap-2 text-xs font-semibold text-muted-foreground shadow-xs">
               <CheckCircle2 className="h-4 w-4 shrink-0" />
-              <span>Internal transfer requisition initiated for {item.name}.</span>
+              <span>Recommendation dismissed for {item.name}.</span>
             </div>
           )}
         </div>
@@ -544,29 +533,39 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-8 px-3 gap-1.5 cursor-pointer text-xs font-medium"
-              onClick={handleTransfer}
-            >
-              <ArrowLeftRight className="h-3.5 w-3.5" />
-              Transfer Stock
-            </Button>
-            <Button
-              size="sm"
-              className={`h-8 px-4 gap-1.5 cursor-pointer text-xs font-bold text-white shadow-sm transition-all ${
-                item.risk === "critical"
-                  ? "bg-destructive hover:bg-destructive/90 shadow-destructive/20"
-                  : item.risk === "high"
-                  ? "bg-warning hover:bg-warning/90 shadow-warning/20"
-                  : "bg-primary hover:bg-primary/90 shadow-primary/20"
-              }`}
-              onClick={handleReplenish}
-            >
-              <ShoppingCart className="h-3.5 w-3.5" />
-              Quick Replenish
-            </Button>
+            {item.aiRecommendation === null ? (
+              <span className="text-xs font-medium text-muted-foreground">
+                No open recommendation for this SKU
+              </span>
+            ) : (
+              <>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="h-8 px-3 gap-1.5 cursor-pointer text-xs font-medium"
+                  onClick={() => dismiss.mutate(item.aiRecommendation!.id)}
+                  disabled={dismiss.isPending || item.aiRecommendation.status !== "OPEN"}
+                >
+                  <ArrowLeftRight className="h-3.5 w-3.5" />
+                  Dismiss
+                </Button>
+                <Button
+                  size="sm"
+                  className={`h-8 px-4 gap-1.5 cursor-pointer text-xs font-bold text-white shadow-sm transition-all ${
+                    item.risk === "critical"
+                      ? "bg-destructive hover:bg-destructive/90 shadow-destructive/20"
+                      : item.risk === "high"
+                      ? "bg-warning hover:bg-warning/90 shadow-warning/20"
+                      : "bg-primary hover:bg-primary/90 shadow-primary/20"
+                  }`}
+                  onClick={() => execute.mutate(item.aiRecommendation!.id)}
+                  disabled={execute.isPending || item.aiRecommendation.status !== "OPEN"}
+                >
+                  <ShoppingCart className="h-3.5 w-3.5" />
+                  {item.aiRecommendation.status === "OPEN" ? "Execute" : item.aiRecommendation.status}
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </SheetContent>
