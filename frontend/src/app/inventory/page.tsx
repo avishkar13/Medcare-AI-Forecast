@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/config/query-keys";
 import { useInventory } from "@/hooks/use-inventory";
 import { InventoryKpiCards } from "@/components/inventory/inventory-kpi-cards";
 import { InventoryHealth } from "@/components/inventory/inventory-health";
@@ -12,7 +14,8 @@ import { InventoryTable } from "@/components/inventory/inventory-table";
 import type { InventoryTableItem } from "@/types/inventory";
 
 export default function InventoryPage() {
-  const { data, isPending, isError } = useInventory();
+  const client = useQueryClient();
+  const { data, isPending, isError, isFetching } = useInventory();
 
   // a position is one product at one warehouse, so the row id has to be both.
   const allItems: InventoryTableItem[] = useMemo(
@@ -81,8 +84,13 @@ export default function InventoryPage() {
           <span className="text-xs text-muted-foreground font-medium" suppressHydrationWarning>
             Last updated: {lastUpdated}
           </span>
-          <Button variant="outline" size="sm" className="h-8 gap-2 cursor-pointer">
-            <RefreshCw className="h-3.5 w-3.5" />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-8 gap-2 cursor-pointer"
+            onClick={() => void client.invalidateQueries({ queryKey: queryKeys.inventory.all })}
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
             <span>Refresh</span>
           </Button>
         </div>

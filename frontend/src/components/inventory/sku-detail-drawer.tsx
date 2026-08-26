@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { useInventoryDetail } from "@/hooks/use-inventory";
 import { useRecommendationAction, useRecommendations } from "@/hooks/use-recommendations";
-import { formatCurrency, formatNumber } from "@/lib/utils";
+import { useFormatters } from "@/hooks/use-formatters";
 import type { StockBatch, StockMovement, MovementType, InventoryRisk } from "@/types/inventory";
 import Link from "next/link";
 
@@ -33,6 +33,7 @@ interface SkuDetailDrawerProps {
 }
 
 export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps) {
+  const { formatCurrency, formatNumber } = useFormatters();
   const { data, isPending } = useInventoryDetail(skuId);
   const { data: recs } = useRecommendations({ pageSize: 200 });
   const { execute, dismiss } = useRecommendationAction();
@@ -183,7 +184,7 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
             <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-card/60 border border-border/40">
               <span className="text-[11px] font-medium text-muted-foreground">Unit Price</span>
               <span className="text-base sm:text-lg font-bold tabular-nums text-foreground">
-                ${item.unitValue.toFixed(2)}
+                {formatCurrency(item.unitValue)}
               </span>
             </div>
             <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-card/60 border border-border/40">

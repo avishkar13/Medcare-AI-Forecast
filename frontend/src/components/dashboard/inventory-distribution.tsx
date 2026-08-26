@@ -4,9 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useDashboardNetwork } from "@/hooks/use-dashboard";
 import { Progress } from "@/components/ui/progress";
 import { Info, MapPin } from "lucide-react";
+import { useFormatters } from "@/hooks/use-formatters";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function InventoryDistribution() {
+  const { formatCompactCurrency: formatCurrency } = useFormatters();
   const { data, isPending, isError } = useDashboardNetwork();
 
   // the component calls it atRiskInventory; the backend reports the value of stock
@@ -20,9 +22,7 @@ export function InventoryDistribution() {
     stockoutRisk: dc.stockoutRisk,
   }));
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", style: 'currency', currency: 'USD' }).format(value);
-  };
+
 
   if (isPending || isError) {
     return (

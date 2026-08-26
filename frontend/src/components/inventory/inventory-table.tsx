@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 import type { InventoryTableItem, InventoryRisk, InventoryDetailStatus } from "@/types/inventory";
 import { SkuDetailDrawer } from "@/components/inventory/sku-detail-drawer";
-import { formatCurrency, formatNumber } from "@/lib/utils";
+import { useFormatters } from "@/hooks/use-formatters";
 
 interface InventoryTableProps {
   items: InventoryTableItem[];
@@ -69,26 +69,27 @@ const getRiskBadge = (risk: InventoryRisk) => {
 const getStatusLabel = (status: InventoryDetailStatus) => {
   const labels: Record<InventoryDetailStatus, string> = {
     healthy: "Healthy",
-    reorder_required: "Reorder",
-    overstocked: "Overstocked",
-    at_risk: "At Risk",
-    expiring: "Expiring",
+    belowReorderPoint: "Reorder",
+    excessStock: "Overstocked",
+    criticalStock: "At Risk",
+    expiringSoon: "Expiring",
   };
-  return labels[status];
+  return labels[status] || "—";
 };
 
 const getStatusColor = (status: InventoryDetailStatus) => {
   const colors: Record<InventoryDetailStatus, string> = {
     healthy: "text-success bg-success/10 border-success/20",
-    reorder_required: "text-warning bg-warning/10 border-warning/20",
-    overstocked: "text-primary bg-primary/10 border-primary/20",
-    at_risk: "text-destructive bg-destructive/10 border-destructive/20",
-    expiring: "text-[#7C3AED] bg-[#7C3AED]/10 border-[#7C3AED]/20",
+    belowReorderPoint: "text-warning bg-warning/10 border-warning/20",
+    excessStock: "text-primary bg-primary/10 border-primary/20",
+    criticalStock: "text-destructive bg-destructive/10 border-destructive/20",
+    expiringSoon: "text-[#7C3AED] bg-[#7C3AED]/10 border-[#7C3AED]/20",
   };
-  return colors[status];
+  return colors[status] || "text-muted-foreground bg-muted border-border";
 };
 
 export function InventoryTable({ items, onResetFilters }: InventoryTableProps) {
+  const { formatCurrency, formatNumber } = useFormatters();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [sortKey, setSortKey] = useState<SortKey>("risk");

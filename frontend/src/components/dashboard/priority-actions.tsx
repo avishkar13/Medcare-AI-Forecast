@@ -36,7 +36,7 @@ export function PriorityActions() {
           Priority Actions
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent className="p-0 max-h-[460px] overflow-y-auto overflow-x-hidden">
         <div className="flex flex-col divide-y divide-border/50">
           {actions.map((action) => (
             <div key={action.id} className="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors hover:bg-muted/30">

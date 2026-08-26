@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingDown, Coins } from "lucide-react";
 import { useExpiryOverview, useWastePrevention } from "@/hooks/use-expiry";
-import { formatNumber } from "@/lib/utils";
+import { useFormatters } from "@/hooks/use-formatters";
 
 const BAR_SHADES = ["bg-success", "bg-success/80", "bg-success/60", "bg-success/40"];
 
@@ -17,7 +17,7 @@ export function WastePreventionImpact() {
     sharePercent: row.sharePercent,
     color: BAR_SHADES[index]!,
   }));
-  const formatCurrency = (val: number) => "$" + (val / 1000).toFixed(1) + "K";
+  const { formatCompactCurrency: formatCurrency, formatNumber } = useFormatters();
 
   if (isPending) return null;
 

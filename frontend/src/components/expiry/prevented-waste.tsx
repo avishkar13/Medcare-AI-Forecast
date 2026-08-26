@@ -3,6 +3,7 @@
 import { WastePreventionRecord } from "@/types/expiry";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { History, ArrowUpRight } from "lucide-react";
+import { useFormatters } from "@/hooks/use-formatters";
 
 interface PreventedWasteProps {
   records: WastePreventionRecord[];
@@ -10,7 +11,7 @@ interface PreventedWasteProps {
 }
 
 export function PreventedWaste({ records, totalValueSaved }: PreventedWasteProps) {
-  const formatCurrency = (val: number) => "$" + (val / 1000).toFixed(1) + "K";
+  const { formatCompactCurrency: formatCurrency } = useFormatters();
 
   return (
     <Card className="border-border/60 shadow-sm bg-background h-full flex flex-col">

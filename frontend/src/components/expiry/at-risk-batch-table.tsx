@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CalendarClock } from "lucide-react";
+import { useFormatters } from "@/hooks/use-formatters";
 
 interface AtRiskBatchTableProps {
   batches: ExpiryBatch[];
@@ -13,6 +14,8 @@ interface AtRiskBatchTableProps {
 }
 
 export function AtRiskBatchTable({ batches, onBatchClick, onActionClick }: AtRiskBatchTableProps) {
+  const { formatCurrency, formatNumber, formatDate } = useFormatters();
+
   const getRiskColor = (risk: string) => {
     switch (risk) {
       case "critical": return "bg-destructive text-destructive-foreground hover:bg-destructive/90";
@@ -67,25 +70,25 @@ export function AtRiskBatchTable({ batches, onBatchClick, onActionClick }: AtRis
         </div>
       </div>
 
-        <div className="hidden md:block overflow-x-auto">
+        <div className="hidden md:block overflow-auto max-h-[500px]">
           <Table className="text-xs">
-            <TableHeader>
-              <TableRow className="hover:bg-transparent border-border/50 bg-muted/5 h-9">
-                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground w-[80px]">Risk</TableHead>
+            <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
+              <TableRow className="hover:bg-transparent border-border/50 bg-muted/5 h-8">
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground w-[70px]">Risk</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Product & Batch</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Location</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right">Quantity</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Expiry</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right">Demand Cov.</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right">Value Risk</TableHead>
-                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right w-[100px]">Action</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right w-[90px]">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {batches.map((batch) => (
                 <TableRow 
                   key={batch.id} 
-                  className="cursor-pointer hover:bg-muted/30 border-border/30 transition-colors h-14"
+                  className="cursor-pointer hover:bg-muted/30 border-border/30 transition-colors h-11"
                   onClick={() => onBatchClick(batch)}
                 >
                   <TableCell>
@@ -108,11 +111,11 @@ export function AtRiskBatchTable({ batches, onBatchClick, onActionClick }: AtRis
                     {batch.location}
                   </TableCell>
                   <TableCell className="text-right font-bold text-xs">
-                    {batch.quantity.toLocaleString()}
+                    {formatNumber(batch.quantity)}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col">
-                      <span className="font-bold text-foreground text-xs leading-tight">{new Date(batch.expiryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      <span className="font-bold text-foreground text-xs leading-tight">{formatDate(batch.expiryDate)}</span>
                       <span className={`text-[10px] font-black mt-0.5 ${batch.daysRemaining <= 30 ? 'text-destructive' : batch.daysRemaining <= 60 ? 'text-warning' : 'text-muted-foreground'}`}>
                         {batch.daysRemaining} days
                       </span>
@@ -125,7 +128,7 @@ export function AtRiskBatchTable({ batches, onBatchClick, onActionClick }: AtRis
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex flex-col items-end">
-                      <span className="font-black text-foreground text-xs leading-tight">${batch.inventoryValue.toLocaleString()}</span>
+                      <span className="font-black text-foreground text-xs leading-tight">{formatCurrency(batch.inventoryValue)}</span>
                       <span className="text-[10px] font-medium text-muted-foreground mt-0.5">{batch.wasteSharePercent}% prob.</span>
                     </div>
                   </TableCell>
@@ -175,7 +178,7 @@ export function AtRiskBatchTable({ batches, onBatchClick, onActionClick }: AtRis
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[9px] font-bold uppercase text-muted-foreground">Quantity</span>
-                  <span className="font-bold text-foreground">{batch.quantity.toLocaleString()}</span>
+                  <span className="font-bold text-foreground">{formatNumber(batch.quantity)}</span>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[9px] font-bold uppercase text-muted-foreground">Location</span>
@@ -183,7 +186,7 @@ export function AtRiskBatchTable({ batches, onBatchClick, onActionClick }: AtRis
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[9px] font-bold uppercase text-muted-foreground">Value Risk</span>
-                  <span className="font-bold text-foreground">${batch.inventoryValue.toLocaleString()}</span>
+                  <span className="font-bold text-foreground">{formatCurrency(batch.inventoryValue)}</span>
                 </div>
               </div>
 

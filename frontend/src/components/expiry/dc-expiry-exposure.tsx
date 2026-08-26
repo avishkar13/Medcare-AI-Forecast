@@ -3,15 +3,15 @@
 import { DistributionCenterExpiry } from "@/types/expiry";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
+import { useFormatters } from "@/hooks/use-formatters";
 
 interface DCExpiryExposureProps {
   data: DistributionCenterExpiry[];
 }
 
 export function DCExpiryExposure({ data }: DCExpiryExposureProps) {
+  const { formatCompactCurrency: formatCurrency } = useFormatters();
   const maxExposure = Math.max(...data.map(d => d.atRiskValue));
-
-  const formatCurrency = (val: number) => "$" + (val / 1000).toFixed(1) + "K";
 
   return (
     <Card className="border-border/60 shadow-sm bg-background h-full flex flex-col">

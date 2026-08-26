@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useExpiryExposure } from "@/hooks/use-expiry";
-import { formatCompactCurrency } from "@/lib/utils";
+import { useFormatters } from "@/hooks/use-formatters";
 
 const WINDOW_COLORS = ["bg-destructive", "bg-warning", "bg-primary", "bg-muted-foreground/30"];
 
@@ -14,6 +14,7 @@ const RISK_DOT = {
 } as const;
 
 export function ExpiryExposure() {
+  const { formatCompactCurrency } = useFormatters();
   const { data, isPending } = useExpiryExposure();
 
   if (isPending || !data) return null;

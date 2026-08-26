@@ -8,8 +8,10 @@ import {
   useRecommendationSummary,
 } from "@/hooks/use-recommendations";
 import { formatNumber } from "@/lib/utils";
+import { useFormatters } from "@/hooks/use-formatters";
 
 export function RecommendationsKpiCards() {
+  const { formatCompactCurrency } = useFormatters();
   const { data: kpi, isPending } = useRecommendationKpi();
   const { data: summary } = useRecommendationSummary();
   const { data: intelligence } = useRecommendationIntelligence();
@@ -66,7 +68,7 @@ export function RecommendationsKpiCards() {
               <DollarSign className="h-4 w-4 text-success" />
             </div>
           </div>
-          <p className="text-2xl font-black text-success-foreground tracking-tight">${(kpi.potentialSavings / 1000).toFixed(1)}K</p>
+          <p className="text-2xl font-black text-success-foreground tracking-tight">{formatCompactCurrency(kpi.potentialSavings)}</p>
           <div className="mt-2 text-[11px] font-semibold text-success flex items-center gap-1">
             <TrendingUp className="h-3 w-3" />
             Optimized via AI

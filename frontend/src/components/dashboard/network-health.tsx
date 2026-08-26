@@ -4,14 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useDashboardSummary } from "@/hooks/use-dashboard";
 import { Activity } from "lucide-react";
+import { useFormatters } from "@/hooks/use-formatters";
 
 export function NetworkHealth() {
   const { data, isPending, isError } = useDashboardSummary();
+  const { formatCurrency } = useFormatters();
   const health = data?.networkHealth;
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
-  };
 
   if (isPending || isError || !health) {
     return (
