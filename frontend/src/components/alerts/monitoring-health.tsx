@@ -15,9 +15,11 @@ const relativeTime = (iso: string) => {
 export function MonitoringHealth() {
   const { data, isPending, isError } = useAlertHealth();
 
+  // Before the null guard: on failure `data` is undefined, so a guard that
+  // returns null on falsy data swallows the error and the panel just vanishes.
+  if (isError) return <QueryError label="monitoring health" />;
   if (isPending || !data) return null;
 
-  if (isError) return <QueryError label="monitoring health" />;
 
   // the api reports the alert pipeline itself, not a list of subsystems, so these
   // are the four facts it can actually vouch for

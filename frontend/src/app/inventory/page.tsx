@@ -187,7 +187,7 @@ function InventoryView() {
         */}
         <InventoryKpiCards totals={data?.totals} isPending={isPending} isError={isError} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid [&>*]:min-w-0 grid-cols-1 lg:grid-cols-2 gap-6">
           <InventoryHealth warehouseId={dc} />
           <InventoryNetwork />
         </div>

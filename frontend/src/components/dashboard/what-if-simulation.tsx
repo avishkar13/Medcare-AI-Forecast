@@ -8,17 +8,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { useWhatIf } from "@/hooks/use-simulation";
 import { useLatestRunOutcome } from "@/hooks/use-planning";
-
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
+import { useFormatters } from "@/hooks/use-formatters";
 
 export function WhatIfSimulation() {
   const [demandChange, setDemandChange] = useState(0);
   const [leadTimeChange, setLeadTimeChange] = useState(0);
+  // Was a module-level formatter hardcoded to USD, which no setting could reach.
+  const { formatCurrency } = useFormatters();
 
   const baseline = useLatestRunOutcome();
   const whatIf = useWhatIf();

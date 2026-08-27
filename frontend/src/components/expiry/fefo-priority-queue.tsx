@@ -10,12 +10,18 @@ interface FEFOPriorityQueueProps {
 }
 
 export function FEFOPriorityQueue({ batches }: FEFOPriorityQueueProps) {
-  // Sort by highest waste risk & lowest days remaining
+  /**
+   * First-Expired-First-Out, which is what the panel is named after.
+   *
+   * It used to sort on waste value alone, so a batch with three days left could sit below
+   * one with three months. Expiry leads; waste value only breaks ties between batches
+   * expiring on the same day. This matches the page's own FEFO branch, so the queue and
+   * the table below it agree on the order.
+   */
   const priorityBatches = [...batches]
     .sort((a, b) => {
-      const aRisk = a.wasteValue;
-      const bRisk = b.wasteValue;
-      return bRisk - aRisk; // descending risk
+      if (a.daysRemaining !== b.daysRemaining) return a.daysRemaining - b.daysRemaining;
+      return b.wasteValue - a.wasteValue;
     })
     .slice(0, 5);
 
@@ -23,7 +29,8 @@ export function FEFOPriorityQueue({ batches }: FEFOPriorityQueueProps) {
     if (batch.status === "prioritized") return "Prioritize Fulfillment";
     if (batch.status === "transfer") return "Transfer to Demand Node";
     if (batch.status === "monitor") return "Accelerate Consumption";
-    return "Review Repositioning";
+    // `normal` - demand already covers the batch before it expires.
+    return "No Action Needed";
   };
 
   return (
@@ -35,7 +42,7 @@ export function FEFOPriorityQueue({ batches }: FEFOPriorityQueueProps) {
             FEFO Priority Queue
           </span>
           <span className="text-[10px] font-medium text-muted-foreground normal-case">
-            Batches that should be consumed or repositioned first.
+            Soonest to expire first. Follows the filters and the FEFO toggle above.
           </span>
         </CardTitle>
       </CardHeader>

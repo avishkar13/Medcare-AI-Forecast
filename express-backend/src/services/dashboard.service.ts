@@ -1,14 +1,7 @@
 import { Prisma } from "../../generated/prisma/client.js";
 import { prisma } from "../config/prisma.js";
 import { currentAccuracyPercent } from "./forecast-accuracy.service.js";
-import {
-  classifyStock,
-  percentage,
-  projectFefoWaste,
-  reorderPoint,
-  round,
-  safetyStock,
-} from "../utils/inventory.js";
+import { availableStock, classifyStock, inventoryPosition, percentage, projectFefoWaste, reorderPoint, round, safetyStock } from "../utils/inventory.js";
 import { planTransfers } from "../utils/allocation.js";
 import { NotFoundError } from "../utils/errors.js";
 import type {
@@ -72,6 +65,13 @@ export interface InventoryPosition {
   stockoutCostPerUnit: number;
   daysOfSupply: number;
   inventoryValue: number;
+  /**
+   * Per item-location alert overrides, null where the position inherits the global
+   * value. Carried here because `loadPositions` already reads `PlanningParameter`, so
+   * the detector needs no second query.
+   */
+  alertStockoutProbability: number | null;
+  alertExpiryWindowDays: number | null;
 }
 
 export interface ExpiringBatch {
@@ -171,8 +171,18 @@ export const loadPositions = async (scope?: { warehouseId?: string | null }): Pr
       reorderPoint: round(reorderPoint(profile)),
       maximumInventory: parameter?.maximumInventory ?? null,
       stockoutCostPerUnit: parameter?.stockoutCostPerUnit ?? unitCost,
-      daysOfSupply: avgDailyDemand > 0 ? round(row.onHand / avgDailyDemand, 1) : 0,
+      /**
+       * Cover is measured on stock that can actually be shipped, not on stock already
+       * promised to orders - which is the SCM definition and what makes the stockout
+       * probability reflect reserved inventory instead of ignoring it.
+       */
+      daysOfSupply:
+        avgDailyDemand > 0
+          ? round(availableStock({ onHand: row.onHand, reserved: row.reserved, inTransit: row.inTransit }) / avgDailyDemand, 1)
+          : 0,
       inventoryValue: round(row.onHand * unitCost),
+      alertStockoutProbability: parameter?.alertStockoutProbability ?? null,
+      alertExpiryWindowDays: parameter?.alertExpiryWindowDays ?? null,
     };
   });
 };
@@ -226,8 +236,22 @@ const excessOf = (position: InventoryPosition) =>
     ? 0
     : Math.max(0, position.onHand - position.maximumInventory) * position.unitCost;
 
-const isBelowSafetyStock = (position: InventoryPosition) => position.onHand < position.safetyStock;
-const isBelowReorderPoint = (position: InventoryPosition) => position.onHand < position.reorderPoint;
+/**
+ * The two stock signals, each judged on the quantity that answers its own question.
+ *
+ * Reserved units are committed, so they cannot cover demand - stockout risk is measured on
+ * **available**. In-transit units are already bought, so replenishment is measured on the
+ * **inventory position**; comparing the reorder point to bare on-hand re-orders stock that
+ * is already on its way. Measured on the live network, that was 9 of 35 flagged positions.
+ */
+const isBelowSafetyStock = (position: InventoryPosition) =>
+  availableStock(position) < position.safetyStock;
+
+const isBelowReorderPoint = (position: InventoryPosition) =>
+  inventoryPosition(position) < position.reorderPoint;
+
+// Deliberately still on-hand: a warehouse is physically full of what it holds, whatever is
+// committed out of it or still arriving.
 const isAboveMaximum = (position: InventoryPosition) =>
   position.maximumInventory !== null && position.onHand > position.maximumInventory;
 
@@ -705,7 +729,11 @@ export const getInventoryHealth = async (
   const byCategory: CategoryHealth[] = [...groupBy(positions, (row) => row.category ?? UNCATEGORIZED)]
     .map(([category, rows]) => ({
       category,
-      skuCount: rows.length,
+      // `rows` are positions, not products. Network-wide these summed to 160 under the
+      // name `skuCount` while only 40 SKUs exist, which read as a count that never
+      // changed when the DC did. Both figures are now sent, each meaning what it says.
+      skuCount: new Set(rows.map((row) => row.productId)).size,
+      positionCount: rows.length,
       inventoryValue: round(sumBy(rows, (row) => row.inventoryValue)),
       atRiskCount: rows.filter(isBelowReorderPoint).length,
       expiringValue: round(

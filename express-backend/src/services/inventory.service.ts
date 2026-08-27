@@ -1,9 +1,11 @@
 import { prisma } from "../config/prisma.js";
 import { loadPositions, type InventoryPosition } from "./dashboard.service.js";
 import {
+  availableStock,
   classifyRisk,
   classifyStock,
   expirySeverity,
+  inventoryPosition,
   percentage,
   round,
   supplyUrgency,
@@ -74,8 +76,10 @@ const toItem = (
   position: InventoryPosition,
   expiry: ExpirySummary | undefined,
 ): InventoryPositionItem => {
-  const belowSafetyStock = position.onHand < position.safetyStock;
-  const belowReorderPoint = position.onHand < position.reorderPoint;
+  // The same two measures the counts use, so a row's own status and risk can never
+  // contradict the totals summarising it.
+  const belowSafetyStock = availableStock(position) < position.safetyStock;
+  const belowReorderPoint = inventoryPosition(position) < position.reorderPoint;
   const aboveMaximum =
     position.maximumInventory !== null && position.onHand > position.maximumInventory;
   const daysToNearestExpiry = expiry?.daysToNearest ?? null;
@@ -93,7 +97,10 @@ const toItem = (
     onHand: position.onHand,
     reserved: position.reserved,
     inTransit: position.inTransit,
-    available: round(position.onHand - position.reserved),
+    // The two derived quantities the stock signals are judged on, sent so a reader can
+    // check the verdict rather than compare on-hand to the reorder point and disagree.
+    available: round(availableStock(position)),
+    inventoryPosition: round(inventoryPosition(position)),
     safetyStock: position.safetyStock,
     reorderPoint: position.reorderPoint,
     maximumInventory: position.maximumInventory,
@@ -125,15 +132,19 @@ const totalsOf = (items: InventoryPositionItem[]): InventoryTotals => ({
   warehouseCount: new Set(items.map((item) => item.warehouseId)).size,
   onHandUnits: round(items.reduce((total, item) => total + item.onHand, 0)),
   inventoryValue: round(items.reduce((total, item) => total + item.inventoryValue, 0)),
-  belowSafetyStockCount: items.filter((item) => item.onHand < item.safetyStock).length,
-  belowReorderPointCount: items.filter((item) => item.onHand < item.reorderPoint).length,
+  // The same two measures the dashboard and the detector use. This was a third copy of
+  // the arithmetic on raw on-hand, so the moment the other two started counting reserved
+  // and in-transit stock the routes disagreed - which `inventory.test.ts` caught.
+  belowSafetyStockCount: items.filter((item) => item.available < item.safetyStock).length,
+  belowReorderPointCount: items.filter((item) => item.inventoryPosition < item.reorderPoint)
+    .length,
   aboveMaximumCount: items.filter(
     (item) => item.maximumInventory !== null && item.onHand > item.maximumInventory,
   ).length,
   expiringValue: round(items.reduce((total, item) => total + item.expiringValue, 0)),
   // Positions at or above their reorder point, as a share of all positions.
   inStockRatePercent: percentage(
-    items.length - items.filter((item) => item.onHand < item.reorderPoint).length,
+    items.length - items.filter((item) => item.inventoryPosition < item.reorderPoint).length,
     items.length,
   ),
 });

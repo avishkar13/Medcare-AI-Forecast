@@ -33,6 +33,12 @@ export const upsertParametersBodySchema = z
     holdingCostPerUnit: nonNegative,
     stockoutCostPerUnit: nonNegative,
     expiryCostPerUnit: nonNegative,
+    /**
+     * Per item-location alert overrides. **Null means inherit** the global setting, and
+     * clearing a value has to be expressible - otherwise an override is a one-way door.
+     */
+    alertStockoutProbability: z.number().min(0).max(100).nullable().default(null),
+    alertExpiryWindowDays: z.number().int().min(1).max(365).nullable().default(null),
   })
   .refine(
     (value) =>

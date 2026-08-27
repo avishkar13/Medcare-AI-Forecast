@@ -3,11 +3,15 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useDashboardExpiryRisk } from "@/hooks/use-dashboard";
+import { useFormatters } from "@/hooks/use-formatters";
 import { Info, FlaskConical } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function ExpiryRiskPanel() {
   const { data, isPending, isError } = useDashboardExpiryRisk();
+  // Shared formatter, not a local one: this panel hardcoded USD and so reported
+  // value at risk in dollars on a workspace configured for rupees.
+  const { formatCurrency } = useFormatters();
 
   const risks = (data?.items ?? []).map((item) => ({
     id: item.batchId,
@@ -29,10 +33,6 @@ export function ExpiryRiskPanel() {
       </Card>
     );
   }
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
-  };
 
   const getSeverityStyles = (severity: string) => {
     switch(severity) {

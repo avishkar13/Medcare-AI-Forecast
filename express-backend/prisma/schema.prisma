@@ -176,6 +176,18 @@ model PlanningParameter {
   stockoutCostPerUnit Float
   expiryCostPerUnit   Float
 
+  /**
+   * Per item-location alert thresholds. **Null means inherit** the global value in
+   * `AlertSettings`, not "zero" and not "disabled".
+   *
+   * An override, never a default - the same shape `ScenarioSettings.serviceLevelTarget`
+   * settled on. A default here would silently flatten every pair onto one number, which
+   * is the bug this exists to fix: a critical antibiotic at a Tier-2 DC with a 14-day
+   * lead time cannot be judged by the same trigger as a routine analgesic at a metro DC.
+   */
+  alertStockoutProbability Float? // 0-100
+  alertExpiryWindowDays    Int? // days
+
   product   Product   @relation(fields: [productId], references: [id])
   warehouse Warehouse @relation(fields: [warehouseId], references: [id])
 

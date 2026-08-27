@@ -2,16 +2,16 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useLatestComparison } from "@/hooks/use-planning";
+import { useFormatters } from "@/hooks/use-formatters";
 import { TrendingDown, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
 
 export function OptimizationSummary() {
   const { data, isPending, isError, hasTwoRuns } = useLatestComparison();
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", style: 'currency', currency: 'USD', maximumFractionDigits: 1 }).format(value);
-  };
+  // Was a local formatter hardcoded to USD; the shared one follows the configured
+  // currency and its grouping.
+  const { formatCompactCurrency: formatCurrency } = useFormatters();
 
   const cost = data?.cost;
 

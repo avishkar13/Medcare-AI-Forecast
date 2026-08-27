@@ -13,6 +13,16 @@ export function useFormatters() {
     return general.currency.split(" ")[0]; // "USD ($)" -> "USD"
   })();
 
+  /**
+   * Grouping follows the currency, not the browser.
+   *
+   * `en-US` renders INR as ₹4,902,600. India groups in lakh and crore, so the same
+   * figure reads ₹49,02,600 - which is what `utils/currency.ts` produces on the
+   * server for the text baked into alerts. Formatting the two halves differently
+   * puts two spellings of the same amount on one screen.
+   */
+  const currencyLocale = ({ INR: "en-IN" } as Record<string, string>)[currencyCode] ?? "en-US";
+
   const timezone = (() => {
     if (!general?.timezone) return undefined;
     return general.timezone.split(" ")[0]; // "Asia/Kolkata (IST)" -> "Asia/Kolkata"
@@ -22,7 +32,7 @@ export function useFormatters() {
 
   const formatCurrency = (value: number | null | undefined): string => {
     if (value == null) return "—";
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat(currencyLocale, {
       style: "currency",
       currency: currencyCode,
       maximumFractionDigits: 0,
@@ -32,7 +42,7 @@ export function useFormatters() {
   const formatCompactCurrency = (value: number | null | undefined): string => {
     if (value == null) return "—";
     
-    const formatter = new Intl.NumberFormat("en-US", {
+    const formatter = new Intl.NumberFormat(currencyLocale, {
       style: "currency",
       currency: currencyCode,
       notation: "compact",

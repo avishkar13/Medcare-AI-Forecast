@@ -14,6 +14,7 @@ import { ForecastSettings } from "@/components/settings/forecast-settings";
 import { InventorySettings } from "@/components/settings/inventory-settings";
 import { AlertSettings } from "@/components/settings/alert-settings";
 import { NotificationSettings } from "@/components/settings/notification-settings";
+import { ThresholdSettings } from "@/components/settings/threshold-settings";
 import { AISettings } from "@/components/settings/ai-settings";
 import { IntegrationSettings } from "@/components/settings/integration-settings";
 import { SecuritySettings } from "@/components/settings/security-settings";
@@ -68,6 +69,10 @@ export default function SettingsPage() {
         return <InventorySettings data={draftSettings.inventory} onChange={(v) => handleUpdate("inventory", v)} />;
       case "alerts":
         return <AlertSettings data={draftSettings.alerts} onChange={(v) => handleUpdate("alerts", v)} />;
+      case "thresholds":
+        // Not part of the settings draft: these live on PlanningParameter per SKU and DC
+        // and are saved per row, so they do not belong to the global save button above.
+        return <ThresholdSettings />;
       case "notifications":
         return <NotificationSettings data={draftSettings.notifications} onChange={(v) => handleUpdate("notifications", v)} />;
       case "ai":

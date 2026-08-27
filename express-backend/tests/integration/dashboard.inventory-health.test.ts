@@ -31,7 +31,14 @@ interface HealthReport {
     expiringWithin30Days: number;
     expiringWithin90Days: number;
   };
-  byCategory: { category: string; skuCount: number; inventoryValue: number; atRiskCount: number; expiringValue: number }[];
+  byCategory: {
+    category: string;
+    skuCount: number;
+    positionCount: number;
+    inventoryValue: number;
+    atRiskCount: number;
+    expiringValue: number;
+  }[];
   byCriticality: { criticality: string; skuCount: number; atRiskCount: number; stockoutRisk: number }[];
 }
 
@@ -155,10 +162,21 @@ describe("GET /api/dashboard/inventory-health", () => {
       assert.equal(typeof row.category, "string");
       assert.ok(row.category.length > 0, "an uncategorised product must be labelled, not blank");
       assert.ok(row.skuCount > 0);
+      assert.ok(row.positionCount > 0);
       assert.ok(row.inventoryValue >= 0);
       assert.ok(row.expiringValue >= 0);
-      assert.ok(row.atRiskCount <= row.skuCount, row.category + " reported more at risk than it holds");
-      positions += row.skuCount;
+      // `skuCount` is distinct products, `positionCount` is product-warehouse pairs. They
+      // used to be one field named for the first that counted the second, which is what
+      // made the category figures look identical whichever DC was selected.
+      assert.ok(
+        row.skuCount <= row.positionCount,
+        row.category + " reported more products than positions holding them",
+      );
+      assert.ok(
+        row.atRiskCount <= row.positionCount,
+        row.category + " reported more at risk than it holds",
+      );
+      positions += row.positionCount;
     }
 
     assert.equal(positions, breakdown.total, "every position must belong to exactly one category bucket");

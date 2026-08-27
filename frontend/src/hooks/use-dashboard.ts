@@ -12,6 +12,15 @@ import {
 } from "@/lib/api/dashboard";
 
 /**
+ * These queries refresh on their own.
+ *
+ * Another planner's movement changes these figures, and the socket carries alert events
+ * only - so a movement that raises nothing would otherwise sit unseen until the page was
+ * touched. `LIVE` is applied to every query below rather than repeated per hook.
+ */
+const LIVE = { refetchInterval: 30_000, refetchOnWindowFocus: true } as const;
+
+/**
  * Every dashboard panel follows the DC selected in the top bar.
  *
  * The scope is read from the store rather than taken as a prop: these hooks are
@@ -31,6 +40,7 @@ export function useDashboardSummary() {
     queryKey: queryKeys.dashboard.summary(dc),
     queryFn: () => getSummary(scopeOf(dc)),
     staleTime: STALE_TIME.dashboard,
+    ...LIVE,
   });
 }
 
@@ -40,6 +50,7 @@ export function useDashboardNetwork() {
     queryKey: queryKeys.dashboard.network(dc),
     queryFn: () => getNetwork(scopeOf(dc)),
     staleTime: STALE_TIME.dashboard,
+    ...LIVE,
   });
 }
 
@@ -49,6 +60,7 @@ export function useDashboardPriorityActions() {
     queryKey: queryKeys.dashboard.priorityActions(dc),
     queryFn: () => getPriorityActions(scopeOf(dc)),
     staleTime: STALE_TIME.dashboard,
+    ...LIVE,
   });
 }
 
@@ -58,5 +70,6 @@ export function useDashboardExpiryRisk() {
     queryKey: queryKeys.dashboard.expiryRisk(dc),
     queryFn: () => getExpiryRisk(scopeOf(dc)),
     staleTime: STALE_TIME.dashboard,
+    ...LIVE,
   });
 }

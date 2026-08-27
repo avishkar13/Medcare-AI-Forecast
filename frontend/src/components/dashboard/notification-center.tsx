@@ -27,6 +27,15 @@ import type { SystemAlert } from "@/types/alert";
  * looks broken.
  */
 
+/**
+ * A definite height, not `max-h`.
+ *
+ * The ScrollArea primitive's viewport is `size-full`, so with only a max-height it resolves
+ * `h-full` against a container with no definite height and grows with the list - pushing
+ * "View all alerts" out of the bottom of the dropdown, which is exactly what it did.
+ */
+const SCROLL_HEIGHT = "h-[320px]";
+
 const SEVERITY_DOT: Record<string, string> = {
   critical: "bg-destructive",
   high: "bg-orange-500",
@@ -127,7 +136,7 @@ export function NotificationCenter() {
             Nothing needs attention.
           </p>
         ) : (
-          <ScrollArea className="max-h-[320px]">
+          <ScrollArea className={SCROLL_HEIGHT}>
             {alerts.map((alert) => (
               <Link
                 key={alert.id}

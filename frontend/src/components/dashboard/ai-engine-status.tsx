@@ -8,9 +8,11 @@ import { QueryError } from "@/components/ui/query-state";
 export function AIEngineStatus() {
   const { data, isPending, isError } = useReadiness();
 
+  // Before the null guard: on failure `data` is undefined, so a guard that
+  // returns null on falsy data swallows the error and the panel just vanishes.
+  if (isError) return <QueryError label="engine status" />;
   if (isPending || !data) return null;
 
-  if (isError) return <QueryError label="engine status" />;
 
   // the readiness probe reports the three dependencies the planner needs, which is
   // the only engine state anything actually knows

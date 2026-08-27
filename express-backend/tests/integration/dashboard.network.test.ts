@@ -37,6 +37,17 @@ interface WarehouseStats {
 const network = async (query = ""): Promise<WarehouseStats[]> =>
   expectEnvelope<WarehouseStats[]>(await server.json("/api/dashboard/network" + query)).data;
 
+interface InventoryRow {
+  sku: string;
+  warehouseCode: string;
+  onHand: number;
+  reserved: number;
+  inTransit: number;
+  available: number;
+  inventoryPosition: number;
+  reorderPoint: number;
+}
+
 describe("GET /api/dashboard/network", () => {
   test("returns one row per warehouse, ordered by code", async () => {
     const response = await server.get("/api/dashboard/network");
@@ -85,11 +96,65 @@ describe("GET /api/dashboard/network", () => {
     }
   });
 
+  /**
+   * Holds because safety stock is a floor under the reorder point and available stock is
+   * a floor under the inventory position - so anything short on the stricter measure is
+   * short on the looser one.
+   *
+   * It is not an identity, though: a position with an empty shelf and a large inbound
+   * shipment is below safety stock (it cannot serve demand today) while its inventory
+   * position clears the reorder point (nothing needs ordering). If this ever fails, check
+   * for that shape before assuming a regression - it would be the data changing, not the
+   * rule breaking.
+   */
   test("the stricter safety-stock count never exceeds the reorder-point count", async () => {
     for (const row of await network()) {
       assert.ok(
         row.belowSafetyStockCount <= row.belowReorderPointCount,
         row.code + ": below safety stock must be a subset of below reorder point",
+      );
+    }
+  });
+
+  test("inbound stock never invents a replenishment need", async () => {
+    // The reorder trigger is judged on the inventory position, which only ever adds
+    // in-transit units to what is on hand. Counting them can remove a trigger - it can
+    // never create one - so the count must not exceed the naive on-hand comparison.
+    const { data: items } = await server.json<{ data: { items: InventoryRow[] } }>(
+      "/api/inventory?pageSize=200",
+    );
+
+    const naiveByWarehouse = new Map<string, number>();
+    for (const item of items.items) {
+      if (item.onHand < item.reorderPoint) {
+        naiveByWarehouse.set(item.warehouseCode, (naiveByWarehouse.get(item.warehouseCode) ?? 0) + 1);
+      }
+    }
+
+    for (const row of await network()) {
+      assert.ok(
+        row.belowReorderPointCount <= (naiveByWarehouse.get(row.code) ?? 0),
+        `${row.code}: counting inbound stock added a reorder trigger instead of removing one`,
+      );
+    }
+  });
+
+  test("available and inventory position are ordered, and reported", async () => {
+    const { data } = await server.json<{ data: { items: InventoryRow[] } }>(
+      "/api/inventory?pageSize=200",
+    );
+
+    for (const item of data.items) {
+      assert.equal(typeof item.available, "number", `${item.sku}: available missing`);
+      assert.equal(
+        typeof item.inventoryPosition,
+        "number",
+        `${item.sku}: inventoryPosition missing - the verdict cannot be checked without it`,
+      );
+      assert.ok(item.available <= item.onHand, `${item.sku}: available exceeded on hand`);
+      assert.ok(
+        item.inventoryPosition >= item.available,
+        `${item.sku}: inbound stock reduced the position`,
       );
     }
   });
