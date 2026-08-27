@@ -27,12 +27,25 @@ jobs:
           push: true
           tags: aniketjha4518/medcare-backend:latest
 
+      # The forecasting engine was never deployed, so production has been answering
+      # every forecast from the naive seasonal fallback rather than the trained model.
+      # The image carries the fitted artifact - see python_backend/Dockerfile.
+      - name: Build and push forecast engine image
+        uses: docker/build-push-action@v6
+        with:
+          context: python_backend
+          file: python_backend/Dockerfile
+          push: true
+          tags: aniketjha4518/medcare-engine:latest
+
   deploy:
     needs: build
     runs-on: self-hosted
     steps:
       - name: Stop old containers
         run: |
+          docker stop medcare-engine || true
+          docker rm medcare-engine || true
           docker stop medcare-backend || true
           docker rm medcare-backend || true
 
@@ -41,15 +54,26 @@ jobs:
           docker system prune -af --volumes
           sudo apt clean 2>/dev/null || true
 
-      - name: Pull image from docker hub
-        run: docker pull aniketjha4518/medcare-backend:latest
+      - name: Pull images from docker hub
+        run: |
+          docker pull aniketjha4518/medcare-backend:latest
+          docker pull aniketjha4518/medcare-engine:latest
+
+      # The two containers address each other by name, so they need a user-defined
+      # network - the default bridge has no DNS. Created after the prune above, which
+      # would otherwise remove it as unused while both containers are stopped.
+      - name: Ensure the container network exists
+        run: docker network create medcare || true
 
       - name: Run docker container
         run: |
           docker run -d \
             -p 4000:4000 \
             --name medcare-backend \
+            --network medcare \
             --restart unless-stopped \
+            -e FORECAST_SERVICE_URL="http://medcare-engine:8000" \
+            -e TRAINING_API_KEY="${{ secrets.TRAINING_API_KEY }}" \
             -e NODE_ENV="production" \
             -e PORT="4000" \
             -e HOST="0.0.0.0" \
@@ -74,6 +98,22 @@ jobs:
             -e ALERT_SMS_RECIPIENTS="${{ secrets.ALERT_SMS_RECIPIENTS }}" \
             -e TEAMS_WEBHOOK_URL="${{ secrets.TEAMS_WEBHOOK_URL }}" \
             aniketjha4518/medcare-backend:latest
+
+      # After the backend, because the engine reads /api/training-data on every
+      # forecast and reports 503 until that answers.
+      - name: Run forecast engine container
+        run: |
+          docker run -d \
+            --name medcare-engine \
+            --network medcare \
+            --restart unless-stopped \
+            -e API_BASE_URL="http://medcare-backend:4000/api" \
+            -e TRAINING_API_KEY="${{ secrets.TRAINING_API_KEY }}" \
+            -e ENGINE_PORT="8000" \
+            aniketjha4518/medcare-engine:latest
+
+      # Not published to the host: the engine has no auth of its own and nothing
+      # outside the network has any business calling it. Only the backend does.
 
       - name: Remove old images
         run: docker image prune -af

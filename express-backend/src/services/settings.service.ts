@@ -48,7 +48,16 @@ const DEFAULT_SETTINGS = {
       overstock: true,
     },
     thresholds: {
-      stockoutProbability: 70,
+      /**
+       * Share of the lead time a position is *not* covered for.
+       *
+       * 70 meant "less than a third of your lead time is covered", which is past the
+       * point of acting: a replenishment takes the whole lead time to arrive, so an
+       * alert that late is a report, not a warning. At 40 there is still room to
+       * expedite or transfer. Measured against the seeded network, every alert this
+       * raises is at a Tier-2 DC - which is the failure mode the brief describes.
+       */
+      stockoutProbability: 40,
       demandDeviation: 20,
       expiryWindow: 30,
       capacityUtilization: 90,

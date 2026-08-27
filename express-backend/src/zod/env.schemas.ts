@@ -78,8 +78,20 @@ export const envSchema = z
     // Which severities are worth interrupting someone for. In-app always gets all.
     NOTIFY_MIN_SEVERITY: z.enum(["critical", "high", "medium", "low"]).default("high"),
     NOTIFY_TIMEOUT_MS: durationMs.default(10_000),
+
+    // Machine-to-machine key for /api/training-data, which the forecasting engine
+    // reads and which carries the whole demand history. Required in production.
+    TRAINING_API_KEY: optionalText,
   })
   .superRefine((value, ctx) => {
+    if (value.NODE_ENV === "production" && !value.TRAINING_API_KEY) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["TRAINING_API_KEY"],
+        message: "required in production: /api/training-data is otherwise unauthenticated",
+      });
+    }
+
     if (value.NODE_ENV === "production" && !value.REDIS_URL) {
       ctx.addIssue({
         code: "custom",

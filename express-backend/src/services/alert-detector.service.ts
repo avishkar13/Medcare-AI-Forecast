@@ -1,7 +1,7 @@
 import { prisma } from "../config/prisma.js";
 import { loadPositions, type InventoryPosition } from "./dashboard.service.js";
 import { getSettings } from "./settings.service.js";
-import { projectFefoWaste, round } from "../utils/inventory.js";
+import { availableStock, inventoryPosition, projectFefoWaste, round } from "../utils/inventory.js";
 import { aggregateOverdueSupply, type OverdueSupply } from "../utils/supply.js";
 import { OPEN_STATUSES, broadcastCounts } from "./alert.service.js";
 import { routeAlert, routeAlerts } from "./notification.service.js";
@@ -103,10 +103,13 @@ const detectStockoutRisk = (
     const probability = stockoutProbabilityPercent(position);
     if (probability < thresholdPercent) continue;
 
-    const shortfall = Math.max(0, position.reorderPoint - position.onHand);
+    // Judged on the same two quantities the dashboard uses, so an alert and the KPI it
+    // rolls into can never disagree: replenishment against the inventory position
+    // (on-hand plus what is already inbound), cover against what is actually available.
+    const shortfall = Math.max(0, position.reorderPoint - inventoryPosition(position));
     if (shortfall < MIN_ACTIONABLE_UNITS) continue;
 
-    const bufferBreached = position.onHand < position.safetyStock;
+    const bufferBreached = availableStock(position) < position.safetyStock;
     const severity: Severity = bufferBreached
       ? escalates(position)
         ? "critical"
@@ -132,6 +135,10 @@ const detectStockoutRisk = (
       explanation: `${position.daysOfSupply} days of supply remain against a ${position.leadTimeDays}-day lead time, so a standard order placed today arrives after stock runs out.`,
       metrics: [
         { label: "On hand", value: units(position.onHand) },
+        // Both shown, because the verdict is made on them rather than on on-hand, and a
+        // reader comparing on-hand to the reorder point would otherwise dispute the alert.
+        { label: "Available", value: units(availableStock(position)) },
+        { label: "Inventory position", value: units(inventoryPosition(position)) },
         { label: "Safety stock", value: units(position.safetyStock) },
         { label: "Reorder point", value: units(position.reorderPoint) },
         { label: "Days of supply", value: `${position.daysOfSupply}` },

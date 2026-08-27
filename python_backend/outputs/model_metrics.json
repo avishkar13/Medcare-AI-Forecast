@@ -1,61 +1,61 @@
 {
-  "training_rows": 19360,
-  "test_rows": 4960,
+  "training_rows": 11840,
+  "test_rows": 2881,
   "unique_skus": 40,
   "unique_warehouses": 4,
   "baseline_7_day_moving_average": {
-    "MAE": 12.85397465437788,
-    "RMSE": 17.639045092750017,
-    "MAPE_percent": 31.18288982041404,
-    "sMAPE_percent": 26.7736525505626,
-    "wMAPE_percent": 25.431890242095594,
-    "bias_percent": 0.79163731932867
+    "MAE": 15.688104328854068,
+    "RMSE": 22.05980406228448,
+    "MAPE_percent": 34.11844190749937,
+    "sMAPE_percent": 27.94279262403661,
+    "wMAPE_percent": 26.331002191323428,
+    "bias_percent": 2.7402778228581757
   },
   "xgboost": {
-    "MAE": 4.877793652588322,
-    "RMSE": 6.899656358916596,
-    "MAPE_percent": 9.707390741780703,
-    "sMAPE_percent": 9.686542155227281,
-    "wMAPE_percent": 9.650829111753895,
-    "bias_percent": -1.2838533853515637
+    "MAE": 7.194245224568381,
+    "RMSE": 11.469575231449152,
+    "MAPE_percent": 14.271943209798762,
+    "sMAPE_percent": 12.468168590165998,
+    "wMAPE_percent": 12.074861487542458,
+    "bias_percent": 7.160036231255962
   },
   "quantile_forecasting": {
-    "P10_pinball": 0.9481280149855923,
-    "P50_pinball": 2.438896826294161,
-    "P90_pinball": 1.1685829740185891,
-    "P10_P90_coverage_percent": 79.83870967741935
+    "P10_pinball": 2.405196473450348,
+    "P50_pinball": 3.5971226122841906,
+    "P90_pinball": 1.603715070772816,
+    "P10_P90_coverage_percent": 67.54599097535578
   },
   "rolling_time_series_cv": [
     {
-      "MAE": 5.212446863055229,
-      "RMSE": 7.4134317277377395,
-      "MAPE_percent": 10.628669697753226,
-      "sMAPE_percent": 10.37547642240962,
-      "wMAPE_percent": 10.147857223898042,
-      "bias_percent": 0.06595051858367816,
+      "MAE": 4.705190121796396,
+      "RMSE": 7.879811383412889,
+      "MAPE_percent": 9.87657168275865,
+      "sMAPE_percent": 9.398287446914962,
+      "wMAPE_percent": 9.093863279986591,
+      "bias_percent": -0.48040519243111895,
       "fold": 1
     },
     {
-      "MAE": 5.050627370476723,
-      "RMSE": 7.1917830810774035,
-      "MAPE_percent": 9.769311895550214,
-      "sMAPE_percent": 9.760021390139533,
-      "wMAPE_percent": 9.745385738405988,
-      "bias_percent": -1.1096780110106308,
+      "MAE": 5.899605445067087,
+      "RMSE": 9.228956598202465,
+      "MAPE_percent": 12.908937727724961,
+      "sMAPE_percent": 12.903464368129272,
+      "wMAPE_percent": 11.404259218450747,
+      "bias_percent": -0.34297608288731773,
       "fold": 2
     },
     {
-      "MAE": 4.969258067806562,
-      "RMSE": 6.973093467390644,
-      "MAPE_percent": 9.884616435817595,
-      "sMAPE_percent": 9.827095380459129,
-      "wMAPE_percent": 9.674090982102326,
-      "bias_percent": -0.5772091308094943,
+      "MAE": 6.89177360849248,
+      "RMSE": 13.223530116868055,
+      "MAPE_percent": 10.061675516646037,
+      "sMAPE_percent": 10.446247440640503,
+      "wMAPE_percent": 11.344937207397612,
+      "bias_percent": -5.8360748102737,
       "fold": 3
     }
   ],
   "selected_model_by_mae": "XGBoost",
-  "calibration_ok": true,
+  "calibration_ok": false,
   "production_model": "XGBoost + Quantile XGBoost",
   "model_version": "medcare-xgb-qrf-v1",
   "data_source": "express:/api/training-data"
