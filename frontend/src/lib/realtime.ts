@@ -11,9 +11,9 @@ import { env } from "@/config/env";
  * queries refetch through the same typed API layer. Nothing here writes to the cache
  * directly, so there is one shape of alert in the app rather than two.
  *
- * Connection is best-effort by design. `NEXT_PUBLIC_WS_URL` unset, a backend that is
- * down, or a proxy that will not upgrade all land in the same place: `connected`
- * stays false and the caller polls instead.
+ * Connection is best-effort by design. `NEXT_PUBLIC_WS_URL` unset, no token yet, a
+ * backend that is down, or a proxy that will not upgrade all land in the same place:
+ * `connected` stays false and the caller polls instead.
  */
 
 export type AlertEventName =
@@ -41,13 +41,33 @@ export interface RealtimeAlert {
 }
 
 let socket: Socket | null = null;
+/** What the live socket was built with, so a token change can be detected. */
+let connectedToken: string | null = null;
 
-export const getSocket = (): Socket | null => {
-  if (!env.wsUrl) return null;
-  if (socket) return socket;
+/**
+ * Opens the socket for this token, reusing the existing one when nothing changed.
+ *
+ * The token goes in the handshake rather than a header because a WebSocket upgrade
+ * carries no custom headers - `auth` is the payload the server reads in `io.use()`.
+ *
+ * A different token means a different user, so the old socket is torn down rather
+ * than reused: its rooms were joined under the previous identity and could be wider
+ * than the new one is allowed to see.
+ */
+export const connectSocket = (token: string | null): Socket | null => {
+  if (!env.wsUrl || !token) {
+    disconnectSocket();
+    return null;
+  }
+
+  if (socket && connectedToken === token) return socket;
+
+  disconnectSocket();
+  connectedToken = token;
 
   socket = io(env.wsUrl, {
     path: "/socket.io",
+    auth: { token },
     // websocket first, polling as the fallback the server also advertises.
     transports: ["websocket", "polling"],
     // Bounded: a backend that is genuinely absent should stop being retried rather
@@ -59,15 +79,37 @@ export const getSocket = (): Socket | null => {
     autoConnect: true,
   });
 
+  /**
+   * A rejected handshake is not a transient fault - the same token will be refused
+   * every time. Retrying it just burns connections until the attempt cap, so stop.
+   * The app falls back to polling, and a fresh login builds a new socket.
+   */
+  socket.on("connect_error", (error) => {
+    const message = error.message ?? "";
+    const isAuthFailure =
+      message.includes("authentication") ||
+      message.includes("token") ||
+      message.includes("user");
+
+    if (isAuthFailure) {
+      console.warn("realtime handshake rejected:", message);
+      socket?.disconnect();
+    }
+  });
+
   return socket;
 };
 
+export const getSocket = (): Socket | null => socket;
+
 /** Narrows what the server pushes to this client to a single DC, or the whole network. */
 export const setSocketScope = (warehouseId: string | null): void => {
-  getSocket()?.emit("scope:set", warehouseId ?? "");
+  socket?.emit("scope:set", warehouseId ?? "");
 };
 
 export const disconnectSocket = (): void => {
+  socket?.removeAllListeners();
   socket?.disconnect();
   socket = null;
+  connectedToken = null;
 };

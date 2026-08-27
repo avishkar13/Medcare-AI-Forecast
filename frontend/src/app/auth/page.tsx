@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/store/auth.store";
 import { authApi } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/errors";
+import { validateLogin, type LoginFieldErrors } from "@/schemas/auth";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -17,14 +18,25 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // Same schema the API validates against, so a malformed email is caught here
+    // rather than coming back as a 400 with nothing pointing at the field.
+    const parsed = validateLogin({ email, password });
+    if (!parsed.ok) {
+      setFieldErrors(parsed.errors);
+      return;
+    }
+
+    setFieldErrors({});
     setIsPending(true);
 
     try {
-      const result = await authApi.login({ email, password });
+      const result = await authApi.login(parsed.data);
       useAuthStore.getState().login(result.user, result.token);
       router.push("/dashboard");
     } catch (err) {
@@ -36,6 +48,17 @@ export default function AuthPage() {
     } finally {
       setIsPending(false);
     }
+  };
+
+  /** Clears a field's error as soon as it is edited, rather than on the next submit. */
+  const onEmailChange = (value: string) => {
+    setEmail(value);
+    if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+  };
+
+  const onPasswordChange = (value: string) => {
+    setPassword(value);
+    if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: undefined }));
   };
 
   const isFormValid = email.trim() !== "" && password.trim() !== "";
@@ -83,19 +106,36 @@ export default function AuthPage() {
               )}
               
               <div className="space-y-2">
+                {/*
+                  Email only. The label used to offer "Employee ID / Email" and the
+                  placeholder suggested `ID-8924`, but the API validates this field as
+                  an email address, so an employee ID could only ever be rejected.
+                */}
                 <Label htmlFor="email" className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                  Employee ID / Email
+                  Email
                 </Label>
                 <Input
                   id="email"
-                  type="text"
-                  placeholder="e.g. ID-8924 or email@medcare.com"
+                  type="email"
+                  inputMode="email"
+                  placeholder="you@medcare.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => onEmailChange(e.target.value)}
                   disabled={isPending}
-                  className="h-11 bg-white border-slate-200 shadow-sm focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all text-sm rounded-lg"
+                  aria-invalid={fieldErrors.email !== undefined}
+                  aria-describedby={fieldErrors.email ? "email-error" : undefined}
+                  className={`h-11 bg-white shadow-sm focus-visible:ring-1 transition-all text-sm rounded-lg ${
+                    fieldErrors.email
+                      ? "border-red-300 focus-visible:ring-red-400 focus-visible:border-red-400"
+                      : "border-slate-200 focus-visible:ring-primary focus-visible:border-primary"
+                  }`}
                   autoComplete="username"
                 />
+                {fieldErrors.email && (
+                  <p id="email-error" className="text-xs font-medium text-red-600">
+                    {fieldErrors.email}
+                  </p>
+                )}
               </div>
               
               <div className="space-y-2">
@@ -117,9 +157,15 @@ export default function AuthPage() {
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••••••"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => onPasswordChange(e.target.value)}
                     disabled={isPending}
-                    className="h-11 bg-white border-slate-200 shadow-sm focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all pr-10 text-sm rounded-lg"
+                    aria-invalid={fieldErrors.password !== undefined}
+                    aria-describedby={fieldErrors.password ? "password-error" : undefined}
+                    className={`h-11 bg-white shadow-sm focus-visible:ring-1 transition-all pr-10 text-sm rounded-lg ${
+                      fieldErrors.password
+                        ? "border-red-300 focus-visible:ring-red-400 focus-visible:border-red-400"
+                        : "border-slate-200 focus-visible:ring-primary focus-visible:border-primary"
+                    }`}
                     autoComplete="current-password"
                   />
                   <button
@@ -139,6 +185,11 @@ export default function AuthPage() {
                     </span>
                   </button>
                 </div>
+                {fieldErrors.password && (
+                  <p id="password-error" className="text-xs font-medium text-red-600">
+                    {fieldErrors.password}
+                  </p>
+                )}
               </div>
 
               <div className="pt-4">

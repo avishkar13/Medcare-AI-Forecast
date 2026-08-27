@@ -4,7 +4,13 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryKeys } from "@/config/query-keys";
-import { getSocket, type AlertCounts, type RealtimeAlert } from "@/lib/realtime";
+import { useAuthStore } from "@/store/auth.store";
+import {
+  connectSocket,
+  disconnectSocket,
+  type AlertCounts,
+  type RealtimeAlert,
+} from "@/lib/realtime";
 
 /**
  * Turns pushed alert events into cache invalidations and toasts.
@@ -33,12 +39,20 @@ const INTERRUPTS = new Set(["critical", "high"]);
 
 export function RealtimeProvider({ children }: { children: ReactNode }) {
   const client = useQueryClient();
+  // Subscribed rather than read once: the socket has to be rebuilt on login and torn
+  // down on logout, and its rooms were joined under whichever identity it opened with.
+  const token = useAuthStore((state) => state.token);
   const [isLive, setIsLive] = useState(false);
   const [counts, setCounts] = useState<AlertCounts | null>(null);
 
   useEffect(() => {
-    const socket = getSocket();
-    if (!socket) return;
+    const socket = connectSocket(token);
+
+    if (!socket) {
+      setIsLive(false);
+      setCounts(null);
+      return;
+    }
 
     const invalidate = () => void client.invalidateQueries({ queryKey: queryKeys.alerts.all });
 
@@ -81,8 +95,12 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       socket.off("alert:updated", invalidate);
       socket.off("alert:resolved", invalidate);
       socket.off("alert:counts", setCounts);
+      // On logout the token becomes null and this effect re-runs with nothing to
+      // connect to; close the socket rather than leaving it open under the old
+      // identity, still in the rooms that identity was allowed to join.
+      if (!useAuthStore.getState().token) disconnectSocket();
     };
-  }, [client]);
+  }, [client, token]);
 
   const value = useMemo(() => ({ isLive, counts }), [isLive, counts]);
 

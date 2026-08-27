@@ -1,4 +1,5 @@
 import { prisma } from "../config/prisma.js";
+import { emitAlert } from "../lib/realtime.js";
 import type { Prisma } from "../../generated/prisma/client.js";
 import { ConflictError, NotFoundError } from "../utils/errors.js";
 import { percentage, round } from "../utils/inventory.js";
@@ -287,6 +288,31 @@ export const getHealth = async (scope?: { warehouseId?: string | null }) => {
   };
 };
 
+/**
+ * Open counts for the bell.
+ *
+ * Read back from the table rather than derived from whatever just changed, so a
+ * client that missed an event still lands on the right number. Lives here beside
+ * `OPEN_STATUSES` because both the detector and the manual transitions need it, and
+ * putting it in the detector made the two import each other in a cycle.
+ */
+export const broadcastCounts = async (): Promise<void> => {
+  const bySeverity = await prisma.alert.groupBy({
+    by: ["severity"],
+    where: { status: { in: [...OPEN_STATUSES] } },
+    _count: true,
+  });
+
+  const countOf = (severity: string) =>
+    bySeverity.find((row) => row.severity === severity)?._count ?? 0;
+
+  emitAlert("alert:counts", {
+    unresolved: bySeverity.reduce((total, row) => total + row._count, 0),
+    critical: countOf("critical"),
+    high: countOf("high"),
+  });
+};
+
 /** `resolved` is terminal; acknowledging a resolved alert would reopen it by accident. */
 const TRANSITIONS: Record<string, { from: string[]; to: string }> = {
   acknowledge: { from: ["new", "in_progress"], to: "acknowledged" },
@@ -316,7 +342,21 @@ const transition = async ({ id }: AlertParams, action: "acknowledge" | "resolve"
     select: alertSelect,
   });
 
-  return toAlert(row);
+  const alert = toAlert(row);
+
+  /**
+   * Detection pushed its own changes from the start, but a change a *person* made did
+   * not: two planners with the review surface open would both see an alert as open
+   * until whichever one had not touched it happened to refetch, and could each start
+   * working the same condition.
+   *
+   * Pushed after the write commits, and scoped to the alert's DC so a client confined
+   * to another one is not woken by it.
+   */
+  emitAlert(rule.to === "resolved" ? "alert:resolved" : "alert:updated", alert, row.warehouseId);
+  await broadcastCounts();
+
+  return alert;
 };
 
 export const acknowledgeAlert = (params: AlertParams) => transition(params, "acknowledge");
@@ -327,5 +367,11 @@ export const markAllRead = async () => {
     where: { status: "new" },
     data: { status: "acknowledged" },
   });
+
+  // One broadcast rather than one event per row: this is a bulk status change with no
+  // per-alert detail worth pushing, and the badge is the only thing that moves. A
+  // client that has a list open refetches off the counts change.
+  if (result.count > 0) await broadcastCounts();
+
   return { updatedCount: result.count };
 };

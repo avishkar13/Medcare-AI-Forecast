@@ -188,6 +188,20 @@ const main = async () => {
     },
   });
 
+  // A real administrator that can actually be signed in as. The three accounts around
+  // it share a placeholder hash of "!", which is fine for an actor id on a row but
+  // cannot be typed into the login form.
+  await prisma.user.create({
+    data: {
+      name: "Aniket Jha",
+      email: "jhaaniket2005@gmail.com",
+      passwordHash: await bcrypt.hash("Anik@1234", 10),
+      roleId: adminRole.id,
+      // null means network-wide rather than confined to one DC.
+      warehouseId: null,
+    },
+  });
+
   await prisma.warehouse.createMany({ data: WAREHOUSES.map((warehouse) => ({ ...warehouse })) });
 
   await prisma.user.create({

@@ -2,7 +2,7 @@ import { prisma } from "../config/prisma.js";
 import { loadPositions, type InventoryPosition } from "./dashboard.service.js";
 import { getSettings } from "./settings.service.js";
 import { projectFefoWaste, round } from "../utils/inventory.js";
-import { OPEN_STATUSES } from "./alert.service.js";
+import { OPEN_STATUSES, broadcastCounts } from "./alert.service.js";
 import { routeAlert, routeAlerts } from "./notification.service.js";
 import { emitAlert } from "../lib/realtime.js";
 
@@ -422,23 +422,6 @@ const chunk = <T>(rows: T[], size: number): T[][] => {
   return chunks;
 };
 
-/** Open counts for the bell, read back from the table so a missed event self-corrects. */
-export const broadcastCounts = async (): Promise<void> => {
-  const bySeverity = await prisma.alert.groupBy({
-    by: ["severity"],
-    where: { status: { in: [...OPEN_STATUSES] } },
-    _count: true,
-  });
-
-  const countOf = (severity: string) =>
-    bySeverity.find((row) => row.severity === severity)?._count ?? 0;
-
-  emitAlert("alert:counts", {
-    unresolved: bySeverity.reduce((total, row) => total + row._count, 0),
-    critical: countOf("critical"),
-    high: countOf("high"),
-  });
-};
 
 export interface DetectionOutcome {
   detected: number;

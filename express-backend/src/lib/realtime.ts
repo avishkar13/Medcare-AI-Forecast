@@ -1,6 +1,9 @@
 import type { Server as HttpServer } from "node:http";
+import jwt from "jsonwebtoken";
 import { Server, type Socket } from "socket.io";
 import { CORS } from "../config/constants.js";
+import { env } from "../config/env.js";
+import { prisma } from "../config/prisma.js";
 
 /**
  * The push side of the alert surface.
@@ -23,7 +26,50 @@ const dcRoom = (warehouseId: string) => `dc:${warehouseId}`;
 
 export type AlertEvent = "alert:created" | "alert:updated" | "alert:resolved" | "alert:counts";
 
+interface SocketUser {
+  id: string;
+  /** null means network-wide access; a value confines this socket to one DC. */
+  warehouseId: string | null;
+}
+
 let io: Server | null = null;
+
+/**
+ * The handshake gate.
+ *
+ * Alert payloads carry SKU, location and business impact, so an unauthenticated
+ * socket is a read path around the API's auth - the REST routes sit behind
+ * `authenticate` and this must not be the way round them.
+ *
+ * The user is re-read from the database rather than trusted from the token: a
+ * deactivated account or a DC reassignment has to take effect on the next connection,
+ * not whenever a week-old JWT happens to expire. This mirrors `middleware/scopeDc.ts`,
+ * which re-reads `warehouseId` for the same reason.
+ */
+const authenticateSocket = async (socket: Socket): Promise<SocketUser> => {
+  const raw: unknown = socket.handshake.auth?.token;
+  const token = typeof raw === "string" && raw.length > 0 ? raw : null;
+  if (!token) throw new Error("authentication required");
+
+  let payload: string | jwt.JwtPayload;
+  try {
+    payload = jwt.verify(token, env.JWT_SECRET);
+  } catch {
+    throw new Error("invalid or expired token");
+  }
+
+  if (typeof payload === "string" || !payload.sub) throw new Error("invalid token payload");
+
+  const user = await prisma.user.findUnique({
+    where: { id: payload.sub },
+    select: { id: true, warehouseId: true, isActive: true },
+  });
+
+  if (!user) throw new Error("user no longer exists");
+  if (!user.isActive) throw new Error("user account is deactivated");
+
+  return { id: user.id, warehouseId: user.warehouseId };
+};
 
 export const attachRealtime = (server: HttpServer): Server => {
   io = new Server(server, {
@@ -35,16 +81,47 @@ export const attachRealtime = (server: HttpServer): Server => {
     serveClient: false,
   });
 
-  io.on("connection", (socket: Socket) => {
-    socket.join(ALL_ROOM);
+  io.use((socket, next) => {
+    authenticateSocket(socket)
+      .then((user) => {
+        socket.data.user = user;
+        next();
+      })
+      // The message reaches the client as `connect_error`, which is what tells it to
+      // stop retrying rather than hammer the handshake with a token that will not work.
+      .catch((error: Error) => next(error));
+  });
 
-    // A client watching one DC should not be woken by every other DC's alerts.
+  io.on("connection", (socket: Socket) => {
+    const user = socket.data.user as SocketUser;
+
+    if (user.warehouseId === null) {
+      // Network-wide: everything, until the client narrows itself for filtering.
+      socket.join(ALL_ROOM);
+    } else {
+      // Confined to one DC. Deliberately *not* in `all` - that room carries every
+      // other DC's alerts, and joining it would hand this user the whole network.
+      socket.join(dcRoom(user.warehouseId));
+    }
+
+    /**
+     * Narrows a network-wide client to one DC so it is not woken by the rest.
+     *
+     * Only meaningful for a user who can see everything; a DC-confined socket ignores
+     * it, because honouring it would either be a no-op or an escalation.
+     */
     socket.on("scope:set", (warehouseId: unknown) => {
+      if (user.warehouseId !== null) return;
+
       for (const room of socket.rooms) {
         if (room.startsWith("dc:")) void socket.leave(room);
       }
+
       if (typeof warehouseId === "string" && warehouseId.length > 0) {
+        void socket.leave(ALL_ROOM);
         void socket.join(dcRoom(warehouseId));
+      } else {
+        void socket.join(ALL_ROOM);
       }
     });
   });
@@ -64,9 +141,12 @@ export const realtimeConnections = (): number => io?.engine.clientsCount ?? 0;
 /**
  * Emitted to the network room and, when the payload is scoped, to that DC's room.
  *
- * A client in a DC room is also in `all`, so socket.io de-duplicates the delivery -
- * emitting to both is what makes an unscoped client see everything without a second
- * subscription.
+ * A network-wide client sits in `all`, a DC-confined one in its own room, and a
+ * narrowed client in exactly one - so nobody receives a payload twice and nobody
+ * receives one for a DC they cannot read.
+ *
+ * An unscoped payload reaches only `all`. That is correct for the counts broadcast,
+ * which is a network total a DC-confined user should not be shown.
  */
 export const emitAlert = (event: AlertEvent, payload: unknown, warehouseId?: string | null): void => {
   if (!io) return;

@@ -61,6 +61,17 @@ jobs:
             -e JWT_EXPIRES_IN="7d" \
             -e CORS_ORIGINS="${{ secrets.CORS_ORIGINS }}" \
             -e CORS_CREDENTIALS="true" \
+            -e ALERT_DETECTION_INTERVAL_MS="300000" \
+            -e NOTIFY_MIN_SEVERITY="high" \
+            -e RESEND_API_KEY="${{ secrets.RESEND_API_KEY }}" \
+            -e EMAIL_FROM="${{ secrets.EMAIL_FROM }}" \
+            -e ALERT_EMAIL_RECIPIENTS="${{ secrets.ALERT_EMAIL_RECIPIENTS }}" \
+            -e AWS_REGION="${{ secrets.AWS_REGION }}" \
+            -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            -e AWS_SNS_TOPIC_ARN="${{ secrets.AWS_SNS_TOPIC_ARN }}" \
+            -e AWS_SNS_SENDER_ID="${{ secrets.AWS_SNS_SENDER_ID }}" \
+            -e ALERT_SMS_RECIPIENTS="${{ secrets.ALERT_SMS_RECIPIENTS }}" \
             aniketjha4518/medcare-backend:latest
 
       - name: Remove old images

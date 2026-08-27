@@ -46,6 +46,26 @@ services:
       REDIS_URL: redis://:${REDIS_PASSWORD:-cognizant_redis}@redis:6379
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
       CORS_CREDENTIALS: "true"
+      # Required by the env schema, so the stack will not boot without it. The default
+      # is a local-only placeholder - override it anywhere that is not your laptop.
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-me-32ch}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      # Alert detection runs on this cadence as well as at the end of a planning run
+      # and on POST /api/alerts/refresh. 0 disables the scheduler.
+      ALERT_DETECTION_INTERVAL_MS: ${ALERT_DETECTION_INTERVAL_MS:-300000}
+      NOTIFY_MIN_SEVERITY: ${NOTIFY_MIN_SEVERITY:-high}
+      NOTIFY_TIMEOUT_MS: ${NOTIFY_TIMEOUT_MS:-10000}
+      # Unset by default. An unconfigured channel records SKIPPED with a reason rather
+      # than failing detection, so the stack runs fine with no mail or AWS account.
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      ALERT_EMAIL_RECIPIENTS: ${ALERT_EMAIL_RECIPIENTS:-}
+      AWS_REGION: ${AWS_REGION:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SNS_TOPIC_ARN: ${AWS_SNS_TOPIC_ARN:-}
+      AWS_SNS_SENDER_ID: ${AWS_SNS_SENDER_ID:-}
+      ALERT_SMS_RECIPIENTS: ${ALERT_SMS_RECIPIENTS:-}
       PLANNING_EXECUTOR: ${PLANNING_EXECUTOR:-inline}
       PLANNING_SIMULATION_ITERATIONS: ${PLANNING_SIMULATION_ITERATIONS:-500}
       PLANNING_RETENTION_RUNS: ${PLANNING_RETENTION_RUNS:-20}
