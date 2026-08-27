@@ -76,6 +76,18 @@ export const queryKeys = {
     saved: (params?: QueryParams) => ["simulation", "saved", params ?? {}] as const,
   },
 
+  // Phase 3 - the execution loop.
+  movements: {
+    all: ["movements"] as const,
+    list: (params?: QueryParams) => list("movements", params),
+    sync: (dc: string) => ["movements", "sync", dc] as const,
+  },
+
+  restock: {
+    all: ["restock"] as const,
+    list: (params?: QueryParams) => list("restock", params),
+  },
+
   planning: {
     all: ["planning"] as const,
     runs: (params?: QueryParams) => list("planning", params),
@@ -83,6 +95,8 @@ export const queryKeys = {
     compare: (id: string, baseline: string) => ["planning", "compare", id, baseline] as const,
     optimization: (id: string) => ["planning", "optimization", id] as const,
     simulation: (id: string) => ["planning", "simulation", id] as const,
+    inventoryPlans: (id: string, params?: QueryParams) =>
+      ["planning", "inventory-plans", id, params ?? {}] as const,
   },
 
   scenarios: {

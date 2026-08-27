@@ -21,6 +21,7 @@ export * from "./forecast";
 export * from "./inventory";
 export * from "./masterdata";
 export * from "./models";
+export * from "./movements";
 export * from "./parameters";
 export * from "./planning";
 export * from "./plans";

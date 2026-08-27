@@ -2,32 +2,33 @@
 
 import { DollarSign, Package, ShieldCheck, AlertTriangle, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useInventory } from "@/hooks/use-inventory";
 import { useFormatters } from "@/hooks/use-formatters";
 import { QueryError } from "@/components/ui/query-state";
+import type { InventoryTotals } from "@/schemas/inventory";
 
-export function InventoryKpiCards() {
+/**
+ * Fed from the page's own inventory response rather than fetching again.
+ *
+ * These cards used to call `useInventory()` with no arguments, which meant they read
+ * the whole network while the table below them was narrowed to a DC or a filter -
+ * two answers to the same question, on the same screen, one request apart.
+ */
+interface InventoryKpiCardsProps {
+  totals: InventoryTotals | undefined;
+  isPending: boolean;
+  isError: boolean;
+}
+
+export function InventoryKpiCards({ totals, isPending, isError }: InventoryKpiCardsProps) {
   const { formatCompactCurrency, formatNumber } = useFormatters();
-  const { data, isPending, isError } = useInventory();
-  const totals = data?.totals;
-
-  const kpis = {
-    totalInventoryValue: totals?.inventoryValue ?? 0,
-    totalSkus: totals?.skuCount ?? 0,
-    inStockRate: totals?.inStockRatePercent ?? 0,
-    atRiskSkus: totals?.belowReorderPointCount ?? 0,
-    atRiskCritical: totals?.belowSafetyStockCount ?? 0,
-    expiringValue: totals?.expiringValue ?? 0,
-  };
-
-  if (isPending || !totals) return null;
 
   if (isError) return <QueryError label="the inventory KPIs" />;
+  if (isPending || !totals) return null;
 
   const cards = [
     {
       title: "Total Inventory Value",
-      value: formatCompactCurrency(kpis.totalInventoryValue),
+      value: formatCompactCurrency(totals.inventoryValue),
       sub: `${formatNumber(totals.onHandUnits)} units on hand`,
       icon: DollarSign,
       iconColor: "text-muted-foreground",
@@ -35,31 +36,35 @@ export function InventoryKpiCards() {
     },
     {
       title: "Total SKUs",
-      value: formatNumber(kpis.totalSkus),
-      sub: `Across ${totals.warehouseCount} distribution centers`,
+      value: formatNumber(totals.skuCount),
+      sub: `${formatNumber(totals.positionCount)} positions across ${totals.warehouseCount} DCs`,
       icon: Package,
       iconColor: "text-muted-foreground",
       valueColor: "text-foreground",
     },
     {
       title: "In-Stock Rate",
-      value: `${kpis.inStockRate}%`,
+      value: `${totals.inStockRatePercent}%`,
       sub: `${formatNumber(totals.positionCount - totals.belowReorderPointCount)} of ${formatNumber(totals.positionCount)} positions`,
       icon: ShieldCheck,
       iconColor: "text-success",
       valueColor: "text-success",
     },
     {
-      title: "At-Risk SKUs",
-      value: String(kpis.atRiskSkus),
-      sub: <span className="text-destructive font-medium">{kpis.atRiskCritical} critical</span>,
+      title: "At-Risk Positions",
+      value: formatNumber(totals.belowReorderPointCount),
+      sub: (
+        <span className="text-destructive font-medium">
+          {formatNumber(totals.belowSafetyStockCount)} below safety stock
+        </span>
+      ),
       icon: AlertTriangle,
       iconColor: "text-destructive",
       valueColor: "text-destructive",
     },
     {
       title: "Expiring Value",
-      value: formatCompactCurrency(kpis.expiringValue),
+      value: formatCompactCurrency(totals.expiringValue),
       sub: `${formatNumber(totals.aboveMaximumCount)} positions above maximum`,
       icon: TrendingDown,
       iconColor: "text-warning",

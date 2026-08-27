@@ -132,13 +132,25 @@ export type InventoryRisk = "critical" | "high" | "medium" | "low";
 export type InventoryDetailStatus = "healthy" | "belowReorderPoint" | "excessStock" | "criticalStock" | "expiringSoon";
 
 export interface InventoryTableItem {
+  /**
+   * A position is one product at one warehouse, so the row identity has to be both.
+   * This used to be the bare SKU, which gave every SKU held in more than one DC the
+   * same React key and the same target for every row action.
+   */
   id: string;
+  sku: string;
   name: string;
   // Nullable: `Product.category` is optional in the schema and the backend does not
   // substitute a placeholder. Parsed as nullable in `schemas/inventory.ts`.
   category: string | null;
   location: string;
   onHand: number;
+  /** Committed to orders but not yet picked. Held on site, not sellable. */
+  reserved: number;
+  /** Inbound, on a purchase order or a transfer. Not on site at all. */
+  inTransit: number;
+  /** `onHand - reserved`: what a planner can actually promise today. */
+  available: number;
   safetyStock: number;
   reorderPoint: number;
   daysOfSupply: number;
@@ -179,18 +191,36 @@ export interface StockBatch {
   expiryRisk: "critical" | "high" | "medium" | "low";
 }
 
-export type MovementType = "Purchase" | "Transfer" | "Replenishment" | "Consumption" | "Adjustment";
+/**
+ * The backend vocabulary, not a display one.
+ *
+ * This used to be "Purchase" | "Transfer" | "Replenishment" | "Consumption" |
+ * "Adjustment" - names no route ever produced, written when there was no ledger to
+ * disagree with. `schemas/movements.ts` is the source of truth; this alias exists so
+ * the drawer keeps a name for it.
+ */
+export type MovementType =
+  | "SALE"
+  | "RECEIPT"
+  | "TRANSFER_IN"
+  | "TRANSFER_OUT"
+  | "RETURN"
+  | "WASTAGE"
+  | "ADJUSTMENT";
 
 export interface StockMovement {
   id: string;
   date: string;
-  movementType: MovementType;
+  movementType: string;
   sku: string;
+  /** Signed: negative leaves the DC, positive arrives. */
   quantity: number;
-  fromLocation: string;
-  toLocation: string;
-  reference: string;
-  userOrSystem: string;
+  stockBefore: number;
+  stockAfter: number;
+  fromLocation: string | null;
+  toLocation: string | null;
+  reference: string | null;
+  userOrSystem: string | null;
 }
 
 export interface SkuDetailData extends InventoryTableItem {

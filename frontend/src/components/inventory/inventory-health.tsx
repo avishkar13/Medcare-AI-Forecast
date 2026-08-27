@@ -25,14 +25,18 @@ const COLORS = [
   "#7C3AED",
 ];
 
-export function InventoryHealth() {
-  const { data, isPending, isError } = useInventoryHealth();
+/**
+ * `warehouseId` follows the DC in the top bar. Without it this panel answered for the
+ * whole network while everything around it was scoped to one site.
+ */
+export function InventoryHealth({ warehouseId }: { warehouseId?: string }) {
+  const { data, isPending, isError } = useInventoryHealth(warehouseId);
   const { formatCompactCurrency } = useFormatters();
   const health = data?.breakdown;
 
-  if (isPending || !health || !data) return null;
-
   if (isError) return <QueryError label="inventory health" />;
+
+  if (isPending || !health || !data) return null;
 
   const categoryData = data.byCategory.map((row) => ({
     name: row.category,

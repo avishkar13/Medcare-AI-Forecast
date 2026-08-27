@@ -59,7 +59,16 @@ const navGroups: NavGroup[] = [
   {
     title: "PLANNING",
     items: [
-      { title: "Inventory", href: "/inventory", icon: Package, requiredPermission: "inventory:view" },
+      {
+        title: "Inventory",
+        href: "/inventory",
+        icon: Package,
+        requiredPermission: "inventory:view",
+        // The first user of Phase 2's sub-navigation: the ledger belongs under
+        // inventory, not beside it. Gated by the parent's permission - a reader who
+        // cannot see inventory has no business in its ledger either.
+        children: [{ title: "Transactions", href: "/inventory/transactions" }],
+      },
       { title: "Demand Forecast", href: "/forecast", icon: TrendingUp, requiredPermission: "forecast:view" },
       { title: "Recommendations", href: "/recommendations", icon: Sparkles, requiredPermission: "recommendations:view" },
       { title: "Simulation", href: "/simulation", icon: FlaskConical, requiredPermission: "simulation:view" },

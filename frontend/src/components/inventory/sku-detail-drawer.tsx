@@ -22,8 +22,9 @@ import {
 } from "lucide-react";
 import { useInventoryDetail } from "@/hooks/use-inventory";
 import { useRecommendationAction, useRecommendations } from "@/hooks/use-recommendations";
+import { useMovements } from "@/hooks/use-movements";
 import { useFormatters } from "@/hooks/use-formatters";
-import type { StockBatch, StockMovement, MovementType, InventoryRisk } from "@/types/inventory";
+import type { StockBatch, StockMovement, InventoryRisk } from "@/types/inventory";
 import Link from "next/link";
 import { QueryError } from "@/components/ui/query-state";
 
@@ -37,6 +38,8 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
   const { formatCurrency, formatNumber } = useFormatters();
   const { data, isPending, isError } = useInventoryDetail(skuId);
   const { data: recs } = useRecommendations({ pageSize: 200 });
+  // Scoped to this SKU rather than filtered client-side: the ledger grows without bound.
+  const { data: movements } = useMovements({ sku: skuId ?? undefined, pageSize: 25 });
   const { execute, dismiss } = useRecommendationAction();
 
   if (!skuId) return null;
@@ -50,11 +53,17 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
 
   const item = product
     ? {
-        id: product.sku,
+        sku: product.sku,
         name: product.name,
         category: product.category,
+        criticality: product.criticality,
         location: positions.length === 1 ? positions[0]!.warehouseName : `${positions.length} DCs`,
         onHand: network?.onHand ?? 0,
+        // The roll-up carries `available`; reserved and in-transit are only per
+        // position, so they are summed here rather than left off the network view.
+        available: network?.available ?? 0,
+        reserved: positions.reduce((total, row) => total + row.reserved, 0),
+        inTransit: positions.reduce((total, row) => total + row.inTransit, 0),
         safetyStock: network?.safetyStock ?? 0,
         reorderPoint: network?.reorderPoint ?? 0,
         maximumStock: network?.maximumInventory ?? 0,
@@ -75,9 +84,8 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
           valueAtRisk: b.valueAtRisk,
           expiryRisk: b.severity,
         })),
-        // no movement ledger exists; it is out of scope for this deliverable.
-        movements: [] as never[],
-        manufacturer: null as string | null,
+        // The ledger exists as of Phase 3, so this reads it rather than standing empty.
+        movements: movements?.data ?? [],
         // the top open recommendation for this sku, if the planner produced one
         aiRecommendation: (() => {
           const match = (recs?.data ?? []).find((r) => r.sku === product.sku);
@@ -94,9 +102,7 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
             : null;
         })(),
         expiryRiskLevel: (data?.batches[0]?.severity ?? "low") as InventoryRisk,
-        expiryRiskReason: null as string | null,
         stockoutRiskLevel: (network?.risk ?? "low") as InventoryRisk,
-        stockoutRiskReason: null as string | null,
       }
     : null;
 
@@ -113,16 +119,19 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
     return styles[risk] || styles.low;
   };
 
-  const getMovementBadge = (type: MovementType) => {
+  const getMovementBadge = (type: string) => {
     switch (type) {
-      case "Replenishment":
-      case "Purchase":
+      case "RECEIPT":
+      case "RETURN":
+      case "TRANSFER_IN":
         return "bg-success/15 text-success border-success/30";
-      case "Transfer":
+      case "TRANSFER_OUT":
         return "bg-primary/15 text-primary border-primary/30";
-      case "Consumption":
+      case "SALE":
         return "bg-muted text-foreground border-border";
-      case "Adjustment":
+      case "WASTAGE":
+        return "bg-destructive/15 text-destructive border-destructive/30";
+      case "ADJUSTMENT":
         return "bg-warning/15 text-warning border-warning/30";
       default:
         return "bg-muted text-muted-foreground";
@@ -146,13 +155,13 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
             <div className="flex flex-col gap-1.5 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono text-sm font-bold text-primary px-2.5 py-0.5 rounded-md bg-primary/10 border border-primary/20 shrink-0">
-                  {item.id}
+                  {item.sku}
                 </span>
                 <Badge className={`capitalize shrink-0 ${getRiskBadge(item.risk)}`}>
                   {item.risk} Risk
                 </Badge>
                 <span className="text-xs font-medium text-muted-foreground bg-muted/60 px-2 py-0.5 rounded shrink-0">
-                  {item.category}
+                  {item.category ?? "Uncategorised"}
                 </span>
               </div>
               <SheetTitle className="text-xl font-bold tracking-tight text-foreground mt-1 truncate">
@@ -161,37 +170,64 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
               <SheetDescription className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1">
                 <span className="inline-flex items-center gap-1">
                   <Building2 className="h-3.5 w-3.5 text-muted-foreground/70" />
-                  <span className="font-medium text-foreground">{item.manufacturer}</span>
+                  <span className="font-medium text-foreground">{item.location}</span>
                 </span>
                 <span>&bull;</span>
-                <span className="font-medium text-foreground">{item.location}</span>
+                <span>
+                  <span className="font-medium text-foreground">{item.criticality}</span> criticality
+                </span>
               </SheetDescription>
             </div>
           </div>
 
-          {/* Quick Metrics Grid */}
+          {/*
+            The stock split first, because "on hand" alone is the number people act on
+            wrongly: reserved units are on site but already committed, and in-transit
+            units are counted nowhere on the shelf yet.
+          */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-3 border-t border-border/50">
             <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-card/60 border border-border/40">
-              <span className="text-[11px] font-medium text-muted-foreground">On Hand Stock</span>
+              <span className="text-[11px] font-medium text-muted-foreground">On Hand</span>
               <span className={`text-base sm:text-lg font-bold tabular-nums ${item.onHand < item.safetyStock ? "text-destructive" : "text-foreground"}`}>
                 {formatNumber(item.onHand)} <span className="text-xs font-normal text-muted-foreground">units</span>
               </span>
             </div>
             <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-card/60 border border-border/40">
+              <span className="text-[11px] font-medium text-muted-foreground">Reserved</span>
+              <span className="text-base sm:text-lg font-bold tabular-nums text-warning">
+                {formatNumber(item.reserved)} <span className="text-xs font-normal text-muted-foreground">units</span>
+              </span>
+            </div>
+            <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-card/60 border border-border/40">
+              <span className="text-[11px] font-medium text-muted-foreground">In Transit</span>
+              <span className="text-base sm:text-lg font-bold tabular-nums text-primary">
+                {formatNumber(item.inTransit)} <span className="text-xs font-normal text-muted-foreground">units</span>
+              </span>
+            </div>
+            <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-card/60 border border-border/40">
+              <span className="text-[11px] font-medium text-muted-foreground">Available</span>
+              <span className={`text-base sm:text-lg font-bold tabular-nums ${item.available <= 0 ? "text-destructive" : item.available < item.safetyStock ? "text-warning" : "text-success"}`}>
+                {formatNumber(item.available)} <span className="text-xs font-normal text-muted-foreground">units</span>
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 mt-3">
+            <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-card/60 border border-border/40">
               <span className="text-[11px] font-medium text-muted-foreground">Days of Supply</span>
-              <span className={`text-base sm:text-lg font-bold tabular-nums ${item.daysOfSupply <= 7 ? "text-destructive" : item.daysOfSupply <= 14 ? "text-warning" : "text-foreground"}`}>
+              <span className={`text-sm font-bold tabular-nums ${item.daysOfSupply <= 7 ? "text-destructive" : item.daysOfSupply <= 14 ? "text-warning" : "text-foreground"}`}>
                 {item.daysOfSupply} <span className="text-xs font-normal text-muted-foreground">days</span>
               </span>
             </div>
             <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-card/60 border border-border/40">
               <span className="text-[11px] font-medium text-muted-foreground">Unit Price</span>
-              <span className="text-base sm:text-lg font-bold tabular-nums text-foreground">
+              <span className="text-sm font-bold tabular-nums text-foreground">
                 {formatCurrency(item.unitValue)}
               </span>
             </div>
             <div className="flex flex-col gap-0.5 p-2 rounded-lg bg-card/60 border border-border/40">
               <span className="text-[11px] font-medium text-muted-foreground">Capital Value</span>
-              <span className="text-base sm:text-lg font-bold tabular-nums text-foreground">
+              <span className="text-sm font-bold tabular-nums text-foreground">
                 {formatCurrency(item.inventoryValue)}
               </span>
             </div>
@@ -277,6 +313,68 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
                 </div>
               </div>
 
+              {/*
+                Where the stock actually is.
+
+                `positions` was already being fetched and thrown away on a label that
+                read "4 DCs" - the reader could see that the SKU was spread across the
+                network but not which sites were short and which were sitting on it.
+              */}
+              {positions.length > 1 && (
+                <div className="flex flex-col gap-3">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Position by Distribution Center
+                  </span>
+                  <div className="rounded-xl border border-border overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="bg-muted/40 border-b border-border text-muted-foreground">
+                          <th className="text-left font-semibold uppercase tracking-wider px-3 py-2">Location</th>
+                          <th className="text-right font-semibold uppercase tracking-wider px-3 py-2">On Hand</th>
+                          <th className="text-right font-semibold uppercase tracking-wider px-3 py-2">Reserved</th>
+                          <th className="text-right font-semibold uppercase tracking-wider px-3 py-2">In Transit</th>
+                          <th className="text-right font-semibold uppercase tracking-wider px-3 py-2">Available</th>
+                          <th className="text-right font-semibold uppercase tracking-wider px-3 py-2">Days</th>
+                          <th className="text-center font-semibold uppercase tracking-wider px-3 py-2">Risk</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/60">
+                        {positions.map((row) => (
+                          <tr key={`${row.productId}:${row.warehouseId}`} className="hover:bg-muted/20">
+                            <td className="px-3 py-2">
+                              <div className="flex flex-col">
+                                <span className="font-medium text-foreground">{row.warehouseName}</span>
+                                <span className="font-mono text-[10px] text-muted-foreground">{row.warehouseCode}</span>
+                              </div>
+                            </td>
+                            <td className={`px-3 py-2 text-right tabular-nums font-semibold ${row.onHand < row.safetyStock ? "text-destructive" : "text-foreground"}`}>
+                              {formatNumber(row.onHand)}
+                            </td>
+                            <td className="px-3 py-2 text-right tabular-nums text-warning">
+                              {row.reserved > 0 ? formatNumber(row.reserved) : <span className="text-muted-foreground/50">&mdash;</span>}
+                            </td>
+                            <td className="px-3 py-2 text-right tabular-nums text-primary">
+                              {row.inTransit > 0 ? `+${formatNumber(row.inTransit)}` : <span className="text-muted-foreground/50">&mdash;</span>}
+                            </td>
+                            <td className={`px-3 py-2 text-right tabular-nums font-semibold ${row.available <= 0 ? "text-destructive" : "text-foreground"}`}>
+                              {formatNumber(row.available)}
+                            </td>
+                            <td className={`px-3 py-2 text-right tabular-nums ${row.daysOfSupply <= 7 ? "text-destructive font-semibold" : "text-muted-foreground"}`}>
+                              {row.daysOfSupply}d
+                            </td>
+                            <td className="px-3 py-2 text-center">
+                              <Badge className={`capitalize text-[10px] font-semibold ${getRiskBadge(row.risk as InventoryRisk)}`}>
+                                {row.risk}
+                              </Badge>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
               {/* Operational Parameters */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="p-3.5 rounded-lg border border-border/60 bg-muted/10 flex flex-col gap-1">
@@ -325,7 +423,9 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
                       Stockout Risk: <span className="capitalize">{item.stockoutRiskLevel}</span>
                     </span>
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                      {item.stockoutRiskReason}
+                      {formatNumber(item.available)} available against a {formatNumber(item.safetyStock)}-unit
+                      safety buffer and a {formatNumber(item.reorderPoint)}-unit reorder point, at{" "}
+                      {formatNumber(item.avgDailyDemand)} units/day over a {item.leadTimeDays}-day lead time.
                     </p>
                   </div>
                 </div>
@@ -346,7 +446,9 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
                       Expiry Risk: <span className="capitalize">{item.expiryRiskLevel}</span>
                     </span>
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                      {item.expiryRiskReason}
+                      {item.batches.length === 0
+                        ? "No batches fall inside the 90-day expiry horizon."
+                        : `Earliest of ${item.batches.length} batch${item.batches.length === 1 ? "" : "es"} expires in ${item.batches[0]!.daysRemaining} days, ${formatCurrency(item.batches[0]!.valueAtRisk)} at risk.`}
                     </p>
                   </div>
                 </div>
@@ -447,10 +549,10 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
                           </span>
                         </td>
                         <td className="p-3 text-foreground font-medium truncate max-w-[180px]">
-                          {m.fromLocation} &rarr; {m.toLocation}
+                          {m.fromLocation ?? "—"} &rarr; {m.toLocation ?? "—"}
                         </td>
-                        <td className="p-3 font-mono text-muted-foreground">{m.reference}</td>
-                        <td className="p-3 text-muted-foreground pr-4">{m.userOrSystem}</td>
+                        <td className="p-3 font-mono text-muted-foreground">{m.reference ?? "—"}</td>
+                        <td className="p-3 text-muted-foreground pr-4">{m.userOrSystem ?? "system"}</td>
                       </tr>
                     ))}
                   </tbody>

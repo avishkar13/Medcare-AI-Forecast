@@ -11,6 +11,8 @@ import { AIRecommendations } from "@/components/dashboard/ai-recommendations";
 import { OptimizationSummary } from "@/components/dashboard/optimization-summary";
 import { WhatIfSimulation } from "@/components/dashboard/what-if-simulation";
 import { ExecutiveDecisionPanel } from "@/components/dashboard/executive-decision-panel";
+import { LiveActivity } from "@/components/dashboard/live-activity";
+import { PositionProjection } from "@/components/dashboard/position-projection";
 
 export default function DashboardPage() {
   return (
@@ -27,6 +29,16 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-6 lg:col-span-1">
             <NetworkHealth />
             <AIEngineStatus />
+          </div>
+        </div>
+
+        {/* The execution loop - what just moved, and what the plan says happens next. */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <PositionProjection />
+          </div>
+          <div className="lg:col-span-1">
+            <LiveActivity />
           </div>
         </div>
 

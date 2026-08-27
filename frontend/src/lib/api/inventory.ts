@@ -1,5 +1,5 @@
 import { api } from "./client";
-import type { QueryParams } from "./types";
+import type { QueryParams, ResponseMeta } from "./types";
 import {
   inventoryDetailSchema,
   inventoryHealthSchema,
@@ -38,8 +38,23 @@ export interface InventoryListParams extends QueryParams {
   pageSize?: number;
 }
 
-export const listInventory = async (params?: InventoryListParams): Promise<InventoryList> =>
-  inventoryListSchema.parse(await api.get<unknown>("/inventory", params));
+/**
+ * `totals` covers the whole filtered set; `items` is one page of it.
+ *
+ * `meta` carries the server's row count, which is the only honest source for "showing
+ * 1-10 of N" - counting `items` reports the page size back to the reader as if it
+ * were the network.
+ */
+export interface InventoryListPage extends InventoryList {
+  meta: ResponseMeta;
+}
+
+export const listInventory = async (
+  params?: InventoryListParams,
+): Promise<InventoryListPage> => {
+  const page = await api.getPage<unknown>("/inventory", params);
+  return { ...inventoryListSchema.parse(page.data), meta: page.meta };
+};
 
 export const getInventoryHealth = async (params?: {
   warehouseId?: string;

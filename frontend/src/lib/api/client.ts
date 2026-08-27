@@ -31,6 +31,11 @@ interface RequestOptions {
   params?: QueryParams;
   body?: unknown;
   signal?: AbortSignal;
+  /**
+   * Extra request headers. Currently only `Idempotency-Key`, which is what makes a
+   * retried write safe rather than a duplicate.
+   */
+  headers?: Record<string, string>;
 }
 
 async function request<T>(
@@ -52,6 +57,7 @@ async function request<T>(
         [REQUEST_ID_HEADER]: requestId,
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(hasBody ? { "content-type": "application/json" } : {}),
+        ...(options.headers ?? {}),
       },
       ...(hasBody ? { body: JSON.stringify(options.body) } : {}),
       ...(options.signal ? { signal: options.signal } : {}),
@@ -115,8 +121,10 @@ export const api = {
   getPage: <T>(path: string, params?: QueryParams, signal?: AbortSignal) =>
     request<T>("GET", path, { ...(params ? { params } : {}), ...(signal ? { signal } : {}) }),
 
-  post: <T>(path: string, body?: unknown) =>
-    request<T>("POST", path, { body }).then((result) => result.data),
+  post: <T>(path: string, body?: unknown, headers?: Record<string, string>) =>
+    request<T>("POST", path, { body, ...(headers ? { headers } : {}) }).then(
+      (result) => result.data,
+    ),
 
   patch: <T>(path: string, body?: unknown) =>
     request<T>("PATCH", path, { body }).then((result) => result.data),
