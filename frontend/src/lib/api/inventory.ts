@@ -1,133 +1,52 @@
 import { api } from "./client";
+import type { QueryParams } from "./types";
+import {
+  inventoryDetailSchema,
+  inventoryHealthSchema,
+  inventoryListSchema,
+  type InventoryDetail,
+  type InventoryHealth,
+  type InventoryList,
+} from "@/schemas/inventory";
 
-export interface InventoryPosition {
-  productId: string;
-  sku: string;
-  productName: string;
-  category: string;
-  criticality: string;
-  warehouseId: string;
-  warehouseCode: string;
-  warehouseName: string;
-  tier: string;
-  onHand: number;
-  reserved: number;
-  inTransit: number;
-  available: number;
-  safetyStock: number;
-  reorderPoint: number;
-  maximumInventory: number | null;
-  avgDailyDemand: number;
-  leadTimeDays: number;
-  daysOfSupply: number;
-  unitCost: number;
-  inventoryValue: number;
-  expiringUnits: number;
-  expiringValue: number;
-  bufferCoveragePercent: number;
-  daysToNearestExpiry: number | null;
-  status: string;
-  risk: "critical" | "high" | "medium" | "low";
+export type {
+  InventoryBatch,
+  InventoryDetail,
+  InventoryHealth,
+  InventoryList,
+  InventoryPosition,
+  InventoryTotals,
+} from "@/schemas/inventory";
+
+/**
+ * Every filter is applied by the server.
+ *
+ * The page used to ask for 200 rows and narrow them in the browser, which made the
+ * page control decorative and quietly capped the network at whatever came back first.
+ * `warehouse` accepts an id, a code or a display name (`inventory.service.ts`
+ * matches on all three), so the DC selector and the location filter share one field.
+ */
+export interface InventoryListParams extends QueryParams {
+  search?: string;
+  category?: string;
+  warehouse?: string;
+  criticality?: string;
+  status?: string;
+  risk?: string;
+  sort?: "sku" | "risk" | "daysOfSupply" | "inventoryValue";
+  page?: number;
+  pageSize?: number;
 }
 
-export interface InventoryTotals {
-  positionCount: number;
-  skuCount: number;
-  warehouseCount: number;
-  onHandUnits: number;
-  inventoryValue: number;
-  belowSafetyStockCount: number;
-  belowReorderPointCount: number;
-  aboveMaximumCount: number;
-  expiringValue: number;
-  inStockRatePercent: number;
-}
+export const listInventory = async (params?: InventoryListParams): Promise<InventoryList> =>
+  inventoryListSchema.parse(await api.get<unknown>("/inventory", params));
 
-export interface InventoryList {
-  items: InventoryPosition[];
-  totals: InventoryTotals;
-}
+export const getInventoryHealth = async (params?: {
+  warehouseId?: string;
+}): Promise<InventoryHealth> =>
+  inventoryHealthSchema.parse(await api.get<unknown>("/dashboard/inventory-health", params));
 
-export const listInventory = (params?: { pageSize?: number; page?: number }) =>
-  api.get<InventoryList>("/inventory", params);
-
-export interface InventoryHealth {
-  breakdown: {
-    criticalStock: number;
-    belowReorderPoint: number;
-    expiringSoon: number;
-    excessStock: number;
-    healthy: number;
-    total: number;
-  };
-  breakdownPercent: {
-    criticalStock: number;
-    belowReorderPoint: number;
-    expiringSoon: number;
-    excessStock: number;
-    healthy: number;
-  };
-  totalInventoryValue: number;
-  conditions: Record<string, number>;
-  byCategory: {
-    category: string;
-    skuCount: number;
-    inventoryValue: number;
-    atRiskCount: number;
-    expiringValue: number;
-  }[];
-}
-
-export const getInventoryHealth = () =>
-  api.get<InventoryHealth>("/dashboard/inventory-health");
-
-export interface InventoryBatch {
-  batchId: string;
-  batchNumber: string;
-  warehouseCode: string;
-  warehouseName: string;
-  quantity: number;
-  unitCost: number;
-  valueAtRisk: number;
-  manufacturingDate: string | null;
-  expiryDate: string;
-  daysToExpiry: number;
-  severity: "critical" | "high" | "medium" | "low";
-}
-
-export interface SkuNetworkPosition {
-  warehouseCount: number;
-  onHand: number;
-  available: number;
-  safetyStock: number;
-  reorderPoint: number;
-  maximumInventory: number;
-  avgDailyDemand: number;
-  inventoryValue: number;
-  expiringUnits: number;
-  expiringValue: number;
-  leadTimeDays: number;
-  daysOfSupply: number;
-  risk: "critical" | "high" | "medium" | "low";
-  stockScaleUnits: number;
-}
-
-export interface InventoryDetail {
-  product: {
-    id: string;
-    sku: string;
-    name: string;
-    category: string;
-    unit: string;
-    unitCost: number;
-    shelfLifeDays: number;
-    criticality: string;
-  };
-  totals: InventoryTotals;
-  network: SkuNetworkPosition;
-  positions: InventoryPosition[];
-  batches: InventoryBatch[];
-}
-
-export const getInventoryDetail = (sku: string) =>
-  api.get<InventoryDetail>(`/inventory/${encodeURIComponent(sku)}`);
+export const getInventoryDetail = async (sku: string): Promise<InventoryDetail> =>
+  inventoryDetailSchema.parse(
+    await api.get<unknown>(`/inventory/${encodeURIComponent(sku)}`),
+  );

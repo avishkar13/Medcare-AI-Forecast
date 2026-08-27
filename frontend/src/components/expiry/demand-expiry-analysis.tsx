@@ -4,12 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, TrendingDown } from "lucide-react";
 import { useExpiryDemandCoverage } from "@/hooks/use-expiry";
 import { useFormatters } from "@/hooks/use-formatters";
+import { QueryError } from "@/components/ui/query-state";
 
 export function DemandExpiryAnalysis() {
   const { formatCompactCurrency, formatNumber } = useFormatters();
-  const { data, isPending } = useExpiryDemandCoverage();
+  const { data, isPending, isError } = useExpiryDemandCoverage();
 
   if (isPending || !data) return null;
+
+  if (isError) return <QueryError label="demand coverage" />;
 
   return (
     <Card className="border-border/60 shadow-sm bg-background h-full flex flex-col">

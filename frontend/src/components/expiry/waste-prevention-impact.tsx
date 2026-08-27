@@ -4,11 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingDown, Coins } from "lucide-react";
 import { useExpiryOverview, useWastePrevention } from "@/hooks/use-expiry";
 import { useFormatters } from "@/hooks/use-formatters";
+import { QueryError } from "@/components/ui/query-state";
 
 const BAR_SHADES = ["bg-success", "bg-success/80", "bg-success/60", "bg-success/40"];
 
 export function WastePreventionImpact() {
-  const { data: prevention, isPending } = useWastePrevention();
+  const { data: prevention, isPending, isError } = useWastePrevention();
   const { data: overview } = useExpiryOverview();
 
   const breakdown = (prevention?.byAction ?? []).slice(0, 4).map((row, index) => ({
@@ -20,6 +21,8 @@ export function WastePreventionImpact() {
   const { formatCompactCurrency: formatCurrency, formatNumber } = useFormatters();
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="waste prevention" />;
 
   return (
     <Card className="border-border/60 shadow-sm bg-background h-full flex flex-col">

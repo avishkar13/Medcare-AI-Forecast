@@ -7,22 +7,28 @@ import {
   getInventoryDetail,
   getInventoryHealth,
   listInventory,
+  type InventoryListParams,
 } from "@/lib/api/inventory";
 
-// the network is 160 positions, so one page covers it and the existing client-side
-// filtering keeps working. push filters server-side when it outgrows that.
-export function useInventory(pageSize = 200) {
+/**
+ * Filters go to the server.
+ *
+ * This used to fetch a fixed 200 rows and let the page narrow them in the browser,
+ * which capped the network at whatever came back first and made paging decorative.
+ * The params are part of the query key, so two filter states are two caches.
+ */
+export function useInventory(params: InventoryListParams = {}) {
   return useQuery({
-    queryKey: queryKeys.inventory.list({ pageSize }),
-    queryFn: () => listInventory({ pageSize }),
+    queryKey: queryKeys.inventory.list(params),
+    queryFn: () => listInventory(params),
     staleTime: STALE_TIME.list,
   });
 }
 
-export function useInventoryHealth() {
+export function useInventoryHealth(warehouseId?: string) {
   return useQuery({
-    queryKey: queryKeys.dashboard.inventoryHealth(),
-    queryFn: getInventoryHealth,
+    queryKey: queryKeys.dashboard.inventoryHealth(warehouseId),
+    queryFn: () => getInventoryHealth(warehouseId ? { warehouseId } : undefined),
     staleTime: STALE_TIME.dashboard,
   });
 }

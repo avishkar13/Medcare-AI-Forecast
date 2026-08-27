@@ -70,11 +70,22 @@ export const connectSocket = (token: string | null): Socket | null => {
     auth: { token },
     // websocket first, polling as the fallback the server also advertises.
     transports: ["websocket", "polling"],
-    // Bounded: a backend that is genuinely absent should stop being retried rather
-    // than reconnecting forever behind a page nobody is watching.
-    reconnectionAttempts: 5,
+    /**
+     * Retries indefinitely, with backoff.
+     *
+     * This used to give up after five attempts, which meant a backend restart left
+     * the socket dead until someone reloaded the page - the data stayed correct via
+     * the polling fallback, but the "Live" indicator claimed otherwise for the rest
+     * of the session. The delay ceiling is what makes unbounded retries cheap: after
+     * the first few it settles to one attempt every 30s.
+     *
+     * A rejected handshake is handled separately below and does stop retrying, since
+     * the same token will be refused every time.
+     */
+    reconnectionAttempts: Infinity,
     reconnectionDelay: 1_000,
-    reconnectionDelayMax: 10_000,
+    reconnectionDelayMax: 30_000,
+    randomizationFactor: 0.5,
     timeout: 5_000,
     autoConnect: true,
   });

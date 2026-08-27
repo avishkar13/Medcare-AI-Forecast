@@ -79,6 +79,19 @@ const whereOf = async (query: ExpiryQuery, authScope?: { warehouseId?: string | 
   };
 };
 
+/**
+ * The DC a request is answered for, resolved from an id, a code or the caller's own
+ * assignment. `whereOf` narrows batches; this is for the tables that are not batches.
+ */
+const scopedWarehouseId = async (
+  query: Pick<ExpiryQuery, "warehouse">,
+  authScope?: { warehouseId?: string | null },
+): Promise<string | undefined> => {
+  const effectiveWarehouse = authScope?.warehouseId ?? query.warehouse;
+  if (effectiveWarehouse === undefined || effectiveWarehouse === null) return undefined;
+  return resolveWarehouse(effectiveWarehouse);
+};
+
 const batchSelect = {
   id: true,
   batchNumber: true,
@@ -206,12 +219,17 @@ export const listBatches = async (query: ExpiryBatchQuery, authScope?: { warehou
 export const getOverview = async (query: ExpiryQuery, authScope?: { warehouseId?: string | null }) => {
   const where = await whereOf(query, authScope);
 
+  const warehouseId = await scopedWarehouseId(query, authScope);
+
   const [rows, prevented] = await Promise.all([
     prisma.inventoryBatch.findMany({
       where,
       select: { quantity: true, expiryDate: true, product: { select: { unitCost: true } } },
     }),
-    prisma.wastePreventionRecord.aggregate({ _sum: { valueSaved: true, unitsSaved: true } }),
+    prisma.wastePreventionRecord.aggregate({
+      _sum: { valueSaved: true, unitsSaved: true },
+      where: warehouseId === undefined ? {} : { warehouseId },
+    }),
   ]);
 
   const now = Date.now();
@@ -445,8 +463,14 @@ export const getDcExposure = async (query: ExpiryQuery, authScope?: { warehouseI
     .sort((a, b) => b.totalExposureValue - a.totalExposureValue);
 };
 
-export const listWastePrevention = async () => {
+export const listWastePrevention = async (
+  query: Pick<ExpiryQuery, "warehouse"> = {},
+  authScope?: { warehouseId?: string | null },
+) => {
+  const warehouseId = await scopedWarehouseId(query, authScope);
+
   const rows = await prisma.wastePreventionRecord.findMany({
+    where: warehouseId === undefined ? {} : { warehouseId },
     orderBy: { date: "desc" },
     take: 100,
   });

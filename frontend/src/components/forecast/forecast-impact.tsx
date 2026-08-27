@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useForecastImpact } from "@/hooks/use-forecast";
 import { TrendingDown, ShieldCheck, DollarSign, PackageMinus } from "lucide-react";
 import { useForecastScope } from "@/store/filters.store";
+import { QueryError } from "@/components/ui/query-state";
 
 export function ForecastImpact() {
   const scope = useForecastScope();
-  const { data, isPending } = useForecastImpact(scope);
+  const { data, isPending, isError } = useForecastImpact(scope);
 
   // the card was framed as reductions, which needs a baseline. the api reports one
   // run's actual cost and risk, so the tiles show those instead of a made-up delta.
@@ -15,6 +16,8 @@ export function ForecastImpact() {
     value === null ? "—" : `$${(value / 1000).toFixed(1)}K`;
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="the forecast impact" />;
 
   return (
     <Card className="h-full bg-gradient-to-br from-background to-success/5 border-success/30">

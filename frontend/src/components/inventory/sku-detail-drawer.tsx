@@ -25,6 +25,7 @@ import { useRecommendationAction, useRecommendations } from "@/hooks/use-recomme
 import { useFormatters } from "@/hooks/use-formatters";
 import type { StockBatch, StockMovement, MovementType, InventoryRisk } from "@/types/inventory";
 import Link from "next/link";
+import { QueryError } from "@/components/ui/query-state";
 
 interface SkuDetailDrawerProps {
   skuId: string | null;
@@ -34,7 +35,7 @@ interface SkuDetailDrawerProps {
 
 export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps) {
   const { formatCurrency, formatNumber } = useFormatters();
-  const { data, isPending } = useInventoryDetail(skuId);
+  const { data, isPending, isError } = useInventoryDetail(skuId);
   const { data: recs } = useRecommendations({ pageSize: 200 });
   const { execute, dismiss } = useRecommendationAction();
 
@@ -99,6 +100,7 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
       }
     : null;
 
+  if (isError) return <QueryError label="this SKU" />;
   if (isPending || !item) return null;
 
   const getRiskBadge = (risk: InventoryRisk) => {

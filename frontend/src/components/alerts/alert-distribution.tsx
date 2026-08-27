@@ -2,11 +2,12 @@
 
 import { useAlertDistribution } from "@/hooks/use-alerts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { QueryError } from "@/components/ui/query-state";
 
 const TYPE_COLORS = ["bg-destructive", "bg-warning", "bg-primary", "bg-muted-foreground", "bg-muted"];
 
 export function AlertDistribution() {
-  const { data, isPending } = useAlertDistribution();
+  const { data, isPending, isError } = useAlertDistribution();
 
   const types = (data?.byType ?? []).map((row, index) => ({
     name: row.type,
@@ -20,6 +21,8 @@ export function AlertDistribution() {
   const locations = data?.byLocation ?? [];
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="the alert breakdown" />;
 
   return (
     <Card className="border-border/60 shadow-sm mt-5">

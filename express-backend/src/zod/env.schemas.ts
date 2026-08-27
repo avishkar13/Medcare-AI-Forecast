@@ -73,6 +73,7 @@ export const envSchema = z
     // published to individually. One or the other, topic wins.
     AWS_SNS_TOPIC_ARN: optionalText,
     AWS_SNS_SENDER_ID: optionalText,
+    TEAMS_WEBHOOK_URL: optionalUrl,
     ALERT_SMS_RECIPIENTS: z.string().default(""),
     // Which severities are worth interrupting someone for. In-app always gets all.
     NOTIFY_MIN_SEVERITY: z.enum(["critical", "high", "medium", "low"]).default("high"),

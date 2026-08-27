@@ -237,7 +237,7 @@ const isAboveMaximum = (position: InventoryPosition) =>
  * run's recommendations to the KPI, so the dashboard claimed 798 pending actions while
  * the page a planner opens from it showed 200.
  */
-const countOpenRecommendations = async (): Promise<number> => {
+const countOpenRecommendations = async (warehouseId?: string | null): Promise<number> => {
   const latest = await prisma.planningRun.findFirst({
     where: { status: "COMPLETED" },
     orderBy: { completedAt: "desc" },
@@ -245,18 +245,39 @@ const countOpenRecommendations = async (): Promise<number> => {
   });
   if (!latest) return 0;
 
-  return prisma.recommendation.count({ where: { planningRunId: latest.id, status: "OPEN" } });
+  return prisma.recommendation.count({
+    where: {
+      planningRunId: latest.id,
+      status: "OPEN",
+      ...(warehouseId ? { warehouseId } : {}),
+    },
+  });
+};
+
+/**
+ * A warehouse filter is checked before it is used.
+ *
+ * An unknown id would otherwise return an empty network and read as "this DC holds
+ * nothing", which hides the typo. `alert.service.ts` takes the same line, and
+ * `/expiry-risk` already 404s - this closes the two routes that did not.
+ */
+const assertWarehouseExists = async (warehouseId?: string | null): Promise<void> => {
+  if (!warehouseId) return;
+  const exists = await prisma.warehouse.count({ where: { id: warehouseId } });
+  if (exists === 0) throw new NotFoundError(`Warehouse '${warehouseId}' not found`);
 };
 
 export const getSummary = async (scope?: { warehouseId?: string | null }): Promise<{
   kpis: DashboardKPIs;
   networkHealth: NetworkHealthSummary;
 }> => {
+  await assertWarehouseExists(scope?.warehouseId);
+
   const [positions, expiringBatches, pendingRecommendations, forecastAccuracy] = await Promise.all([
     loadPositions(scope),
     loadExpiringBatches(EXPIRY_HORIZON_DAYS, scope),
-    countOpenRecommendations(),
-    currentAccuracyPercent(),
+    countOpenRecommendations(scope?.warehouseId),
+    currentAccuracyPercent(scope?.warehouseId),
   ]);
 
   const totalInventoryValue = sumBy(positions, (row) => row.inventoryValue);
@@ -295,6 +316,8 @@ export const getSummary = async (scope?: { warehouseId?: string | null }): Promi
 };
 
 export const getNetwork = async (query: NetworkQuery, scope?: { warehouseId?: string | null }): Promise<WarehouseStats[]> => {
+  await assertWarehouseExists(scope?.warehouseId);
+
   const [positions, warehouses, expiringBatches] = await Promise.all([
     loadPositions(scope),
     prisma.warehouse.findMany({

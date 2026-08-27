@@ -84,6 +84,8 @@ model Warehouse {
   distributors       Distributor[]
   distributorOrders  DistributorOrder[]
   alerts             Alert[]
+  stockMovements     StockMovement[]
+  wastePrevention    WastePreventionRecord[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -617,20 +619,37 @@ model SystemSettings {
   updatedAt DateTime @updatedAt
 }
 
+/**
+ * The movement ledger. Written by nothing yet - Phase 3.1 is its writer.
+ *
+ * `warehouseId` is the DC the row belongs to, which is what a DC page filters on.
+ * It does not replace `fromLocation` / `toLocation`: a transfer has two endpoints
+ * and one foreign key cannot hold both.
+ */
 model StockMovement {
   id           String   @id @default(cuid())
   date         DateTime
   movementType String
   sku          String
   quantity     Float
+  warehouseId  String?
   fromLocation String?
   toLocation   String?
   reference    String?
   userOrSystem String?
 
+  warehouse Warehouse? @relation(fields: [warehouseId], references: [id])
+
   createdAt DateTime @default(now())
+
+  @@index([warehouseId, date])
 }
 
+/**
+ * Nullable because the existing rows predate the column and carry no warehouse to
+ * recover one from - a network-wide record stays network-wide rather than being
+ * assigned to an arbitrary DC.
+ */
 model WastePreventionRecord {
   id          String   @id @default(cuid())
   productName String
@@ -638,8 +657,13 @@ model WastePreventionRecord {
   unitsSaved  Float
   valueSaved  Float
   date        DateTime
+  warehouseId String?
+
+  warehouse Warehouse? @relation(fields: [warehouseId], references: [id])
 
   createdAt DateTime @default(now())
+
+  @@index([warehouseId])
 }
 
 // --- Replaced JSON fields with strict relations ---

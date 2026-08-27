@@ -7,6 +7,7 @@ import { useForecastAccuracy, useForecastChart, useForecastSummary } from "@/hoo
 import { useProducts, useWarehouses } from "@/hooks/use-masterdata";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { QueryError } from "@/components/ui/query-state";
 
 export function DemandForecastChart() {
   const [sku, setSku] = useState<string | undefined>(undefined);
@@ -16,7 +17,7 @@ export function DemandForecastChart() {
   const { data: products } = useProducts();
   const { data: warehouses } = useWarehouses();
 
-  const { data: chart, isPending } = useForecastChart({ sku, warehouse, days: horizon, historyDays: horizon });
+  const { data: chart, isPending, isError } = useForecastChart({ sku, warehouse, days: horizon, historyDays: horizon });
   const { data: accuracy } = useForecastAccuracy({ sku, warehouse });
   const { data: summary } = useForecastSummary({ sku, warehouse });
 
@@ -59,6 +60,10 @@ export function DemandForecastChart() {
       </Card>
     );
   }
+
+  // Distinct from the empty state below: "no run has produced one" and "we could not
+  // reach the API" are different answers, and both used to render as an empty chart.
+  if (isError) return <QueryError label="the forecast" />;
 
   if (data.length === 0) {
     return (

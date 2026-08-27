@@ -1,54 +1,37 @@
 import { api } from "./client";
+import type { QueryParams } from "./types";
+import { z } from "zod";
+import {
+  distributorSchema,
+  productSchema,
+  promotionSchema,
+  warehouseSchema,
+} from "@/schemas/masterdata";
 
-export interface Product {
-  id: string;
-  sku: string;
-  name: string;
-  category: string;
-  unit: string;
-  unitCost: number;
-  shelfLifeDays: number;
-  criticality: string;
-  isActive: boolean;
-}
+export type { Distributor, Product, Promotion, Warehouse } from "@/schemas/masterdata";
 
-export interface Warehouse {
-  id: string;
-  code: string;
-  name: string;
-  region: string;
-  tier: string;
-  location: string;
-  capacity: number;
-  isActive: boolean;
-}
-
-export interface Distributor {
-  id: string;
-  code: string;
-  name: string;
-  region: string;
-  warehouseId: string | null;
-  isActive: boolean;
-}
-
-export interface Promotion {
-  id: string;
-  name: string;
-  productId: string;
-  region: string | null;
-  startDate: string;
-  endDate: string;
-  upliftPercent: number;
+export interface MasterDataParams extends QueryParams {
+  search?: string;
+  category?: string;
+  warehouse?: string;
+  isActive?: boolean;
+  page?: number;
+  pageSize?: number;
 }
 
 // master data is mounted at the api root rather than under a prefix of its own
-export const listProducts = (params?: { pageSize?: number; page?: number }) =>
-  api.getPage<Product[]>("/products", params);
+export const listProducts = async (params?: MasterDataParams) => {
+  const page = await api.getPage<unknown>("/products", params);
+  return { ...page, data: z.array(productSchema).parse(page.data) };
+};
 
-export const listWarehouses = () => api.get<Warehouse[]>("/warehouses");
+export const listWarehouses = async (params?: MasterDataParams) =>
+  z.array(warehouseSchema).parse(await api.get<unknown>("/warehouses", params));
 
-export const listDistributors = () => api.get<Distributor[]>("/distributors");
+export const listDistributors = async (params?: MasterDataParams) =>
+  z.array(distributorSchema).parse(await api.get<unknown>("/distributors", params));
 
-export const listPromotions = (params?: { pageSize?: number }) =>
-  api.getPage<Promotion[]>("/promotions", params);
+export const listPromotions = async (params?: MasterDataParams) => {
+  const page = await api.getPage<unknown>("/promotions", params);
+  return { ...page, data: z.array(promotionSchema).parse(page.data) };
+};

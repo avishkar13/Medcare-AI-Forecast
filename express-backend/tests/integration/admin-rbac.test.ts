@@ -1,6 +1,6 @@
 import { test, describe, before, after } from "node:test";
 import assert from "node:assert";
-import { app } from "../../src/app.js";
+import { app, teardown } from "../helpers/app.js";
 import { prisma } from "../../src/config/prisma.js";
 import { redis } from "../../src/config/redis.js";
 import { startServer, type TestServer } from "../helpers/server.js";
@@ -106,6 +106,7 @@ after(async () => {
   await prisma.role.deleteMany({ where: { name: { startsWith: "CUSTOM_ROLE" } } });
   await prisma.warehouse.deleteMany({ where: { code: "ADMIN_TEST_W1" } });
   await server.close();
+  await teardown();
 });
 
 describe("Admin Role Management", () => {

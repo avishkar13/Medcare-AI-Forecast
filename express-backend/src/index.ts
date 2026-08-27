@@ -21,7 +21,13 @@ const server = app.listen(SERVER.port, SERVER.host, () => {
   });
 });
 
-attachRealtime(server);
+// Async only because it loads the Redis adapter lazily - see the note in realtime.ts.
+// A failure here costs live updates, not the server, so it is logged rather than
+// rethrown: an unhandled rejection would reach the handler below and shut us down.
+void attachRealtime(server).catch((error) =>
+  console.error("realtime could not start; clients will fall back to polling", error),
+);
+
 startAlertScheduler();
 
 // A crash or a kill leaves runs stuck at PENDING/RUNNING. Sweep them at boot rather

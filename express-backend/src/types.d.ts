@@ -24,6 +24,12 @@ declare global {
       userId?: string;
       rateLimit?: RateLimitInfo;
       warehouseScope: string | null;
+      /**
+       * Every spelling of the confined DC - id, code and display name, lowercased.
+       * `?warehouse=` accepts all three, so a raw compare against the id alone
+       * rejected a confined caller filtering by their own DC's code.
+       */
+      warehouseScopeAliases: string[];
     }
   }
 }

@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from "recharts";
 import { useForecastSeasonality, useForecastTrend } from "@/hooks/use-forecast";
 import { useForecastScope } from "@/store/filters.store";
+import { QueryError } from "@/components/ui/query-state";
 
 export function ForecastSeasonality() {
   const scope = useForecastScope();
-  const { data: raw, isPending } = useForecastSeasonality(scope);
+  const { data: raw, isPending, isError } = useForecastSeasonality(scope);
   const { data: trend } = useForecastTrend(scope);
 
   const data = {
@@ -25,6 +26,8 @@ export function ForecastSeasonality() {
   };
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="seasonality" />;
 
   return (
     <Card className="h-full">

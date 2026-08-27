@@ -5,10 +5,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useForecastKpi, useForecastPerformance } from "@/hooks/use-forecast";
 import { Target, CheckCircle2 } from "lucide-react";
 import { useForecastScope } from "@/store/filters.store";
+import { QueryError } from "@/components/ui/query-state";
 
 export function ForecastPerformance() {
   const scope = useForecastScope();
-  const { data, isPending } = useForecastPerformance(scope);
+  const { data, isPending, isError } = useForecastPerformance(scope);
   const kpi = useForecastKpi(scope);
 
   // one model produced these rows, so one row comes back. bias is not scored yet.
@@ -28,6 +29,8 @@ export function ForecastPerformance() {
   };
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="model performance" />;
 
   return (
     <Card className="h-full">

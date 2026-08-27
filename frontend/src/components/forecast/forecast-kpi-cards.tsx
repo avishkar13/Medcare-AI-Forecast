@@ -5,10 +5,11 @@ import { useForecastKpi, useForecastSummary } from "@/hooks/use-forecast";
 import { useModelMetrics } from "@/hooks/use-models";
 import { LineChart, Target, ShieldCheck, ArrowUpRight, Activity } from "lucide-react";
 import { useForecastScope } from "@/store/filters.store";
+import { QueryError } from "@/components/ui/query-state";
 
 export function ForecastKpiCards() {
   const scope = useForecastScope();
-  const { data, isPending } = useForecastKpi(scope);
+  const { data, isPending, isError } = useForecastKpi(scope);
   const { data: summary } = useForecastSummary(scope);
   const { data: metrics } = useModelMetrics();
 
@@ -31,6 +32,8 @@ export function ForecastKpiCards() {
     value === null ? "—" : `${value >= 0 ? "+" : ""}${value}%`;
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="the forecast KPIs" />;
   
   const cards = [
     {

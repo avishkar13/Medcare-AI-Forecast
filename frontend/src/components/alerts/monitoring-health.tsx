@@ -3,6 +3,7 @@
 import { useAlertHealth } from "@/hooks/use-alerts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity } from "lucide-react";
+import { QueryError } from "@/components/ui/query-state";
 
 const relativeTime = (iso: string) => {
   const minutes = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
@@ -12,9 +13,11 @@ const relativeTime = (iso: string) => {
 };
 
 export function MonitoringHealth() {
-  const { data, isPending } = useAlertHealth();
+  const { data, isPending, isError } = useAlertHealth();
 
   if (isPending || !data) return null;
+
+  if (isError) return <QueryError label="monitoring health" />;
 
   // the api reports the alert pipeline itself, not a list of subsystems, so these
   // are the four facts it can actually vouch for

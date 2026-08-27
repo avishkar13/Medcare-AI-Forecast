@@ -87,6 +87,9 @@ export const NOTIFY = {
     from: env.EMAIL_FROM,
     recipients: list(env.ALERT_EMAIL_RECIPIENTS),
   },
+  teams: {
+    webhookUrl: env.TEAMS_WEBHOOK_URL,
+  },
   sms: {
     region: env.AWS_REGION,
     accessKeyId: env.AWS_ACCESS_KEY_ID,

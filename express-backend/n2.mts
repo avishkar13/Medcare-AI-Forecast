@@ -1,0 +1,14 @@
+import { prisma } from "./src/config/prisma.js";
+const t = (m: string) => console.log(`[${new Date().toISOString().slice(11,19)}] ${m}`);
+t("start");
+const victims = await prisma.alert.findMany({ where: { type: "supplier_delay", status: { notIn: ["resolved"] } }, take: 6, select: { id: true } });
+await prisma.alert.updateMany({ where: { id: { in: victims.map((v) => v.id) } }, data: { status: "resolved" } });
+t(`resolved ${victims.length}`);
+const { refreshAlerts } = await import("./src/services/alert-detector.service.js");
+t("imported detector");
+const out = await refreshAlerts();
+t("cycle done: " + JSON.stringify(out));
+const d = await prisma.notificationDelivery.groupBy({ by: ["channel"], _count: true, where: { createdAt: { gte: new Date(Date.now() - 300000) } } });
+t("deliveries: " + (d.map((r) => `${r.channel}=${r._count}`).join(" ") || "none"));
+await prisma.$disconnect();
+t("done");

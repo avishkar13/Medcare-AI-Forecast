@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, ComposedChart, Line, ReferenceLine } from "recharts";
 import { useForecastChart } from "@/hooks/use-forecast";
 import { useForecastScope } from "@/store/filters.store";
+import { QueryError } from "@/components/ui/query-state";
 
 export function ForecastMainChart() {
   const scope = useForecastScope();
-  const { data: chart, isPending } = useForecastChart({ ...scope, historyDays: 30 });
+  const { data: chart, isPending, isError } = useForecastChart({ ...scope, historyDays: 30 });
 
   // history stops where the prediction starts, so they concatenate
   const data = [
@@ -37,6 +38,8 @@ export function ForecastMainChart() {
   const todayStr = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
   if (isPending) {
+
+  if (isError) return <QueryError label="the forecast" />;
     return (
       <Card>
         <CardContent className="py-10 text-sm text-muted-foreground">Loading forecast…</CardContent>

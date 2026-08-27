@@ -226,7 +226,8 @@ const groupBy = <K>(points: Point[], key: (point: Point) => K) => {
 };
 
 export const getAccuracy = async (query: AccuracyQuery, authScope?: { warehouseId?: string | null }) => {
-  const effectiveWarehouse = query.warehouse ?? authScope?.warehouseId;
+  // Auth scope first: a confined caller cannot widen itself with ?warehouse=.
+  const effectiveWarehouse = authScope?.warehouseId ?? query.warehouse;
   const [productId, warehouseId] = await Promise.all([
     query.sku === undefined ? undefined : resolveProduct(query.sku),
     effectiveWarehouse === undefined || effectiveWarehouse === null ? undefined : resolveWarehouse(effectiveWarehouse),
@@ -324,11 +325,18 @@ export const getAccuracy = async (query: AccuracyQuery, authScope?: { warehouseI
   return { ...base, groups };
 };
 
-/** The dashboard KPI. Null when nothing can be scored, never a stand-in figure. */
-export const currentAccuracyPercent = async (): Promise<number | null> => {
+/**
+ * The dashboard KPI. Null when nothing can be scored, never a stand-in figure.
+ *
+ * Scoped to one DC when the caller is, so the accuracy figure on the KPI row is
+ * measured over the same positions as the stock figures beside it.
+ */
+export const currentAccuracyPercent = async (
+  warehouseId?: string | null,
+): Promise<number | null> => {
   const runId = await latestScorableRunId();
   if (runId === null) return null;
 
-  const points = await loadScoredPoints(runId, {});
+  const points = await loadScoredPoints(runId, warehouseId ? { warehouseId } : {});
   return metricsOf(points).accuracyPercent;
 };

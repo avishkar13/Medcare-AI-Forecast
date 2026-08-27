@@ -42,6 +42,12 @@ import { useFormatters } from "@/hooks/use-formatters";
 interface InventoryTableProps {
   items: InventoryTableItem[];
   onResetFilters?: () => void;
+  /**
+   * Carries the current DC onto every link out of this table. A bare `/forecast`
+   * dropped the reader on an unfiltered page and left them to find, by hand, the row
+   * they had just been looking at.
+   */
+  withScope?: (href: string, extra?: Record<string, string | undefined>) => string;
 }
 
 type SortKey = "id" | "name" | "location" | "onHand" | "safetyStock" | "daysOfSupply" | "inventoryValue" | "risk" | "status";
@@ -88,7 +94,11 @@ const getStatusColor = (status: InventoryDetailStatus) => {
   return colors[status] || "text-muted-foreground bg-muted border-border";
 };
 
-export function InventoryTable({ items, onResetFilters }: InventoryTableProps) {
+export function InventoryTable({
+  items,
+  onResetFilters,
+  withScope = (href) => href,
+}: InventoryTableProps) {
   const { formatCurrency, formatNumber } = useFormatters();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -380,7 +390,7 @@ export function InventoryTable({ items, onResetFilters }: InventoryTableProps) {
                                 <DropdownMenuItem
                                   className="gap-2 cursor-pointer text-xs font-medium"
                                   render={
-                                    <Link href="/forecast">
+                                    <Link href={withScope("/forecast", { sku: item.id })}>
                                       <TrendingUp className="h-3.5 w-3.5 text-primary" />
                                       View Demand Forecast
                                     </Link>
@@ -389,7 +399,7 @@ export function InventoryTable({ items, onResetFilters }: InventoryTableProps) {
                                 <DropdownMenuItem
                                   className="gap-2 cursor-pointer text-xs font-medium"
                                   render={
-                                    <Link href="/recommendations">
+                                    <Link href={withScope("/recommendations", { sku: item.id })}>
                                       <Sparkles className="h-3.5 w-3.5 text-primary" />
                                       View Recommendation
                                     </Link>

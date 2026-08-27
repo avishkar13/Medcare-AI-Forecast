@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import { after, before, describe, test } from "node:test";
 import { startServer, type TestServer } from "../helpers/server.js";
-import { app } from "../../src/app.js";
+import { app, teardown } from "../helpers/app.js";
 import { redis } from "../../src/config/redis.js";
 
 let server: TestServer;
@@ -13,6 +13,7 @@ before(async () => {
 
 after(async () => {
   await server.close();
+  await teardown();
 });
 
 describe("POST /api/auth/login", () => {

@@ -10,6 +10,7 @@ import type { ForecastTableItem } from "@/types/forecast";
 import { Search, TrendingUp, TrendingDown, Minus, FilterX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForecastScope } from "@/store/filters.store";
+import { QueryError } from "@/components/ui/query-state";
 
 export function ForecastSkuTable() {
   const scope = useForecastScope();
@@ -18,7 +19,7 @@ export function ForecastSkuTable() {
   const [trend, setTrend] = useState("all trends");
   const [risk, setRisk] = useState("all risks");
 
-  const { data, isPending } = useForecastSkus(scope);
+  const { data, isPending, isError } = useForecastSkus(scope);
 
   // per-sku accuracy, confidence and trend are not broken out by the api
   const items = (data?.items ?? []).map((row) => ({
@@ -49,6 +50,7 @@ export function ForecastSkuTable() {
   }, [items, search, category, trend, risk]);
 
   if (isPending) return null;
+  if (isError) return <QueryError label="the SKU forecast" />;
 
   const resetFilters = () => {
     setSearch("");

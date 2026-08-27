@@ -2,6 +2,7 @@ import { prisma } from "../config/prisma.js";
 import { NOTIFY, SEVERITY_RANK } from "../config/constants.js";
 import { emailConfigured, sendEmail, type SendResult } from "../lib/mailer.js";
 import { sendSms, smsConfigured } from "../lib/sms.js";
+import { sendTeams, teamsConfigured } from "../lib/teams.js";
 import { emitAlert } from "../lib/realtime.js";
 import { getSettings } from "./settings.service.js";
 import type { DeliveryQuery } from "../zod/alert.schemas.js";
@@ -28,7 +29,7 @@ import type { DeliveryQuery } from "../zod/alert.schemas.js";
  * arrive?" instead of showing an empty log.
  */
 
-export type Channel = "IN_APP" | "EMAIL" | "SMS";
+export type Channel = "IN_APP" | "EMAIL" | "SMS" | "TEAMS";
 type Severity = keyof typeof SEVERITY_RANK;
 
 export interface NotifiableAlert {
@@ -94,18 +95,38 @@ const bodyOf = (alert: NotifiableAlert) =>
 const smsBodyOf = (alert: NotifiableAlert) =>
   `MedCare ${alert.severity.toUpperCase()}: ${alert.title}. ${alert.recommendedAction}`;
 
+const teamsCardOf = (alert: NotifiableAlert) => ({
+  title: alert.title,
+  severity: alert.severity,
+  facts: [
+    { name: "Location", value: alert.location },
+    ...(alert.sku === null ? [] : [{ name: "SKU", value: alert.sku }]),
+    { name: "Impact", value: alert.businessImpact },
+  ],
+  text: alert.recommendedAction,
+});
+
+/** What the gates below need, resolved once rather than per alert. */
+type NotificationConfig = Awaited<ReturnType<typeof getSettings>>["notifications"];
+
 /**
  * Routes one alert and records every attempt.
  *
  * Never throws. This runs at the tail of a detection cycle whose rows are already
  * committed; a provider outage must not turn a successful reconciliation into a
  * failed one.
+ *
+ * `config` is optional so a single call still works, but a batch must pass it - see
+ * `routeAlerts`.
  */
-export const routeAlert = async (alert: NotifiableAlert): Promise<Attempt[]> => {
+export const routeAlert = async (
+  alert: NotifiableAlert,
+  config?: NotificationConfig,
+): Promise<Attempt[]> => {
   const attempts: Attempt[] = [];
 
   try {
-    const { notifications } = await getSettings();
+    const notifications = config ?? (await getSettings()).notifications;
     // `getSettings()` widens the rules array, so the shape is named here rather than
     // letting `any` leak into the two gates below.
     const rules = notifications.rules as NotificationRuleRow[];
@@ -146,6 +167,21 @@ export const routeAlert = async (alert: NotifiableAlert): Promise<Attempt[]> => 
         attempts.push(fromSendResult("SMS", result));
       }
     }
+
+    /**
+     * Teams has no per-event flag - `NotificationRule` carries `inApp`, `email` and
+     * `sms` only. It follows the master toggle and the severity floor instead, which
+     * is the closest honest reading of a channel the rules cannot address.
+     */
+    if (!channels.teams) {
+      attempts.push(skipped("TEAMS", "teams is disabled"));
+    } else if (!interrupts) {
+      attempts.push(skipped("TEAMS", `severity ${alert.severity} is below ${NOTIFY.minSeverity}`));
+    } else if (!teamsConfigured()) {
+      attempts.push(skipped("TEAMS", "teams webhook is not configured"));
+    } else {
+      attempts.push(fromSendResult("TEAMS", await sendTeams(teamsCardOf(alert))));
+    }
   } catch (error) {
     attempts.push({
       channel: "IN_APP",
@@ -173,9 +209,14 @@ const recordDeliveries = async (alertId: string, attempts: Attempt[]): Promise<v
           error: attempt.error,
         })),
       }),
-      // `notifiedAt` is what stops the next cycle re-sending a condition that is still
-      // true. Reconciliation leaves an unchanged alert alone, but a severity change
-      // rewrites it, and without this every re-assessment would page someone again.
+      /**
+       * When this alert was last routed, denormalised onto the row.
+       *
+       * It does **not** gate anything - re-sends are prevented structurally, because
+       * `routeAlert` is only reached on a create or a severity change, and an
+       * unchanged condition is left alone by reconciliation. This is the cheap
+       * "last notified" a reader wants without joining the delivery log.
+       */
       prisma.alert.update({ where: { id: alertId }, data: { notifiedAt: new Date() } }),
     ]);
   } catch (error) {
@@ -193,11 +234,23 @@ const recordDeliveries = async (alertId: string, attempts: Attempt[]): Promise<v
 const SEND_CONCURRENCY = 4;
 
 export const routeAlerts = async (alerts: NotifiableAlert[]): Promise<number> => {
+  if (alerts.length === 0) return 0;
+
+  /**
+   * Read once for the whole batch.
+   *
+   * `getSettings()` is uncached and joins eight settings tables, and this used to sit
+   * inside `routeAlert` - so a first detection on an empty database, which creates one
+   * alert per at-risk position, spent a hundred-plus full settings reads answering a
+   * question that cannot change inside a single cycle.
+   */
+  const { notifications } = await getSettings();
+
   let sent = 0;
 
   for (let index = 0; index < alerts.length; index += SEND_CONCURRENCY) {
     const batch = alerts.slice(index, index + SEND_CONCURRENCY);
-    const results = await Promise.all(batch.map((alert) => routeAlert(alert)));
+    const results = await Promise.all(batch.map((alert) => routeAlert(alert, notifications)));
     sent += results.flat().filter((attempt) => attempt.status === "SENT").length;
   }
 
@@ -289,6 +342,24 @@ export const sendTestNotification = async () => {
     for (const result of await sendSms("MedCare SCM test notification. No action required.")) {
       results.push(fromSendResult("SMS", result));
     }
+  }
+
+  if (!notifications.channels.teams) {
+    results.push(skipped("TEAMS", "teams is disabled"));
+  } else if (!teamsConfigured()) {
+    results.push(skipped("TEAMS", "teams webhook is not configured"));
+  } else {
+    results.push(
+      fromSendResult(
+        "TEAMS",
+        await sendTeams({
+          title: "MedCare SCM test notification",
+          severity: "low",
+          facts: [{ name: "Status", value: "Webhook is configured correctly" }],
+          text: "No action is required.",
+        }),
+      ),
+    );
   }
 
   return { results };

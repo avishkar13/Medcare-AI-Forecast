@@ -134,7 +134,9 @@ export type InventoryDetailStatus = "healthy" | "belowReorderPoint" | "excessSto
 export interface InventoryTableItem {
   id: string;
   name: string;
-  category: string;
+  // Nullable: `Product.category` is optional in the schema and the backend does not
+  // substitute a placeholder. Parsed as nullable in `schemas/inventory.ts`.
+  category: string | null;
   location: string;
   onHand: number;
   safetyStock: number;

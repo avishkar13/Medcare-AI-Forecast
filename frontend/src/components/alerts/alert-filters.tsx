@@ -9,11 +9,26 @@ export interface AlertFilterState {
   search: string;
   severity: AlertSeverity | "all";
   type: AlertType | "all";
-  status: AlertStatus | "all";
+  status: AlertStatus | "all" | "open";
   location: string;
   time: string;
   sortBy: "severity" | "newest" | "oldest" | "impact";
 }
+
+/**
+ * The landing view. Lives here rather than in the page so "is anything filtered?"
+ * below and "what does Reset go back to?" cannot drift apart - they did the moment
+ * the default stopped being `all` across the board.
+ */
+export const DEFAULT_ALERT_FILTERS: AlertFilterState = {
+  search: "",
+  severity: "all",
+  type: "all",
+  status: "open",
+  location: "all",
+  time: "all",
+  sortBy: "severity",
+};
 
 interface AlertFiltersProps {
   filters: AlertFilterState;
@@ -26,13 +41,9 @@ export function AlertFilters({ filters, onChange, onReset }: AlertFiltersProps) 
     onChange({ ...filters, [key]: value });
   };
 
-  const hasActiveFilters = 
-    filters.search !== "" || 
-    filters.severity !== "all" || 
-    filters.type !== "all" || 
-    filters.status !== "all" || 
-    filters.location !== "all" || 
-    filters.time !== "all";
+  const hasActiveFilters = (
+    Object.keys(DEFAULT_ALERT_FILTERS) as (keyof AlertFilterState)[]
+  ).some((key) => key !== "sortBy" && filters[key] !== DEFAULT_ALERT_FILTERS[key]);
 
   return (
     <div className="bg-background border border-border/60 rounded-xl p-2.5 shadow-sm flex flex-col gap-2.5">
@@ -107,6 +118,9 @@ export function AlertFilters({ filters, onChange, onReset }: AlertFiltersProps) 
           onChange={(e) => updateFilter("status", e.target.value)}
         >
           <option value="all">Status: All</option>
+          {/* The backend's own alias for "not resolved". This is the landing view, so
+              "All" is free to mean all - resolved included - rather than both. */}
+          <option value="open">Open</option>
           <option value="new">New</option>
           <option value="acknowledged">Acknowledged</option>
           <option value="in_progress">In Progress</option>

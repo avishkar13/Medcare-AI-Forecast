@@ -3,8 +3,20 @@ import { WarehouseTier } from "../../generated/prisma/enums.js";
 
 const identifier = z.string().trim().min(1);
 
+/**
+ * `warehouseId` narrows the hub to one DC.
+ *
+ * It is a filter, not a permission: a caller confined to a DC is narrowed by
+ * `req.warehouseScope` whether or not they send this, and `enforceScopeConflict`
+ * rejects a request for anyone else's DC before the service sees it.
+ */
+export const summaryQuerySchema = z.object({
+  warehouseId: identifier.optional(),
+});
+
 export const networkQuerySchema = z.object({
   tier: z.nativeEnum(WarehouseTier).optional(),
+  warehouseId: identifier.optional(),
 });
 
 export const inventoryHealthQuerySchema = z.object({
@@ -36,6 +48,7 @@ export const priorityActionsQuerySchema = z.object({
 });
 
 export type PriorityActionsQuery = z.infer<typeof priorityActionsQuerySchema>;
+export type SummaryQuery = z.infer<typeof summaryQuerySchema>;
 export type NetworkQuery = z.infer<typeof networkQuerySchema>;
 export type InventoryHealthQuery = z.infer<typeof inventoryHealthQuerySchema>;
 export type ExpiryRiskQuery = z.infer<typeof expiryRiskQuerySchema>;

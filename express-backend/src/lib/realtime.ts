@@ -1,5 +1,7 @@
 import type { Server as HttpServer } from "node:http";
 import jwt from "jsonwebtoken";
+import type { Redis } from "ioredis";
+import { createAdapter } from "@socket.io/redis-adapter";
 import { Server, type Socket } from "socket.io";
 import { CORS } from "../config/constants.js";
 import { env } from "../config/env.js";
@@ -33,6 +35,8 @@ interface SocketUser {
 }
 
 let io: Server | null = null;
+/** The adapter's own Redis connections, so shutdown can close what it opened. */
+let adapterClients: Redis[] | null = null;
 
 /**
  * The handshake gate.
@@ -71,7 +75,7 @@ const authenticateSocket = async (socket: Socket): Promise<SocketUser> => {
   return { id: user.id, warehouseId: user.warehouseId };
 };
 
-export const attachRealtime = (server: HttpServer): Server => {
+export const attachRealtime = async (server: HttpServer): Promise<Server> => {
   io = new Server(server, {
     path: "/socket.io",
     cors: { origin: CORS.origins, credentials: CORS.credentials },
@@ -80,6 +84,34 @@ export const attachRealtime = (server: HttpServer): Server => {
     transports: ["websocket", "polling"],
     serveClient: false,
   });
+
+  /**
+   * Fan emits out across instances when Redis is available.
+   *
+   * The default adapter keeps rooms in this process's memory, so with two replicas a
+   * detection cycle on instance A reaches only the clients connected to A - and does
+   * so silently, which is the worst kind of scaling bug. The adapter publishes each
+   * emit on a Redis channel instead, so every instance delivers to its own clients.
+   *
+   * Optional on purpose: `REDIS_URL` is unset in plenty of local setups, and one
+   * process needs no fan-out. `duplicate()` because the adapter needs connections in
+   * subscriber mode, which cannot also serve the rate limiter's commands.
+   *
+   * Imported here rather than at the top of the file. `config/redis.js` opens its
+   * connection at module scope, and this module is reachable from the detector - so a
+   * static import made `prisma/seed.ts` and every one-off script hold an open socket
+   * and never exit, long after their work was done.
+   */
+  const { redis } = await import("../config/redis.js");
+
+  if (redis) {
+    // Held so shutdown can close them; `io.close()` does not own connections it was
+    // handed, and leaving two subscribers open keeps the process alive.
+    adapterClients = [redis.duplicate(), redis.duplicate()];
+    io.adapter(createAdapter(adapterClients[0]!, adapterClients[1]!));
+  } else {
+    console.warn("REDIS_URL is not set: realtime events stay within this process");
+  }
 
   io.use((socket, next) => {
     authenticateSocket(socket)
@@ -134,6 +166,14 @@ export const closeRealtime = async (): Promise<void> => {
   const closing = io;
   io = null;
   await new Promise<void>((resolve) => closing.close(() => resolve()));
+
+  const clients = adapterClients;
+  adapterClients = null;
+  if (clients) {
+    // Settled, not awaited individually: a subscriber that is already gone must not
+    // hold up a shutdown that is on a timer.
+    await Promise.allSettled(clients.map((client) => client.quit()));
+  }
 };
 
 export const realtimeConnections = (): number => io?.engine.clientsCount ?? 0;
@@ -145,12 +185,27 @@ export const realtimeConnections = (): number => io?.engine.clientsCount ?? 0;
  * narrowed client in exactly one - so nobody receives a payload twice and nobody
  * receives one for a DC they cannot read.
  *
- * An unscoped payload reaches only `all`. That is correct for the counts broadcast,
- * which is a network total a DC-confined user should not be shown.
+ * An unscoped payload reaches only `all`. Counts use `emitAlertToDc` below to give
+ * each DC room its own subtotal rather than the network figure.
  */
 export const emitAlert = (event: AlertEvent, payload: unknown, warehouseId?: string | null): void => {
   if (!io) return;
 
   const rooms = warehouseId ? [ALL_ROOM, dcRoom(warehouseId)] : [ALL_ROOM];
   io.to(rooms).emit(event, payload);
+};
+
+/**
+ * One DC's room and nothing else.
+ *
+ * Separate from `emitAlert` because the payload differs per room rather than being
+ * the same thing fanned out: counts are per-DC totals, and a network-wide client must
+ * not receive another DC's subtotal as if it were the network's.
+ */
+export const emitAlertToDc = (
+  event: AlertEvent,
+  payload: unknown,
+  warehouseId: string,
+): void => {
+  io?.to(dcRoom(warehouseId)).emit(event, payload);
 };

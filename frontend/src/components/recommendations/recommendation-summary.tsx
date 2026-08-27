@@ -3,9 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ListChecks, AlertCircle, AlertTriangle, Info, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { useRecommendationSummary } from "@/hooks/use-recommendations";
+import { QueryError } from "@/components/ui/query-state";
 
 export function RecommendationSummary() {
-  const { data, isPending } = useRecommendationSummary();
+  const { data, isPending, isError } = useRecommendationSummary();
 
   // counted over the whole run by the api, not over whatever page is on screen
   const priority = (level: string) =>
@@ -23,6 +24,8 @@ export function RecommendationSummary() {
   const dismissed = status("REJECTED");
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="the recommendation summary" />;
 
   return (
     <Card className="shadow-sm">

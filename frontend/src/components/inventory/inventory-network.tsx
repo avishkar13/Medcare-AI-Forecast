@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { useDashboardNetwork } from "@/hooks/use-dashboard";
 import { useFormatters } from "@/hooks/use-formatters";
+import { QueryError } from "@/components/ui/query-state";
 
 export function InventoryNetwork() {
   const { formatCompactCurrency } = useFormatters();
-  const { data, isPending } = useDashboardNetwork();
+  const { data, isPending, isError } = useDashboardNetwork();
 
   const dcs = (data ?? []).map((dc) => ({
     id: dc.id,
@@ -21,6 +22,8 @@ export function InventoryNetwork() {
   }));
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="the network view" />;
 
   return (
     <Card className="flex flex-col">
@@ -41,11 +44,11 @@ export function InventoryNetwork() {
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Capacity</span>
-                  <span className={`font-medium ${dc.utilization > 90 ? "text-warning" : "text-foreground"}`}>
-                    {dc.utilization}%
+                  <span className={`font-medium ${(dc.utilization ?? 0) > 90 ? "text-warning" : "text-foreground"}`}>
+                    {dc.utilization === null ? "—" : `${dc.utilization}%`}
                   </span>
                 </div>
-                <Progress value={dc.utilization} className="h-1.5" />
+                <Progress value={dc.utilization ?? 0} className="h-1.5" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-0.5">

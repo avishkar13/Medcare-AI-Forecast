@@ -9,10 +9,11 @@ import {
 } from "@/hooks/use-recommendations";
 import { formatNumber } from "@/lib/utils";
 import { useFormatters } from "@/hooks/use-formatters";
+import { QueryError } from "@/components/ui/query-state";
 
 export function RecommendationsKpiCards() {
   const { formatCompactCurrency } = useFormatters();
-  const { data: kpi, isPending } = useRecommendationKpi();
+  const { data: kpi, isPending, isError } = useRecommendationKpi();
   const { data: summary } = useRecommendationSummary();
   const { data: intelligence } = useRecommendationIntelligence();
 
@@ -22,6 +23,8 @@ export function RecommendationsKpiCards() {
     summary?.byPriority.find((row) => row.priority === "CRITICAL")?.count ?? 0;
 
   if (isPending || !kpi) return null;
+
+  if (isError) return <QueryError label="the recommendation KPIs" />;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

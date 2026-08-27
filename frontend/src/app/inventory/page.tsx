@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/config/query-keys";
 import { useInventory } from "@/hooks/use-inventory";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { useScope } from "@/hooks/use-scope";
+import { useProducts, useWarehouses } from "@/hooks/use-masterdata";
 import { InventoryKpiCards } from "@/components/inventory/inventory-kpi-cards";
 import { InventoryHealth } from "@/components/inventory/inventory-health";
 import { InventoryNetwork } from "@/components/inventory/inventory-network";
@@ -13,12 +16,49 @@ import { InventoryFilters } from "@/components/inventory/inventory-filters";
 import { InventoryTable } from "@/components/inventory/inventory-table";
 import type { InventoryTableItem } from "@/types/inventory";
 
+/**
+ * `useScope` reads `useSearchParams`, which opts a route out of static rendering
+ * unless it sits behind a Suspense boundary. Kept in a child so the shell still
+ * prerenders - the same split `app/alerts/page.tsx` uses.
+ */
 export default function InventoryPage() {
+  return (
+    <Suspense fallback={<p className="p-6 text-sm text-muted-foreground">Loading inventory…</p>}>
+      <InventoryView />
+    </Suspense>
+  );
+}
+
+function InventoryView() {
   const client = useQueryClient();
-  const { data, isPending, isError, isFetching } = useInventory();
+  const { dc, withScope } = useScope();
+
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [location, setLocation] = useState("all");
+  const [status, setStatus] = useState("all");
+  const [risk, setRisk] = useState("all");
+
+  // One request per settled search term rather than one per keystroke.
+  const debouncedSearch = useDebouncedValue(search);
+
+  /**
+   * Narrowing happens on the server.
+   *
+   * The DC from the URL wins over the location dropdown: the top bar is the scope the
+   * whole app is read at, and a page-level control must not silently leave it.
+   */
+  const { data, isPending, isError, isFetching } = useInventory({
+    ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(category === "all" ? {} : { category }),
+    ...(dc ? { warehouse: dc } : location === "all" ? {} : { warehouse: location }),
+    ...(status === "all" ? {} : { status }),
+    ...(risk === "all" ? {} : { risk }),
+    pageSize: 200,
+  });
 
   // a position is one product at one warehouse, so the row id has to be both.
-  const allItems: InventoryTableItem[] = useMemo(
+  const items: InventoryTableItem[] = useMemo(
     () =>
       (data?.items ?? []).map((row) => ({
         id: row.sku,
@@ -32,34 +72,38 @@ export default function InventoryPage() {
         unitValue: row.unitCost,
         inventoryValue: row.inventoryValue,
         bufferCoveragePercent: row.bufferCoveragePercent,
-        risk: row.risk as InventoryTableItem["risk"],
+        risk: row.risk,
         status: row.status as InventoryTableItem["status"],
       })),
     [data],
   );
 
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
-  const [location, setLocation] = useState("all");
-  const [status, setStatus] = useState("all");
-  const [risk, setRisk] = useState("all");
+  /**
+   * Filter options come from master data, not from the rows on screen.
+   *
+   * Deriving them from the response worked only while the response was the whole
+   * network; now that the server narrows, the options would collapse to whatever
+   * survived the current filter and there would be no way back.
+   */
+  const { data: products } = useProducts();
+  const { data: warehouses } = useWarehouses();
 
-  const filteredItems = useMemo(() => {
-    return allItems.filter((item: InventoryTableItem) => {
-      const matchSearch =
-        !search ||
-        item.id.toLowerCase().includes(search.toLowerCase()) ||
-        item.name.toLowerCase().includes(search.toLowerCase());
-      const matchCategory = category === "all" || item.category === category;
-      const matchLocation = location === "all" || item.location === location;
-      const matchStatus = status === "all" || item.status === status;
-      const matchRisk = risk === "all" || item.risk === risk;
-      return matchSearch && matchCategory && matchLocation && matchStatus && matchRisk;
-    });
-  }, [allItems, search, category, location, status, risk]);
+  // `category` is nullable, and an uncategorised product has nothing to filter on.
+  const categories = useMemo(
+    () => [
+      ...new Set(
+        (products ?? [])
+          .map((product) => product.category)
+          .filter((category): category is string => Boolean(category)),
+      ),
+    ],
+    [products],
+  );
+  const locations = useMemo(
+    () => (warehouses ?? []).map((warehouse) => warehouse.name),
+    [warehouses],
+  );
 
-  const categories = [...new Set(allItems.map((i: InventoryTableItem) => i.category))];
-  const locations = [...new Set(allItems.map((i: InventoryTableItem) => i.location))];
   const lastUpdated = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   const resetFilters = () => {
@@ -84,9 +128,9 @@ export default function InventoryPage() {
           <span className="text-xs text-muted-foreground font-medium" suppressHydrationWarning>
             Last updated: {lastUpdated}
           </span>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="h-8 gap-2 cursor-pointer"
             onClick={() => void client.invalidateQueries({ queryKey: queryKeys.inventory.all })}
           >
@@ -104,11 +148,13 @@ export default function InventoryPage() {
           <InventoryNetwork />
         </div>
 
-      {isPending ? (
-        <p className="text-sm text-muted-foreground py-6">Loading inventory…</p>
-      ) : isError ? (
-        <p className="text-sm text-muted-foreground py-6">Could not load inventory.</p>
-      ) : null}
+        {isPending ? (
+          <p className="text-sm text-muted-foreground py-6">Loading inventory…</p>
+        ) : isError ? (
+          <p className="text-sm text-destructive py-6">
+            Could not load inventory. The figures below are unavailable, not zero.
+          </p>
+        ) : null}
 
         <InventoryFilters
           search={search}
@@ -124,9 +170,10 @@ export default function InventoryPage() {
           categories={categories}
           locations={locations}
           onReset={resetFilters}
+          dcLocked={Boolean(dc)}
         />
 
-        <InventoryTable items={filteredItems} onResetFilters={resetFilters} />
+        <InventoryTable items={items} onResetFilters={resetFilters} withScope={withScope} />
       </div>
     </div>
   );

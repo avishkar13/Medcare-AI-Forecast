@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useRecommendations } from "@/hooks/use-recommendations";
 import { Briefcase, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { QueryError } from "@/components/ui/query-state";
 
 export function ExecutiveDecisionPanel() {
-  const { data, isPending } = useRecommendations({ pageSize: 3 });
+  const { data, isPending, isError } = useRecommendations({ pageSize: 3 });
 
   const topDecisions = (data?.data ?? []).map((rec) => ({
     id: rec.id,
@@ -20,6 +21,8 @@ export function ExecutiveDecisionPanel() {
   }));
 
   if (isPending || topDecisions.length === 0) {
+
+  if (isError) return <QueryError label="the decision summary" />;
     return (
       <Card>
         <CardContent className="py-6 text-sm text-muted-foreground">

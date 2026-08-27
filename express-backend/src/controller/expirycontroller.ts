@@ -47,6 +47,8 @@ export const getAssessment = async (req: Request, res: Response) => {
   ok(res, await expiry.getAssessment(query, { warehouseId: req.warehouseScope }));
 };
 
-export const getWastePrevention = async (_req: Request, res: Response) => {
-  ok(res, await expiry.listWastePrevention());
+export const getWastePrevention = async (req: Request, res: Response) => {
+  const query = expiryQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await expiry.listWastePrevention(query, { warehouseId: req.warehouseScope }));
 };

@@ -15,6 +15,7 @@ import {
 } from "recharts";
 import { useInventoryHealth } from "@/hooks/use-inventory";
 import { useFormatters } from "@/hooks/use-formatters";
+import { QueryError } from "@/components/ui/query-state";
 
 const COLORS = [
   "var(--success)",
@@ -25,11 +26,13 @@ const COLORS = [
 ];
 
 export function InventoryHealth() {
-  const { data, isPending } = useInventoryHealth();
+  const { data, isPending, isError } = useInventoryHealth();
   const { formatCompactCurrency } = useFormatters();
   const health = data?.breakdown;
 
   if (isPending || !health || !data) return null;
+
+  if (isError) return <QueryError label="inventory health" />;
 
   const categoryData = data.byCategory.map((row) => ({
     name: row.category,

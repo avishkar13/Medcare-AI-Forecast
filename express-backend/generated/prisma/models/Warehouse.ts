@@ -270,6 +270,8 @@ export type WarehouseWhereInput = {
   distributors?: Prisma.DistributorListRelationFilter
   distributorOrders?: Prisma.DistributorOrderListRelationFilter
   alerts?: Prisma.AlertListRelationFilter
+  stockMovements?: Prisma.StockMovementListRelationFilter
+  wastePrevention?: Prisma.WastePreventionRecordListRelationFilter
   users?: Prisma.UserListRelationFilter
 }
 
@@ -298,6 +300,8 @@ export type WarehouseOrderByWithRelationInput = {
   distributors?: Prisma.DistributorOrderByRelationAggregateInput
   distributorOrders?: Prisma.DistributorOrderOrderByRelationAggregateInput
   alerts?: Prisma.AlertOrderByRelationAggregateInput
+  stockMovements?: Prisma.StockMovementOrderByRelationAggregateInput
+  wastePrevention?: Prisma.WastePreventionRecordOrderByRelationAggregateInput
   users?: Prisma.UserOrderByRelationAggregateInput
 }
 
@@ -329,6 +333,8 @@ export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
   distributors?: Prisma.DistributorListRelationFilter
   distributorOrders?: Prisma.DistributorOrderListRelationFilter
   alerts?: Prisma.AlertListRelationFilter
+  stockMovements?: Prisma.StockMovementListRelationFilter
+  wastePrevention?: Prisma.WastePreventionRecordListRelationFilter
   users?: Prisma.UserListRelationFilter
 }, "id" | "code">
 
@@ -391,6 +397,8 @@ export type WarehouseCreateInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -419,6 +427,8 @@ export type WarehouseUncheckedCreateInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -447,6 +457,8 @@ export type WarehouseUpdateInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -475,6 +487,8 @@ export type WarehouseUncheckedUpdateInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -796,6 +810,38 @@ export type WarehouseUpdateOneWithoutAlertsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutAlertsInput, Prisma.WarehouseUpdateWithoutAlertsInput>, Prisma.WarehouseUncheckedUpdateWithoutAlertsInput>
 }
 
+export type WarehouseCreateNestedOneWithoutStockMovementsInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutStockMovementsInput, Prisma.WarehouseUncheckedCreateWithoutStockMovementsInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutStockMovementsInput
+  connect?: Prisma.WarehouseWhereUniqueInput
+}
+
+export type WarehouseUpdateOneWithoutStockMovementsNestedInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutStockMovementsInput, Prisma.WarehouseUncheckedCreateWithoutStockMovementsInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutStockMovementsInput
+  upsert?: Prisma.WarehouseUpsertWithoutStockMovementsInput
+  disconnect?: Prisma.WarehouseWhereInput | boolean
+  delete?: Prisma.WarehouseWhereInput | boolean
+  connect?: Prisma.WarehouseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutStockMovementsInput, Prisma.WarehouseUpdateWithoutStockMovementsInput>, Prisma.WarehouseUncheckedUpdateWithoutStockMovementsInput>
+}
+
+export type WarehouseCreateNestedOneWithoutWastePreventionInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutWastePreventionInput, Prisma.WarehouseUncheckedCreateWithoutWastePreventionInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutWastePreventionInput
+  connect?: Prisma.WarehouseWhereUniqueInput
+}
+
+export type WarehouseUpdateOneWithoutWastePreventionNestedInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutWastePreventionInput, Prisma.WarehouseUncheckedCreateWithoutWastePreventionInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutWastePreventionInput
+  upsert?: Prisma.WarehouseUpsertWithoutWastePreventionInput
+  disconnect?: Prisma.WarehouseWhereInput | boolean
+  delete?: Prisma.WarehouseWhereInput | boolean
+  connect?: Prisma.WarehouseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutWastePreventionInput, Prisma.WarehouseUpdateWithoutWastePreventionInput>, Prisma.WarehouseUncheckedUpdateWithoutWastePreventionInput>
+}
+
 export type WarehouseCreateWithoutUsersInput = {
   id?: string
   code: string
@@ -821,6 +867,8 @@ export type WarehouseCreateWithoutUsersInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutUsersInput = {
@@ -848,6 +896,8 @@ export type WarehouseUncheckedCreateWithoutUsersInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutUsersInput = {
@@ -891,6 +941,8 @@ export type WarehouseUpdateWithoutUsersInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutUsersInput = {
@@ -918,6 +970,8 @@ export type WarehouseUncheckedUpdateWithoutUsersInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutDemandHistoryInput = {
@@ -944,6 +998,8 @@ export type WarehouseCreateWithoutDemandHistoryInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -971,6 +1027,8 @@ export type WarehouseUncheckedCreateWithoutDemandHistoryInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1014,6 +1072,8 @@ export type WarehouseUpdateWithoutDemandHistoryInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1041,6 +1101,8 @@ export type WarehouseUncheckedUpdateWithoutDemandHistoryInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1068,6 +1130,8 @@ export type WarehouseCreateWithoutInventoryInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1095,6 +1159,8 @@ export type WarehouseUncheckedCreateWithoutInventoryInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1138,6 +1204,8 @@ export type WarehouseUpdateWithoutInventoryInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1165,6 +1233,8 @@ export type WarehouseUncheckedUpdateWithoutInventoryInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1192,6 +1262,8 @@ export type WarehouseCreateWithoutBatchesInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1219,6 +1291,8 @@ export type WarehouseUncheckedCreateWithoutBatchesInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1262,6 +1336,8 @@ export type WarehouseUpdateWithoutBatchesInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1289,6 +1365,8 @@ export type WarehouseUncheckedUpdateWithoutBatchesInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1316,6 +1394,8 @@ export type WarehouseCreateWithoutPlanningParametersInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1343,6 +1423,8 @@ export type WarehouseUncheckedCreateWithoutPlanningParametersInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1386,6 +1468,8 @@ export type WarehouseUpdateWithoutPlanningParametersInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1413,6 +1497,8 @@ export type WarehouseUncheckedUpdateWithoutPlanningParametersInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1440,6 +1526,8 @@ export type WarehouseCreateWithoutPromotionEventsInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1467,6 +1555,8 @@ export type WarehouseUncheckedCreateWithoutPromotionEventsInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1510,6 +1600,8 @@ export type WarehouseUpdateWithoutPromotionEventsInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1537,6 +1629,8 @@ export type WarehouseUncheckedUpdateWithoutPromotionEventsInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1564,6 +1658,8 @@ export type WarehouseCreateWithoutDistributorsInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1591,6 +1687,8 @@ export type WarehouseUncheckedCreateWithoutDistributorsInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1634,6 +1732,8 @@ export type WarehouseUpdateWithoutDistributorsInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1661,6 +1761,8 @@ export type WarehouseUncheckedUpdateWithoutDistributorsInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1688,6 +1790,8 @@ export type WarehouseCreateWithoutDistributorOrdersInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1715,6 +1819,8 @@ export type WarehouseUncheckedCreateWithoutDistributorOrdersInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1758,6 +1864,8 @@ export type WarehouseUpdateWithoutDistributorOrdersInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1785,6 +1893,8 @@ export type WarehouseUncheckedUpdateWithoutDistributorOrdersInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1812,6 +1922,8 @@ export type WarehouseCreateWithoutForecastsInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1839,6 +1951,8 @@ export type WarehouseUncheckedCreateWithoutForecastsInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1882,6 +1996,8 @@ export type WarehouseUpdateWithoutForecastsInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1909,6 +2025,8 @@ export type WarehouseUncheckedUpdateWithoutForecastsInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1936,6 +2054,8 @@ export type WarehouseCreateWithoutInventoryPlansInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1963,6 +2083,8 @@ export type WarehouseUncheckedCreateWithoutInventoryPlansInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2006,6 +2128,8 @@ export type WarehouseUpdateWithoutInventoryPlansInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2033,6 +2157,8 @@ export type WarehouseUncheckedUpdateWithoutInventoryPlansInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2060,6 +2186,8 @@ export type WarehouseCreateWithoutSupplyPlansInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2087,6 +2215,8 @@ export type WarehouseUncheckedCreateWithoutSupplyPlansInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2130,6 +2260,8 @@ export type WarehouseUpdateWithoutSupplyPlansInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2157,6 +2289,8 @@ export type WarehouseUncheckedUpdateWithoutSupplyPlansInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2184,6 +2318,8 @@ export type WarehouseCreateWithoutDrpFromInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2211,6 +2347,8 @@ export type WarehouseUncheckedCreateWithoutDrpFromInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2243,6 +2381,8 @@ export type WarehouseCreateWithoutDrpToInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2270,6 +2410,8 @@ export type WarehouseUncheckedCreateWithoutDrpToInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2313,6 +2455,8 @@ export type WarehouseUpdateWithoutDrpFromInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2340,6 +2484,8 @@ export type WarehouseUncheckedUpdateWithoutDrpFromInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2378,6 +2524,8 @@ export type WarehouseUpdateWithoutDrpToInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2405,6 +2553,8 @@ export type WarehouseUncheckedUpdateWithoutDrpToInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2432,6 +2582,8 @@ export type WarehouseCreateWithoutRecommendationsInput = {
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2459,6 +2611,8 @@ export type WarehouseUncheckedCreateWithoutRecommendationsInput = {
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2502,6 +2656,8 @@ export type WarehouseUpdateWithoutRecommendationsInput = {
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2529,6 +2685,8 @@ export type WarehouseUncheckedUpdateWithoutRecommendationsInput = {
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2556,6 +2714,8 @@ export type WarehouseCreateWithoutAlertsInput = {
   promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2583,6 +2743,8 @@ export type WarehouseUncheckedCreateWithoutAlertsInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
   distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2626,6 +2788,8 @@ export type WarehouseUpdateWithoutAlertsInput = {
   promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2653,6 +2817,272 @@ export type WarehouseUncheckedUpdateWithoutAlertsInput = {
   promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
   distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseCreateWithoutStockMovementsInput = {
+  id?: string
+  code: string
+  name: string
+  region?: string | null
+  tier: $Enums.WarehouseTier
+  location?: string | null
+  capacity?: number | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutWarehouseInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutWarehouseInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutWarehouseInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutWarehouseInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutWarehouseInput
+  drpFrom?: Prisma.DRPPlanCreateNestedManyWithoutFromWarehouseInput
+  drpTo?: Prisma.DRPPlanCreateNestedManyWithoutToWarehouseInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutWarehouseInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
+  distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseUncheckedCreateWithoutStockMovementsInput = {
+  id?: string
+  code: string
+  name: string
+  region?: string | null
+  tier: $Enums.WarehouseTier
+  location?: string | null
+  capacity?: number | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutWarehouseInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutWarehouseInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutWarehouseInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutWarehouseInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutWarehouseInput
+  drpFrom?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutFromWarehouseInput
+  drpTo?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutToWarehouseInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutWarehouseInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
+  distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseCreateOrConnectWithoutStockMovementsInput = {
+  where: Prisma.WarehouseWhereUniqueInput
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutStockMovementsInput, Prisma.WarehouseUncheckedCreateWithoutStockMovementsInput>
+}
+
+export type WarehouseUpsertWithoutStockMovementsInput = {
+  update: Prisma.XOR<Prisma.WarehouseUpdateWithoutStockMovementsInput, Prisma.WarehouseUncheckedUpdateWithoutStockMovementsInput>
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutStockMovementsInput, Prisma.WarehouseUncheckedCreateWithoutStockMovementsInput>
+  where?: Prisma.WarehouseWhereInput
+}
+
+export type WarehouseUpdateToOneWithWhereWithoutStockMovementsInput = {
+  where?: Prisma.WarehouseWhereInput
+  data: Prisma.XOR<Prisma.WarehouseUpdateWithoutStockMovementsInput, Prisma.WarehouseUncheckedUpdateWithoutStockMovementsInput>
+}
+
+export type WarehouseUpdateWithoutStockMovementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.EnumWarehouseTierFieldUpdateOperationsInput | $Enums.WarehouseTier
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutWarehouseNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutWarehouseNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutWarehouseNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutWarehouseNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutWarehouseNestedInput
+  drpFrom?: Prisma.DRPPlanUpdateManyWithoutFromWarehouseNestedInput
+  drpTo?: Prisma.DRPPlanUpdateManyWithoutToWarehouseNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutWarehouseNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
+  distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseUncheckedUpdateWithoutStockMovementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.EnumWarehouseTierFieldUpdateOperationsInput | $Enums.WarehouseTier
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutWarehouseNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutWarehouseNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutWarehouseNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutWarehouseNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutWarehouseNestedInput
+  drpFrom?: Prisma.DRPPlanUncheckedUpdateManyWithoutFromWarehouseNestedInput
+  drpTo?: Prisma.DRPPlanUncheckedUpdateManyWithoutToWarehouseNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutWarehouseNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
+  distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseCreateWithoutWastePreventionInput = {
+  id?: string
+  code: string
+  name: string
+  region?: string | null
+  tier: $Enums.WarehouseTier
+  location?: string | null
+  capacity?: number | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutWarehouseInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutWarehouseInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutWarehouseInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutWarehouseInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutWarehouseInput
+  drpFrom?: Prisma.DRPPlanCreateNestedManyWithoutFromWarehouseInput
+  drpTo?: Prisma.DRPPlanCreateNestedManyWithoutToWarehouseInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutWarehouseInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
+  distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseUncheckedCreateWithoutWastePreventionInput = {
+  id?: string
+  code: string
+  name: string
+  region?: string | null
+  tier: $Enums.WarehouseTier
+  location?: string | null
+  capacity?: number | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutWarehouseInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutWarehouseInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutWarehouseInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutWarehouseInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutWarehouseInput
+  drpFrom?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutFromWarehouseInput
+  drpTo?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutToWarehouseInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutWarehouseInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
+  distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseCreateOrConnectWithoutWastePreventionInput = {
+  where: Prisma.WarehouseWhereUniqueInput
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutWastePreventionInput, Prisma.WarehouseUncheckedCreateWithoutWastePreventionInput>
+}
+
+export type WarehouseUpsertWithoutWastePreventionInput = {
+  update: Prisma.XOR<Prisma.WarehouseUpdateWithoutWastePreventionInput, Prisma.WarehouseUncheckedUpdateWithoutWastePreventionInput>
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutWastePreventionInput, Prisma.WarehouseUncheckedCreateWithoutWastePreventionInput>
+  where?: Prisma.WarehouseWhereInput
+}
+
+export type WarehouseUpdateToOneWithWhereWithoutWastePreventionInput = {
+  where?: Prisma.WarehouseWhereInput
+  data: Prisma.XOR<Prisma.WarehouseUpdateWithoutWastePreventionInput, Prisma.WarehouseUncheckedUpdateWithoutWastePreventionInput>
+}
+
+export type WarehouseUpdateWithoutWastePreventionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.EnumWarehouseTierFieldUpdateOperationsInput | $Enums.WarehouseTier
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutWarehouseNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutWarehouseNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutWarehouseNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutWarehouseNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutWarehouseNestedInput
+  drpFrom?: Prisma.DRPPlanUpdateManyWithoutFromWarehouseNestedInput
+  drpTo?: Prisma.DRPPlanUpdateManyWithoutToWarehouseNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutWarehouseNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
+  distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseUncheckedUpdateWithoutWastePreventionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.EnumWarehouseTierFieldUpdateOperationsInput | $Enums.WarehouseTier
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutWarehouseNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutWarehouseNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutWarehouseNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutWarehouseNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutWarehouseNestedInput
+  drpFrom?: Prisma.DRPPlanUncheckedUpdateManyWithoutFromWarehouseNestedInput
+  drpTo?: Prisma.DRPPlanUncheckedUpdateManyWithoutToWarehouseNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutWarehouseNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
+  distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2676,6 +3106,8 @@ export type WarehouseCountOutputType = {
   distributors: number
   distributorOrders: number
   alerts: number
+  stockMovements: number
+  wastePrevention: number
   users: number
 }
 
@@ -2694,6 +3126,8 @@ export type WarehouseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   distributors?: boolean | WarehouseCountOutputTypeCountDistributorsArgs
   distributorOrders?: boolean | WarehouseCountOutputTypeCountDistributorOrdersArgs
   alerts?: boolean | WarehouseCountOutputTypeCountAlertsArgs
+  stockMovements?: boolean | WarehouseCountOutputTypeCountStockMovementsArgs
+  wastePrevention?: boolean | WarehouseCountOutputTypeCountWastePreventionArgs
   users?: boolean | WarehouseCountOutputTypeCountUsersArgs
 }
 
@@ -2808,6 +3242,20 @@ export type WarehouseCountOutputTypeCountAlertsArgs<ExtArgs extends runtime.Type
 /**
  * WarehouseCountOutputType without action
  */
+export type WarehouseCountOutputTypeCountStockMovementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StockMovementWhereInput
+}
+
+/**
+ * WarehouseCountOutputType without action
+ */
+export type WarehouseCountOutputTypeCountWastePreventionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WastePreventionRecordWhereInput
+}
+
+/**
+ * WarehouseCountOutputType without action
+ */
 export type WarehouseCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.UserWhereInput
 }
@@ -2838,6 +3286,8 @@ export type WarehouseSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   distributors?: boolean | Prisma.Warehouse$distributorsArgs<ExtArgs>
   distributorOrders?: boolean | Prisma.Warehouse$distributorOrdersArgs<ExtArgs>
   alerts?: boolean | Prisma.Warehouse$alertsArgs<ExtArgs>
+  stockMovements?: boolean | Prisma.Warehouse$stockMovementsArgs<ExtArgs>
+  wastePrevention?: boolean | Prisma.Warehouse$wastePreventionArgs<ExtArgs>
   users?: boolean | Prisma.Warehouse$usersArgs<ExtArgs>
   _count?: boolean | Prisma.WarehouseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["warehouse"]>
@@ -2897,6 +3347,8 @@ export type WarehouseInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   distributors?: boolean | Prisma.Warehouse$distributorsArgs<ExtArgs>
   distributorOrders?: boolean | Prisma.Warehouse$distributorOrdersArgs<ExtArgs>
   alerts?: boolean | Prisma.Warehouse$alertsArgs<ExtArgs>
+  stockMovements?: boolean | Prisma.Warehouse$stockMovementsArgs<ExtArgs>
+  wastePrevention?: boolean | Prisma.Warehouse$wastePreventionArgs<ExtArgs>
   users?: boolean | Prisma.Warehouse$usersArgs<ExtArgs>
   _count?: boolean | Prisma.WarehouseCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2920,6 +3372,8 @@ export type $WarehousePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     distributors: Prisma.$DistributorPayload<ExtArgs>[]
     distributorOrders: Prisma.$DistributorOrderPayload<ExtArgs>[]
     alerts: Prisma.$AlertPayload<ExtArgs>[]
+    stockMovements: Prisma.$StockMovementPayload<ExtArgs>[]
+    wastePrevention: Prisma.$WastePreventionRecordPayload<ExtArgs>[]
     users: Prisma.$UserPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -3341,6 +3795,8 @@ export interface Prisma__WarehouseClient<T, Null = never, ExtArgs extends runtim
   distributors<T extends Prisma.Warehouse$distributorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$distributorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DistributorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   distributorOrders<T extends Prisma.Warehouse$distributorOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$distributorOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DistributorOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   alerts<T extends Prisma.Warehouse$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  stockMovements<T extends Prisma.Warehouse$stockMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$stockMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  wastePrevention<T extends Prisma.Warehouse$wastePreventionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$wastePreventionArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WastePreventionRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   users<T extends Prisma.Warehouse$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -4107,6 +4563,54 @@ export type Warehouse$alertsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.AlertScalarFieldEnum | Prisma.AlertScalarFieldEnum[]
+}
+
+/**
+ * Warehouse.stockMovements
+ */
+export type Warehouse$stockMovementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StockMovement
+   */
+  select?: Prisma.StockMovementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StockMovement
+   */
+  omit?: Prisma.StockMovementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
+  where?: Prisma.StockMovementWhereInput
+  orderBy?: Prisma.StockMovementOrderByWithRelationInput | Prisma.StockMovementOrderByWithRelationInput[]
+  cursor?: Prisma.StockMovementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StockMovementScalarFieldEnum | Prisma.StockMovementScalarFieldEnum[]
+}
+
+/**
+ * Warehouse.wastePrevention
+ */
+export type Warehouse$wastePreventionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WastePreventionRecord
+   */
+  select?: Prisma.WastePreventionRecordSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WastePreventionRecord
+   */
+  omit?: Prisma.WastePreventionRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordInclude<ExtArgs> | null
+  where?: Prisma.WastePreventionRecordWhereInput
+  orderBy?: Prisma.WastePreventionRecordOrderByWithRelationInput | Prisma.WastePreventionRecordOrderByWithRelationInput[]
+  cursor?: Prisma.WastePreventionRecordWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WastePreventionRecordScalarFieldEnum | Prisma.WastePreventionRecordScalarFieldEnum[]
 }
 
 /**

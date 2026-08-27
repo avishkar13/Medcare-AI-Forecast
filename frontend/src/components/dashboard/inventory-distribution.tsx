@@ -67,10 +67,12 @@ export function InventoryDistribution() {
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Capacity Utilization</span>
-                  <span className={`font-medium ${dc.utilization > 90 ? 'text-warning' : 'text-foreground'}`}>{dc.utilization}%</span>
+                  <span className={`font-medium ${(dc.utilization ?? 0) > 90 ? 'text-warning' : 'text-foreground'}`}>
+                    {dc.utilization === null ? "—" : `${dc.utilization}%`}
+                  </span>
                 </div>
                 <Progress 
-                  value={dc.utilization} 
+                  value={dc.utilization ?? 0} 
                   className="h-1.5"
                   // Use inline style hack to change color if we want, or just rely on default
                 />

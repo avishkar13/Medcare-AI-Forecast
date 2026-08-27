@@ -6,13 +6,16 @@ const list = (scope: string, params?: QueryParams) =>
   params ? ([scope, "list", params] as const) : ([scope, "list"] as const);
 
 export const queryKeys = {
+  // the dc is part of every dashboard key: two scopes are two caches, and without
+  // that a dc switch shows the previous dc's numbers until the refetch lands.
   dashboard: {
     all: ["dashboard"] as const,
-    summary: () => ["dashboard", "summary"] as const,
-    network: () => ["dashboard", "network"] as const,
-    inventoryHealth: () => ["dashboard", "inventory-health"] as const,
-    expiryRisk: () => ["dashboard", "expiry-risk"] as const,
-    priorityActions: () => ["dashboard", "priority-actions"] as const,
+    summary: (dc?: string) => ["dashboard", "summary", dc ?? "all"] as const,
+    network: (dc?: string) => ["dashboard", "network", dc ?? "all"] as const,
+    inventoryHealth: (warehouseId?: string) =>
+      ["dashboard", "inventory-health", warehouseId ?? "all"] as const,
+    expiryRisk: (dc?: string) => ["dashboard", "expiry-risk", dc ?? "all"] as const,
+    priorityActions: (dc?: string) => ["dashboard", "priority-actions", dc ?? "all"] as const,
   },
 
   inventory: {
@@ -60,10 +63,10 @@ export const queryKeys = {
     batches: (params?: QueryParams) => list("expiry", params),
     overview: (params?: QueryParams) => ["expiry", "overview", params ?? {}] as const,
     timeline: (params?: QueryParams) => ["expiry", "timeline", params ?? {}] as const,
-    exposure: () => ["expiry", "exposure"] as const,
-    demandCoverage: () => ["expiry", "demand-coverage"] as const,
+    exposure: (params?: QueryParams) => ["expiry", "exposure", params ?? {}] as const,
+    demandCoverage: (params?: QueryParams) => ["expiry", "demand-coverage", params ?? {}] as const,
     dcExposure: (params?: QueryParams) => ["expiry", "dc-exposure", params ?? {}] as const,
-    wastePrevention: () => ["expiry", "waste-prevention"] as const,
+    wastePrevention: (params?: QueryParams) => ["expiry", "waste-prevention", params ?? {}] as const,
     assessment: (params?: QueryParams) => ["expiry", "assessment", params ?? {}] as const,
   },
 

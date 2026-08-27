@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Zap, Navigation, ArrowRightLeft, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { useExpiryAssessment } from "@/hooks/use-expiry";
+import { useScopedHref } from "@/hooks/use-scope";
+import { QueryError } from "@/components/ui/query-state";
 
 const RISK_TONE = {
   high: "text-destructive",
@@ -13,11 +15,14 @@ const RISK_TONE = {
 } as const;
 
 export function AIExpiryAssessment() {
-  const { data, isPending } = useExpiryAssessment();
+  const scopedHref = useScopedHref();
+  const { data, isPending, isError } = useExpiryAssessment();
 
   const findings = data?.findings ?? [];
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="the expiry assessment" />;
 
   return (
     <Card className="border-ai/30 shadow-sm bg-ai/5  flex flex-col relative overflow-hidden">
@@ -55,13 +60,13 @@ export function AIExpiryAssessment() {
         </div>
 
         <div className="grid grid-cols-2 gap-2 mt-auto">
-          <Link href="/recommendations" className="block w-full cursor-pointer" passHref>
+          <Link href={scopedHref("/recommendations")} className="block w-full cursor-pointer" passHref>
             <Button className="w-full bg-ai hover:bg-ai/90 text-primary-foreground font-bold h-11 text-xs shadow-sm transition-transform hover:scale-[1.02] cursor-pointer">
               <Navigation className="h-4 w-4" />
               Recommendations
             </Button>
           </Link>
-          <Link href="/simulation" className="block w-full cursor-pointer" passHref>
+          <Link href={scopedHref("/simulation")} className="block w-full cursor-pointer" passHref>
             <Button variant="outline" className="w-full h-11 text-xs font-bold border-ai/30 text-foreground hover:bg-ai/10 transition-transform hover:scale-[1.02] cursor-pointer">
               <ArrowRightLeft className="h-4 w-4 mr-2 text-ai" />
               Simulate Transfer

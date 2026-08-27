@@ -13,9 +13,13 @@ alertsRouter.get("/health", rateLimiter.read, authorize("alerts:view"), alertsCo
 
 alertsRouter.get("/notifications", rateLimiter.read, authorize("alerts:view"), alertsController.getDeliveries);
 
-// Detection reconciles the whole table, so it sits on the expensive tier beside a
-// planning run rather than the write tier used for single-row transitions.
-alertsRouter.post("/refresh", rateLimiter.expensive, authorize("alerts:manage"), alertsController.refresh);
+// The write tier, not the expensive one. A cycle is seconds and reconciles rows that
+// already exist - it is nothing like a planning run, which schedules ~10,000 rows
+// behind a 202. On `expensive` (10/hour) the Refresh button returned 429 on the
+// eleventh press, which is easy to reach while working through a review queue.
+alertsRouter.post("/refresh", rateLimiter.write, authorize("alerts:manage"), alertsController.refresh);
+
+// This one stays expensive: it reaches a third-party provider on every call.
 alertsRouter.post("/test-notification", rateLimiter.expensive, authorize("alerts:manage"), alertsController.testNotification);
 
 alertsRouter.patch("/:id/acknowledge", rateLimiter.write, authorize("alerts:manage"), alertsController.acknowledge);

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Zap, Navigation, ArrowRightLeft, Star, Clock } from "lucide-react";
 import Link from "next/link";
 import { useFormatters } from "@/hooks/use-formatters";
+import { useScopedHref } from "@/hooks/use-scope";
 
 interface BatchDetailsSheetProps {
   batch: ExpiryBatch | null;
@@ -16,6 +17,7 @@ interface BatchDetailsSheetProps {
 }
 
 export function BatchDetailsSheet({ batch, isOpen, onClose, onPrioritize }: BatchDetailsSheetProps) {
+  const scopedHref = useScopedHref();
   const { formatCurrency } = useFormatters();
 
   if (!batch) return null;
@@ -174,7 +176,7 @@ export function BatchDetailsSheet({ batch, isOpen, onClose, onPrioritize }: Batc
                   <><Clock className="h-4 w-4 mr-2" /> Monitor Batch</>
                 )}
               </Button>
-              <Link href="/recommendations" passHref className="w-full">
+              <Link href={scopedHref("/recommendations", { sku: batch.sku })} passHref className="w-full">
                 <Button variant="outline" className="w-full h-11 text-sm font-bold bg-background border-border/60 hover:bg-muted/30 transition-all" onClick={onClose}>
                   <Navigation className="h-4 w-4 mr-2 text-muted-foreground" />
                   View Recommendation Details

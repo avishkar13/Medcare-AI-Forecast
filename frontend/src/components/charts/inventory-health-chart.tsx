@@ -6,10 +6,11 @@ import { useInventory, useInventoryHealth } from "@/hooks/use-inventory";
 import { Info, BarChart2 } from "lucide-react";
 import { useFormatters } from "@/hooks/use-formatters";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { QueryError } from "@/components/ui/query-state";
 
 export function InventoryHealthChart() {
   const { formatCompactCurrency, formatCurrency } = useFormatters();
-  const { data, isPending } = useInventory();
+  const { data, isPending, isError } = useInventory();
   const { data: health } = useInventoryHealth();
   const positions = data?.items ?? [];
 
@@ -31,6 +32,8 @@ export function InventoryHealthChart() {
     .map((row) => ({ name: row.category, value: row.inventoryValue }));
 
   if (isPending || positions.length === 0) {
+
+  if (isError) return <QueryError label="inventory health" />;
     return (
       <Card>
         <CardContent className="py-10 text-sm text-muted-foreground">

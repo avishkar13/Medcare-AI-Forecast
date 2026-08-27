@@ -75,5 +75,7 @@ export const getInsight = async (req: Request, res: Response) => {
 };
 
 export const getAccuracy = async (req: Request, res: Response) => {
-  ok(res, await accuracy.getAccuracy(accuracyQuerySchema.parse(req.query)));
+  const query = accuracyQuerySchema.parse(req.query);
+  enforceScopeConflict(query.warehouse, req);
+  ok(res, await accuracy.getAccuracy(query, { warehouseId: req.warehouseScope }));
 };

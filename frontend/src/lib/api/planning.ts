@@ -1,79 +1,68 @@
 import { api } from "./client";
+import type { QueryParams } from "./types";
+import {
+  planningRunSchema,
+  runComparisonSchema,
+  runOptimizationSchema,
+  runSimulationSchema,
+  type PlanningRun,
+} from "@/schemas/planning";
 
-export interface PlanningRun {
-  id: string;
-  status: "PENDING" | "RUNNING" | "COMPLETED" | "FAILED" | "CANCELLED";
-  horizonDays: number;
-  modelVersion: string | null;
-  scenario: { id: string; name: string } | null;
-  createdAt: string;
-  completedAt: string | null;
-  durationSeconds: number | null;
-  stale: boolean;
-  failureReason: string | null;
-  failureStage: string | null;
-  currentStage: string | null;
-  progress: number | null;
+export type {
+  Delta,
+  PlanningRun,
+  PlanningRunStatus,
+  RunComparison,
+  RunOptimization,
+  RunSimulation,
+} from "@/schemas/planning";
+
+export interface PlanningRunListParams extends QueryParams {
+  status?: string;
+  page?: number;
+  pageSize?: number;
 }
 
-export interface Delta {
-  baseline: number;
-  scenario: number;
-  delta: number;
-  percentChange: number | null;
-}
+/**
+ * A list is validated per row and bad rows are dropped rather than failing the page.
+ */
+const parseRuns = (rows: unknown): PlanningRun[] => {
+  if (!Array.isArray(rows)) return [];
 
-export interface RunComparison {
-  scenario: { id: string; horizonDays: number };
-  baseline: { id: string; horizonDays: number };
-  headline: {
-    stockoutDaysAvoided: number;
-    writeOffUnitsAvoided: number;
-    costSaved: number;
-    serviceLevelChange: number;
-    transfersProposed: number;
-  };
-  cost: Record<"holding" | "stockout" | "transfer" | "expiry" | "total", Delta>;
-  risk: Record<string, Delta>;
-  plan: Record<string, Delta>;
-  warnings: string[];
-}
+  const parsed: PlanningRun[] = [];
+  for (const row of rows) {
+    const result = planningRunSchema.safeParse(row);
+    if (result.success) parsed.push(result.data);
+    else console.error("dropped a planning run that did not match the contract", result.error.issues);
+  }
+  return parsed;
+};
 
-export const listRuns = (params?: { status?: string; pageSize?: number }) =>
-  api.getPage<PlanningRun[]>("/planning/runs", params);
+export const listRuns = async (params?: PlanningRunListParams) => {
+  const page = await api.getPage<unknown>("/planning/runs", params);
+  return { ...page, data: parseRuns(page.data) };
+};
 
-export const compareRuns = (id: string, baseline: string) =>
-  api.get<RunComparison>(`/planning/runs/${id}/compare`, { baseline });
+export const getRun = async (id: string) =>
+  planningRunSchema.parse(await api.get<unknown>(`/planning/runs/${id}`));
 
-export interface RunSimulation {
-  riskLevel: "low" | "moderate" | "high" | "critical";
-  stockoutProbabilityPercent: number;
-  serviceLevelPercent: number;
-  planningRunId: string;
-  iterations: number;
-  serviceLevel: number;
-  stockoutProbability: number;
-  expiryProbability: number;
-  expectedInventory: number;
-  expectedWaste: number;
-  expectedCost: number;
-}
+export const compareRuns = async (id: string, baseline: string) =>
+  runComparisonSchema.parse(
+    await api.get<unknown>(`/planning/runs/${id}/compare`, { baseline }),
+  );
 
-export interface RunOptimization {
-  planningRunId: string;
-  totalCost: number;
-  holdingCost: number;
-  stockoutCost: number;
-  transferCost: number;
-  expiryCost: number;
-  componentSum: number;
-  solver: string;
-}
+export const getRunSimulation = async (id: string) =>
+  runSimulationSchema.parse(await api.get<unknown>(`/planning/runs/${id}/simulation`));
 
-export const getRun = (id: string) => api.get<PlanningRun>(`/planning/runs/${id}`);
+export const getRunOptimization = async (id: string) =>
+  runOptimizationSchema.parse(await api.get<unknown>(`/planning/runs/${id}/optimization`));
 
-export const getRunSimulation = (id: string) =>
-  api.get<RunSimulation>(`/planning/runs/${id}/simulation`);
-
-export const getRunOptimization = (id: string) =>
-  api.get<RunOptimization>(`/planning/runs/${id}/optimization`);
+/**
+ * Starts a run. Answers `202` with the run to poll - it does not wait for completion.
+ * Phase 5 gives this its first caller; the module is built now so the contract is
+ * parsed the same way as every other.
+ */
+export const createRun = async (body?: {
+  horizonDays?: number;
+  scenarioId?: string;
+}) => planningRunSchema.parse(await api.post<unknown>("/planning/runs", body ?? {}));

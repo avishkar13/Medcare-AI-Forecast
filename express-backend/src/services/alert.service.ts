@@ -1,5 +1,5 @@
 import { prisma } from "../config/prisma.js";
-import { emitAlert } from "../lib/realtime.js";
+import { emitAlert, emitAlertToDc } from "../lib/realtime.js";
 import type { Prisma } from "../../generated/prisma/client.js";
 import { ConflictError, NotFoundError } from "../utils/errors.js";
 import { percentage, round } from "../utils/inventory.js";
@@ -297,20 +297,36 @@ export const getHealth = async (scope?: { warehouseId?: string | null }) => {
  * putting it in the detector made the two import each other in a cycle.
  */
 export const broadcastCounts = async (): Promise<void> => {
-  const bySeverity = await prisma.alert.groupBy({
-    by: ["severity"],
+  // Grouped by warehouse as well as severity so each DC room can be given its own
+  // totals. A DC-confined socket is deliberately not in the `all` room - it would
+  // otherwise receive every other DC's alerts - so a single network-wide emit never
+  // reaches it, and its badge would sit on whatever the last fetch happened to say.
+  const rows = await prisma.alert.groupBy({
+    by: ["severity", "warehouseId"],
     where: { status: { in: [...OPEN_STATUSES] } },
     _count: true,
   });
 
-  const countOf = (severity: string) =>
-    bySeverity.find((row) => row.severity === severity)?._count ?? 0;
+  const tally = (subset: typeof rows) => {
+    const countOf = (severity: string) =>
+      subset.filter((row) => row.severity === severity).reduce((n, row) => n + row._count, 0);
 
-  emitAlert("alert:counts", {
-    unresolved: bySeverity.reduce((total, row) => total + row._count, 0),
-    critical: countOf("critical"),
-    high: countOf("high"),
-  });
+    return {
+      unresolved: subset.reduce((total, row) => total + row._count, 0),
+      critical: countOf("critical"),
+      high: countOf("high"),
+    };
+  };
+
+  emitAlert("alert:counts", tally(rows));
+
+  for (const warehouseId of new Set(rows.map((row) => row.warehouseId))) {
+    if (warehouseId === null) continue;
+    const scoped = rows.filter((row) => row.warehouseId === warehouseId);
+    // Scoped to the DC room only. The network total above already went to `all`, and
+    // sending it again here would double-count for anyone in both.
+    emitAlertToDc("alert:counts", tally(scoped), warehouseId);
+  }
 };
 
 /** `resolved` is terminal; acknowledging a resolved alert would reopen it by accident. */

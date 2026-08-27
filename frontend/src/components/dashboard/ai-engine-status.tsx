@@ -3,11 +3,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Cpu, CheckCircle2, XCircle } from "lucide-react";
 import { useReadiness } from "@/hooks/use-health";
+import { QueryError } from "@/components/ui/query-state";
 
 export function AIEngineStatus() {
-  const { data, isPending } = useReadiness();
+  const { data, isPending, isError } = useReadiness();
 
   if (isPending || !data) return null;
+
+  if (isError) return <QueryError label="engine status" />;
 
   // the readiness probe reports the three dependencies the planner needs, which is
   // the only engine state anything actually knows

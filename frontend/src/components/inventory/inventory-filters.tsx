@@ -18,6 +18,8 @@ interface InventoryFiltersProps {
   categories: string[];
   locations: string[];
   onReset: () => void;
+  /** The DC is set in the top bar, so the location dropdown must not contradict it. */
+  dcLocked?: boolean;
 }
 
 const statusOptions = [
@@ -54,6 +56,7 @@ export function InventoryFilters({
   categories,
   locations,
   onReset,
+  dcLocked = false,
 }: InventoryFiltersProps) {
   const hasActiveFilters = search || category !== "all" || location !== "all" || status !== "all" || risk !== "all";
 
@@ -81,9 +84,15 @@ export function InventoryFilters({
             ))}
           </select>
 
-          {/* Location */}
-          <select className={selectClass} value={location} onChange={(e) => onLocationChange(e.target.value)}>
-            <option value="all">All Locations</option>
+          {/* Location - disabled while the top bar owns the scope */}
+          <select
+            className={selectClass}
+            value={dcLocked ? "all" : location}
+            onChange={(e) => onLocationChange(e.target.value)}
+            disabled={dcLocked}
+            title={dcLocked ? "Scoped by the DC selector in the top bar" : undefined}
+          >
+            <option value="all">{dcLocked ? "Scoped by top bar" : "All Locations"}</option>
             {locations.map((l) => (
               <option key={l} value={l}>{l}</option>
             ))}

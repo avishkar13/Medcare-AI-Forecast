@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
   Package,
@@ -28,7 +29,26 @@ function getInitials(name?: string) {
   return name.slice(0, 2).toUpperCase();
 }
 
-const navGroups = [
+/**
+ * `items` carries an optional `children`, one level deep.
+ *
+ * The array was flat, so Phase 3-5 could not add sub-navigation - a Planning section
+ * with Runs, Supply and Scenarios under it - without changing this component. Nothing
+ * uses `children` yet; the shape is here so adding a sub-page is a data change.
+ */
+interface NavItem {
+  title: string;
+  href: string;
+  icon: LucideIcon;
+  children?: { title: string; href: string }[];
+}
+
+interface NavGroup {
+  title: string;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
   {
     title: "OVERVIEW",
     items: [{ title: "Dashboard", href: "/dashboard", icon: LayoutDashboard }],
@@ -94,22 +114,46 @@ export function SidebarContent() {
               const Icon = item.icon;
 
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors relative",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  )}
-                >
-                  {isActive && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-md" />
-                  )}
-                  <Icon className={cn("h-4 w-4", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
-                  {item.title}
-                </Link>
+                <div key={item.href} className="flex flex-col gap-1">
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors relative",
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
+                  >
+                    {isActive && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-md" />
+                    )}
+                    <Icon className={cn("h-4 w-4", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+                    {item.title}
+                  </Link>
+
+                  {/* Sub-navigation, shown only while its parent section is open. */}
+                  {isActive && item.children?.length ? (
+                    <div className="ml-7 flex flex-col gap-0.5 border-l border-sidebar-border pl-3">
+                      {item.children.map((child) => {
+                        const childActive = pathname === child.href;
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className={cn(
+                              "rounded-md px-2 py-1.5 text-[13px] font-medium transition-colors",
+                              childActive
+                                ? "text-primary"
+                                : "text-muted-foreground hover:text-foreground"
+                            )}
+                          >
+                            {child.title}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
               );
             })}
           </div>

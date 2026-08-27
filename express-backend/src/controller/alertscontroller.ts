@@ -14,7 +14,10 @@ import { enforceScopeConflict } from "../middleware/scopeDc.js";
 
 export const getAlerts = async (req: Request, res: Response) => {
   const query = alertQuerySchema.parse(req.query);
-  enforceScopeConflict(query.location, req); // We can't strictly compare name vs ID here, but if the frontend sends the ID by mistake it throws. The service enforces the real scope.
+  // Guarded on the id, not `location`. `location` is a display name and would never
+  // equal a warehouse id, so guarding it 403d a confined caller filtering by the name
+  // of their own DC.
+  enforceScopeConflict(query.warehouseId, req);
   const { items, total } = await alerts.listAlerts(query, { warehouseId: req.warehouseScope });
   paginated(res, items, query.page, query.pageSize, total);
 };

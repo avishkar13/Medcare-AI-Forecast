@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useForecastNetwork } from "@/hooks/use-forecast";
 import { MapPin, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
 import { useForecastScope } from "@/store/filters.store";
+import { QueryError } from "@/components/ui/query-state";
 
 export function ForecastNetwork() {
   const scope = useForecastScope();
-  const { data, isPending } = useForecastNetwork(scope);
+  const { data, isPending, isError } = useForecastNetwork(scope);
 
   // confidence and a per-dc peak are not exposed per warehouse
   const networks = (data?.items ?? []).map((dc) => ({
@@ -22,6 +23,8 @@ export function ForecastNetwork() {
   }));
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="the forecast by DC" />;
 
   return (
     <Card className="col-span-full">

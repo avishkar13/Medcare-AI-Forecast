@@ -14,7 +14,12 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model StockMovement
- * 
+ * *
+ *  * The movement ledger. Written by nothing yet - Phase 3.1 is its writer.
+ *  *
+ *  * `warehouseId` is the DC the row belongs to, which is what a DC page filters on.
+ *  * It does not replace `fromLocation` / `toLocation`: a transfer has two endpoints
+ *  * and one foreign key cannot hold both.
  */
 export type StockMovementModel = runtime.Types.Result.DefaultSelection<Prisma.$StockMovementPayload>
 
@@ -40,6 +45,7 @@ export type StockMovementMinAggregateOutputType = {
   movementType: string | null
   sku: string | null
   quantity: number | null
+  warehouseId: string | null
   fromLocation: string | null
   toLocation: string | null
   reference: string | null
@@ -53,6 +59,7 @@ export type StockMovementMaxAggregateOutputType = {
   movementType: string | null
   sku: string | null
   quantity: number | null
+  warehouseId: string | null
   fromLocation: string | null
   toLocation: string | null
   reference: string | null
@@ -66,6 +73,7 @@ export type StockMovementCountAggregateOutputType = {
   movementType: number
   sku: number
   quantity: number
+  warehouseId: number
   fromLocation: number
   toLocation: number
   reference: number
@@ -89,6 +97,7 @@ export type StockMovementMinAggregateInputType = {
   movementType?: true
   sku?: true
   quantity?: true
+  warehouseId?: true
   fromLocation?: true
   toLocation?: true
   reference?: true
@@ -102,6 +111,7 @@ export type StockMovementMaxAggregateInputType = {
   movementType?: true
   sku?: true
   quantity?: true
+  warehouseId?: true
   fromLocation?: true
   toLocation?: true
   reference?: true
@@ -115,6 +125,7 @@ export type StockMovementCountAggregateInputType = {
   movementType?: true
   sku?: true
   quantity?: true
+  warehouseId?: true
   fromLocation?: true
   toLocation?: true
   reference?: true
@@ -215,6 +226,7 @@ export type StockMovementGroupByOutputType = {
   movementType: string
   sku: string
   quantity: number
+  warehouseId: string | null
   fromLocation: string | null
   toLocation: string | null
   reference: string | null
@@ -251,11 +263,13 @@ export type StockMovementWhereInput = {
   movementType?: Prisma.StringFilter<"StockMovement"> | string
   sku?: Prisma.StringFilter<"StockMovement"> | string
   quantity?: Prisma.FloatFilter<"StockMovement"> | number
+  warehouseId?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   fromLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   toLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   reference?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   userOrSystem?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   createdAt?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
+  warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
 }
 
 export type StockMovementOrderByWithRelationInput = {
@@ -264,11 +278,13 @@ export type StockMovementOrderByWithRelationInput = {
   movementType?: Prisma.SortOrder
   sku?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrderInput | Prisma.SortOrder
   fromLocation?: Prisma.SortOrderInput | Prisma.SortOrder
   toLocation?: Prisma.SortOrderInput | Prisma.SortOrder
   reference?: Prisma.SortOrderInput | Prisma.SortOrder
   userOrSystem?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  warehouse?: Prisma.WarehouseOrderByWithRelationInput
 }
 
 export type StockMovementWhereUniqueInput = Prisma.AtLeast<{
@@ -280,11 +296,13 @@ export type StockMovementWhereUniqueInput = Prisma.AtLeast<{
   movementType?: Prisma.StringFilter<"StockMovement"> | string
   sku?: Prisma.StringFilter<"StockMovement"> | string
   quantity?: Prisma.FloatFilter<"StockMovement"> | number
+  warehouseId?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   fromLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   toLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   reference?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   userOrSystem?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   createdAt?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
+  warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
 }, "id">
 
 export type StockMovementOrderByWithAggregationInput = {
@@ -293,6 +311,7 @@ export type StockMovementOrderByWithAggregationInput = {
   movementType?: Prisma.SortOrder
   sku?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrderInput | Prisma.SortOrder
   fromLocation?: Prisma.SortOrderInput | Prisma.SortOrder
   toLocation?: Prisma.SortOrderInput | Prisma.SortOrder
   reference?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -314,6 +333,7 @@ export type StockMovementScalarWhereWithAggregatesInput = {
   movementType?: Prisma.StringWithAggregatesFilter<"StockMovement"> | string
   sku?: Prisma.StringWithAggregatesFilter<"StockMovement"> | string
   quantity?: Prisma.FloatWithAggregatesFilter<"StockMovement"> | number
+  warehouseId?: Prisma.StringNullableWithAggregatesFilter<"StockMovement"> | string | null
   fromLocation?: Prisma.StringNullableWithAggregatesFilter<"StockMovement"> | string | null
   toLocation?: Prisma.StringNullableWithAggregatesFilter<"StockMovement"> | string | null
   reference?: Prisma.StringNullableWithAggregatesFilter<"StockMovement"> | string | null
@@ -332,6 +352,7 @@ export type StockMovementCreateInput = {
   reference?: string | null
   userOrSystem?: string | null
   createdAt?: Date | string
+  warehouse?: Prisma.WarehouseCreateNestedOneWithoutStockMovementsInput
 }
 
 export type StockMovementUncheckedCreateInput = {
@@ -340,6 +361,7 @@ export type StockMovementUncheckedCreateInput = {
   movementType: string
   sku: string
   quantity: number
+  warehouseId?: string | null
   fromLocation?: string | null
   toLocation?: string | null
   reference?: string | null
@@ -358,6 +380,7 @@ export type StockMovementUpdateInput = {
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  warehouse?: Prisma.WarehouseUpdateOneWithoutStockMovementsNestedInput
 }
 
 export type StockMovementUncheckedUpdateInput = {
@@ -366,6 +389,7 @@ export type StockMovementUncheckedUpdateInput = {
   movementType?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -379,6 +403,7 @@ export type StockMovementCreateManyInput = {
   movementType: string
   sku: string
   quantity: number
+  warehouseId?: string | null
   fromLocation?: string | null
   toLocation?: string | null
   reference?: string | null
@@ -405,11 +430,22 @@ export type StockMovementUncheckedUpdateManyInput = {
   movementType?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StockMovementListRelationFilter = {
+  every?: Prisma.StockMovementWhereInput
+  some?: Prisma.StockMovementWhereInput
+  none?: Prisma.StockMovementWhereInput
+}
+
+export type StockMovementOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type StockMovementCountOrderByAggregateInput = {
@@ -418,6 +454,7 @@ export type StockMovementCountOrderByAggregateInput = {
   movementType?: Prisma.SortOrder
   sku?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   fromLocation?: Prisma.SortOrder
   toLocation?: Prisma.SortOrder
   reference?: Prisma.SortOrder
@@ -435,6 +472,7 @@ export type StockMovementMaxOrderByAggregateInput = {
   movementType?: Prisma.SortOrder
   sku?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   fromLocation?: Prisma.SortOrder
   toLocation?: Prisma.SortOrder
   reference?: Prisma.SortOrder
@@ -448,6 +486,7 @@ export type StockMovementMinOrderByAggregateInput = {
   movementType?: Prisma.SortOrder
   sku?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   fromLocation?: Prisma.SortOrder
   toLocation?: Prisma.SortOrder
   reference?: Prisma.SortOrder
@@ -459,6 +498,169 @@ export type StockMovementSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
 }
 
+export type StockMovementCreateNestedManyWithoutWarehouseInput = {
+  create?: Prisma.XOR<Prisma.StockMovementCreateWithoutWarehouseInput, Prisma.StockMovementUncheckedCreateWithoutWarehouseInput> | Prisma.StockMovementCreateWithoutWarehouseInput[] | Prisma.StockMovementUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.StockMovementCreateOrConnectWithoutWarehouseInput | Prisma.StockMovementCreateOrConnectWithoutWarehouseInput[]
+  createMany?: Prisma.StockMovementCreateManyWarehouseInputEnvelope
+  connect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+}
+
+export type StockMovementUncheckedCreateNestedManyWithoutWarehouseInput = {
+  create?: Prisma.XOR<Prisma.StockMovementCreateWithoutWarehouseInput, Prisma.StockMovementUncheckedCreateWithoutWarehouseInput> | Prisma.StockMovementCreateWithoutWarehouseInput[] | Prisma.StockMovementUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.StockMovementCreateOrConnectWithoutWarehouseInput | Prisma.StockMovementCreateOrConnectWithoutWarehouseInput[]
+  createMany?: Prisma.StockMovementCreateManyWarehouseInputEnvelope
+  connect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+}
+
+export type StockMovementUpdateManyWithoutWarehouseNestedInput = {
+  create?: Prisma.XOR<Prisma.StockMovementCreateWithoutWarehouseInput, Prisma.StockMovementUncheckedCreateWithoutWarehouseInput> | Prisma.StockMovementCreateWithoutWarehouseInput[] | Prisma.StockMovementUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.StockMovementCreateOrConnectWithoutWarehouseInput | Prisma.StockMovementCreateOrConnectWithoutWarehouseInput[]
+  upsert?: Prisma.StockMovementUpsertWithWhereUniqueWithoutWarehouseInput | Prisma.StockMovementUpsertWithWhereUniqueWithoutWarehouseInput[]
+  createMany?: Prisma.StockMovementCreateManyWarehouseInputEnvelope
+  set?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  disconnect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  delete?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  connect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  update?: Prisma.StockMovementUpdateWithWhereUniqueWithoutWarehouseInput | Prisma.StockMovementUpdateWithWhereUniqueWithoutWarehouseInput[]
+  updateMany?: Prisma.StockMovementUpdateManyWithWhereWithoutWarehouseInput | Prisma.StockMovementUpdateManyWithWhereWithoutWarehouseInput[]
+  deleteMany?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
+}
+
+export type StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput = {
+  create?: Prisma.XOR<Prisma.StockMovementCreateWithoutWarehouseInput, Prisma.StockMovementUncheckedCreateWithoutWarehouseInput> | Prisma.StockMovementCreateWithoutWarehouseInput[] | Prisma.StockMovementUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.StockMovementCreateOrConnectWithoutWarehouseInput | Prisma.StockMovementCreateOrConnectWithoutWarehouseInput[]
+  upsert?: Prisma.StockMovementUpsertWithWhereUniqueWithoutWarehouseInput | Prisma.StockMovementUpsertWithWhereUniqueWithoutWarehouseInput[]
+  createMany?: Prisma.StockMovementCreateManyWarehouseInputEnvelope
+  set?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  disconnect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  delete?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  connect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  update?: Prisma.StockMovementUpdateWithWhereUniqueWithoutWarehouseInput | Prisma.StockMovementUpdateWithWhereUniqueWithoutWarehouseInput[]
+  updateMany?: Prisma.StockMovementUpdateManyWithWhereWithoutWarehouseInput | Prisma.StockMovementUpdateManyWithWhereWithoutWarehouseInput[]
+  deleteMany?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
+}
+
+export type StockMovementCreateWithoutWarehouseInput = {
+  id?: string
+  date: Date | string
+  movementType: string
+  sku: string
+  quantity: number
+  fromLocation?: string | null
+  toLocation?: string | null
+  reference?: string | null
+  userOrSystem?: string | null
+  createdAt?: Date | string
+}
+
+export type StockMovementUncheckedCreateWithoutWarehouseInput = {
+  id?: string
+  date: Date | string
+  movementType: string
+  sku: string
+  quantity: number
+  fromLocation?: string | null
+  toLocation?: string | null
+  reference?: string | null
+  userOrSystem?: string | null
+  createdAt?: Date | string
+}
+
+export type StockMovementCreateOrConnectWithoutWarehouseInput = {
+  where: Prisma.StockMovementWhereUniqueInput
+  create: Prisma.XOR<Prisma.StockMovementCreateWithoutWarehouseInput, Prisma.StockMovementUncheckedCreateWithoutWarehouseInput>
+}
+
+export type StockMovementCreateManyWarehouseInputEnvelope = {
+  data: Prisma.StockMovementCreateManyWarehouseInput | Prisma.StockMovementCreateManyWarehouseInput[]
+  skipDuplicates?: boolean
+}
+
+export type StockMovementUpsertWithWhereUniqueWithoutWarehouseInput = {
+  where: Prisma.StockMovementWhereUniqueInput
+  update: Prisma.XOR<Prisma.StockMovementUpdateWithoutWarehouseInput, Prisma.StockMovementUncheckedUpdateWithoutWarehouseInput>
+  create: Prisma.XOR<Prisma.StockMovementCreateWithoutWarehouseInput, Prisma.StockMovementUncheckedCreateWithoutWarehouseInput>
+}
+
+export type StockMovementUpdateWithWhereUniqueWithoutWarehouseInput = {
+  where: Prisma.StockMovementWhereUniqueInput
+  data: Prisma.XOR<Prisma.StockMovementUpdateWithoutWarehouseInput, Prisma.StockMovementUncheckedUpdateWithoutWarehouseInput>
+}
+
+export type StockMovementUpdateManyWithWhereWithoutWarehouseInput = {
+  where: Prisma.StockMovementScalarWhereInput
+  data: Prisma.XOR<Prisma.StockMovementUpdateManyMutationInput, Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseInput>
+}
+
+export type StockMovementScalarWhereInput = {
+  AND?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
+  OR?: Prisma.StockMovementScalarWhereInput[]
+  NOT?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
+  id?: Prisma.StringFilter<"StockMovement"> | string
+  date?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
+  movementType?: Prisma.StringFilter<"StockMovement"> | string
+  sku?: Prisma.StringFilter<"StockMovement"> | string
+  quantity?: Prisma.FloatFilter<"StockMovement"> | number
+  warehouseId?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  fromLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  toLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  reference?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  userOrSystem?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
+}
+
+export type StockMovementCreateManyWarehouseInput = {
+  id?: string
+  date: Date | string
+  movementType: string
+  sku: string
+  quantity: number
+  fromLocation?: string | null
+  toLocation?: string | null
+  reference?: string | null
+  userOrSystem?: string | null
+  createdAt?: Date | string
+}
+
+export type StockMovementUpdateWithoutWarehouseInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  movementType?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StockMovementUncheckedUpdateWithoutWarehouseInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  movementType?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StockMovementUncheckedUpdateManyWithoutWarehouseInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  movementType?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type StockMovementSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -467,11 +669,13 @@ export type StockMovementSelect<ExtArgs extends runtime.Types.Extensions.Interna
   movementType?: boolean
   sku?: boolean
   quantity?: boolean
+  warehouseId?: boolean
   fromLocation?: boolean
   toLocation?: boolean
   reference?: boolean
   userOrSystem?: boolean
   createdAt?: boolean
+  warehouse?: boolean | Prisma.StockMovement$warehouseArgs<ExtArgs>
 }, ExtArgs["result"]["stockMovement"]>
 
 export type StockMovementSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -480,11 +684,13 @@ export type StockMovementSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   movementType?: boolean
   sku?: boolean
   quantity?: boolean
+  warehouseId?: boolean
   fromLocation?: boolean
   toLocation?: boolean
   reference?: boolean
   userOrSystem?: boolean
   createdAt?: boolean
+  warehouse?: boolean | Prisma.StockMovement$warehouseArgs<ExtArgs>
 }, ExtArgs["result"]["stockMovement"]>
 
 export type StockMovementSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -493,11 +699,13 @@ export type StockMovementSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   movementType?: boolean
   sku?: boolean
   quantity?: boolean
+  warehouseId?: boolean
   fromLocation?: boolean
   toLocation?: boolean
   reference?: boolean
   userOrSystem?: boolean
   createdAt?: boolean
+  warehouse?: boolean | Prisma.StockMovement$warehouseArgs<ExtArgs>
 }, ExtArgs["result"]["stockMovement"]>
 
 export type StockMovementSelectScalar = {
@@ -506,6 +714,7 @@ export type StockMovementSelectScalar = {
   movementType?: boolean
   sku?: boolean
   quantity?: boolean
+  warehouseId?: boolean
   fromLocation?: boolean
   toLocation?: boolean
   reference?: boolean
@@ -513,17 +722,29 @@ export type StockMovementSelectScalar = {
   createdAt?: boolean
 }
 
-export type StockMovementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "movementType" | "sku" | "quantity" | "fromLocation" | "toLocation" | "reference" | "userOrSystem" | "createdAt", ExtArgs["result"]["stockMovement"]>
+export type StockMovementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "movementType" | "sku" | "quantity" | "warehouseId" | "fromLocation" | "toLocation" | "reference" | "userOrSystem" | "createdAt", ExtArgs["result"]["stockMovement"]>
+export type StockMovementInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  warehouse?: boolean | Prisma.StockMovement$warehouseArgs<ExtArgs>
+}
+export type StockMovementIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  warehouse?: boolean | Prisma.StockMovement$warehouseArgs<ExtArgs>
+}
+export type StockMovementIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  warehouse?: boolean | Prisma.StockMovement$warehouseArgs<ExtArgs>
+}
 
 export type $StockMovementPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "StockMovement"
-  objects: {}
+  objects: {
+    warehouse: Prisma.$WarehousePayload<ExtArgs> | null
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     date: Date
     movementType: string
     sku: string
     quantity: number
+    warehouseId: string | null
     fromLocation: string | null
     toLocation: string | null
     reference: string | null
@@ -923,6 +1144,7 @@ readonly fields: StockMovementFieldRefs;
  */
 export interface Prisma__StockMovementClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  warehouse<T extends Prisma.StockMovement$warehouseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StockMovement$warehouseArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -957,6 +1179,7 @@ export interface StockMovementFieldRefs {
   readonly movementType: Prisma.FieldRef<"StockMovement", 'String'>
   readonly sku: Prisma.FieldRef<"StockMovement", 'String'>
   readonly quantity: Prisma.FieldRef<"StockMovement", 'Float'>
+  readonly warehouseId: Prisma.FieldRef<"StockMovement", 'String'>
   readonly fromLocation: Prisma.FieldRef<"StockMovement", 'String'>
   readonly toLocation: Prisma.FieldRef<"StockMovement", 'String'>
   readonly reference: Prisma.FieldRef<"StockMovement", 'String'>
@@ -979,6 +1202,10 @@ export type StockMovementFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.StockMovementOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
+  /**
    * Filter, which StockMovement to fetch.
    */
   where: Prisma.StockMovementWhereUniqueInput
@@ -997,6 +1224,10 @@ export type StockMovementFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.StockMovementOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
+  /**
    * Filter, which StockMovement to fetch.
    */
   where: Prisma.StockMovementWhereUniqueInput
@@ -1014,6 +1245,10 @@ export type StockMovementFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the StockMovement
    */
   omit?: Prisma.StockMovementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
   /**
    * Filter, which StockMovement to fetch.
    */
@@ -1063,6 +1298,10 @@ export type StockMovementFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
    */
   omit?: Prisma.StockMovementOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
+  /**
    * Filter, which StockMovement to fetch.
    */
   where?: Prisma.StockMovementWhereInput
@@ -1110,6 +1349,10 @@ export type StockMovementFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Omit specific fields from the StockMovement
    */
   omit?: Prisma.StockMovementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
   /**
    * Filter, which StockMovements to fetch.
    */
@@ -1159,6 +1402,10 @@ export type StockMovementCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   omit?: Prisma.StockMovementOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
+  /**
    * The data needed to create a StockMovement.
    */
   data: Prisma.XOR<Prisma.StockMovementCreateInput, Prisma.StockMovementUncheckedCreateInput>
@@ -1192,6 +1439,10 @@ export type StockMovementCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    */
   data: Prisma.StockMovementCreateManyInput | Prisma.StockMovementCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1206,6 +1457,10 @@ export type StockMovementUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the StockMovement
    */
   omit?: Prisma.StockMovementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
   /**
    * The data needed to update a StockMovement.
    */
@@ -1258,6 +1513,10 @@ export type StockMovementUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * Limit how many StockMovements to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1272,6 +1531,10 @@ export type StockMovementUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the StockMovement
    */
   omit?: Prisma.StockMovementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
   /**
    * The filter to search for the StockMovement to update in case it exists.
    */
@@ -1299,6 +1562,10 @@ export type StockMovementDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   omit?: Prisma.StockMovementOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
+  /**
    * Filter which StockMovement to delete.
    */
   where: Prisma.StockMovementWhereUniqueInput
@@ -1319,6 +1586,25 @@ export type StockMovementDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
 }
 
 /**
+ * StockMovement.warehouse
+ */
+export type StockMovement$warehouseArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Warehouse
+   */
+  select?: Prisma.WarehouseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Warehouse
+   */
+  omit?: Prisma.WarehouseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WarehouseInclude<ExtArgs> | null
+  where?: Prisma.WarehouseWhereInput
+}
+
+/**
  * StockMovement without action
  */
 export type StockMovementDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1330,4 +1616,8 @@ export type StockMovementDefaultArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the StockMovement
    */
   omit?: Prisma.StockMovementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
 }

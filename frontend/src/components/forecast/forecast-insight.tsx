@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForecastInsight } from "@/hooks/use-forecast";
 import { BrainCircuit, AlertTriangle, Lightbulb } from "lucide-react";
 import { useForecastScope } from "@/store/filters.store";
+import { QueryError } from "@/components/ui/query-state";
 
 export function ForecastInsight() {
   const scope = useForecastScope();
-  const { data, isPending } = useForecastInsight(scope);
+  const { data, isPending, isError } = useForecastInsight(scope);
 
   // the api returns observations with their numbers rather than written prose
   const by = (kind: string) =>
@@ -22,6 +23,8 @@ export function ForecastInsight() {
   };
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="forecast insights" />;
 
   return (
     <Card className="h-full border-ai/50 shadow-sm bg-gradient-to-br from-background to-ai/5">

@@ -72,6 +72,7 @@ jobs:
             -e AWS_SNS_TOPIC_ARN="${{ secrets.AWS_SNS_TOPIC_ARN }}" \
             -e AWS_SNS_SENDER_ID="${{ secrets.AWS_SNS_SENDER_ID }}" \
             -e ALERT_SMS_RECIPIENTS="${{ secrets.ALERT_SMS_RECIPIENTS }}" \
+            -e TEAMS_WEBHOOK_URL="${{ secrets.TEAMS_WEBHOOK_URL }}" \
             aniketjha4518/medcare-backend:latest
 
       - name: Remove old images

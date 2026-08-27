@@ -4238,6 +4238,7 @@ export const StockMovementScalarFieldEnum = {
   movementType: 'movementType',
   sku: 'sku',
   quantity: 'quantity',
+  warehouseId: 'warehouseId',
   fromLocation: 'fromLocation',
   toLocation: 'toLocation',
   reference: 'reference',
@@ -4255,6 +4256,7 @@ export const WastePreventionRecordScalarFieldEnum = {
   unitsSaved: 'unitsSaved',
   valueSaved: 'valueSaved',
   date: 'date',
+  warehouseId: 'warehouseId',
   createdAt: 'createdAt'
 } as const
 

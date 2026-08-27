@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import { after, before, describe, test } from "node:test";
 import { startServer, type TestServer } from "../helpers/server.js";
-import { app } from "../../src/app.js";
+import { app, teardown } from "../helpers/app.js";
 import { prisma } from "../../src/config/prisma.js";
 import { redis } from "../../src/config/redis.js";
 import bcrypt from "bcryptjs";
@@ -38,6 +38,8 @@ before(async () => {
     { key: "dashboard:view", name: "Dashboard Read", module: "dashboard", action: "view" },
     { key: "forecast:view", name: "Forecast Read", module: "forecast", action: "view" },
     { key: "inventory:view", name: "Inventory Read", module: "inventory", action: "view" },
+    { key: "alerts:view", name: "Alerts Read", module: "alerts", action: "view" },
+    { key: "expiry:view", name: "Expiry Read", module: "expiry", action: "view" },
   ];
   const createdPerms = [];
   for (const p of perms) {
@@ -140,6 +142,9 @@ after(async () => {
   const wIds = [warehouse1?.id, warehouse2?.id].filter(Boolean);
   if (wIds.length > 0) await prisma.warehouse.deleteMany({ where: { id: { in: wIds } } });
   await server.close();
+  // Every other suite does this. Without it the Prisma and Redis handles stay open,
+  // the event loop never drains, and the file hangs after its last assertion passes.
+  await teardown();
 });
 
 describe("Global Admin (No Warehouse Scope)", () => {
@@ -212,5 +217,99 @@ describe("DC2 User (Scoped to Warehouse 2)", () => {
     assert.equal(res.status, 200);
     const body = (await res.json()) as any;
     assert.equal(body.data.id, warehouse2.id);
+  });
+});
+
+/**
+ * Phase 2.1 / 2.4 - the routes that were reachable network-wide by a confined caller.
+ *
+ * Assertions are about the *relationship* between two responses, never a seeded
+ * figure: the seed computes expiry dates relative to today, so a pinned number passes
+ * once and fails tomorrow.
+ */
+describe("Phase 2 - scope on the routes that lacked it", () => {
+  const get = (path: string, token: string) =>
+    fetch(`${server.url}${path}`, { headers: { Authorization: `Bearer ${token}` } });
+
+  test("summary takes an explicit warehouseId, and a confined caller cannot widen", async () => {
+    const own = await get(`/api/dashboard/summary?warehouseId=${warehouse1.id}`, dc1UserToken);
+    assert.equal(own.status, 200);
+
+    const other = await get(`/api/dashboard/summary?warehouseId=${warehouse2.id}`, dc1UserToken);
+    assert.equal(
+      other.status,
+      403,
+      "a confined caller asking for another DC must be refused, not quietly filtered",
+    );
+    assert.equal(((await other.json()) as any).error.code, "FORBIDDEN");
+  });
+
+  test("summary scoped to one DC never exceeds the network figure", async () => {
+    const [wide, narrow] = await Promise.all([
+      get("/api/dashboard/summary", globalAdminToken),
+      get(`/api/dashboard/summary?warehouseId=${warehouse1.id}`, globalAdminToken),
+    ]);
+    assert.equal(wide.status, 200);
+    assert.equal(narrow.status, 200);
+
+    const all = ((await wide.json()) as any).data.kpis;
+    const one = ((await narrow.json()) as any).data.kpis;
+
+    // pendingRecommendations and forecastAccuracy used to ignore scope entirely, so a
+    // DC row carried network-wide figures beside DC-wide stock.
+    assert.ok(one.pendingRecommendations <= all.pendingRecommendations);
+    assert.ok(one.skusMonitored <= all.skusMonitored);
+    assert.ok(one.totalInventoryValue <= all.totalInventoryValue + 1e-6);
+  });
+
+  test("network accepts warehouseId and refuses another DC", async () => {
+    const own = await get(`/api/dashboard/network?warehouseId=${warehouse1.id}`, globalAdminToken);
+    assert.equal(own.status, 200);
+    const rows = ((await own.json()) as any).data;
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].id, warehouse1.id);
+
+    const other = await get(`/api/dashboard/network?warehouseId=${warehouse1.id}`, dc2UserToken);
+    assert.equal(other.status, 403);
+  });
+
+  test("forecast accuracy is scoped - it was answered network-wide for everyone", async () => {
+    const own = await get(`/api/forecast/accuracy?warehouse=${warehouse1.code}`, dc1UserToken);
+    assert.equal(own.status, 200);
+
+    const other = await get(`/api/forecast/accuracy?warehouse=${warehouse2.code}`, dc1UserToken);
+    assert.equal(other.status, 403, "?warehouse= used to win over the caller's own assignment");
+  });
+
+  test("alerts guard the id, so filtering by a display name still works", async () => {
+    // `location` is a display name and never equals a warehouse id. Guarding it 403d a
+    // confined caller filtering by the name of their own DC.
+    const byName = await get(`/api/alerts?location=${encodeURIComponent("Scope Warehouse 1")}`, dc1UserToken);
+    assert.equal(byName.status, 200);
+
+    const other = await get(`/api/alerts?warehouseId=${warehouse2.id}`, dc1UserToken);
+    assert.equal(
+      other.status,
+      403,
+      "another DC's id must be refused, not answered with an empty list",
+    );
+  });
+
+  test("an unknown warehouseId is a 404, not a silently empty network", async () => {
+    // An empty body reads as "this DC holds nothing" and hides the typo. `/expiry-risk`
+    // and `/alerts` already answered 404; summary and network did not.
+    for (const path of ["/api/dashboard/summary", "/api/dashboard/network"]) {
+      const res = await get(`${path}?warehouseId=NOT_A_REAL_ID`, globalAdminToken);
+      assert.equal(res.status, 404, `${path} must reject an unknown warehouse`);
+      assert.equal(((await res.json()) as any).error.code, "NOT_FOUND");
+    }
+  });
+
+  test("waste prevention is scoped rather than network-wide", async () => {
+    const own = await get(`/api/expiry/waste-prevention?warehouse=${warehouse1.code}`, dc1UserToken);
+    assert.equal(own.status, 200);
+
+    const other = await get(`/api/expiry/waste-prevention?warehouse=${warehouse2.code}`, dc1UserToken);
+    assert.equal(other.status, 403);
   });
 });

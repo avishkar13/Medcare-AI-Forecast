@@ -1,82 +1,44 @@
 import { api } from "./client";
-import type { DashboardKPIs, NetworkHealth } from "@/types/inventory";
+import type { QueryParams } from "./types";
+import {
+  dashboardSummarySchema,
+  expiryRiskSchema,
+  networkCenterSchema,
+  priorityActionsSchema,
+  type DashboardSummary,
+  type ExpiryRisk,
+  type NetworkCenter,
+  type PriorityActions,
+} from "@/schemas/dashboard";
+import { z } from "zod";
 
-export interface DashboardSummary {
-  kpis: DashboardKPIs;
-  networkHealth: NetworkHealth;
+export type {
+  DashboardKPIs,
+  DashboardSummary,
+  ExpiryRisk,
+  ExpiryRiskItem,
+  NetworkCenter,
+  NetworkHealth,
+  PriorityAction,
+  PriorityActions,
+} from "@/schemas/dashboard";
+
+/**
+ * `warehouseId` narrows the hub to one DC. It is optional everywhere: a caller
+ * already confined to a DC is narrowed by the server whether or not it is sent.
+ */
+export interface DashboardScope extends QueryParams {
+  warehouseId?: string;
 }
 
-export const getSummary = () => api.get<DashboardSummary>("/dashboard/summary");
+export const getSummary = async (scope?: DashboardScope): Promise<DashboardSummary> =>
+  dashboardSummarySchema.parse(await api.get<unknown>("/dashboard/summary", scope));
 
-export interface NetworkCenter {
-  id: string;
-  code: string;
-  name: string;
-  region: string | null;
-  tier: string;
-  capacity: number;
-  skuCount: number;
-  onHandUnits: number;
-  utilization: number;
-  inventoryValue: number;
-  belowReorderPointCount: number;
-  belowSafetyStockCount: number;
-  stockoutRisk: number;
-  shortageValue: number;
-  excessValue: number;
-  expiringValue: number;
-}
+export const getNetwork = async (scope?: DashboardScope): Promise<NetworkCenter[]> =>
+  z.array(networkCenterSchema).parse(await api.get<unknown>("/dashboard/network", scope));
 
-export const getNetwork = () => api.get<NetworkCenter[]>("/dashboard/network");
+export const getPriorityActions = async (scope?: DashboardScope): Promise<PriorityActions> =>
+  priorityActionsSchema.parse(await api.get<unknown>("/dashboard/priority-actions", scope));
 
-export interface PriorityAction {
-  id: string;
-  type: string;
-  severity: "critical" | "high" | "medium" | "low";
-  sku: string;
-  productName: string;
-  warehouseCode: string;
-  warehouseName: string;
-  problem: string;
-  recommendedAction: string;
-  quantity: number | null;
-  impactValue: number | null;
-  sourceWarehouseCode: string | null;
-}
-
-export interface PriorityActions {
-  items: PriorityAction[];
-  counts: { critical: number; high: number; medium: number; low: number; total: number };
-}
-
-export const getPriorityActions = () =>
-  api.get<PriorityActions>("/dashboard/priority-actions");
-
-export interface ExpiryRiskItem {
-  batchId: string;
-  batchNumber: string;
-  sku: string;
-  productName: string;
-  warehouseCode: string;
-  warehouseName: string;
-  quantity: number;
-  valueAtRisk: number;
-  expiryDate: string;
-  daysToExpiry: number;
-  severity: "critical" | "high" | "medium" | "low";
-  projectedWaste: number;
-  projectedWasteValue: number;
-}
-
-export interface ExpiryRisk {
-  items: ExpiryRiskItem[];
-  totals: {
-    batchCount: number;
-    quantity: number;
-    valueAtRisk: number;
-    projectedWaste: number;
-    projectedWasteValue: number;
-  };
-}
-
-export const getExpiryRisk = () => api.get<ExpiryRisk>("/dashboard/expiry-risk");
+export const getExpiryRisk = async (scope?: DashboardScope): Promise<ExpiryRisk> =>
+  expiryRiskSchema.parse(await api.get<unknown>("/dashboard/expiry-risk", scope));

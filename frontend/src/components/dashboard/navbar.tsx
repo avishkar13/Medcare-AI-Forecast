@@ -1,10 +1,10 @@
 "use client";
 
+import { Suspense } from "react";
 import { usePathname, useRouter } from "next/navigation";
 // `Bell` moved into NotificationCenter along with the badge it used to sit beside.
-import { Search, Menu, Settings, LogOut } from "lucide-react";
+import { Menu, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuthStore } from "@/store/auth.store";
 import { SidebarContent } from "./sidebar";
 import { NotificationCenter } from "./notification-center";
+import { ScopeSelectors } from "./scope-selectors";
 
 function getInitials(name?: string) {
   if (!name) return "U";
@@ -95,18 +96,16 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Right side: Search, Notifications, Avatar */}
+      {/* Right side: Scope, Notifications, Avatar */}
       <div className="flex items-center gap-2 sm:gap-4">
-        {/* Search */}
-        <div className="relative hidden md:flex items-center w-64">
-          <Search className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
-
-          <Input
-            type="search"
-            placeholder="Search inventory, SKU..."
-            className="w-full rounded-md bg-muted/50 pl-9 border border-border focus-visible:bg-transparent h-9 text-sm"
-          />
-        </div>
+        {/*
+          Scope, not search. The input that stood here had no state and no handler.
+          Suspense because `useScope` reads `useSearchParams`, which would otherwise
+          opt every page rendering this layout out of static generation.
+        */}
+        <Suspense fallback={<div className="hidden md:block h-8 w-56" />}>
+          <ScopeSelectors />
+        </Suspense>
 
         {/* Notifications */}
         <NotificationCenter />

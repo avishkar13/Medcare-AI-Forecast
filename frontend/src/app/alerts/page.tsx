@@ -1,10 +1,10 @@
 "use client";
 
 import { Suspense, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useScope } from "@/hooks/use-scope";
 import { AlertsHeader } from "@/components/alerts/alerts-header";
 import { AlertOverview } from "@/components/alerts/alert-overview";
-import { AlertFilters, AlertFilterState } from "@/components/alerts/alert-filters";
+import { AlertFilters, AlertFilterState, DEFAULT_ALERT_FILTERS } from "@/components/alerts/alert-filters";
 import { ActiveAlertList } from "@/components/alerts/active-alert-list";
 import { AlertDetailsSheet } from "@/components/alerts/alert-details-sheet";
 import { AlertTrends } from "@/components/alerts/alert-trends";
@@ -14,15 +14,7 @@ import { AlertDistribution } from "@/components/alerts/alert-distribution";
 import { useAlertActions, useAlertOverview, useAlerts } from "@/hooks/use-alerts";
 import { SystemAlert } from "@/types/alert";
 
-const defaultFilters: AlertFilterState = {
-  search: "",
-  severity: "all",
-  type: "all",
-  status: "all",
-  location: "all",
-  time: "all",
-  sortBy: "severity",
-};
+const defaultFilters = DEFAULT_ALERT_FILTERS;
 
 const SEVERITY_WEIGHT: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
 
@@ -40,10 +32,10 @@ export default function AlertsPage() {
 }
 
 function AlertsView() {
-  const params = useSearchParams();
   // A link from the bell, a toast or an alert detail arrives already scoped.
-  const dc = params.get("dc") ?? undefined;
-  const sku = params.get("sku") ?? undefined;
+  // `useScope` resolves `?dc=` whether it holds an id or a DC code; reading the param
+  // raw sent a hand-typed code straight to the API, which only matches on the id.
+  const { dc, sku } = useScope();
 
   const [filters, setFilters] = useState<AlertFilterState>(defaultFilters);
   const [selectedAlertId, setSelectedAlertId] = useState<string | null>(null);
@@ -60,7 +52,10 @@ function AlertsView() {
     ...(filters.severity === "all" ? {} : { severity: filters.severity }),
     ...(filters.type === "all" ? {} : { type: filters.type }),
     ...(filters.location === "all" ? {} : { location: filters.location }),
-    status: filters.status === "all" ? "open" : filters.status,
+    // "All" means all, resolved included. It used to map to "open", which made the
+    // resolved half of the table unreachable from the one filter that promises
+    // everything - the default view is set by `defaultFilters` instead.
+    ...(filters.status === "all" ? {} : { status: filters.status }),
     ...(dc ? { warehouseId: dc } : {}),
     pageSize: 100,
   });

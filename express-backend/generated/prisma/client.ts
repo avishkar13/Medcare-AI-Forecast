@@ -181,12 +181,20 @@ export type NotificationDelivery = Prisma.NotificationDeliveryModel
 export type SystemSettings = Prisma.SystemSettingsModel
 /**
  * Model StockMovement
- * 
+ * *
+ *  * The movement ledger. Written by nothing yet - Phase 3.1 is its writer.
+ *  *
+ *  * `warehouseId` is the DC the row belongs to, which is what a DC page filters on.
+ *  * It does not replace `fromLocation` / `toLocation`: a transfer has two endpoints
+ *  * and one foreign key cannot hold both.
  */
 export type StockMovement = Prisma.StockMovementModel
 /**
  * Model WastePreventionRecord
- * 
+ * *
+ *  * Nullable because the existing rows predate the column and carry no warehouse to
+ *  * recover one from - a network-wide record stays network-wide rather than being
+ *  * assigned to an arbitrary DC.
  */
 export type WastePreventionRecord = Prisma.WastePreventionRecordModel
 /**

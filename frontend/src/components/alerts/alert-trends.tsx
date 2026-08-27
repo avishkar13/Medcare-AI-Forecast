@@ -3,10 +3,11 @@
 import { useAlertTrends } from "@/hooks/use-alerts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingDown, TrendingUp } from "lucide-react";
+import { QueryError } from "@/components/ui/query-state";
 
 export function AlertTrends() {
   // fourteen days so the api has a previous half to compare the recent one against
-  const { data: trends, isPending } = useAlertTrends(14);
+  const { data: trends, isPending, isError } = useAlertTrends(14);
 
   const comparison = trends?.comparison;
   const recent = (trends?.points ?? []).slice(-(comparison?.halfWindowDays ?? 7));
@@ -27,6 +28,8 @@ export function AlertTrends() {
   const maxTotal = Math.max(1, ...data.map((d) => d.critical + d.high + d.med + d.low));
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="alert trends" />;
 
   return (
     <Card className="border-border/60 shadow-sm h-full flex flex-col">

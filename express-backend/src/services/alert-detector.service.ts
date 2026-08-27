@@ -2,6 +2,7 @@ import { prisma } from "../config/prisma.js";
 import { loadPositions, type InventoryPosition } from "./dashboard.service.js";
 import { getSettings } from "./settings.service.js";
 import { projectFefoWaste, round } from "../utils/inventory.js";
+import { aggregateOverdueSupply, type OverdueSupply } from "../utils/supply.js";
 import { OPEN_STATUSES, broadcastCounts } from "./alert.service.js";
 import { routeAlert, routeAlerts } from "./notification.service.js";
 import { emitAlert } from "../lib/realtime.js";
@@ -20,6 +21,17 @@ import { emitAlert } from "../lib/realtime.js";
 
 const MS_PER_DAY = 86_400_000;
 const MIN_ACTIONABLE_UNITS = 1;
+
+/**
+ * How far back a late order still counts as a live problem.
+ *
+ * Not configurable, like the spike windows below. The tunable half of this rule is
+ * `thresholds.supplierDelay` in settings, which sets how late is late; this only
+ * stops the detector reaching back into orders that were written off long ago.
+ */
+const SUPPLIER_DELAY_WINDOW_DAYS = 14;
+
+const pairKey = (productId: string, warehouseId: string) => `${productId}:${warehouseId}`;
 
 /** Demand-spike detection compares the recent window against the baseline before it. */
 const SPIKE_WINDOW_DAYS = 7;
@@ -382,6 +394,107 @@ const loadDemandSpikes = async (): Promise<SpikeRow[]> => {
   `;
 };
 
+/**
+ * Late inbound supply, per position.
+ *
+ * `DistributorOrder` records no delivery date, so "late" can only mean: the requested
+ * date has passed and the order is still not fully fulfilled.
+ *
+ * Bounded to a recent window on purpose. The order history is full of rows that are
+ * permanently short by a few percent and months past their requested date - a
+ * property of how the data is generated rather than a live supply problem. Without
+ * the window this detector reports roughly 1,200 orders across every pair in the
+ * network, with a median lateness of 45 days, and buries the handful that are
+ * actually actionable.
+ */
+const loadOverdueSupply = async (thresholdDays: number): Promise<OverdueSupply[]> => {
+  const now = Date.now();
+  const dueBefore = new Date(now - thresholdDays * MS_PER_DAY);
+  const dueAfter = new Date(now - SUPPLIER_DELAY_WINDOW_DAYS * MS_PER_DAY);
+
+  // A findMany rather than raw SQL: the window bounds this to a couple of hundred
+  // rows, and `groupBy` cannot express `quantity - fulfilledQuantity` anyway.
+  const orders = await prisma.distributorOrder.findMany({
+    where: { requestedDate: { lt: dueBefore, gt: dueAfter } },
+    select: {
+      productId: true,
+      warehouseId: true,
+      quantity: true,
+      fulfilledQuantity: true,
+      requestedDate: true,
+    },
+  });
+
+  return aggregateOverdueSupply(orders, now);
+};
+
+const detectSupplierDelay = (
+  positions: InventoryPosition[],
+  overdue: OverdueSupply[],
+  thresholdDays: number,
+): AlertDraft[] => {
+  const positionByPair = new Map(
+    positions.map((position) => [pairKey(position.productId, position.warehouseId), position]),
+  );
+
+  const drafts: AlertDraft[] = [];
+
+  for (const supply of overdue) {
+    if (supply.outstanding < MIN_ACTIONABLE_UNITS) continue;
+
+    const position = positionByPair.get(pairKey(supply.productId, supply.warehouseId));
+    if (!position) continue;
+
+    // Late supply only bites once the shelf cannot cover the wait. A position with
+    // months of cover is late on paper and fine in practice.
+    const coverDays =
+      position.avgDailyDemand > 0
+        ? Math.floor(position.onHand / position.avgDailyDemand)
+        : null;
+    const uncovered = coverDays !== null && coverDays <= supply.daysLate;
+
+    const severity: Severity = uncovered
+      ? escalates(position)
+        ? "critical"
+        : "high"
+      : escalates(position)
+        ? "medium"
+        : "low";
+
+    drafts.push({
+      fingerprint: fingerprintOf("supplier_delay", position.productId, position.warehouseId),
+      severity,
+      type: "supplier_delay",
+      title: `${units(supply.outstanding)} units of ${position.productName} are ${supply.daysLate} days late into ${position.warehouseName}`,
+      sku: position.sku,
+      productName: position.productName,
+      location: position.warehouseName,
+      productId: position.productId,
+      warehouseId: position.warehouseId,
+      businessImpact: uncovered
+        ? `${money(supply.outstanding * position.unitCost)} of inbound stock is overdue and on-hand cover has already run past the delay`
+        : `${money(supply.outstanding * position.unitCost)} of inbound stock is overdue`,
+      recommendedAction: uncovered
+        ? `Chase the outstanding ${units(supply.outstanding)} units or re-source them - cover has run out`
+        : `Confirm a delivery date for the outstanding ${units(supply.outstanding)} units`,
+      explanation:
+        coverDays === null
+          ? `${supply.orderCount} order${supply.orderCount === 1 ? "" : "s"} passed the requested date more than ${thresholdDays} days ago and ${supply.orderCount === 1 ? "is" : "are"} still short. This position records no demand, so nothing is drawing the shelf down while it waits.`
+          : `${supply.orderCount} order${supply.orderCount === 1 ? "" : "s"} passed the requested date more than ${thresholdDays} days ago and ${supply.orderCount === 1 ? "is" : "are"} still short. Stock on hand covers ${coverDays} days against a delay already ${supply.daysLate} days long.`,
+      metrics: [
+        { label: "Units outstanding", value: units(supply.outstanding) },
+        { label: "Value outstanding", value: money(supply.outstanding * position.unitCost) },
+        { label: "Days late", value: `${supply.daysLate}` },
+        { label: "Orders affected", value: `${supply.orderCount}` },
+        { label: "Threshold", value: `${thresholdDays} days` },
+        { label: "Cover remaining", value: coverDays === null ? "no demand" : `${coverDays} days` },
+      ],
+    });
+  }
+
+  return drafts;
+};
+
 interface AlertContent {
   severity: string;
   title: string;
@@ -456,7 +569,7 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
     return { detected: 0, created: 0, retained: 0, resolved: 0, notified: 0, skipped: true };
   }
 
-  const [positions, batches, spikes] = await Promise.all([
+  const [positions, batches, spikes, overdue] = await Promise.all([
     loadPositions(),
     types.expiryRisk
       ? prisma.inventoryBatch.findMany({
@@ -475,6 +588,9 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
         })
       : Promise.resolve([]),
     types.demandSpike ? loadDemandSpikes() : Promise.resolve([]),
+    types.supplierDelay
+      ? loadOverdueSupply(thresholds.supplierDelay)
+      : Promise.resolve([]),
   ]);
 
   const drafts = [
@@ -487,6 +603,9 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
       ? detectCapacityBreach(positions, thresholds.capacityUtilization)
       : []),
     ...(types.demandSpike ? detectDemandSpike(positions, spikes, thresholds.demandDeviation) : []),
+    ...(types.supplierDelay
+      ? detectSupplierDelay(positions, overdue, thresholds.supplierDelay)
+      : []),
   ];
 
   // A condition detected twice is one alert. Later drafts win so the reducer stays
@@ -542,6 +661,7 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
       types.overstock ? "overstock" : null,
       types.capacityBreach ? "capacity_breach" : null,
       types.demandSpike ? "demand_spike" : null,
+      types.supplierDelay ? "supplier_delay" : null,
     ].filter((value): value is string => value !== null),
   );
 

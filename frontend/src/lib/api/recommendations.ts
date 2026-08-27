@@ -1,54 +1,79 @@
 import { api } from "./client";
+import type { QueryParams } from "./types";
+import {
+  recommendationImpactSchema,
+  recommendationIntelligenceSchema,
+  recommendationKpiSchema,
+  recommendationSchema,
+  recommendationSummarySchema,
+  type Recommendation,
+} from "@/schemas/recommendations";
+import type { RecommendationSignal } from "@/types/recommendation";
 
-export interface Recommendation {
-  id: string;
-  planningRunId: string;
-  type: string;
-  actionType: string | null;
-  priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
-  status: "OPEN" | "ACCEPTED" | "REJECTED" | "COMPLETED";
-  message: string;
-  quantity: number | null;
-  confidence: number | null;
-  expectedImpact: string | null;
-  impactValue: number | null;
-  sku: string;
-  productName: string;
-  warehouseCode: string;
-  warehouseName: string;
-  createdAt: string;
+export type {
+  Recommendation,
+  RecommendationImpactPayload,
+  RecommendationIntelligencePayload,
+  RecommendationKpi,
+  RecommendationPriority,
+  RecommendationStatus,
+  RecommendationSummaryPayload,
+} from "@/schemas/recommendations";
+
+/**
+ * Filters are applied by the server. `warehouse` accepts an id, a code or a name.
+ */
+export interface RecommendationListParams extends QueryParams {
+  status?: string;
+  priority?: string;
+  type?: string;
+  warehouse?: string;
+  runId?: string;
+  page?: number;
+  pageSize?: number;
 }
 
-export const listRecommendations = (params?: { pageSize?: number; status?: string }) =>
-  api.getPage<Recommendation[]>("/recommendations", params);
+/**
+ * A list is validated per row and bad rows are dropped rather than failing the page:
+ * one malformed recommendation should not blank the whole review surface, and the
+ * console line is what makes the drift visible.
+ */
+const parseList = (rows: unknown): Recommendation[] => {
+  if (!Array.isArray(rows)) return [];
 
-export interface RecommendationImpactPayload {
-  planningRunId: string | null;
-  planCost: {
-    total: number;
-    holding: number;
-    stockout: number;
-    transfer: number;
-    expiry: number;
-  } | null;
-  attributedImpact: number;
-  byType: { type: string; count: number; impactValue: number | null; sharePercent: number | null }[];
-}
+  const parsed: Recommendation[] = [];
+  for (const row of rows) {
+    const result = recommendationSchema.safeParse(row);
+    if (result.success) parsed.push(result.data);
+    else
+      console.error(
+        "dropped a recommendation that did not match the contract",
+        result.error.issues,
+      );
+  }
+  return parsed;
+};
 
-export interface RecommendationIntelligencePayload {
-  planningRunId: string | null;
-  modelVersion: string | null;
-  horizonDays: number | null;
-  recommendationCount: number;
-  averageConfidence: number | null;
-  signalsCited: { type: string; count: number }[];
-}
+export const listRecommendations = async (params?: RecommendationListParams) => {
+  const page = await api.getPage<unknown>("/recommendations", params);
+  return { ...page, data: parseList(page.data) };
+};
 
-export const getImpact = () =>
-  api.get<RecommendationImpactPayload>("/recommendations/impact");
+export const getImpact = async (params?: RecommendationListParams) =>
+  recommendationImpactSchema.parse(await api.get<unknown>("/recommendations/impact", params));
 
-export const getIntelligence = () =>
-  api.get<RecommendationIntelligencePayload>("/recommendations/intelligence");
+export const getIntelligence = async (params?: RecommendationListParams) =>
+  recommendationIntelligenceSchema.parse(
+    await api.get<unknown>("/recommendations/intelligence", params),
+  );
+
+export const getKpi = async (params?: RecommendationListParams) =>
+  recommendationKpiSchema.parse(await api.get<unknown>("/recommendations/kpi", params));
+
+export const getSummary = async (params?: RecommendationListParams) =>
+  recommendationSummarySchema.parse(
+    await api.get<unknown>("/recommendations/summary", params),
+  );
 
 export const executeRecommendation = (id: string) =>
   api.patch<Recommendation>(`/recommendations/${id}/execute`);
@@ -88,30 +113,9 @@ export const toRecommendationItem = (rec: Recommendation) => ({
   recommendedQuantity: rec.quantity ?? 0,
   expectedImpact: rec.expectedImpact ?? "",
   impactValue: rec.impactValue ?? 0,
-  signals: [] as never[],
+  // The executor's cited signals, which the card has always been able to render.
+  // This was hardcoded to `[]` while every row arrived carrying them.
+  signals: rec.signals as RecommendationSignal[],
   status: STATUS[rec.status] ?? "Pending",
   createdAt: rec.createdAt,
 });
-
-export interface RecommendationKpi {
-  planningRunId: string | null;
-  totalRecommendations: number;
-  open: number;
-  accepted: number;
-  completed: number;
-  rejected: number;
-  potentialSavings: number;
-  executionRatePercent: number;
-}
-
-export interface RecommendationSummaryPayload {
-  planningRunId: string | null;
-  byType: { type: string; count: number; impactValue: number | null }[];
-  byPriority: { priority: Recommendation["priority"]; count: number }[];
-  byStatus: { status: Recommendation["status"]; count: number }[];
-}
-
-export const getKpi = () => api.get<RecommendationKpi>("/recommendations/kpi");
-
-export const getSummary = () =>
-  api.get<RecommendationSummaryPayload>("/recommendations/summary");

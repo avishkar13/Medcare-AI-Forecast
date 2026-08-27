@@ -4,10 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useDashboardPriorityActions } from "@/hooks/use-dashboard";
+import Link from "next/link";
 import { AlertCircle, ArrowRight } from "lucide-react";
+import { useScopedHref } from "@/hooks/use-scope";
 
 export function PriorityActions() {
   const { data, isPending, isError } = useDashboardPriorityActions();
+  const scopedHref = useScopedHref();
 
   const actions = (data?.items ?? []).map((item) => ({
     id: item.id,
@@ -16,6 +19,7 @@ export function PriorityActions() {
     dc: item.warehouseCode,
     problem: item.problem,
     recommendedAction: item.recommendedAction,
+    warehouseId: item.warehouseId,
   }));
 
   if (isPending || isError) {
@@ -60,9 +64,19 @@ export function PriorityActions() {
                   <span>{action.recommendedAction}</span>
                 </div>
               </div>
-              <Button size="sm" className="w-full sm:w-auto shrink-0 gap-1.5 cursor-pointer group" variant="secondary">
-                Review Action <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-              </Button>
+              {/*
+                This button had no onClick and no Link at all. It now opens the
+                recommendations list narrowed to the SKU and DC of the action being
+                read, which is what "review" meant.
+              */}
+              <Link
+                href={scopedHref("/recommendations", { sku: action.sku, dc: action.warehouseId })}
+                className="w-full sm:w-auto shrink-0"
+              >
+                <Button size="sm" className="w-full gap-1.5 cursor-pointer group" variant="secondary">
+                  Review Action <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
             </div>
           ))}
         </div>

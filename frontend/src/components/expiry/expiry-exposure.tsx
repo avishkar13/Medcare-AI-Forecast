@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useExpiryExposure } from "@/hooks/use-expiry";
 import { useFormatters } from "@/hooks/use-formatters";
+import { QueryError } from "@/components/ui/query-state";
 
 const WINDOW_COLORS = ["bg-destructive", "bg-warning", "bg-primary", "bg-muted-foreground/30"];
 
@@ -15,9 +16,11 @@ const RISK_DOT = {
 
 export function ExpiryExposure() {
   const { formatCompactCurrency } = useFormatters();
-  const { data, isPending } = useExpiryExposure();
+  const { data, isPending, isError } = useExpiryExposure();
 
   if (isPending || !data) return null;
+
+  if (isError) return <QueryError label="expiry exposure" />;
 
   return (
     <Card className="border-border/60 shadow-sm mb-6 bg-background">

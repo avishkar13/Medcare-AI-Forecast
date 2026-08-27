@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/config/query-keys";
 import { STALE_TIME } from "@/config/constants";
+import { useUiStore } from "@/store/ui.store";
 import {
   dismissRecommendation,
   executeRecommendation,
@@ -11,28 +12,43 @@ import {
   getKpi,
   getSummary,
   listRecommendations,
+  type RecommendationListParams,
 } from "@/lib/api/recommendations";
 
-export function useRecommendations(params?: { pageSize?: number; status?: string }) {
+/**
+ * Every panel follows the DC selected in the top bar, for the same reason the
+ * dashboard hooks do: threading `warehouse` through a dozen leaf components is how
+ * one panel ends up network-wide beside three that are not. The DC is part of the
+ * query key, so two scopes are two caches.
+ */
+const useScopedParams = (params?: RecommendationListParams): RecommendationListParams => {
+  const dc = useUiStore((state) => state.dc);
+  return { ...params, ...(dc ? { warehouse: dc } : {}) };
+};
+
+export function useRecommendations(params?: RecommendationListParams) {
+  const scoped = useScopedParams(params);
   return useQuery({
-    queryKey: queryKeys.recommendations.list(params),
-    queryFn: () => listRecommendations(params),
+    queryKey: queryKeys.recommendations.list(scoped),
+    queryFn: () => listRecommendations(scoped),
     staleTime: STALE_TIME.list,
   });
 }
 
 export function useRecommendationImpact() {
+  const scoped = useScopedParams();
   return useQuery({
-    queryKey: queryKeys.recommendations.impact(),
-    queryFn: getImpact,
+    queryKey: queryKeys.recommendations.impact(scoped),
+    queryFn: () => getImpact(scoped),
     staleTime: STALE_TIME.dashboard,
   });
 }
 
 export function useRecommendationIntelligence() {
+  const scoped = useScopedParams();
   return useQuery({
-    queryKey: queryKeys.recommendations.intelligence(),
-    queryFn: getIntelligence,
+    queryKey: queryKeys.recommendations.intelligence(scoped),
+    queryFn: () => getIntelligence(scoped),
     staleTime: STALE_TIME.dashboard,
   });
 }
@@ -51,17 +67,19 @@ export function useRecommendationAction() {
 }
 
 export function useRecommendationKpi() {
+  const scoped = useScopedParams();
   return useQuery({
-    queryKey: queryKeys.recommendations.kpi(),
-    queryFn: getKpi,
+    queryKey: queryKeys.recommendations.kpi(scoped),
+    queryFn: () => getKpi(scoped),
     staleTime: STALE_TIME.dashboard,
   });
 }
 
 export function useRecommendationSummary() {
+  const scoped = useScopedParams();
   return useQuery({
-    queryKey: queryKeys.recommendations.summary(),
-    queryFn: getSummary,
+    queryKey: queryKeys.recommendations.summary(scoped),
+    queryFn: () => getSummary(scoped),
     staleTime: STALE_TIME.dashboard,
   });
 }

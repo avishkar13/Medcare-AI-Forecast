@@ -20,10 +20,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { QueryError } from "@/components/ui/query-state";
 
 export function ForecastSummaryPanel() {
   const scope = useForecastScope();
-  const { data, isPending } = useForecastSummary(scope);
+  const { data, isPending, isError } = useForecastSummary(scope);
   const kpi = useForecastKpi(scope);
 
   const summary = {
@@ -38,6 +39,8 @@ export function ForecastSummaryPanel() {
   };
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="the forecast summary" />;
 
   const formatPeakDate = (value: string) => {
     try {

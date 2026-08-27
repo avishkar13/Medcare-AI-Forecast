@@ -14,7 +14,10 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model WastePreventionRecord
- * 
+ * *
+ *  * Nullable because the existing rows predate the column and carry no warehouse to
+ *  * recover one from - a network-wide record stays network-wide rather than being
+ *  * assigned to an arbitrary DC.
  */
 export type WastePreventionRecordModel = runtime.Types.Result.DefaultSelection<Prisma.$WastePreventionRecordPayload>
 
@@ -43,6 +46,7 @@ export type WastePreventionRecordMinAggregateOutputType = {
   unitsSaved: number | null
   valueSaved: number | null
   date: Date | null
+  warehouseId: string | null
   createdAt: Date | null
 }
 
@@ -53,6 +57,7 @@ export type WastePreventionRecordMaxAggregateOutputType = {
   unitsSaved: number | null
   valueSaved: number | null
   date: Date | null
+  warehouseId: string | null
   createdAt: Date | null
 }
 
@@ -63,6 +68,7 @@ export type WastePreventionRecordCountAggregateOutputType = {
   unitsSaved: number
   valueSaved: number
   date: number
+  warehouseId: number
   createdAt: number
   _all: number
 }
@@ -85,6 +91,7 @@ export type WastePreventionRecordMinAggregateInputType = {
   unitsSaved?: true
   valueSaved?: true
   date?: true
+  warehouseId?: true
   createdAt?: true
 }
 
@@ -95,6 +102,7 @@ export type WastePreventionRecordMaxAggregateInputType = {
   unitsSaved?: true
   valueSaved?: true
   date?: true
+  warehouseId?: true
   createdAt?: true
 }
 
@@ -105,6 +113,7 @@ export type WastePreventionRecordCountAggregateInputType = {
   unitsSaved?: true
   valueSaved?: true
   date?: true
+  warehouseId?: true
   createdAt?: true
   _all?: true
 }
@@ -202,6 +211,7 @@ export type WastePreventionRecordGroupByOutputType = {
   unitsSaved: number
   valueSaved: number
   date: Date
+  warehouseId: string | null
   createdAt: Date
   _count: WastePreventionRecordCountAggregateOutputType | null
   _avg: WastePreventionRecordAvgAggregateOutputType | null
@@ -235,7 +245,9 @@ export type WastePreventionRecordWhereInput = {
   unitsSaved?: Prisma.FloatFilter<"WastePreventionRecord"> | number
   valueSaved?: Prisma.FloatFilter<"WastePreventionRecord"> | number
   date?: Prisma.DateTimeFilter<"WastePreventionRecord"> | Date | string
+  warehouseId?: Prisma.StringNullableFilter<"WastePreventionRecord"> | string | null
   createdAt?: Prisma.DateTimeFilter<"WastePreventionRecord"> | Date | string
+  warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
 }
 
 export type WastePreventionRecordOrderByWithRelationInput = {
@@ -245,7 +257,9 @@ export type WastePreventionRecordOrderByWithRelationInput = {
   unitsSaved?: Prisma.SortOrder
   valueSaved?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  warehouse?: Prisma.WarehouseOrderByWithRelationInput
 }
 
 export type WastePreventionRecordWhereUniqueInput = Prisma.AtLeast<{
@@ -258,7 +272,9 @@ export type WastePreventionRecordWhereUniqueInput = Prisma.AtLeast<{
   unitsSaved?: Prisma.FloatFilter<"WastePreventionRecord"> | number
   valueSaved?: Prisma.FloatFilter<"WastePreventionRecord"> | number
   date?: Prisma.DateTimeFilter<"WastePreventionRecord"> | Date | string
+  warehouseId?: Prisma.StringNullableFilter<"WastePreventionRecord"> | string | null
   createdAt?: Prisma.DateTimeFilter<"WastePreventionRecord"> | Date | string
+  warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
 }, "id">
 
 export type WastePreventionRecordOrderByWithAggregationInput = {
@@ -268,6 +284,7 @@ export type WastePreventionRecordOrderByWithAggregationInput = {
   unitsSaved?: Prisma.SortOrder
   valueSaved?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.WastePreventionRecordCountOrderByAggregateInput
   _avg?: Prisma.WastePreventionRecordAvgOrderByAggregateInput
@@ -286,6 +303,7 @@ export type WastePreventionRecordScalarWhereWithAggregatesInput = {
   unitsSaved?: Prisma.FloatWithAggregatesFilter<"WastePreventionRecord"> | number
   valueSaved?: Prisma.FloatWithAggregatesFilter<"WastePreventionRecord"> | number
   date?: Prisma.DateTimeWithAggregatesFilter<"WastePreventionRecord"> | Date | string
+  warehouseId?: Prisma.StringNullableWithAggregatesFilter<"WastePreventionRecord"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"WastePreventionRecord"> | Date | string
 }
 
@@ -297,6 +315,7 @@ export type WastePreventionRecordCreateInput = {
   valueSaved: number
   date: Date | string
   createdAt?: Date | string
+  warehouse?: Prisma.WarehouseCreateNestedOneWithoutWastePreventionInput
 }
 
 export type WastePreventionRecordUncheckedCreateInput = {
@@ -306,6 +325,7 @@ export type WastePreventionRecordUncheckedCreateInput = {
   unitsSaved: number
   valueSaved: number
   date: Date | string
+  warehouseId?: string | null
   createdAt?: Date | string
 }
 
@@ -317,6 +337,7 @@ export type WastePreventionRecordUpdateInput = {
   valueSaved?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  warehouse?: Prisma.WarehouseUpdateOneWithoutWastePreventionNestedInput
 }
 
 export type WastePreventionRecordUncheckedUpdateInput = {
@@ -326,6 +347,7 @@ export type WastePreventionRecordUncheckedUpdateInput = {
   unitsSaved?: Prisma.FloatFieldUpdateOperationsInput | number
   valueSaved?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -336,6 +358,7 @@ export type WastePreventionRecordCreateManyInput = {
   unitsSaved: number
   valueSaved: number
   date: Date | string
+  warehouseId?: string | null
   createdAt?: Date | string
 }
 
@@ -356,7 +379,18 @@ export type WastePreventionRecordUncheckedUpdateManyInput = {
   unitsSaved?: Prisma.FloatFieldUpdateOperationsInput | number
   valueSaved?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type WastePreventionRecordListRelationFilter = {
+  every?: Prisma.WastePreventionRecordWhereInput
+  some?: Prisma.WastePreventionRecordWhereInput
+  none?: Prisma.WastePreventionRecordWhereInput
+}
+
+export type WastePreventionRecordOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type WastePreventionRecordCountOrderByAggregateInput = {
@@ -366,6 +400,7 @@ export type WastePreventionRecordCountOrderByAggregateInput = {
   unitsSaved?: Prisma.SortOrder
   valueSaved?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -381,6 +416,7 @@ export type WastePreventionRecordMaxOrderByAggregateInput = {
   unitsSaved?: Prisma.SortOrder
   valueSaved?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -391,12 +427,155 @@ export type WastePreventionRecordMinOrderByAggregateInput = {
   unitsSaved?: Prisma.SortOrder
   valueSaved?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type WastePreventionRecordSumOrderByAggregateInput = {
   unitsSaved?: Prisma.SortOrder
   valueSaved?: Prisma.SortOrder
+}
+
+export type WastePreventionRecordCreateNestedManyWithoutWarehouseInput = {
+  create?: Prisma.XOR<Prisma.WastePreventionRecordCreateWithoutWarehouseInput, Prisma.WastePreventionRecordUncheckedCreateWithoutWarehouseInput> | Prisma.WastePreventionRecordCreateWithoutWarehouseInput[] | Prisma.WastePreventionRecordUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.WastePreventionRecordCreateOrConnectWithoutWarehouseInput | Prisma.WastePreventionRecordCreateOrConnectWithoutWarehouseInput[]
+  createMany?: Prisma.WastePreventionRecordCreateManyWarehouseInputEnvelope
+  connect?: Prisma.WastePreventionRecordWhereUniqueInput | Prisma.WastePreventionRecordWhereUniqueInput[]
+}
+
+export type WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput = {
+  create?: Prisma.XOR<Prisma.WastePreventionRecordCreateWithoutWarehouseInput, Prisma.WastePreventionRecordUncheckedCreateWithoutWarehouseInput> | Prisma.WastePreventionRecordCreateWithoutWarehouseInput[] | Prisma.WastePreventionRecordUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.WastePreventionRecordCreateOrConnectWithoutWarehouseInput | Prisma.WastePreventionRecordCreateOrConnectWithoutWarehouseInput[]
+  createMany?: Prisma.WastePreventionRecordCreateManyWarehouseInputEnvelope
+  connect?: Prisma.WastePreventionRecordWhereUniqueInput | Prisma.WastePreventionRecordWhereUniqueInput[]
+}
+
+export type WastePreventionRecordUpdateManyWithoutWarehouseNestedInput = {
+  create?: Prisma.XOR<Prisma.WastePreventionRecordCreateWithoutWarehouseInput, Prisma.WastePreventionRecordUncheckedCreateWithoutWarehouseInput> | Prisma.WastePreventionRecordCreateWithoutWarehouseInput[] | Prisma.WastePreventionRecordUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.WastePreventionRecordCreateOrConnectWithoutWarehouseInput | Prisma.WastePreventionRecordCreateOrConnectWithoutWarehouseInput[]
+  upsert?: Prisma.WastePreventionRecordUpsertWithWhereUniqueWithoutWarehouseInput | Prisma.WastePreventionRecordUpsertWithWhereUniqueWithoutWarehouseInput[]
+  createMany?: Prisma.WastePreventionRecordCreateManyWarehouseInputEnvelope
+  set?: Prisma.WastePreventionRecordWhereUniqueInput | Prisma.WastePreventionRecordWhereUniqueInput[]
+  disconnect?: Prisma.WastePreventionRecordWhereUniqueInput | Prisma.WastePreventionRecordWhereUniqueInput[]
+  delete?: Prisma.WastePreventionRecordWhereUniqueInput | Prisma.WastePreventionRecordWhereUniqueInput[]
+  connect?: Prisma.WastePreventionRecordWhereUniqueInput | Prisma.WastePreventionRecordWhereUniqueInput[]
+  update?: Prisma.WastePreventionRecordUpdateWithWhereUniqueWithoutWarehouseInput | Prisma.WastePreventionRecordUpdateWithWhereUniqueWithoutWarehouseInput[]
+  updateMany?: Prisma.WastePreventionRecordUpdateManyWithWhereWithoutWarehouseInput | Prisma.WastePreventionRecordUpdateManyWithWhereWithoutWarehouseInput[]
+  deleteMany?: Prisma.WastePreventionRecordScalarWhereInput | Prisma.WastePreventionRecordScalarWhereInput[]
+}
+
+export type WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput = {
+  create?: Prisma.XOR<Prisma.WastePreventionRecordCreateWithoutWarehouseInput, Prisma.WastePreventionRecordUncheckedCreateWithoutWarehouseInput> | Prisma.WastePreventionRecordCreateWithoutWarehouseInput[] | Prisma.WastePreventionRecordUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.WastePreventionRecordCreateOrConnectWithoutWarehouseInput | Prisma.WastePreventionRecordCreateOrConnectWithoutWarehouseInput[]
+  upsert?: Prisma.WastePreventionRecordUpsertWithWhereUniqueWithoutWarehouseInput | Prisma.WastePreventionRecordUpsertWithWhereUniqueWithoutWarehouseInput[]
+  createMany?: Prisma.WastePreventionRecordCreateManyWarehouseInputEnvelope
+  set?: Prisma.WastePreventionRecordWhereUniqueInput | Prisma.WastePreventionRecordWhereUniqueInput[]
+  disconnect?: Prisma.WastePreventionRecordWhereUniqueInput | Prisma.WastePreventionRecordWhereUniqueInput[]
+  delete?: Prisma.WastePreventionRecordWhereUniqueInput | Prisma.WastePreventionRecordWhereUniqueInput[]
+  connect?: Prisma.WastePreventionRecordWhereUniqueInput | Prisma.WastePreventionRecordWhereUniqueInput[]
+  update?: Prisma.WastePreventionRecordUpdateWithWhereUniqueWithoutWarehouseInput | Prisma.WastePreventionRecordUpdateWithWhereUniqueWithoutWarehouseInput[]
+  updateMany?: Prisma.WastePreventionRecordUpdateManyWithWhereWithoutWarehouseInput | Prisma.WastePreventionRecordUpdateManyWithWhereWithoutWarehouseInput[]
+  deleteMany?: Prisma.WastePreventionRecordScalarWhereInput | Prisma.WastePreventionRecordScalarWhereInput[]
+}
+
+export type WastePreventionRecordCreateWithoutWarehouseInput = {
+  id?: string
+  productName: string
+  actionTaken: string
+  unitsSaved: number
+  valueSaved: number
+  date: Date | string
+  createdAt?: Date | string
+}
+
+export type WastePreventionRecordUncheckedCreateWithoutWarehouseInput = {
+  id?: string
+  productName: string
+  actionTaken: string
+  unitsSaved: number
+  valueSaved: number
+  date: Date | string
+  createdAt?: Date | string
+}
+
+export type WastePreventionRecordCreateOrConnectWithoutWarehouseInput = {
+  where: Prisma.WastePreventionRecordWhereUniqueInput
+  create: Prisma.XOR<Prisma.WastePreventionRecordCreateWithoutWarehouseInput, Prisma.WastePreventionRecordUncheckedCreateWithoutWarehouseInput>
+}
+
+export type WastePreventionRecordCreateManyWarehouseInputEnvelope = {
+  data: Prisma.WastePreventionRecordCreateManyWarehouseInput | Prisma.WastePreventionRecordCreateManyWarehouseInput[]
+  skipDuplicates?: boolean
+}
+
+export type WastePreventionRecordUpsertWithWhereUniqueWithoutWarehouseInput = {
+  where: Prisma.WastePreventionRecordWhereUniqueInput
+  update: Prisma.XOR<Prisma.WastePreventionRecordUpdateWithoutWarehouseInput, Prisma.WastePreventionRecordUncheckedUpdateWithoutWarehouseInput>
+  create: Prisma.XOR<Prisma.WastePreventionRecordCreateWithoutWarehouseInput, Prisma.WastePreventionRecordUncheckedCreateWithoutWarehouseInput>
+}
+
+export type WastePreventionRecordUpdateWithWhereUniqueWithoutWarehouseInput = {
+  where: Prisma.WastePreventionRecordWhereUniqueInput
+  data: Prisma.XOR<Prisma.WastePreventionRecordUpdateWithoutWarehouseInput, Prisma.WastePreventionRecordUncheckedUpdateWithoutWarehouseInput>
+}
+
+export type WastePreventionRecordUpdateManyWithWhereWithoutWarehouseInput = {
+  where: Prisma.WastePreventionRecordScalarWhereInput
+  data: Prisma.XOR<Prisma.WastePreventionRecordUpdateManyMutationInput, Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseInput>
+}
+
+export type WastePreventionRecordScalarWhereInput = {
+  AND?: Prisma.WastePreventionRecordScalarWhereInput | Prisma.WastePreventionRecordScalarWhereInput[]
+  OR?: Prisma.WastePreventionRecordScalarWhereInput[]
+  NOT?: Prisma.WastePreventionRecordScalarWhereInput | Prisma.WastePreventionRecordScalarWhereInput[]
+  id?: Prisma.StringFilter<"WastePreventionRecord"> | string
+  productName?: Prisma.StringFilter<"WastePreventionRecord"> | string
+  actionTaken?: Prisma.StringFilter<"WastePreventionRecord"> | string
+  unitsSaved?: Prisma.FloatFilter<"WastePreventionRecord"> | number
+  valueSaved?: Prisma.FloatFilter<"WastePreventionRecord"> | number
+  date?: Prisma.DateTimeFilter<"WastePreventionRecord"> | Date | string
+  warehouseId?: Prisma.StringNullableFilter<"WastePreventionRecord"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"WastePreventionRecord"> | Date | string
+}
+
+export type WastePreventionRecordCreateManyWarehouseInput = {
+  id?: string
+  productName: string
+  actionTaken: string
+  unitsSaved: number
+  valueSaved: number
+  date: Date | string
+  createdAt?: Date | string
+}
+
+export type WastePreventionRecordUpdateWithoutWarehouseInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  actionTaken?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsSaved?: Prisma.FloatFieldUpdateOperationsInput | number
+  valueSaved?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type WastePreventionRecordUncheckedUpdateWithoutWarehouseInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  actionTaken?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsSaved?: Prisma.FloatFieldUpdateOperationsInput | number
+  valueSaved?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type WastePreventionRecordUncheckedUpdateManyWithoutWarehouseInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  actionTaken?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsSaved?: Prisma.FloatFieldUpdateOperationsInput | number
+  valueSaved?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -408,7 +587,9 @@ export type WastePreventionRecordSelect<ExtArgs extends runtime.Types.Extensions
   unitsSaved?: boolean
   valueSaved?: boolean
   date?: boolean
+  warehouseId?: boolean
   createdAt?: boolean
+  warehouse?: boolean | Prisma.WastePreventionRecord$warehouseArgs<ExtArgs>
 }, ExtArgs["result"]["wastePreventionRecord"]>
 
 export type WastePreventionRecordSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -418,7 +599,9 @@ export type WastePreventionRecordSelectCreateManyAndReturn<ExtArgs extends runti
   unitsSaved?: boolean
   valueSaved?: boolean
   date?: boolean
+  warehouseId?: boolean
   createdAt?: boolean
+  warehouse?: boolean | Prisma.WastePreventionRecord$warehouseArgs<ExtArgs>
 }, ExtArgs["result"]["wastePreventionRecord"]>
 
 export type WastePreventionRecordSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -428,7 +611,9 @@ export type WastePreventionRecordSelectUpdateManyAndReturn<ExtArgs extends runti
   unitsSaved?: boolean
   valueSaved?: boolean
   date?: boolean
+  warehouseId?: boolean
   createdAt?: boolean
+  warehouse?: boolean | Prisma.WastePreventionRecord$warehouseArgs<ExtArgs>
 }, ExtArgs["result"]["wastePreventionRecord"]>
 
 export type WastePreventionRecordSelectScalar = {
@@ -438,14 +623,26 @@ export type WastePreventionRecordSelectScalar = {
   unitsSaved?: boolean
   valueSaved?: boolean
   date?: boolean
+  warehouseId?: boolean
   createdAt?: boolean
 }
 
-export type WastePreventionRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productName" | "actionTaken" | "unitsSaved" | "valueSaved" | "date" | "createdAt", ExtArgs["result"]["wastePreventionRecord"]>
+export type WastePreventionRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productName" | "actionTaken" | "unitsSaved" | "valueSaved" | "date" | "warehouseId" | "createdAt", ExtArgs["result"]["wastePreventionRecord"]>
+export type WastePreventionRecordInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  warehouse?: boolean | Prisma.WastePreventionRecord$warehouseArgs<ExtArgs>
+}
+export type WastePreventionRecordIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  warehouse?: boolean | Prisma.WastePreventionRecord$warehouseArgs<ExtArgs>
+}
+export type WastePreventionRecordIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  warehouse?: boolean | Prisma.WastePreventionRecord$warehouseArgs<ExtArgs>
+}
 
 export type $WastePreventionRecordPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "WastePreventionRecord"
-  objects: {}
+  objects: {
+    warehouse: Prisma.$WarehousePayload<ExtArgs> | null
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     productName: string
@@ -453,6 +650,7 @@ export type $WastePreventionRecordPayload<ExtArgs extends runtime.Types.Extensio
     unitsSaved: number
     valueSaved: number
     date: Date
+    warehouseId: string | null
     createdAt: Date
   }, ExtArgs["result"]["wastePreventionRecord"]>
   composites: {}
@@ -848,6 +1046,7 @@ readonly fields: WastePreventionRecordFieldRefs;
  */
 export interface Prisma__WastePreventionRecordClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  warehouse<T extends Prisma.WastePreventionRecord$warehouseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WastePreventionRecord$warehouseArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -883,6 +1082,7 @@ export interface WastePreventionRecordFieldRefs {
   readonly unitsSaved: Prisma.FieldRef<"WastePreventionRecord", 'Float'>
   readonly valueSaved: Prisma.FieldRef<"WastePreventionRecord", 'Float'>
   readonly date: Prisma.FieldRef<"WastePreventionRecord", 'DateTime'>
+  readonly warehouseId: Prisma.FieldRef<"WastePreventionRecord", 'String'>
   readonly createdAt: Prisma.FieldRef<"WastePreventionRecord", 'DateTime'>
 }
     
@@ -900,6 +1100,10 @@ export type WastePreventionRecordFindUniqueArgs<ExtArgs extends runtime.Types.Ex
    * Omit specific fields from the WastePreventionRecord
    */
   omit?: Prisma.WastePreventionRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordInclude<ExtArgs> | null
   /**
    * Filter, which WastePreventionRecord to fetch.
    */
@@ -919,6 +1123,10 @@ export type WastePreventionRecordFindUniqueOrThrowArgs<ExtArgs extends runtime.T
    */
   omit?: Prisma.WastePreventionRecordOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordInclude<ExtArgs> | null
+  /**
    * Filter, which WastePreventionRecord to fetch.
    */
   where: Prisma.WastePreventionRecordWhereUniqueInput
@@ -936,6 +1144,10 @@ export type WastePreventionRecordFindFirstArgs<ExtArgs extends runtime.Types.Ext
    * Omit specific fields from the WastePreventionRecord
    */
   omit?: Prisma.WastePreventionRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordInclude<ExtArgs> | null
   /**
    * Filter, which WastePreventionRecord to fetch.
    */
@@ -985,6 +1197,10 @@ export type WastePreventionRecordFindFirstOrThrowArgs<ExtArgs extends runtime.Ty
    */
   omit?: Prisma.WastePreventionRecordOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordInclude<ExtArgs> | null
+  /**
    * Filter, which WastePreventionRecord to fetch.
    */
   where?: Prisma.WastePreventionRecordWhereInput
@@ -1032,6 +1248,10 @@ export type WastePreventionRecordFindManyArgs<ExtArgs extends runtime.Types.Exte
    * Omit specific fields from the WastePreventionRecord
    */
   omit?: Prisma.WastePreventionRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordInclude<ExtArgs> | null
   /**
    * Filter, which WastePreventionRecords to fetch.
    */
@@ -1081,6 +1301,10 @@ export type WastePreventionRecordCreateArgs<ExtArgs extends runtime.Types.Extens
    */
   omit?: Prisma.WastePreventionRecordOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordInclude<ExtArgs> | null
+  /**
    * The data needed to create a WastePreventionRecord.
    */
   data: Prisma.XOR<Prisma.WastePreventionRecordCreateInput, Prisma.WastePreventionRecordUncheckedCreateInput>
@@ -1114,6 +1338,10 @@ export type WastePreventionRecordCreateManyAndReturnArgs<ExtArgs extends runtime
    */
   data: Prisma.WastePreventionRecordCreateManyInput | Prisma.WastePreventionRecordCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1128,6 +1356,10 @@ export type WastePreventionRecordUpdateArgs<ExtArgs extends runtime.Types.Extens
    * Omit specific fields from the WastePreventionRecord
    */
   omit?: Prisma.WastePreventionRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordInclude<ExtArgs> | null
   /**
    * The data needed to update a WastePreventionRecord.
    */
@@ -1180,6 +1412,10 @@ export type WastePreventionRecordUpdateManyAndReturnArgs<ExtArgs extends runtime
    * Limit how many WastePreventionRecords to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1194,6 +1430,10 @@ export type WastePreventionRecordUpsertArgs<ExtArgs extends runtime.Types.Extens
    * Omit specific fields from the WastePreventionRecord
    */
   omit?: Prisma.WastePreventionRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordInclude<ExtArgs> | null
   /**
    * The filter to search for the WastePreventionRecord to update in case it exists.
    */
@@ -1221,6 +1461,10 @@ export type WastePreventionRecordDeleteArgs<ExtArgs extends runtime.Types.Extens
    */
   omit?: Prisma.WastePreventionRecordOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordInclude<ExtArgs> | null
+  /**
    * Filter which WastePreventionRecord to delete.
    */
   where: Prisma.WastePreventionRecordWhereUniqueInput
@@ -1241,6 +1485,25 @@ export type WastePreventionRecordDeleteManyArgs<ExtArgs extends runtime.Types.Ex
 }
 
 /**
+ * WastePreventionRecord.warehouse
+ */
+export type WastePreventionRecord$warehouseArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Warehouse
+   */
+  select?: Prisma.WarehouseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Warehouse
+   */
+  omit?: Prisma.WarehouseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WarehouseInclude<ExtArgs> | null
+  where?: Prisma.WarehouseWhereInput
+}
+
+/**
  * WastePreventionRecord without action
  */
 export type WastePreventionRecordDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1252,4 +1515,8 @@ export type WastePreventionRecordDefaultArgs<ExtArgs extends runtime.Types.Exten
    * Omit specific fields from the WastePreventionRecord
    */
   omit?: Prisma.WastePreventionRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WastePreventionRecordInclude<ExtArgs> | null
 }

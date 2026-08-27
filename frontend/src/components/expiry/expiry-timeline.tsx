@@ -5,6 +5,7 @@ import { ExpiryTimelineGroup } from "@/types/expiry";
 import { CalendarClock } from "lucide-react";
 import { useExpiryTimeline } from "@/hooks/use-expiry";
 import { useFormatters } from "@/hooks/use-formatters";
+import { QueryError } from "@/components/ui/query-state";
 
 // the api buckets by calendar month, so the nodes are months rather than day windows
 const monthLabel = (month: string) =>
@@ -15,7 +16,7 @@ const monthLabel = (month: string) =>
   });
 
 export function ExpiryTimeline() {
-  const { data, isPending } = useExpiryTimeline();
+  const { data, isPending, isError } = useExpiryTimeline();
   const { formatCompactCurrency: formatCurrency } = useFormatters();
 
   const timelineData: ExpiryTimelineGroup[] = (data ?? []).slice(0, 5).map((point) => ({
@@ -33,6 +34,8 @@ export function ExpiryTimeline() {
   };
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="the expiry timeline" />;
 
   return (
     <Card className="border-border/60 shadow-sm mb-6 bg-background">

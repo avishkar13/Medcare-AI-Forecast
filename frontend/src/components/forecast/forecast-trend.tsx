@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForecastSeasonality, useForecastTrend } from "@/hooks/use-forecast";
 import { BarChart3, TrendingUp, Calendar, Zap } from "lucide-react";
 import { useForecastScope } from "@/store/filters.store";
+import { QueryError } from "@/components/ui/query-state";
 
 export function ForecastTrend() {
   const scope = useForecastScope();
-  const { data, isPending } = useForecastTrend(scope);
+  const { data, isPending, isError } = useForecastTrend(scope);
   const seasonality = useForecastSeasonality(scope);
 
   // the peak weekday, taken from the measured index rather than described in prose
@@ -24,6 +25,8 @@ export function ForecastTrend() {
   };
 
   if (isPending) return null;
+
+  if (isError) return <QueryError label="demand trends" />;
 
   return (
     <Card className="h-full">
