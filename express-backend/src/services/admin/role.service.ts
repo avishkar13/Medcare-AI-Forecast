@@ -5,8 +5,11 @@ import type { CreateRoleInput, UpdateRoleInput } from "../../zod/admin/role.sche
 export const listRoles = async () => {
   const roles = await prisma.role.findMany({
     include: {
+      permissions: {
+        include: { permission: true },
+      },
       _count: {
-        select: { users: true, permissions: true },
+        select: { users: true },
       },
     },
     orderBy: { createdAt: "asc" },
@@ -20,7 +23,7 @@ export const listRoles = async () => {
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
     userCount: r._count.users,
-    permissionCount: r._count.permissions,
+    permissions: r.permissions.map((rp) => rp.permission),
   }));
 };
 

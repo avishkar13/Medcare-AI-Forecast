@@ -45,6 +45,7 @@ export interface AuthenticatedUser {
     id: string;
     name: string;
   };
+  permissions: string[];
 }
 
 export interface LoginResponse {

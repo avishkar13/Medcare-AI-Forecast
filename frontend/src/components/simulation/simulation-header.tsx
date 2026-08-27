@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Play, RotateCcw, Loader2 } from "lucide-react";
+import { useAuthStore } from "@/store/auth.store";
 
 interface SimulationHeaderProps {
   lastSimulation: string | null;
@@ -11,6 +12,8 @@ interface SimulationHeaderProps {
 }
 
 export function SimulationHeader({ lastSimulation, isSimulating, onRun, onReset }: SimulationHeaderProps) {
+  const { hasPermission } = useAuthStore();
+  
   return (
     <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-4 sm:pt-6 mb-2">
       <div>
@@ -33,24 +36,26 @@ export function SimulationHeader({ lastSimulation, isSimulating, onRun, onReset 
           <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
           Reset
         </Button>
-        <Button
-          size="sm"
-          className="bg-ai hover:bg-ai/90 text-primary-foreground font-bold shadow-md h-8 px-4 transition-all duration-200"
-          onClick={onRun}
-          disabled={isSimulating}
-        >
-          {isSimulating ? (
-            <>
-              <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-              Simulating...
-            </>
-          ) : (
-            <>
-              <Play className="h-3.5 w-3.5 mr-1.5" />
-              Run Simulation
-            </>
-          )}
-        </Button>
+        {hasPermission("simulation:run") && (
+          <Button
+            size="sm"
+            className="bg-ai hover:bg-ai/90 text-primary-foreground font-bold shadow-md h-8 px-4 transition-all duration-200"
+            onClick={onRun}
+            disabled={isSimulating}
+          >
+            {isSimulating ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                Simulating...
+              </>
+            ) : (
+              <>
+                <Play className="h-3.5 w-3.5 mr-1.5" />
+                Run Simulation
+              </>
+            )}
+          </Button>
+        )}
       </div>
     </div>
   );
