@@ -17,6 +17,8 @@ import { NotificationSettings } from "@/components/settings/notification-setting
 import { AISettings } from "@/components/settings/ai-settings";
 import { IntegrationSettings } from "@/components/settings/integration-settings";
 import { SecuritySettings } from "@/components/settings/security-settings";
+import { PermissionGuard } from "@/components/auth/permission-guard";
+import { useAuthStore } from "@/store/auth.store";
 
 export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState<SettingsSectionKey>("general");
@@ -27,6 +29,7 @@ export default function SettingsPage() {
   // null means untouched, so the server copy shows through without a sync effect
   const [draft, setDraft] = useState<AppSettings | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const { hasPermission } = useAuthStore();
 
   const isSaving = save.isPending;
   const hasUnsavedChanges =
@@ -90,8 +93,9 @@ export default function SettingsPage() {
   const draftSettings = draft ?? savedSettings;
 
   return (
-    <div className="flex-1 w-full p-4 md:p-8 max-w-[1200px] mx-auto overflow-y-auto no-scrollbar pb-24">
-      {/* Page Header */}
+    <PermissionGuard requiredPermission="settings:view">
+      <div className="flex-1 w-full p-4 md:p-8 max-w-[1200px] mx-auto overflow-y-auto no-scrollbar pb-24">
+        {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8 pb-4 border-b border-border/50">
         <div className="flex flex-col gap-1.5">
           <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">System Configuration</span>
@@ -114,14 +118,16 @@ export default function SettingsPage() {
               </span>
             )}
           </div>
-          <Button 
-            onClick={handleSave}
-            disabled={!hasUnsavedChanges || isSaving}
-            className="h-10 px-6 font-bold shadow-sm transition-all"
-          >
-            <Save className={cn("h-4 w-4 mr-2", isSaving && "animate-spin opacity-50")} />
-            {isSaving ? "Saving..." : "Save Changes"}
-          </Button>
+          {hasPermission("settings:update") && (
+            <Button 
+              onClick={handleSave}
+              disabled={!hasUnsavedChanges || isSaving}
+              className="h-10 px-6 font-bold shadow-sm transition-all"
+            >
+              <Save className={cn("h-4 w-4 mr-2", isSaving && "animate-spin opacity-50")} />
+              {isSaving ? "Saving..." : "Save Changes"}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -136,8 +142,7 @@ export default function SettingsPage() {
         <div className="flex-1 w-full min-w-0">
           {renderActiveSection()}
           
-          {/* Bottom Actions */}
-          {hasUnsavedChanges && (
+          {hasUnsavedChanges && hasPermission("settings:update") && (
             <div className="mt-8 pt-6 border-t border-border/50 flex flex-col sm:flex-row items-center justify-end gap-3">
               <span className="text-xs text-muted-foreground mr-auto hidden sm:block">
                 You have unsaved changes in this section.
@@ -161,5 +166,6 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
+    </PermissionGuard>
   );
 }

@@ -13,7 +13,9 @@ import {
   CalendarClock,
   Settings,
   Activity,
-  LogOut
+  LogOut,
+  Users,
+  ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -41,6 +43,7 @@ interface NavItem {
   href: string;
   icon: LucideIcon;
   children?: { title: string; href: string }[];
+  requiredPermission?: string;
 }
 
 interface NavGroup {
@@ -51,27 +54,34 @@ interface NavGroup {
 const navGroups: NavGroup[] = [
   {
     title: "OVERVIEW",
-    items: [{ title: "Dashboard", href: "/dashboard", icon: LayoutDashboard }],
+    items: [{ title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, requiredPermission: "dashboard:view" }],
   },
   {
     title: "PLANNING",
     items: [
-      { title: "Inventory", href: "/inventory", icon: Package },
-      { title: "Demand Forecast", href: "/forecast", icon: TrendingUp },
-      { title: "Recommendations", href: "/recommendations", icon: Sparkles },
-      { title: "Simulation", href: "/simulation", icon: FlaskConical },
+      { title: "Inventory", href: "/inventory", icon: Package, requiredPermission: "inventory:view" },
+      { title: "Demand Forecast", href: "/forecast", icon: TrendingUp, requiredPermission: "forecast:view" },
+      { title: "Recommendations", href: "/recommendations", icon: Sparkles, requiredPermission: "recommendations:view" },
+      { title: "Simulation", href: "/simulation", icon: FlaskConical, requiredPermission: "simulation:view" },
     ],
   },
   {
     title: "MONITORING",
     items: [
-      { title: "Alerts", href: "/alerts", icon: Bell },
-      { title: "Expiry Risk", href: "/expiry", icon: CalendarClock },
+      { title: "Alerts", href: "/alerts", icon: Bell, requiredPermission: "alerts:view" },
+      { title: "Expiry Risk", href: "/expiry", icon: CalendarClock, requiredPermission: "expiry:view" },
     ],
   },
   {
     title: "SYSTEM",
-    items: [{ title: "Settings", href: "/settings", icon: Settings }],
+    items: [{ title: "Settings", href: "/settings", icon: Settings, requiredPermission: "settings:view" }],
+  },
+  {
+    title: "ADMINISTRATION",
+    items: [
+      { title: "User Management", href: "/admin/users", icon: Users, requiredPermission: "users:view" },
+      { title: "Roles & Permissions", href: "/admin/roles", icon: ShieldCheck, requiredPermission: "roles:view" },
+    ],
   },
 ];
 
@@ -102,12 +112,20 @@ export function SidebarContent() {
 
       {/* Nav Links */}
       <nav className="flex-1 overflow-auto py-4 px-3 space-y-6">
-        {navGroups.map((group) => (
+        {navGroups.map((group) => {
+          const visibleItems = group.items.filter((item) => {
+            if (!item.requiredPermission) return true;
+            return user?.permissions?.includes(item.requiredPermission);
+          });
+
+          if (visibleItems.length === 0) return null;
+
+          return (
           <div key={group.title} className="flex flex-col gap-1">
             <span className="px-3 text-xs font-semibold tracking-wider text-muted-foreground/70 mb-1">
               {group.title}
             </span>
-            {group.items.map((item) => {
+            {visibleItems.map((item) => {
               // Ensure exact match for /dashboard so child routes don't highlight it, 
               // or simple startsWith logic
               const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href.split("?")[0]));
@@ -157,7 +175,8 @@ export function SidebarContent() {
               );
             })}
           </div>
-        ))}
+          );
+        })}
       </nav>
 
       {/* Bottom Section */}

@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { RecommendationItem } from "@/types/recommendation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuthStore } from "@/store/auth.store";
 import { ShieldCheck, Package, TrendingUp, TrendingDown, Minus, Clock, MapPin, Zap } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -16,6 +17,8 @@ interface RecommendationDrawerProps {
 }
 
 export function RecommendationDrawer({ isOpen, onOpenChange, recommendation, onExecute, onDismiss }: RecommendationDrawerProps) {
+  const { hasPermission } = useAuthStore();
+
   if (!recommendation) return null;
 
   const isExecuted = recommendation.status === "Executed";
@@ -136,12 +139,16 @@ export function RecommendationDrawer({ isOpen, onOpenChange, recommendation, onE
         <div className="mt-8 pt-6 border-t border-border/50 flex flex-col gap-3">
           {recommendation.status === "Pending" ? (
             <>
-              <Button onClick={onExecute} size="lg" className="w-full bg-ai hover:bg-ai/90 text-primary-foreground font-semibold shadow-md">
-                Execute Action
-              </Button>
-              <Button onClick={onDismiss} variant="outline" size="lg" className="w-full font-medium">
-                Dismiss Recommendation
-              </Button>
+              {hasPermission("recommendations:execute") && (
+                <Button onClick={onExecute} size="lg" className="w-full bg-ai hover:bg-ai/90 text-primary-foreground font-semibold shadow-md">
+                  Execute Action
+                </Button>
+              )}
+              {hasPermission("recommendations:dismiss") && (
+                <Button onClick={onDismiss} variant="outline" size="lg" className="w-full font-medium">
+                  Dismiss Recommendation
+                </Button>
+              )}
             </>
           ) : (
             <div className="p-4 text-center rounded-xl border border-border bg-muted/30">

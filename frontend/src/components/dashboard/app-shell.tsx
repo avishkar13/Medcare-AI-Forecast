@@ -6,6 +6,20 @@ import { Sidebar } from "./sidebar";
 import { Navbar } from "./navbar";
 import { useAuthStore } from "@/store/auth.store";
 import { Loader2 } from "lucide-react";
+import { PermissionGuard } from "@/components/auth/permission-guard";
+
+const ROUTE_PERMISSIONS: Record<string, string> = {
+  "/dashboard": "dashboard:view",
+  "/inventory": "inventory:view",
+  "/forecast": "forecast:view",
+  "/recommendations": "recommendations:view",
+  "/simulation": "simulation:view",
+  "/alerts": "alerts:view",
+  "/expiry": "expiry:view",
+  "/settings": "settings:view",
+  "/admin/users": "users:view",
+  "/admin/roles": "roles:view",
+};
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -53,7 +67,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex flex-col flex-1 w-full md:pl-[250px]">
         <Navbar />
         <main className="flex-1 p-4 md:p-6 lg:p-8">
-          {children}
+          {pathname && ROUTE_PERMISSIONS[pathname] ? (
+            <PermissionGuard requiredPermission={ROUTE_PERMISSIONS[pathname]}>
+              {children}
+            </PermissionGuard>
+          ) : (
+            children
+          )}
         </main>
       </div>
     </div>

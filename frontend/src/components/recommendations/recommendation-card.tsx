@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Package, MapPin, Zap, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useState } from "react";
 import { RecommendationDrawer } from "./recommendation-drawer";
+import { useAuthStore } from "@/store/auth.store";
 
 interface RecommendationCardProps {
   recommendation: RecommendationItem;
@@ -16,6 +17,7 @@ interface RecommendationCardProps {
 
 export function RecommendationCard({ recommendation, onExecute, onDismiss }: RecommendationCardProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { hasPermission } = useAuthStore();
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -114,12 +116,20 @@ export function RecommendationCard({ recommendation, onExecute, onDismiss }: Rec
             <Button size="sm" variant="outline" className="w-full bg-background border-border/80 hover:bg-muted text-xs h-8" onClick={() => setIsDrawerOpen(true)}>
               View Details
             </Button>
-            <Button size="sm" className="w-full bg-ai hover:bg-ai/90 text-primary-foreground font-semibold text-xs h-8" onClick={() => onExecute(recommendation.id)}>
-              Execute
-            </Button>
-            <Button size="sm" variant="ghost" className="w-full text-muted-foreground hover:text-foreground hover:bg-muted/50 text-xs h-8" onClick={() => onDismiss(recommendation.id)}>
-              Dismiss
-            </Button>
+            {recommendation.status === "Pending" && (
+              <>
+                {hasPermission("recommendations:execute") && (
+                  <Button size="sm" className="w-full bg-ai hover:bg-ai/90 text-primary-foreground font-semibold text-xs h-8" onClick={() => onExecute(recommendation.id)}>
+                    Execute
+                  </Button>
+                )}
+                {hasPermission("recommendations:dismiss") && (
+                  <Button size="sm" variant="ghost" className="w-full text-muted-foreground hover:text-foreground hover:bg-muted/50 text-xs h-8" onClick={() => onDismiss(recommendation.id)}>
+                    Dismiss
+                  </Button>
+                )}
+              </>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -81,6 +81,14 @@ async function request<T>(
     if (authStore.isAuthenticated) {
       authStore.clearAuth();
     }
+  } else if (response.status === 403) {
+    // We dynamically import or use the toast function to avoid circular dependencies
+    // if sonner is not client-ready, or we can just import it at the top.
+    // For now we'll throw the error below, but let's change the payload message.
+    if (payload && typeof payload === "object") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (payload as any).message = "You don't have permission to perform this action";
+    }
   }
 
   if (!response.ok) throw toApiError(payload, response.status, echoedId);

@@ -20,7 +20,17 @@ export async function login(input: LoginInput) {
 
   const user = await prisma.user.findUnique({
     where: { email },
-    include: { role: true },
+    include: {
+      role: {
+        include: {
+          permissions: {
+            include: {
+              permission: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!user) {
@@ -53,6 +63,7 @@ export async function login(input: LoginInput) {
         id: user.role.id,
         name: user.role.name,
       },
+      permissions: user.role.permissions.map((rp) => rp.permission.key),
     },
     token,
   };
