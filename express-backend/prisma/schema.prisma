@@ -22,6 +22,8 @@ model User {
   scenarios            Scenario[]
   planningRuns         PlanningRun[]
   actedRecommendations Recommendation[]
+  restockRequested     RestockRequest[] @relation("RestockRequestedBy")
+  restockDecided       RestockRequest[] @relation("RestockDecidedBy")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -52,6 +54,8 @@ model Product {
   demandSignals      DemandSignal[]
   distributorOrders  DistributorOrder[]
   alerts             Alert[]
+  stockMovements     StockMovement[]
+  restockRequests    RestockRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -70,6 +74,12 @@ model Warehouse {
   capacity Int?
   isActive Boolean       @default(true)
 
+  /**
+   * When this DC last reported in. Null means it never has - the hub shows that as
+   * "never synced" rather than as a stale timestamp. Phase 3.3.
+   */
+  lastSyncedAt DateTime?
+
   demandHistory      DemandHistory[]
   inventory          Inventory[]
   batches            InventoryBatch[]
@@ -86,6 +96,7 @@ model Warehouse {
   alerts             Alert[]
   stockMovements     StockMovement[]
   wastePrevention    WastePreventionRecord[]
+  restockRequests    RestockRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -571,6 +582,8 @@ model Alert {
 
   product   Product?   @relation(fields: [productId], references: [id])
   warehouse Warehouse? @relation(fields: [warehouseId], references: [id])
+  /** The movements that raised this alert. "This transaction caused this alert." */
+  triggeredBy StockMovement[] @relation("AlertTriggeredBy")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -620,29 +633,90 @@ model SystemSettings {
 }
 
 /**
- * The movement ledger. Written by nothing yet - Phase 3.1 is its writer.
+ * The movement ledger - the append-only record of stock actually moving.
  *
  * `warehouseId` is the DC the row belongs to, which is what a DC page filters on.
  * It does not replace `fromLocation` / `toLocation`: a transfer has two endpoints
  * and one foreign key cannot hold both.
+ *
+ * **`quantity` is a signed delta**, so `stockAfter = stockBefore + quantity` holds for
+ * every row and the ledger reads without the caller having to know which types
+ * subtract. `movement.service.ts` enforces the sign against the type.
+ *
+ * `stockBefore` / `stockAfter` are written rather than derived: recomputing a position
+ * by folding the ledger would give a different answer the moment anything else touches
+ * `Inventory`, and an audit trail that disagrees with the stock it describes is worse
+ * than none.
  */
+enum RestockStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  FULFILLED
+}
+
 model StockMovement {
   id           String   @id @default(cuid())
   date         DateTime
   movementType String
   sku          String
+  productId    String
   quantity     Float
-  warehouseId  String?
+  stockBefore  Float
+  stockAfter   Float
+  warehouseId  String
   fromLocation String?
   toLocation   String?
   reference    String?
   userOrSystem String?
 
-  warehouse Warehouse? @relation(fields: [warehouseId], references: [id])
+  /** The alert this movement raised, when it raised one. Phase 3.6. */
+  triggeredAlertId String?
+
+  product        Product   @relation(fields: [productId], references: [id])
+  warehouse      Warehouse @relation(fields: [warehouseId], references: [id])
+  triggeredAlert Alert?    @relation("AlertTriggeredBy", fields: [triggeredAlertId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
 
   @@index([warehouseId, date])
+  @@index([productId, warehouseId, date])
+  @@index([triggeredAlertId])
+}
+
+/**
+ * A request to replenish a position, raised from the UI rather than by the planner.
+ *
+ * Distinct from `SupplyPlan`, which the executor proposes: this is a human asking for
+ * stock. The lifecycle mirrors `SupplyPlan`'s so both read the same way on a review
+ * surface, and `REQUESTED` is the only actionable state.
+ */
+model RestockRequest {
+  id          String   @id @default(cuid())
+  productId   String
+  warehouseId String
+  quantity    Float
+  status      RestockStatus @default(REQUESTED)
+  reason      String?
+  notes       String?
+
+  requestedById String?
+  decidedById   String?
+  decidedAt     DateTime?
+  /** Set when the arriving stock was recorded, which is what closes the loop. */
+  fulfilledAt      DateTime?
+  fulfillmentMovementId String?
+
+  product     Product   @relation(fields: [productId], references: [id])
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  requestedBy User?     @relation("RestockRequestedBy", fields: [requestedById], references: [id])
+  decidedBy   User?     @relation("RestockDecidedBy", fields: [decidedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([warehouseId, status])
+  @@index([productId, warehouseId])
 }
 
 /**

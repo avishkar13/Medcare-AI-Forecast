@@ -513,10 +513,6 @@ export type InventoryBatchUncheckedUpdateManyWithoutWarehouseNestedInput = {
   deleteMany?: Prisma.InventoryBatchScalarWhereInput | Prisma.InventoryBatchScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type InventoryBatchCreateWithoutProductInput = {
   id?: string
   batchNumber: string

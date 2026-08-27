@@ -424,6 +424,7 @@ export const ModelName = {
   NotificationDelivery: 'NotificationDelivery',
   SystemSettings: 'SystemSettings',
   StockMovement: 'StockMovement',
+  RestockRequest: 'RestockRequest',
   WastePreventionRecord: 'WastePreventionRecord',
   AlertMetric: 'AlertMetric',
   AlertTimelineEvent: 'AlertTimelineEvent',
@@ -457,7 +458,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "product" | "warehouse" | "demandHistory" | "inventory" | "inventoryBatch" | "planningParameter" | "promotionEvent" | "demandSignal" | "distributor" | "distributorOrder" | "scenario" | "planningRun" | "forecast" | "inventoryPlan" | "supplyPlan" | "dRPPlan" | "optimizationResult" | "simulationRun" | "recommendation" | "role" | "permission" | "rolePermission" | "alert" | "notificationDelivery" | "systemSettings" | "stockMovement" | "wastePreventionRecord" | "alertMetric" | "alertTimelineEvent" | "recommendationSignal" | "simulationMetric" | "scenarioDCImpact" | "scenarioSKUImpact" | "scenarioRiskIndicator" | "generalSettings" | "forecastSettings" | "inventorySettings" | "alertSettings" | "notificationSettings" | "notificationRule" | "aISettings" | "integrationSettings" | "integrationSource" | "securitySettings"
+    modelProps: "user" | "product" | "warehouse" | "demandHistory" | "inventory" | "inventoryBatch" | "planningParameter" | "promotionEvent" | "demandSignal" | "distributor" | "distributorOrder" | "scenario" | "planningRun" | "forecast" | "inventoryPlan" | "supplyPlan" | "dRPPlan" | "optimizationResult" | "simulationRun" | "recommendation" | "role" | "permission" | "rolePermission" | "alert" | "notificationDelivery" | "systemSettings" | "stockMovement" | "restockRequest" | "wastePreventionRecord" | "alertMetric" | "alertTimelineEvent" | "recommendationSignal" | "simulationMetric" | "scenarioDCImpact" | "scenarioSKUImpact" | "scenarioRiskIndicator" | "generalSettings" | "forecastSettings" | "inventorySettings" | "alertSettings" | "notificationSettings" | "notificationRule" | "aISettings" | "integrationSettings" | "integrationSource" | "securitySettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2459,6 +2460,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RestockRequest: {
+      payload: Prisma.$RestockRequestPayload<ExtArgs>
+      fields: Prisma.RestockRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RestockRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RestockRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RestockRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RestockRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.RestockRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RestockRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RestockRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RestockRequestPayload>
+        }
+        findMany: {
+          args: Prisma.RestockRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RestockRequestPayload>[]
+        }
+        create: {
+          args: Prisma.RestockRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RestockRequestPayload>
+        }
+        createMany: {
+          args: Prisma.RestockRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RestockRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RestockRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.RestockRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RestockRequestPayload>
+        }
+        update: {
+          args: Prisma.RestockRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RestockRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.RestockRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RestockRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RestockRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RestockRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.RestockRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RestockRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.RestockRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRestockRequest>
+        }
+        groupBy: {
+          args: Prisma.RestockRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RestockRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RestockRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RestockRequestCountAggregateOutputType> | number
+        }
+      }
+    }
     WastePreventionRecord: {
       payload: Prisma.$WastePreventionRecordPayload<ExtArgs>
       fields: Prisma.WastePreventionRecordFieldRefs
@@ -3871,6 +3946,7 @@ export const WarehouseScalarFieldEnum = {
   location: 'location',
   capacity: 'capacity',
   isActive: 'isActive',
+  lastSyncedAt: 'lastSyncedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -4237,16 +4313,40 @@ export const StockMovementScalarFieldEnum = {
   date: 'date',
   movementType: 'movementType',
   sku: 'sku',
+  productId: 'productId',
   quantity: 'quantity',
+  stockBefore: 'stockBefore',
+  stockAfter: 'stockAfter',
   warehouseId: 'warehouseId',
   fromLocation: 'fromLocation',
   toLocation: 'toLocation',
   reference: 'reference',
   userOrSystem: 'userOrSystem',
+  triggeredAlertId: 'triggeredAlertId',
   createdAt: 'createdAt'
 } as const
 
 export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)[keyof typeof StockMovementScalarFieldEnum]
+
+
+export const RestockRequestScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
+  quantity: 'quantity',
+  status: 'status',
+  reason: 'reason',
+  notes: 'notes',
+  requestedById: 'requestedById',
+  decidedById: 'decidedById',
+  decidedAt: 'decidedAt',
+  fulfilledAt: 'fulfilledAt',
+  fulfillmentMovementId: 'fulfillmentMovementId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RestockRequestScalarFieldEnum = (typeof RestockRequestScalarFieldEnum)[keyof typeof RestockRequestScalarFieldEnum]
 
 
 export const WastePreventionRecordScalarFieldEnum = {
@@ -4747,6 +4847,20 @@ export type EnumRecommendationStatusFieldRefInput<$PrismaModel> = FieldRefInputT
 export type ListEnumRecommendationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RecommendationStatus[]'>
     
 
+
+/**
+ * Reference to a field of type 'RestockStatus'
+ */
+export type EnumRestockStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RestockStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'RestockStatus[]'
+ */
+export type ListEnumRestockStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RestockStatus[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -4925,6 +5039,7 @@ export type GlobalOmitConfig = {
   notificationDelivery?: Prisma.NotificationDeliveryOmit
   systemSettings?: Prisma.SystemSettingsOmit
   stockMovement?: Prisma.StockMovementOmit
+  restockRequest?: Prisma.RestockRequestOmit
   wastePreventionRecord?: Prisma.WastePreventionRecordOmit
   alertMetric?: Prisma.AlertMetricOmit
   alertTimelineEvent?: Prisma.AlertTimelineEventOmit

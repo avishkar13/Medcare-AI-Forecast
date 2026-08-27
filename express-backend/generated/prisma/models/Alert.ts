@@ -287,6 +287,7 @@ export type AlertWhereInput = {
   deliveries?: Prisma.NotificationDeliveryListRelationFilter
   product?: Prisma.XOR<Prisma.ProductNullableScalarRelationFilter, Prisma.ProductWhereInput> | null
   warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
+  triggeredBy?: Prisma.StockMovementListRelationFilter
 }
 
 export type AlertOrderByWithRelationInput = {
@@ -312,6 +313,7 @@ export type AlertOrderByWithRelationInput = {
   deliveries?: Prisma.NotificationDeliveryOrderByRelationAggregateInput
   product?: Prisma.ProductOrderByWithRelationInput
   warehouse?: Prisma.WarehouseOrderByWithRelationInput
+  triggeredBy?: Prisma.StockMovementOrderByRelationAggregateInput
 }
 
 export type AlertWhereUniqueInput = Prisma.AtLeast<{
@@ -340,6 +342,7 @@ export type AlertWhereUniqueInput = Prisma.AtLeast<{
   deliveries?: Prisma.NotificationDeliveryListRelationFilter
   product?: Prisma.XOR<Prisma.ProductNullableScalarRelationFilter, Prisma.ProductWhereInput> | null
   warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
+  triggeredBy?: Prisma.StockMovementListRelationFilter
 }, "id">
 
 export type AlertOrderByWithAggregationInput = {
@@ -409,6 +412,7 @@ export type AlertCreateInput = {
   deliveries?: Prisma.NotificationDeliveryCreateNestedManyWithoutAlertInput
   product?: Prisma.ProductCreateNestedOneWithoutAlertsInput
   warehouse?: Prisma.WarehouseCreateNestedOneWithoutAlertsInput
+  triggeredBy?: Prisma.StockMovementCreateNestedManyWithoutTriggeredAlertInput
 }
 
 export type AlertUncheckedCreateInput = {
@@ -432,6 +436,7 @@ export type AlertUncheckedCreateInput = {
   metrics?: Prisma.AlertMetricUncheckedCreateNestedManyWithoutAlertInput
   timeline?: Prisma.AlertTimelineEventUncheckedCreateNestedManyWithoutAlertInput
   deliveries?: Prisma.NotificationDeliveryUncheckedCreateNestedManyWithoutAlertInput
+  triggeredBy?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTriggeredAlertInput
 }
 
 export type AlertUpdateInput = {
@@ -455,6 +460,7 @@ export type AlertUpdateInput = {
   deliveries?: Prisma.NotificationDeliveryUpdateManyWithoutAlertNestedInput
   product?: Prisma.ProductUpdateOneWithoutAlertsNestedInput
   warehouse?: Prisma.WarehouseUpdateOneWithoutAlertsNestedInput
+  triggeredBy?: Prisma.StockMovementUpdateManyWithoutTriggeredAlertNestedInput
 }
 
 export type AlertUncheckedUpdateInput = {
@@ -478,6 +484,7 @@ export type AlertUncheckedUpdateInput = {
   metrics?: Prisma.AlertMetricUncheckedUpdateManyWithoutAlertNestedInput
   timeline?: Prisma.AlertTimelineEventUncheckedUpdateManyWithoutAlertNestedInput
   deliveries?: Prisma.NotificationDeliveryUncheckedUpdateManyWithoutAlertNestedInput
+  triggeredBy?: Prisma.StockMovementUncheckedUpdateManyWithoutTriggeredAlertNestedInput
 }
 
 export type AlertCreateManyInput = {
@@ -613,6 +620,11 @@ export type AlertScalarRelationFilter = {
   isNot?: Prisma.AlertWhereInput
 }
 
+export type AlertNullableScalarRelationFilter = {
+  is?: Prisma.AlertWhereInput | null
+  isNot?: Prisma.AlertWhereInput | null
+}
+
 export type AlertCreateNestedManyWithoutProductInput = {
   create?: Prisma.XOR<Prisma.AlertCreateWithoutProductInput, Prisma.AlertUncheckedCreateWithoutProductInput> | Prisma.AlertCreateWithoutProductInput[] | Prisma.AlertUncheckedCreateWithoutProductInput[]
   connectOrCreate?: Prisma.AlertCreateOrConnectWithoutProductInput | Prisma.AlertCreateOrConnectWithoutProductInput[]
@@ -711,6 +723,22 @@ export type AlertUpdateOneRequiredWithoutDeliveriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AlertUpdateToOneWithWhereWithoutDeliveriesInput, Prisma.AlertUpdateWithoutDeliveriesInput>, Prisma.AlertUncheckedUpdateWithoutDeliveriesInput>
 }
 
+export type AlertCreateNestedOneWithoutTriggeredByInput = {
+  create?: Prisma.XOR<Prisma.AlertCreateWithoutTriggeredByInput, Prisma.AlertUncheckedCreateWithoutTriggeredByInput>
+  connectOrCreate?: Prisma.AlertCreateOrConnectWithoutTriggeredByInput
+  connect?: Prisma.AlertWhereUniqueInput
+}
+
+export type AlertUpdateOneWithoutTriggeredByNestedInput = {
+  create?: Prisma.XOR<Prisma.AlertCreateWithoutTriggeredByInput, Prisma.AlertUncheckedCreateWithoutTriggeredByInput>
+  connectOrCreate?: Prisma.AlertCreateOrConnectWithoutTriggeredByInput
+  upsert?: Prisma.AlertUpsertWithoutTriggeredByInput
+  disconnect?: Prisma.AlertWhereInput | boolean
+  delete?: Prisma.AlertWhereInput | boolean
+  connect?: Prisma.AlertWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AlertUpdateToOneWithWhereWithoutTriggeredByInput, Prisma.AlertUpdateWithoutTriggeredByInput>, Prisma.AlertUncheckedUpdateWithoutTriggeredByInput>
+}
+
 export type AlertCreateNestedOneWithoutMetricsInput = {
   create?: Prisma.XOR<Prisma.AlertCreateWithoutMetricsInput, Prisma.AlertUncheckedCreateWithoutMetricsInput>
   connectOrCreate?: Prisma.AlertCreateOrConnectWithoutMetricsInput
@@ -759,6 +787,7 @@ export type AlertCreateWithoutProductInput = {
   timeline?: Prisma.AlertTimelineEventCreateNestedManyWithoutAlertInput
   deliveries?: Prisma.NotificationDeliveryCreateNestedManyWithoutAlertInput
   warehouse?: Prisma.WarehouseCreateNestedOneWithoutAlertsInput
+  triggeredBy?: Prisma.StockMovementCreateNestedManyWithoutTriggeredAlertInput
 }
 
 export type AlertUncheckedCreateWithoutProductInput = {
@@ -781,6 +810,7 @@ export type AlertUncheckedCreateWithoutProductInput = {
   metrics?: Prisma.AlertMetricUncheckedCreateNestedManyWithoutAlertInput
   timeline?: Prisma.AlertTimelineEventUncheckedCreateNestedManyWithoutAlertInput
   deliveries?: Prisma.NotificationDeliveryUncheckedCreateNestedManyWithoutAlertInput
+  triggeredBy?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTriggeredAlertInput
 }
 
 export type AlertCreateOrConnectWithoutProductInput = {
@@ -852,6 +882,7 @@ export type AlertCreateWithoutWarehouseInput = {
   timeline?: Prisma.AlertTimelineEventCreateNestedManyWithoutAlertInput
   deliveries?: Prisma.NotificationDeliveryCreateNestedManyWithoutAlertInput
   product?: Prisma.ProductCreateNestedOneWithoutAlertsInput
+  triggeredBy?: Prisma.StockMovementCreateNestedManyWithoutTriggeredAlertInput
 }
 
 export type AlertUncheckedCreateWithoutWarehouseInput = {
@@ -874,6 +905,7 @@ export type AlertUncheckedCreateWithoutWarehouseInput = {
   metrics?: Prisma.AlertMetricUncheckedCreateNestedManyWithoutAlertInput
   timeline?: Prisma.AlertTimelineEventUncheckedCreateNestedManyWithoutAlertInput
   deliveries?: Prisma.NotificationDeliveryUncheckedCreateNestedManyWithoutAlertInput
+  triggeredBy?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTriggeredAlertInput
 }
 
 export type AlertCreateOrConnectWithoutWarehouseInput = {
@@ -922,6 +954,7 @@ export type AlertCreateWithoutDeliveriesInput = {
   timeline?: Prisma.AlertTimelineEventCreateNestedManyWithoutAlertInput
   product?: Prisma.ProductCreateNestedOneWithoutAlertsInput
   warehouse?: Prisma.WarehouseCreateNestedOneWithoutAlertsInput
+  triggeredBy?: Prisma.StockMovementCreateNestedManyWithoutTriggeredAlertInput
 }
 
 export type AlertUncheckedCreateWithoutDeliveriesInput = {
@@ -944,6 +977,7 @@ export type AlertUncheckedCreateWithoutDeliveriesInput = {
   updatedAt?: Date | string
   metrics?: Prisma.AlertMetricUncheckedCreateNestedManyWithoutAlertInput
   timeline?: Prisma.AlertTimelineEventUncheckedCreateNestedManyWithoutAlertInput
+  triggeredBy?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTriggeredAlertInput
 }
 
 export type AlertCreateOrConnectWithoutDeliveriesInput = {
@@ -982,6 +1016,7 @@ export type AlertUpdateWithoutDeliveriesInput = {
   timeline?: Prisma.AlertTimelineEventUpdateManyWithoutAlertNestedInput
   product?: Prisma.ProductUpdateOneWithoutAlertsNestedInput
   warehouse?: Prisma.WarehouseUpdateOneWithoutAlertsNestedInput
+  triggeredBy?: Prisma.StockMovementUpdateManyWithoutTriggeredAlertNestedInput
 }
 
 export type AlertUncheckedUpdateWithoutDeliveriesInput = {
@@ -1004,6 +1039,115 @@ export type AlertUncheckedUpdateWithoutDeliveriesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   metrics?: Prisma.AlertMetricUncheckedUpdateManyWithoutAlertNestedInput
   timeline?: Prisma.AlertTimelineEventUncheckedUpdateManyWithoutAlertNestedInput
+  triggeredBy?: Prisma.StockMovementUncheckedUpdateManyWithoutTriggeredAlertNestedInput
+}
+
+export type AlertCreateWithoutTriggeredByInput = {
+  id?: string
+  severity: string
+  type: string
+  title: string
+  sku?: string | null
+  productName?: string | null
+  location: string
+  detectedAt: Date | string
+  businessImpact: string
+  status: string
+  recommendedAction: string
+  explanation: string
+  notifiedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  metrics?: Prisma.AlertMetricCreateNestedManyWithoutAlertInput
+  timeline?: Prisma.AlertTimelineEventCreateNestedManyWithoutAlertInput
+  deliveries?: Prisma.NotificationDeliveryCreateNestedManyWithoutAlertInput
+  product?: Prisma.ProductCreateNestedOneWithoutAlertsInput
+  warehouse?: Prisma.WarehouseCreateNestedOneWithoutAlertsInput
+}
+
+export type AlertUncheckedCreateWithoutTriggeredByInput = {
+  id?: string
+  severity: string
+  type: string
+  title: string
+  sku?: string | null
+  productName?: string | null
+  location: string
+  productId?: string | null
+  warehouseId?: string | null
+  detectedAt: Date | string
+  businessImpact: string
+  status: string
+  recommendedAction: string
+  explanation: string
+  notifiedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  metrics?: Prisma.AlertMetricUncheckedCreateNestedManyWithoutAlertInput
+  timeline?: Prisma.AlertTimelineEventUncheckedCreateNestedManyWithoutAlertInput
+  deliveries?: Prisma.NotificationDeliveryUncheckedCreateNestedManyWithoutAlertInput
+}
+
+export type AlertCreateOrConnectWithoutTriggeredByInput = {
+  where: Prisma.AlertWhereUniqueInput
+  create: Prisma.XOR<Prisma.AlertCreateWithoutTriggeredByInput, Prisma.AlertUncheckedCreateWithoutTriggeredByInput>
+}
+
+export type AlertUpsertWithoutTriggeredByInput = {
+  update: Prisma.XOR<Prisma.AlertUpdateWithoutTriggeredByInput, Prisma.AlertUncheckedUpdateWithoutTriggeredByInput>
+  create: Prisma.XOR<Prisma.AlertCreateWithoutTriggeredByInput, Prisma.AlertUncheckedCreateWithoutTriggeredByInput>
+  where?: Prisma.AlertWhereInput
+}
+
+export type AlertUpdateToOneWithWhereWithoutTriggeredByInput = {
+  where?: Prisma.AlertWhereInput
+  data: Prisma.XOR<Prisma.AlertUpdateWithoutTriggeredByInput, Prisma.AlertUncheckedUpdateWithoutTriggeredByInput>
+}
+
+export type AlertUpdateWithoutTriggeredByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
+  explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metrics?: Prisma.AlertMetricUpdateManyWithoutAlertNestedInput
+  timeline?: Prisma.AlertTimelineEventUpdateManyWithoutAlertNestedInput
+  deliveries?: Prisma.NotificationDeliveryUpdateManyWithoutAlertNestedInput
+  product?: Prisma.ProductUpdateOneWithoutAlertsNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneWithoutAlertsNestedInput
+}
+
+export type AlertUncheckedUpdateWithoutTriggeredByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  detectedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  recommendedAction?: Prisma.StringFieldUpdateOperationsInput | string
+  explanation?: Prisma.StringFieldUpdateOperationsInput | string
+  notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metrics?: Prisma.AlertMetricUncheckedUpdateManyWithoutAlertNestedInput
+  timeline?: Prisma.AlertTimelineEventUncheckedUpdateManyWithoutAlertNestedInput
+  deliveries?: Prisma.NotificationDeliveryUncheckedUpdateManyWithoutAlertNestedInput
 }
 
 export type AlertCreateWithoutMetricsInput = {
@@ -1026,6 +1170,7 @@ export type AlertCreateWithoutMetricsInput = {
   deliveries?: Prisma.NotificationDeliveryCreateNestedManyWithoutAlertInput
   product?: Prisma.ProductCreateNestedOneWithoutAlertsInput
   warehouse?: Prisma.WarehouseCreateNestedOneWithoutAlertsInput
+  triggeredBy?: Prisma.StockMovementCreateNestedManyWithoutTriggeredAlertInput
 }
 
 export type AlertUncheckedCreateWithoutMetricsInput = {
@@ -1048,6 +1193,7 @@ export type AlertUncheckedCreateWithoutMetricsInput = {
   updatedAt?: Date | string
   timeline?: Prisma.AlertTimelineEventUncheckedCreateNestedManyWithoutAlertInput
   deliveries?: Prisma.NotificationDeliveryUncheckedCreateNestedManyWithoutAlertInput
+  triggeredBy?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTriggeredAlertInput
 }
 
 export type AlertCreateOrConnectWithoutMetricsInput = {
@@ -1086,6 +1232,7 @@ export type AlertUpdateWithoutMetricsInput = {
   deliveries?: Prisma.NotificationDeliveryUpdateManyWithoutAlertNestedInput
   product?: Prisma.ProductUpdateOneWithoutAlertsNestedInput
   warehouse?: Prisma.WarehouseUpdateOneWithoutAlertsNestedInput
+  triggeredBy?: Prisma.StockMovementUpdateManyWithoutTriggeredAlertNestedInput
 }
 
 export type AlertUncheckedUpdateWithoutMetricsInput = {
@@ -1108,6 +1255,7 @@ export type AlertUncheckedUpdateWithoutMetricsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   timeline?: Prisma.AlertTimelineEventUncheckedUpdateManyWithoutAlertNestedInput
   deliveries?: Prisma.NotificationDeliveryUncheckedUpdateManyWithoutAlertNestedInput
+  triggeredBy?: Prisma.StockMovementUncheckedUpdateManyWithoutTriggeredAlertNestedInput
 }
 
 export type AlertCreateWithoutTimelineInput = {
@@ -1130,6 +1278,7 @@ export type AlertCreateWithoutTimelineInput = {
   deliveries?: Prisma.NotificationDeliveryCreateNestedManyWithoutAlertInput
   product?: Prisma.ProductCreateNestedOneWithoutAlertsInput
   warehouse?: Prisma.WarehouseCreateNestedOneWithoutAlertsInput
+  triggeredBy?: Prisma.StockMovementCreateNestedManyWithoutTriggeredAlertInput
 }
 
 export type AlertUncheckedCreateWithoutTimelineInput = {
@@ -1152,6 +1301,7 @@ export type AlertUncheckedCreateWithoutTimelineInput = {
   updatedAt?: Date | string
   metrics?: Prisma.AlertMetricUncheckedCreateNestedManyWithoutAlertInput
   deliveries?: Prisma.NotificationDeliveryUncheckedCreateNestedManyWithoutAlertInput
+  triggeredBy?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTriggeredAlertInput
 }
 
 export type AlertCreateOrConnectWithoutTimelineInput = {
@@ -1190,6 +1340,7 @@ export type AlertUpdateWithoutTimelineInput = {
   deliveries?: Prisma.NotificationDeliveryUpdateManyWithoutAlertNestedInput
   product?: Prisma.ProductUpdateOneWithoutAlertsNestedInput
   warehouse?: Prisma.WarehouseUpdateOneWithoutAlertsNestedInput
+  triggeredBy?: Prisma.StockMovementUpdateManyWithoutTriggeredAlertNestedInput
 }
 
 export type AlertUncheckedUpdateWithoutTimelineInput = {
@@ -1212,6 +1363,7 @@ export type AlertUncheckedUpdateWithoutTimelineInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   metrics?: Prisma.AlertMetricUncheckedUpdateManyWithoutAlertNestedInput
   deliveries?: Prisma.NotificationDeliveryUncheckedUpdateManyWithoutAlertNestedInput
+  triggeredBy?: Prisma.StockMovementUncheckedUpdateManyWithoutTriggeredAlertNestedInput
 }
 
 export type AlertCreateManyProductInput = {
@@ -1253,6 +1405,7 @@ export type AlertUpdateWithoutProductInput = {
   timeline?: Prisma.AlertTimelineEventUpdateManyWithoutAlertNestedInput
   deliveries?: Prisma.NotificationDeliveryUpdateManyWithoutAlertNestedInput
   warehouse?: Prisma.WarehouseUpdateOneWithoutAlertsNestedInput
+  triggeredBy?: Prisma.StockMovementUpdateManyWithoutTriggeredAlertNestedInput
 }
 
 export type AlertUncheckedUpdateWithoutProductInput = {
@@ -1275,6 +1428,7 @@ export type AlertUncheckedUpdateWithoutProductInput = {
   metrics?: Prisma.AlertMetricUncheckedUpdateManyWithoutAlertNestedInput
   timeline?: Prisma.AlertTimelineEventUncheckedUpdateManyWithoutAlertNestedInput
   deliveries?: Prisma.NotificationDeliveryUncheckedUpdateManyWithoutAlertNestedInput
+  triggeredBy?: Prisma.StockMovementUncheckedUpdateManyWithoutTriggeredAlertNestedInput
 }
 
 export type AlertUncheckedUpdateManyWithoutProductInput = {
@@ -1335,6 +1489,7 @@ export type AlertUpdateWithoutWarehouseInput = {
   timeline?: Prisma.AlertTimelineEventUpdateManyWithoutAlertNestedInput
   deliveries?: Prisma.NotificationDeliveryUpdateManyWithoutAlertNestedInput
   product?: Prisma.ProductUpdateOneWithoutAlertsNestedInput
+  triggeredBy?: Prisma.StockMovementUpdateManyWithoutTriggeredAlertNestedInput
 }
 
 export type AlertUncheckedUpdateWithoutWarehouseInput = {
@@ -1357,6 +1512,7 @@ export type AlertUncheckedUpdateWithoutWarehouseInput = {
   metrics?: Prisma.AlertMetricUncheckedUpdateManyWithoutAlertNestedInput
   timeline?: Prisma.AlertTimelineEventUncheckedUpdateManyWithoutAlertNestedInput
   deliveries?: Prisma.NotificationDeliveryUncheckedUpdateManyWithoutAlertNestedInput
+  triggeredBy?: Prisma.StockMovementUncheckedUpdateManyWithoutTriggeredAlertNestedInput
 }
 
 export type AlertUncheckedUpdateManyWithoutWarehouseInput = {
@@ -1387,12 +1543,14 @@ export type AlertCountOutputType = {
   metrics: number
   timeline: number
   deliveries: number
+  triggeredBy: number
 }
 
 export type AlertCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   metrics?: boolean | AlertCountOutputTypeCountMetricsArgs
   timeline?: boolean | AlertCountOutputTypeCountTimelineArgs
   deliveries?: boolean | AlertCountOutputTypeCountDeliveriesArgs
+  triggeredBy?: boolean | AlertCountOutputTypeCountTriggeredByArgs
 }
 
 /**
@@ -1426,6 +1584,13 @@ export type AlertCountOutputTypeCountDeliveriesArgs<ExtArgs extends runtime.Type
   where?: Prisma.NotificationDeliveryWhereInput
 }
 
+/**
+ * AlertCountOutputType without action
+ */
+export type AlertCountOutputTypeCountTriggeredByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StockMovementWhereInput
+}
+
 
 export type AlertSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1450,6 +1615,7 @@ export type AlertSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   deliveries?: boolean | Prisma.Alert$deliveriesArgs<ExtArgs>
   product?: boolean | Prisma.Alert$productArgs<ExtArgs>
   warehouse?: boolean | Prisma.Alert$warehouseArgs<ExtArgs>
+  triggeredBy?: boolean | Prisma.Alert$triggeredByArgs<ExtArgs>
   _count?: boolean | Prisma.AlertCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["alert"]>
 
@@ -1524,6 +1690,7 @@ export type AlertInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   deliveries?: boolean | Prisma.Alert$deliveriesArgs<ExtArgs>
   product?: boolean | Prisma.Alert$productArgs<ExtArgs>
   warehouse?: boolean | Prisma.Alert$warehouseArgs<ExtArgs>
+  triggeredBy?: boolean | Prisma.Alert$triggeredByArgs<ExtArgs>
   _count?: boolean | Prisma.AlertCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AlertIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1543,6 +1710,10 @@ export type $AlertPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     deliveries: Prisma.$NotificationDeliveryPayload<ExtArgs>[]
     product: Prisma.$ProductPayload<ExtArgs> | null
     warehouse: Prisma.$WarehousePayload<ExtArgs> | null
+    /**
+     * * The movements that raised this alert. "This transaction caused this alert."
+     */
+    triggeredBy: Prisma.$StockMovementPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1961,6 +2132,7 @@ export interface Prisma__AlertClient<T, Null = never, ExtArgs extends runtime.Ty
   deliveries<T extends Prisma.Alert$deliveriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Alert$deliveriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationDeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   product<T extends Prisma.Alert$productArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Alert$productArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   warehouse<T extends Prisma.Alert$warehouseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Alert$warehouseArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  triggeredBy<T extends Prisma.Alert$triggeredByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Alert$triggeredByArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2515,6 +2687,30 @@ export type Alert$warehouseArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.WarehouseInclude<ExtArgs> | null
   where?: Prisma.WarehouseWhereInput
+}
+
+/**
+ * Alert.triggeredBy
+ */
+export type Alert$triggeredByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StockMovement
+   */
+  select?: Prisma.StockMovementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StockMovement
+   */
+  omit?: Prisma.StockMovementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
+  where?: Prisma.StockMovementWhereInput
+  orderBy?: Prisma.StockMovementOrderByWithRelationInput | Prisma.StockMovementOrderByWithRelationInput[]
+  cursor?: Prisma.StockMovementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StockMovementScalarFieldEnum | Prisma.StockMovementScalarFieldEnum[]
 }
 
 /**

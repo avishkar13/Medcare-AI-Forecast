@@ -96,3 +96,13 @@ export const RecommendationStatus = {
 } as const
 
 export type RecommendationStatus = (typeof RecommendationStatus)[keyof typeof RecommendationStatus]
+
+
+export const RestockStatus = {
+  REQUESTED: 'REQUESTED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  FULFILLED: 'FULFILLED'
+} as const
+
+export type RestockStatus = (typeof RestockStatus)[keyof typeof RestockStatus]

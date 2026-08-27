@@ -14,12 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model StockMovement
- * *
- *  * The movement ledger. Written by nothing yet - Phase 3.1 is its writer.
- *  *
- *  * `warehouseId` is the DC the row belongs to, which is what a DC page filters on.
- *  * It does not replace `fromLocation` / `toLocation`: a transfer has two endpoints
- *  * and one foreign key cannot hold both.
+ * 
  */
 export type StockMovementModel = runtime.Types.Result.DefaultSelection<Prisma.$StockMovementPayload>
 
@@ -33,10 +28,14 @@ export type AggregateStockMovement = {
 
 export type StockMovementAvgAggregateOutputType = {
   quantity: number | null
+  stockBefore: number | null
+  stockAfter: number | null
 }
 
 export type StockMovementSumAggregateOutputType = {
   quantity: number | null
+  stockBefore: number | null
+  stockAfter: number | null
 }
 
 export type StockMovementMinAggregateOutputType = {
@@ -44,12 +43,16 @@ export type StockMovementMinAggregateOutputType = {
   date: Date | null
   movementType: string | null
   sku: string | null
+  productId: string | null
   quantity: number | null
+  stockBefore: number | null
+  stockAfter: number | null
   warehouseId: string | null
   fromLocation: string | null
   toLocation: string | null
   reference: string | null
   userOrSystem: string | null
+  triggeredAlertId: string | null
   createdAt: Date | null
 }
 
@@ -58,12 +61,16 @@ export type StockMovementMaxAggregateOutputType = {
   date: Date | null
   movementType: string | null
   sku: string | null
+  productId: string | null
   quantity: number | null
+  stockBefore: number | null
+  stockAfter: number | null
   warehouseId: string | null
   fromLocation: string | null
   toLocation: string | null
   reference: string | null
   userOrSystem: string | null
+  triggeredAlertId: string | null
   createdAt: Date | null
 }
 
@@ -72,12 +79,16 @@ export type StockMovementCountAggregateOutputType = {
   date: number
   movementType: number
   sku: number
+  productId: number
   quantity: number
+  stockBefore: number
+  stockAfter: number
   warehouseId: number
   fromLocation: number
   toLocation: number
   reference: number
   userOrSystem: number
+  triggeredAlertId: number
   createdAt: number
   _all: number
 }
@@ -85,10 +96,14 @@ export type StockMovementCountAggregateOutputType = {
 
 export type StockMovementAvgAggregateInputType = {
   quantity?: true
+  stockBefore?: true
+  stockAfter?: true
 }
 
 export type StockMovementSumAggregateInputType = {
   quantity?: true
+  stockBefore?: true
+  stockAfter?: true
 }
 
 export type StockMovementMinAggregateInputType = {
@@ -96,12 +111,16 @@ export type StockMovementMinAggregateInputType = {
   date?: true
   movementType?: true
   sku?: true
+  productId?: true
   quantity?: true
+  stockBefore?: true
+  stockAfter?: true
   warehouseId?: true
   fromLocation?: true
   toLocation?: true
   reference?: true
   userOrSystem?: true
+  triggeredAlertId?: true
   createdAt?: true
 }
 
@@ -110,12 +129,16 @@ export type StockMovementMaxAggregateInputType = {
   date?: true
   movementType?: true
   sku?: true
+  productId?: true
   quantity?: true
+  stockBefore?: true
+  stockAfter?: true
   warehouseId?: true
   fromLocation?: true
   toLocation?: true
   reference?: true
   userOrSystem?: true
+  triggeredAlertId?: true
   createdAt?: true
 }
 
@@ -124,12 +147,16 @@ export type StockMovementCountAggregateInputType = {
   date?: true
   movementType?: true
   sku?: true
+  productId?: true
   quantity?: true
+  stockBefore?: true
+  stockAfter?: true
   warehouseId?: true
   fromLocation?: true
   toLocation?: true
   reference?: true
   userOrSystem?: true
+  triggeredAlertId?: true
   createdAt?: true
   _all?: true
 }
@@ -225,12 +252,16 @@ export type StockMovementGroupByOutputType = {
   date: Date
   movementType: string
   sku: string
+  productId: string
   quantity: number
-  warehouseId: string | null
+  stockBefore: number
+  stockAfter: number
+  warehouseId: string
   fromLocation: string | null
   toLocation: string | null
   reference: string | null
   userOrSystem: string | null
+  triggeredAlertId: string | null
   createdAt: Date
   _count: StockMovementCountAggregateOutputType | null
   _avg: StockMovementAvgAggregateOutputType | null
@@ -262,14 +293,20 @@ export type StockMovementWhereInput = {
   date?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
   movementType?: Prisma.StringFilter<"StockMovement"> | string
   sku?: Prisma.StringFilter<"StockMovement"> | string
+  productId?: Prisma.StringFilter<"StockMovement"> | string
   quantity?: Prisma.FloatFilter<"StockMovement"> | number
-  warehouseId?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  stockBefore?: Prisma.FloatFilter<"StockMovement"> | number
+  stockAfter?: Prisma.FloatFilter<"StockMovement"> | number
+  warehouseId?: Prisma.StringFilter<"StockMovement"> | string
   fromLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   toLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   reference?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   userOrSystem?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  triggeredAlertId?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   createdAt?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
-  warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
+  product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
+  warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
+  triggeredAlert?: Prisma.XOR<Prisma.AlertNullableScalarRelationFilter, Prisma.AlertWhereInput> | null
 }
 
 export type StockMovementOrderByWithRelationInput = {
@@ -277,14 +314,20 @@ export type StockMovementOrderByWithRelationInput = {
   date?: Prisma.SortOrder
   movementType?: Prisma.SortOrder
   sku?: Prisma.SortOrder
+  productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
-  warehouseId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stockBefore?: Prisma.SortOrder
+  stockAfter?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   fromLocation?: Prisma.SortOrderInput | Prisma.SortOrder
   toLocation?: Prisma.SortOrderInput | Prisma.SortOrder
   reference?: Prisma.SortOrderInput | Prisma.SortOrder
   userOrSystem?: Prisma.SortOrderInput | Prisma.SortOrder
+  triggeredAlertId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  product?: Prisma.ProductOrderByWithRelationInput
   warehouse?: Prisma.WarehouseOrderByWithRelationInput
+  triggeredAlert?: Prisma.AlertOrderByWithRelationInput
 }
 
 export type StockMovementWhereUniqueInput = Prisma.AtLeast<{
@@ -295,14 +338,20 @@ export type StockMovementWhereUniqueInput = Prisma.AtLeast<{
   date?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
   movementType?: Prisma.StringFilter<"StockMovement"> | string
   sku?: Prisma.StringFilter<"StockMovement"> | string
+  productId?: Prisma.StringFilter<"StockMovement"> | string
   quantity?: Prisma.FloatFilter<"StockMovement"> | number
-  warehouseId?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  stockBefore?: Prisma.FloatFilter<"StockMovement"> | number
+  stockAfter?: Prisma.FloatFilter<"StockMovement"> | number
+  warehouseId?: Prisma.StringFilter<"StockMovement"> | string
   fromLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   toLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   reference?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   userOrSystem?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  triggeredAlertId?: Prisma.StringNullableFilter<"StockMovement"> | string | null
   createdAt?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
-  warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
+  product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
+  warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
+  triggeredAlert?: Prisma.XOR<Prisma.AlertNullableScalarRelationFilter, Prisma.AlertWhereInput> | null
 }, "id">
 
 export type StockMovementOrderByWithAggregationInput = {
@@ -310,12 +359,16 @@ export type StockMovementOrderByWithAggregationInput = {
   date?: Prisma.SortOrder
   movementType?: Prisma.SortOrder
   sku?: Prisma.SortOrder
+  productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
-  warehouseId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stockBefore?: Prisma.SortOrder
+  stockAfter?: Prisma.SortOrder
+  warehouseId?: Prisma.SortOrder
   fromLocation?: Prisma.SortOrderInput | Prisma.SortOrder
   toLocation?: Prisma.SortOrderInput | Prisma.SortOrder
   reference?: Prisma.SortOrderInput | Prisma.SortOrder
   userOrSystem?: Prisma.SortOrderInput | Prisma.SortOrder
+  triggeredAlertId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.StockMovementCountOrderByAggregateInput
   _avg?: Prisma.StockMovementAvgOrderByAggregateInput
@@ -332,12 +385,16 @@ export type StockMovementScalarWhereWithAggregatesInput = {
   date?: Prisma.DateTimeWithAggregatesFilter<"StockMovement"> | Date | string
   movementType?: Prisma.StringWithAggregatesFilter<"StockMovement"> | string
   sku?: Prisma.StringWithAggregatesFilter<"StockMovement"> | string
+  productId?: Prisma.StringWithAggregatesFilter<"StockMovement"> | string
   quantity?: Prisma.FloatWithAggregatesFilter<"StockMovement"> | number
-  warehouseId?: Prisma.StringNullableWithAggregatesFilter<"StockMovement"> | string | null
+  stockBefore?: Prisma.FloatWithAggregatesFilter<"StockMovement"> | number
+  stockAfter?: Prisma.FloatWithAggregatesFilter<"StockMovement"> | number
+  warehouseId?: Prisma.StringWithAggregatesFilter<"StockMovement"> | string
   fromLocation?: Prisma.StringNullableWithAggregatesFilter<"StockMovement"> | string | null
   toLocation?: Prisma.StringNullableWithAggregatesFilter<"StockMovement"> | string | null
   reference?: Prisma.StringNullableWithAggregatesFilter<"StockMovement"> | string | null
   userOrSystem?: Prisma.StringNullableWithAggregatesFilter<"StockMovement"> | string | null
+  triggeredAlertId?: Prisma.StringNullableWithAggregatesFilter<"StockMovement"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"StockMovement"> | Date | string
 }
 
@@ -347,12 +404,16 @@ export type StockMovementCreateInput = {
   movementType: string
   sku: string
   quantity: number
+  stockBefore: number
+  stockAfter: number
   fromLocation?: string | null
   toLocation?: string | null
   reference?: string | null
   userOrSystem?: string | null
   createdAt?: Date | string
-  warehouse?: Prisma.WarehouseCreateNestedOneWithoutStockMovementsInput
+  product: Prisma.ProductCreateNestedOneWithoutStockMovementsInput
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutStockMovementsInput
+  triggeredAlert?: Prisma.AlertCreateNestedOneWithoutTriggeredByInput
 }
 
 export type StockMovementUncheckedCreateInput = {
@@ -360,12 +421,16 @@ export type StockMovementUncheckedCreateInput = {
   date: Date | string
   movementType: string
   sku: string
+  productId: string
   quantity: number
-  warehouseId?: string | null
+  stockBefore: number
+  stockAfter: number
+  warehouseId: string
   fromLocation?: string | null
   toLocation?: string | null
   reference?: string | null
   userOrSystem?: string | null
+  triggeredAlertId?: string | null
   createdAt?: Date | string
 }
 
@@ -375,12 +440,16 @@ export type StockMovementUpdateInput = {
   movementType?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
   fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  warehouse?: Prisma.WarehouseUpdateOneWithoutStockMovementsNestedInput
+  product?: Prisma.ProductUpdateOneRequiredWithoutStockMovementsNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStockMovementsNestedInput
+  triggeredAlert?: Prisma.AlertUpdateOneWithoutTriggeredByNestedInput
 }
 
 export type StockMovementUncheckedUpdateInput = {
@@ -388,12 +457,16 @@ export type StockMovementUncheckedUpdateInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   movementType?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
-  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
   fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  triggeredAlertId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -402,12 +475,16 @@ export type StockMovementCreateManyInput = {
   date: Date | string
   movementType: string
   sku: string
+  productId: string
   quantity: number
-  warehouseId?: string | null
+  stockBefore: number
+  stockAfter: number
+  warehouseId: string
   fromLocation?: string | null
   toLocation?: string | null
   reference?: string | null
   userOrSystem?: string | null
+  triggeredAlertId?: string | null
   createdAt?: Date | string
 }
 
@@ -417,6 +494,8 @@ export type StockMovementUpdateManyMutationInput = {
   movementType?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
   fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -429,12 +508,16 @@ export type StockMovementUncheckedUpdateManyInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   movementType?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
-  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
   fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  triggeredAlertId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -453,17 +536,23 @@ export type StockMovementCountOrderByAggregateInput = {
   date?: Prisma.SortOrder
   movementType?: Prisma.SortOrder
   sku?: Prisma.SortOrder
+  productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  stockBefore?: Prisma.SortOrder
+  stockAfter?: Prisma.SortOrder
   warehouseId?: Prisma.SortOrder
   fromLocation?: Prisma.SortOrder
   toLocation?: Prisma.SortOrder
   reference?: Prisma.SortOrder
   userOrSystem?: Prisma.SortOrder
+  triggeredAlertId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type StockMovementAvgOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
+  stockBefore?: Prisma.SortOrder
+  stockAfter?: Prisma.SortOrder
 }
 
 export type StockMovementMaxOrderByAggregateInput = {
@@ -471,12 +560,16 @@ export type StockMovementMaxOrderByAggregateInput = {
   date?: Prisma.SortOrder
   movementType?: Prisma.SortOrder
   sku?: Prisma.SortOrder
+  productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  stockBefore?: Prisma.SortOrder
+  stockAfter?: Prisma.SortOrder
   warehouseId?: Prisma.SortOrder
   fromLocation?: Prisma.SortOrder
   toLocation?: Prisma.SortOrder
   reference?: Prisma.SortOrder
   userOrSystem?: Prisma.SortOrder
+  triggeredAlertId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -485,17 +578,65 @@ export type StockMovementMinOrderByAggregateInput = {
   date?: Prisma.SortOrder
   movementType?: Prisma.SortOrder
   sku?: Prisma.SortOrder
+  productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  stockBefore?: Prisma.SortOrder
+  stockAfter?: Prisma.SortOrder
   warehouseId?: Prisma.SortOrder
   fromLocation?: Prisma.SortOrder
   toLocation?: Prisma.SortOrder
   reference?: Prisma.SortOrder
   userOrSystem?: Prisma.SortOrder
+  triggeredAlertId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type StockMovementSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
+  stockBefore?: Prisma.SortOrder
+  stockAfter?: Prisma.SortOrder
+}
+
+export type StockMovementCreateNestedManyWithoutProductInput = {
+  create?: Prisma.XOR<Prisma.StockMovementCreateWithoutProductInput, Prisma.StockMovementUncheckedCreateWithoutProductInput> | Prisma.StockMovementCreateWithoutProductInput[] | Prisma.StockMovementUncheckedCreateWithoutProductInput[]
+  connectOrCreate?: Prisma.StockMovementCreateOrConnectWithoutProductInput | Prisma.StockMovementCreateOrConnectWithoutProductInput[]
+  createMany?: Prisma.StockMovementCreateManyProductInputEnvelope
+  connect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+}
+
+export type StockMovementUncheckedCreateNestedManyWithoutProductInput = {
+  create?: Prisma.XOR<Prisma.StockMovementCreateWithoutProductInput, Prisma.StockMovementUncheckedCreateWithoutProductInput> | Prisma.StockMovementCreateWithoutProductInput[] | Prisma.StockMovementUncheckedCreateWithoutProductInput[]
+  connectOrCreate?: Prisma.StockMovementCreateOrConnectWithoutProductInput | Prisma.StockMovementCreateOrConnectWithoutProductInput[]
+  createMany?: Prisma.StockMovementCreateManyProductInputEnvelope
+  connect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+}
+
+export type StockMovementUpdateManyWithoutProductNestedInput = {
+  create?: Prisma.XOR<Prisma.StockMovementCreateWithoutProductInput, Prisma.StockMovementUncheckedCreateWithoutProductInput> | Prisma.StockMovementCreateWithoutProductInput[] | Prisma.StockMovementUncheckedCreateWithoutProductInput[]
+  connectOrCreate?: Prisma.StockMovementCreateOrConnectWithoutProductInput | Prisma.StockMovementCreateOrConnectWithoutProductInput[]
+  upsert?: Prisma.StockMovementUpsertWithWhereUniqueWithoutProductInput | Prisma.StockMovementUpsertWithWhereUniqueWithoutProductInput[]
+  createMany?: Prisma.StockMovementCreateManyProductInputEnvelope
+  set?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  disconnect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  delete?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  connect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  update?: Prisma.StockMovementUpdateWithWhereUniqueWithoutProductInput | Prisma.StockMovementUpdateWithWhereUniqueWithoutProductInput[]
+  updateMany?: Prisma.StockMovementUpdateManyWithWhereWithoutProductInput | Prisma.StockMovementUpdateManyWithWhereWithoutProductInput[]
+  deleteMany?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
+}
+
+export type StockMovementUncheckedUpdateManyWithoutProductNestedInput = {
+  create?: Prisma.XOR<Prisma.StockMovementCreateWithoutProductInput, Prisma.StockMovementUncheckedCreateWithoutProductInput> | Prisma.StockMovementCreateWithoutProductInput[] | Prisma.StockMovementUncheckedCreateWithoutProductInput[]
+  connectOrCreate?: Prisma.StockMovementCreateOrConnectWithoutProductInput | Prisma.StockMovementCreateOrConnectWithoutProductInput[]
+  upsert?: Prisma.StockMovementUpsertWithWhereUniqueWithoutProductInput | Prisma.StockMovementUpsertWithWhereUniqueWithoutProductInput[]
+  createMany?: Prisma.StockMovementCreateManyProductInputEnvelope
+  set?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  disconnect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  delete?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  connect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  update?: Prisma.StockMovementUpdateWithWhereUniqueWithoutProductInput | Prisma.StockMovementUpdateWithWhereUniqueWithoutProductInput[]
+  updateMany?: Prisma.StockMovementUpdateManyWithWhereWithoutProductInput | Prisma.StockMovementUpdateManyWithWhereWithoutProductInput[]
+  deleteMany?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
 }
 
 export type StockMovementCreateNestedManyWithoutWarehouseInput = {
@@ -540,17 +681,144 @@ export type StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput = {
   deleteMany?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
 }
 
+export type StockMovementCreateNestedManyWithoutTriggeredAlertInput = {
+  create?: Prisma.XOR<Prisma.StockMovementCreateWithoutTriggeredAlertInput, Prisma.StockMovementUncheckedCreateWithoutTriggeredAlertInput> | Prisma.StockMovementCreateWithoutTriggeredAlertInput[] | Prisma.StockMovementUncheckedCreateWithoutTriggeredAlertInput[]
+  connectOrCreate?: Prisma.StockMovementCreateOrConnectWithoutTriggeredAlertInput | Prisma.StockMovementCreateOrConnectWithoutTriggeredAlertInput[]
+  createMany?: Prisma.StockMovementCreateManyTriggeredAlertInputEnvelope
+  connect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+}
+
+export type StockMovementUncheckedCreateNestedManyWithoutTriggeredAlertInput = {
+  create?: Prisma.XOR<Prisma.StockMovementCreateWithoutTriggeredAlertInput, Prisma.StockMovementUncheckedCreateWithoutTriggeredAlertInput> | Prisma.StockMovementCreateWithoutTriggeredAlertInput[] | Prisma.StockMovementUncheckedCreateWithoutTriggeredAlertInput[]
+  connectOrCreate?: Prisma.StockMovementCreateOrConnectWithoutTriggeredAlertInput | Prisma.StockMovementCreateOrConnectWithoutTriggeredAlertInput[]
+  createMany?: Prisma.StockMovementCreateManyTriggeredAlertInputEnvelope
+  connect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+}
+
+export type StockMovementUpdateManyWithoutTriggeredAlertNestedInput = {
+  create?: Prisma.XOR<Prisma.StockMovementCreateWithoutTriggeredAlertInput, Prisma.StockMovementUncheckedCreateWithoutTriggeredAlertInput> | Prisma.StockMovementCreateWithoutTriggeredAlertInput[] | Prisma.StockMovementUncheckedCreateWithoutTriggeredAlertInput[]
+  connectOrCreate?: Prisma.StockMovementCreateOrConnectWithoutTriggeredAlertInput | Prisma.StockMovementCreateOrConnectWithoutTriggeredAlertInput[]
+  upsert?: Prisma.StockMovementUpsertWithWhereUniqueWithoutTriggeredAlertInput | Prisma.StockMovementUpsertWithWhereUniqueWithoutTriggeredAlertInput[]
+  createMany?: Prisma.StockMovementCreateManyTriggeredAlertInputEnvelope
+  set?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  disconnect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  delete?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  connect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  update?: Prisma.StockMovementUpdateWithWhereUniqueWithoutTriggeredAlertInput | Prisma.StockMovementUpdateWithWhereUniqueWithoutTriggeredAlertInput[]
+  updateMany?: Prisma.StockMovementUpdateManyWithWhereWithoutTriggeredAlertInput | Prisma.StockMovementUpdateManyWithWhereWithoutTriggeredAlertInput[]
+  deleteMany?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
+}
+
+export type StockMovementUncheckedUpdateManyWithoutTriggeredAlertNestedInput = {
+  create?: Prisma.XOR<Prisma.StockMovementCreateWithoutTriggeredAlertInput, Prisma.StockMovementUncheckedCreateWithoutTriggeredAlertInput> | Prisma.StockMovementCreateWithoutTriggeredAlertInput[] | Prisma.StockMovementUncheckedCreateWithoutTriggeredAlertInput[]
+  connectOrCreate?: Prisma.StockMovementCreateOrConnectWithoutTriggeredAlertInput | Prisma.StockMovementCreateOrConnectWithoutTriggeredAlertInput[]
+  upsert?: Prisma.StockMovementUpsertWithWhereUniqueWithoutTriggeredAlertInput | Prisma.StockMovementUpsertWithWhereUniqueWithoutTriggeredAlertInput[]
+  createMany?: Prisma.StockMovementCreateManyTriggeredAlertInputEnvelope
+  set?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  disconnect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  delete?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  connect?: Prisma.StockMovementWhereUniqueInput | Prisma.StockMovementWhereUniqueInput[]
+  update?: Prisma.StockMovementUpdateWithWhereUniqueWithoutTriggeredAlertInput | Prisma.StockMovementUpdateWithWhereUniqueWithoutTriggeredAlertInput[]
+  updateMany?: Prisma.StockMovementUpdateManyWithWhereWithoutTriggeredAlertInput | Prisma.StockMovementUpdateManyWithWhereWithoutTriggeredAlertInput[]
+  deleteMany?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
+}
+
+export type StockMovementCreateWithoutProductInput = {
+  id?: string
+  date: Date | string
+  movementType: string
+  sku: string
+  quantity: number
+  stockBefore: number
+  stockAfter: number
+  fromLocation?: string | null
+  toLocation?: string | null
+  reference?: string | null
+  userOrSystem?: string | null
+  createdAt?: Date | string
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutStockMovementsInput
+  triggeredAlert?: Prisma.AlertCreateNestedOneWithoutTriggeredByInput
+}
+
+export type StockMovementUncheckedCreateWithoutProductInput = {
+  id?: string
+  date: Date | string
+  movementType: string
+  sku: string
+  quantity: number
+  stockBefore: number
+  stockAfter: number
+  warehouseId: string
+  fromLocation?: string | null
+  toLocation?: string | null
+  reference?: string | null
+  userOrSystem?: string | null
+  triggeredAlertId?: string | null
+  createdAt?: Date | string
+}
+
+export type StockMovementCreateOrConnectWithoutProductInput = {
+  where: Prisma.StockMovementWhereUniqueInput
+  create: Prisma.XOR<Prisma.StockMovementCreateWithoutProductInput, Prisma.StockMovementUncheckedCreateWithoutProductInput>
+}
+
+export type StockMovementCreateManyProductInputEnvelope = {
+  data: Prisma.StockMovementCreateManyProductInput | Prisma.StockMovementCreateManyProductInput[]
+  skipDuplicates?: boolean
+}
+
+export type StockMovementUpsertWithWhereUniqueWithoutProductInput = {
+  where: Prisma.StockMovementWhereUniqueInput
+  update: Prisma.XOR<Prisma.StockMovementUpdateWithoutProductInput, Prisma.StockMovementUncheckedUpdateWithoutProductInput>
+  create: Prisma.XOR<Prisma.StockMovementCreateWithoutProductInput, Prisma.StockMovementUncheckedCreateWithoutProductInput>
+}
+
+export type StockMovementUpdateWithWhereUniqueWithoutProductInput = {
+  where: Prisma.StockMovementWhereUniqueInput
+  data: Prisma.XOR<Prisma.StockMovementUpdateWithoutProductInput, Prisma.StockMovementUncheckedUpdateWithoutProductInput>
+}
+
+export type StockMovementUpdateManyWithWhereWithoutProductInput = {
+  where: Prisma.StockMovementScalarWhereInput
+  data: Prisma.XOR<Prisma.StockMovementUpdateManyMutationInput, Prisma.StockMovementUncheckedUpdateManyWithoutProductInput>
+}
+
+export type StockMovementScalarWhereInput = {
+  AND?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
+  OR?: Prisma.StockMovementScalarWhereInput[]
+  NOT?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
+  id?: Prisma.StringFilter<"StockMovement"> | string
+  date?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
+  movementType?: Prisma.StringFilter<"StockMovement"> | string
+  sku?: Prisma.StringFilter<"StockMovement"> | string
+  productId?: Prisma.StringFilter<"StockMovement"> | string
+  quantity?: Prisma.FloatFilter<"StockMovement"> | number
+  stockBefore?: Prisma.FloatFilter<"StockMovement"> | number
+  stockAfter?: Prisma.FloatFilter<"StockMovement"> | number
+  warehouseId?: Prisma.StringFilter<"StockMovement"> | string
+  fromLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  toLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  reference?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  userOrSystem?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  triggeredAlertId?: Prisma.StringNullableFilter<"StockMovement"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
+}
+
 export type StockMovementCreateWithoutWarehouseInput = {
   id?: string
   date: Date | string
   movementType: string
   sku: string
   quantity: number
+  stockBefore: number
+  stockAfter: number
   fromLocation?: string | null
   toLocation?: string | null
   reference?: string | null
   userOrSystem?: string | null
   createdAt?: Date | string
+  product: Prisma.ProductCreateNestedOneWithoutStockMovementsInput
+  triggeredAlert?: Prisma.AlertCreateNestedOneWithoutTriggeredByInput
 }
 
 export type StockMovementUncheckedCreateWithoutWarehouseInput = {
@@ -558,11 +826,15 @@ export type StockMovementUncheckedCreateWithoutWarehouseInput = {
   date: Date | string
   movementType: string
   sku: string
+  productId: string
   quantity: number
+  stockBefore: number
+  stockAfter: number
   fromLocation?: string | null
   toLocation?: string | null
   reference?: string | null
   userOrSystem?: string | null
+  triggeredAlertId?: string | null
   createdAt?: Date | string
 }
 
@@ -592,21 +864,132 @@ export type StockMovementUpdateManyWithWhereWithoutWarehouseInput = {
   data: Prisma.XOR<Prisma.StockMovementUpdateManyMutationInput, Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseInput>
 }
 
-export type StockMovementScalarWhereInput = {
-  AND?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
-  OR?: Prisma.StockMovementScalarWhereInput[]
-  NOT?: Prisma.StockMovementScalarWhereInput | Prisma.StockMovementScalarWhereInput[]
-  id?: Prisma.StringFilter<"StockMovement"> | string
-  date?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
-  movementType?: Prisma.StringFilter<"StockMovement"> | string
-  sku?: Prisma.StringFilter<"StockMovement"> | string
-  quantity?: Prisma.FloatFilter<"StockMovement"> | number
-  warehouseId?: Prisma.StringNullableFilter<"StockMovement"> | string | null
-  fromLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
-  toLocation?: Prisma.StringNullableFilter<"StockMovement"> | string | null
-  reference?: Prisma.StringNullableFilter<"StockMovement"> | string | null
-  userOrSystem?: Prisma.StringNullableFilter<"StockMovement"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"StockMovement"> | Date | string
+export type StockMovementCreateWithoutTriggeredAlertInput = {
+  id?: string
+  date: Date | string
+  movementType: string
+  sku: string
+  quantity: number
+  stockBefore: number
+  stockAfter: number
+  fromLocation?: string | null
+  toLocation?: string | null
+  reference?: string | null
+  userOrSystem?: string | null
+  createdAt?: Date | string
+  product: Prisma.ProductCreateNestedOneWithoutStockMovementsInput
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutStockMovementsInput
+}
+
+export type StockMovementUncheckedCreateWithoutTriggeredAlertInput = {
+  id?: string
+  date: Date | string
+  movementType: string
+  sku: string
+  productId: string
+  quantity: number
+  stockBefore: number
+  stockAfter: number
+  warehouseId: string
+  fromLocation?: string | null
+  toLocation?: string | null
+  reference?: string | null
+  userOrSystem?: string | null
+  createdAt?: Date | string
+}
+
+export type StockMovementCreateOrConnectWithoutTriggeredAlertInput = {
+  where: Prisma.StockMovementWhereUniqueInput
+  create: Prisma.XOR<Prisma.StockMovementCreateWithoutTriggeredAlertInput, Prisma.StockMovementUncheckedCreateWithoutTriggeredAlertInput>
+}
+
+export type StockMovementCreateManyTriggeredAlertInputEnvelope = {
+  data: Prisma.StockMovementCreateManyTriggeredAlertInput | Prisma.StockMovementCreateManyTriggeredAlertInput[]
+  skipDuplicates?: boolean
+}
+
+export type StockMovementUpsertWithWhereUniqueWithoutTriggeredAlertInput = {
+  where: Prisma.StockMovementWhereUniqueInput
+  update: Prisma.XOR<Prisma.StockMovementUpdateWithoutTriggeredAlertInput, Prisma.StockMovementUncheckedUpdateWithoutTriggeredAlertInput>
+  create: Prisma.XOR<Prisma.StockMovementCreateWithoutTriggeredAlertInput, Prisma.StockMovementUncheckedCreateWithoutTriggeredAlertInput>
+}
+
+export type StockMovementUpdateWithWhereUniqueWithoutTriggeredAlertInput = {
+  where: Prisma.StockMovementWhereUniqueInput
+  data: Prisma.XOR<Prisma.StockMovementUpdateWithoutTriggeredAlertInput, Prisma.StockMovementUncheckedUpdateWithoutTriggeredAlertInput>
+}
+
+export type StockMovementUpdateManyWithWhereWithoutTriggeredAlertInput = {
+  where: Prisma.StockMovementScalarWhereInput
+  data: Prisma.XOR<Prisma.StockMovementUpdateManyMutationInput, Prisma.StockMovementUncheckedUpdateManyWithoutTriggeredAlertInput>
+}
+
+export type StockMovementCreateManyProductInput = {
+  id?: string
+  date: Date | string
+  movementType: string
+  sku: string
+  quantity: number
+  stockBefore: number
+  stockAfter: number
+  warehouseId: string
+  fromLocation?: string | null
+  toLocation?: string | null
+  reference?: string | null
+  userOrSystem?: string | null
+  triggeredAlertId?: string | null
+  createdAt?: Date | string
+}
+
+export type StockMovementUpdateWithoutProductInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  movementType?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStockMovementsNestedInput
+  triggeredAlert?: Prisma.AlertUpdateOneWithoutTriggeredByNestedInput
+}
+
+export type StockMovementUncheckedUpdateWithoutProductInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  movementType?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  triggeredAlertId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StockMovementUncheckedUpdateManyWithoutProductInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  movementType?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  triggeredAlertId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type StockMovementCreateManyWarehouseInput = {
@@ -614,11 +997,15 @@ export type StockMovementCreateManyWarehouseInput = {
   date: Date | string
   movementType: string
   sku: string
+  productId: string
   quantity: number
+  stockBefore: number
+  stockAfter: number
   fromLocation?: string | null
   toLocation?: string | null
   reference?: string | null
   userOrSystem?: string | null
+  triggeredAlertId?: string | null
   createdAt?: Date | string
 }
 
@@ -628,11 +1015,15 @@ export type StockMovementUpdateWithoutWarehouseInput = {
   movementType?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
   fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  product?: Prisma.ProductUpdateOneRequiredWithoutStockMovementsNestedInput
+  triggeredAlert?: Prisma.AlertUpdateOneWithoutTriggeredByNestedInput
 }
 
 export type StockMovementUncheckedUpdateWithoutWarehouseInput = {
@@ -640,11 +1031,15 @@ export type StockMovementUncheckedUpdateWithoutWarehouseInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   movementType?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
   fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  triggeredAlertId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -653,7 +1048,79 @@ export type StockMovementUncheckedUpdateManyWithoutWarehouseInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   movementType?: Prisma.StringFieldUpdateOperationsInput | string
   sku?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  triggeredAlertId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StockMovementCreateManyTriggeredAlertInput = {
+  id?: string
+  date: Date | string
+  movementType: string
+  sku: string
+  productId: string
+  quantity: number
+  stockBefore: number
+  stockAfter: number
+  warehouseId: string
+  fromLocation?: string | null
+  toLocation?: string | null
+  reference?: string | null
+  userOrSystem?: string | null
+  createdAt?: Date | string
+}
+
+export type StockMovementUpdateWithoutTriggeredAlertInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  movementType?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  product?: Prisma.ProductUpdateOneRequiredWithoutStockMovementsNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStockMovementsNestedInput
+}
+
+export type StockMovementUncheckedUpdateWithoutTriggeredAlertInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  movementType?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userOrSystem?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StockMovementUncheckedUpdateManyWithoutTriggeredAlertInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  movementType?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockBefore?: Prisma.FloatFieldUpdateOperationsInput | number
+  stockAfter?: Prisma.FloatFieldUpdateOperationsInput | number
+  warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
   fromLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   toLocation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -668,14 +1135,20 @@ export type StockMovementSelect<ExtArgs extends runtime.Types.Extensions.Interna
   date?: boolean
   movementType?: boolean
   sku?: boolean
+  productId?: boolean
   quantity?: boolean
+  stockBefore?: boolean
+  stockAfter?: boolean
   warehouseId?: boolean
   fromLocation?: boolean
   toLocation?: boolean
   reference?: boolean
   userOrSystem?: boolean
+  triggeredAlertId?: boolean
   createdAt?: boolean
-  warehouse?: boolean | Prisma.StockMovement$warehouseArgs<ExtArgs>
+  product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  triggeredAlert?: boolean | Prisma.StockMovement$triggeredAlertArgs<ExtArgs>
 }, ExtArgs["result"]["stockMovement"]>
 
 export type StockMovementSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -683,14 +1156,20 @@ export type StockMovementSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   date?: boolean
   movementType?: boolean
   sku?: boolean
+  productId?: boolean
   quantity?: boolean
+  stockBefore?: boolean
+  stockAfter?: boolean
   warehouseId?: boolean
   fromLocation?: boolean
   toLocation?: boolean
   reference?: boolean
   userOrSystem?: boolean
+  triggeredAlertId?: boolean
   createdAt?: boolean
-  warehouse?: boolean | Prisma.StockMovement$warehouseArgs<ExtArgs>
+  product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  triggeredAlert?: boolean | Prisma.StockMovement$triggeredAlertArgs<ExtArgs>
 }, ExtArgs["result"]["stockMovement"]>
 
 export type StockMovementSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -698,14 +1177,20 @@ export type StockMovementSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   date?: boolean
   movementType?: boolean
   sku?: boolean
+  productId?: boolean
   quantity?: boolean
+  stockBefore?: boolean
+  stockAfter?: boolean
   warehouseId?: boolean
   fromLocation?: boolean
   toLocation?: boolean
   reference?: boolean
   userOrSystem?: boolean
+  triggeredAlertId?: boolean
   createdAt?: boolean
-  warehouse?: boolean | Prisma.StockMovement$warehouseArgs<ExtArgs>
+  product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  triggeredAlert?: boolean | Prisma.StockMovement$triggeredAlertArgs<ExtArgs>
 }, ExtArgs["result"]["stockMovement"]>
 
 export type StockMovementSelectScalar = {
@@ -713,42 +1198,61 @@ export type StockMovementSelectScalar = {
   date?: boolean
   movementType?: boolean
   sku?: boolean
+  productId?: boolean
   quantity?: boolean
+  stockBefore?: boolean
+  stockAfter?: boolean
   warehouseId?: boolean
   fromLocation?: boolean
   toLocation?: boolean
   reference?: boolean
   userOrSystem?: boolean
+  triggeredAlertId?: boolean
   createdAt?: boolean
 }
 
-export type StockMovementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "movementType" | "sku" | "quantity" | "warehouseId" | "fromLocation" | "toLocation" | "reference" | "userOrSystem" | "createdAt", ExtArgs["result"]["stockMovement"]>
+export type StockMovementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "movementType" | "sku" | "productId" | "quantity" | "stockBefore" | "stockAfter" | "warehouseId" | "fromLocation" | "toLocation" | "reference" | "userOrSystem" | "triggeredAlertId" | "createdAt", ExtArgs["result"]["stockMovement"]>
 export type StockMovementInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  warehouse?: boolean | Prisma.StockMovement$warehouseArgs<ExtArgs>
+  product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  triggeredAlert?: boolean | Prisma.StockMovement$triggeredAlertArgs<ExtArgs>
 }
 export type StockMovementIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  warehouse?: boolean | Prisma.StockMovement$warehouseArgs<ExtArgs>
+  product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  triggeredAlert?: boolean | Prisma.StockMovement$triggeredAlertArgs<ExtArgs>
 }
 export type StockMovementIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  warehouse?: boolean | Prisma.StockMovement$warehouseArgs<ExtArgs>
+  product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  triggeredAlert?: boolean | Prisma.StockMovement$triggeredAlertArgs<ExtArgs>
 }
 
 export type $StockMovementPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "StockMovement"
   objects: {
-    warehouse: Prisma.$WarehousePayload<ExtArgs> | null
+    product: Prisma.$ProductPayload<ExtArgs>
+    warehouse: Prisma.$WarehousePayload<ExtArgs>
+    triggeredAlert: Prisma.$AlertPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     date: Date
     movementType: string
     sku: string
+    productId: string
     quantity: number
-    warehouseId: string | null
+    stockBefore: number
+    stockAfter: number
+    warehouseId: string
     fromLocation: string | null
     toLocation: string | null
     reference: string | null
     userOrSystem: string | null
+    /**
+     * * The alert this movement raised, when it raised one. Phase 3.6.
+     */
+    triggeredAlertId: string | null
     createdAt: Date
   }, ExtArgs["result"]["stockMovement"]>
   composites: {}
@@ -1144,7 +1648,9 @@ readonly fields: StockMovementFieldRefs;
  */
 export interface Prisma__StockMovementClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  warehouse<T extends Prisma.StockMovement$warehouseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StockMovement$warehouseArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  product<T extends Prisma.ProductDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProductDefaultArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  warehouse<T extends Prisma.WarehouseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WarehouseDefaultArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  triggeredAlert<T extends Prisma.StockMovement$triggeredAlertArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StockMovement$triggeredAlertArgs<ExtArgs>>): Prisma.Prisma__AlertClient<runtime.Types.Result.GetResult<Prisma.$AlertPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1178,12 +1684,16 @@ export interface StockMovementFieldRefs {
   readonly date: Prisma.FieldRef<"StockMovement", 'DateTime'>
   readonly movementType: Prisma.FieldRef<"StockMovement", 'String'>
   readonly sku: Prisma.FieldRef<"StockMovement", 'String'>
+  readonly productId: Prisma.FieldRef<"StockMovement", 'String'>
   readonly quantity: Prisma.FieldRef<"StockMovement", 'Float'>
+  readonly stockBefore: Prisma.FieldRef<"StockMovement", 'Float'>
+  readonly stockAfter: Prisma.FieldRef<"StockMovement", 'Float'>
   readonly warehouseId: Prisma.FieldRef<"StockMovement", 'String'>
   readonly fromLocation: Prisma.FieldRef<"StockMovement", 'String'>
   readonly toLocation: Prisma.FieldRef<"StockMovement", 'String'>
   readonly reference: Prisma.FieldRef<"StockMovement", 'String'>
   readonly userOrSystem: Prisma.FieldRef<"StockMovement", 'String'>
+  readonly triggeredAlertId: Prisma.FieldRef<"StockMovement", 'String'>
   readonly createdAt: Prisma.FieldRef<"StockMovement", 'DateTime'>
 }
     
@@ -1586,22 +2096,22 @@ export type StockMovementDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
 }
 
 /**
- * StockMovement.warehouse
+ * StockMovement.triggeredAlert
  */
-export type StockMovement$warehouseArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type StockMovement$triggeredAlertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Warehouse
+   * Select specific fields to fetch from the Alert
    */
-  select?: Prisma.WarehouseSelect<ExtArgs> | null
+  select?: Prisma.AlertSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Warehouse
+   * Omit specific fields from the Alert
    */
-  omit?: Prisma.WarehouseOmit<ExtArgs> | null
+  omit?: Prisma.AlertOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.WarehouseInclude<ExtArgs> | null
-  where?: Prisma.WarehouseWhereInput
+  include?: Prisma.AlertInclude<ExtArgs> | null
+  where?: Prisma.AlertWhereInput
 }
 
 /**

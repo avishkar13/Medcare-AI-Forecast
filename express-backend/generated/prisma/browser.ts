@@ -157,14 +157,19 @@ export type NotificationDelivery = Prisma.NotificationDeliveryModel
 export type SystemSettings = Prisma.SystemSettingsModel
 /**
  * Model StockMovement
- * *
- *  * The movement ledger. Written by nothing yet - Phase 3.1 is its writer.
- *  *
- *  * `warehouseId` is the DC the row belongs to, which is what a DC page filters on.
- *  * It does not replace `fromLocation` / `toLocation`: a transfer has two endpoints
- *  * and one foreign key cannot hold both.
+ * 
  */
 export type StockMovement = Prisma.StockMovementModel
+/**
+ * Model RestockRequest
+ * *
+ *  * A request to replenish a position, raised from the UI rather than by the planner.
+ *  *
+ *  * Distinct from `SupplyPlan`, which the executor proposes: this is a human asking for
+ *  * stock. The lifecycle mirrors `SupplyPlan`'s so both read the same way on a review
+ *  * surface, and `REQUESTED` is the only actionable state.
+ */
+export type RestockRequest = Prisma.RestockRequestModel
 /**
  * Model WastePreventionRecord
  * *

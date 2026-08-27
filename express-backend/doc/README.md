@@ -10,6 +10,7 @@ and is not repeated per group.
 | masterdata | `/api` | [masterdata.api.md](masterdata.api.md) |
 | dashboard | `/api/dashboard` | [dashboard.api.md](dashboard.api.md) |
 | inventory | `/api/inventory` | [inventory.api.md](inventory.api.md) |
+| movements | `/api/dc`, `/api/inventory/movements`, `/api/restock-requests` | [movements.api.md](movements.api.md) |
 | planning | `/api/planning` | [planning.api.md](planning.api.md) |
 | scenarios | `/api/scenarios` | [scenarios.api.md](scenarios.api.md) |
 | forecast | `/api/forecast` | [forecast.api.md](forecast.api.md) |

@@ -78,6 +78,7 @@ export const ModelName = {
   NotificationDelivery: 'NotificationDelivery',
   SystemSettings: 'SystemSettings',
   StockMovement: 'StockMovement',
+  RestockRequest: 'RestockRequest',
   WastePreventionRecord: 'WastePreventionRecord',
   AlertMetric: 'AlertMetric',
   AlertTimelineEvent: 'AlertTimelineEvent',
@@ -155,6 +156,7 @@ export const WarehouseScalarFieldEnum = {
   location: 'location',
   capacity: 'capacity',
   isActive: 'isActive',
+  lastSyncedAt: 'lastSyncedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -521,16 +523,40 @@ export const StockMovementScalarFieldEnum = {
   date: 'date',
   movementType: 'movementType',
   sku: 'sku',
+  productId: 'productId',
   quantity: 'quantity',
+  stockBefore: 'stockBefore',
+  stockAfter: 'stockAfter',
   warehouseId: 'warehouseId',
   fromLocation: 'fromLocation',
   toLocation: 'toLocation',
   reference: 'reference',
   userOrSystem: 'userOrSystem',
+  triggeredAlertId: 'triggeredAlertId',
   createdAt: 'createdAt'
 } as const
 
 export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)[keyof typeof StockMovementScalarFieldEnum]
+
+
+export const RestockRequestScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  warehouseId: 'warehouseId',
+  quantity: 'quantity',
+  status: 'status',
+  reason: 'reason',
+  notes: 'notes',
+  requestedById: 'requestedById',
+  decidedById: 'decidedById',
+  decidedAt: 'decidedAt',
+  fulfilledAt: 'fulfilledAt',
+  fulfillmentMovementId: 'fulfillmentMovementId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RestockRequestScalarFieldEnum = (typeof RestockRequestScalarFieldEnum)[keyof typeof RestockRequestScalarFieldEnum]
 
 
 export const WastePreventionRecordScalarFieldEnum = {

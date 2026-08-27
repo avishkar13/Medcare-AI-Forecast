@@ -219,6 +219,8 @@ export type UserWhereInput = {
   scenarios?: Prisma.ScenarioListRelationFilter
   planningRuns?: Prisma.PlanningRunListRelationFilter
   actedRecommendations?: Prisma.RecommendationListRelationFilter
+  restockRequested?: Prisma.RestockRequestListRelationFilter
+  restockDecided?: Prisma.RestockRequestListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -236,6 +238,8 @@ export type UserOrderByWithRelationInput = {
   scenarios?: Prisma.ScenarioOrderByRelationAggregateInput
   planningRuns?: Prisma.PlanningRunOrderByRelationAggregateInput
   actedRecommendations?: Prisma.RecommendationOrderByRelationAggregateInput
+  restockRequested?: Prisma.RestockRequestOrderByRelationAggregateInput
+  restockDecided?: Prisma.RestockRequestOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -256,6 +260,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   scenarios?: Prisma.ScenarioListRelationFilter
   planningRuns?: Prisma.PlanningRunListRelationFilter
   actedRecommendations?: Prisma.RecommendationListRelationFilter
+  restockRequested?: Prisma.RestockRequestListRelationFilter
+  restockDecided?: Prisma.RestockRequestListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -301,6 +307,8 @@ export type UserCreateInput = {
   scenarios?: Prisma.ScenarioCreateNestedManyWithoutCreatedByInput
   planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutCreatedByInput
   actedRecommendations?: Prisma.RecommendationCreateNestedManyWithoutActedByInput
+  restockRequested?: Prisma.RestockRequestCreateNestedManyWithoutRequestedByInput
+  restockDecided?: Prisma.RestockRequestCreateNestedManyWithoutDecidedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -316,6 +324,8 @@ export type UserUncheckedCreateInput = {
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutCreatedByInput
   planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutCreatedByInput
   actedRecommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutActedByInput
+  restockRequested?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  restockDecided?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutDecidedByInput
 }
 
 export type UserUpdateInput = {
@@ -331,6 +341,8 @@ export type UserUpdateInput = {
   scenarios?: Prisma.ScenarioUpdateManyWithoutCreatedByNestedInput
   planningRuns?: Prisma.PlanningRunUpdateManyWithoutCreatedByNestedInput
   actedRecommendations?: Prisma.RecommendationUpdateManyWithoutActedByNestedInput
+  restockRequested?: Prisma.RestockRequestUpdateManyWithoutRequestedByNestedInput
+  restockDecided?: Prisma.RestockRequestUpdateManyWithoutDecidedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -346,6 +358,8 @@ export type UserUncheckedUpdateInput = {
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutCreatedByNestedInput
   planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutCreatedByNestedInput
   actedRecommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutActedByNestedInput
+  restockRequested?: Prisma.RestockRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  restockDecided?: Prisma.RestockRequestUncheckedUpdateManyWithoutDecidedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -582,6 +596,38 @@ export type UserUncheckedUpdateManyWithoutRoleNestedInput = {
   deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
+export type UserCreateNestedOneWithoutRestockRequestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRestockRequestedInput, Prisma.UserUncheckedCreateWithoutRestockRequestedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRestockRequestedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutRestockDecidedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRestockDecidedInput, Prisma.UserUncheckedCreateWithoutRestockDecidedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRestockDecidedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutRestockRequestedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRestockRequestedInput, Prisma.UserUncheckedCreateWithoutRestockRequestedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRestockRequestedInput
+  upsert?: Prisma.UserUpsertWithoutRestockRequestedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRestockRequestedInput, Prisma.UserUpdateWithoutRestockRequestedInput>, Prisma.UserUncheckedUpdateWithoutRestockRequestedInput>
+}
+
+export type UserUpdateOneWithoutRestockDecidedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRestockDecidedInput, Prisma.UserUncheckedCreateWithoutRestockDecidedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRestockDecidedInput
+  upsert?: Prisma.UserUpsertWithoutRestockDecidedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRestockDecidedInput, Prisma.UserUpdateWithoutRestockDecidedInput>, Prisma.UserUncheckedUpdateWithoutRestockDecidedInput>
+}
+
 export type UserCreateWithoutWarehouseInput = {
   id?: string
   name: string
@@ -594,6 +640,8 @@ export type UserCreateWithoutWarehouseInput = {
   scenarios?: Prisma.ScenarioCreateNestedManyWithoutCreatedByInput
   planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutCreatedByInput
   actedRecommendations?: Prisma.RecommendationCreateNestedManyWithoutActedByInput
+  restockRequested?: Prisma.RestockRequestCreateNestedManyWithoutRequestedByInput
+  restockDecided?: Prisma.RestockRequestCreateNestedManyWithoutDecidedByInput
 }
 
 export type UserUncheckedCreateWithoutWarehouseInput = {
@@ -608,6 +656,8 @@ export type UserUncheckedCreateWithoutWarehouseInput = {
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutCreatedByInput
   planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutCreatedByInput
   actedRecommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutActedByInput
+  restockRequested?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  restockDecided?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutDecidedByInput
 }
 
 export type UserCreateOrConnectWithoutWarehouseInput = {
@@ -663,6 +713,8 @@ export type UserCreateWithoutScenariosInput = {
   warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
   planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutCreatedByInput
   actedRecommendations?: Prisma.RecommendationCreateNestedManyWithoutActedByInput
+  restockRequested?: Prisma.RestockRequestCreateNestedManyWithoutRequestedByInput
+  restockDecided?: Prisma.RestockRequestCreateNestedManyWithoutDecidedByInput
 }
 
 export type UserUncheckedCreateWithoutScenariosInput = {
@@ -677,6 +729,8 @@ export type UserUncheckedCreateWithoutScenariosInput = {
   isActive?: boolean
   planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutCreatedByInput
   actedRecommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutActedByInput
+  restockRequested?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  restockDecided?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutDecidedByInput
 }
 
 export type UserCreateOrConnectWithoutScenariosInput = {
@@ -707,6 +761,8 @@ export type UserUpdateWithoutScenariosInput = {
   warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
   planningRuns?: Prisma.PlanningRunUpdateManyWithoutCreatedByNestedInput
   actedRecommendations?: Prisma.RecommendationUpdateManyWithoutActedByNestedInput
+  restockRequested?: Prisma.RestockRequestUpdateManyWithoutRequestedByNestedInput
+  restockDecided?: Prisma.RestockRequestUpdateManyWithoutDecidedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutScenariosInput = {
@@ -721,6 +777,8 @@ export type UserUncheckedUpdateWithoutScenariosInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutCreatedByNestedInput
   actedRecommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutActedByNestedInput
+  restockRequested?: Prisma.RestockRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  restockDecided?: Prisma.RestockRequestUncheckedUpdateManyWithoutDecidedByNestedInput
 }
 
 export type UserCreateWithoutPlanningRunsInput = {
@@ -735,6 +793,8 @@ export type UserCreateWithoutPlanningRunsInput = {
   warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
   scenarios?: Prisma.ScenarioCreateNestedManyWithoutCreatedByInput
   actedRecommendations?: Prisma.RecommendationCreateNestedManyWithoutActedByInput
+  restockRequested?: Prisma.RestockRequestCreateNestedManyWithoutRequestedByInput
+  restockDecided?: Prisma.RestockRequestCreateNestedManyWithoutDecidedByInput
 }
 
 export type UserUncheckedCreateWithoutPlanningRunsInput = {
@@ -749,6 +809,8 @@ export type UserUncheckedCreateWithoutPlanningRunsInput = {
   isActive?: boolean
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutCreatedByInput
   actedRecommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutActedByInput
+  restockRequested?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  restockDecided?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutDecidedByInput
 }
 
 export type UserCreateOrConnectWithoutPlanningRunsInput = {
@@ -779,6 +841,8 @@ export type UserUpdateWithoutPlanningRunsInput = {
   warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
   scenarios?: Prisma.ScenarioUpdateManyWithoutCreatedByNestedInput
   actedRecommendations?: Prisma.RecommendationUpdateManyWithoutActedByNestedInput
+  restockRequested?: Prisma.RestockRequestUpdateManyWithoutRequestedByNestedInput
+  restockDecided?: Prisma.RestockRequestUpdateManyWithoutDecidedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPlanningRunsInput = {
@@ -793,6 +857,8 @@ export type UserUncheckedUpdateWithoutPlanningRunsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutCreatedByNestedInput
   actedRecommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutActedByNestedInput
+  restockRequested?: Prisma.RestockRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  restockDecided?: Prisma.RestockRequestUncheckedUpdateManyWithoutDecidedByNestedInput
 }
 
 export type UserCreateWithoutActedRecommendationsInput = {
@@ -807,6 +873,8 @@ export type UserCreateWithoutActedRecommendationsInput = {
   warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
   scenarios?: Prisma.ScenarioCreateNestedManyWithoutCreatedByInput
   planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutCreatedByInput
+  restockRequested?: Prisma.RestockRequestCreateNestedManyWithoutRequestedByInput
+  restockDecided?: Prisma.RestockRequestCreateNestedManyWithoutDecidedByInput
 }
 
 export type UserUncheckedCreateWithoutActedRecommendationsInput = {
@@ -821,6 +889,8 @@ export type UserUncheckedCreateWithoutActedRecommendationsInput = {
   isActive?: boolean
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutCreatedByInput
   planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutCreatedByInput
+  restockRequested?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  restockDecided?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutDecidedByInput
 }
 
 export type UserCreateOrConnectWithoutActedRecommendationsInput = {
@@ -851,6 +921,8 @@ export type UserUpdateWithoutActedRecommendationsInput = {
   warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
   scenarios?: Prisma.ScenarioUpdateManyWithoutCreatedByNestedInput
   planningRuns?: Prisma.PlanningRunUpdateManyWithoutCreatedByNestedInput
+  restockRequested?: Prisma.RestockRequestUpdateManyWithoutRequestedByNestedInput
+  restockDecided?: Prisma.RestockRequestUpdateManyWithoutDecidedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutActedRecommendationsInput = {
@@ -865,6 +937,8 @@ export type UserUncheckedUpdateWithoutActedRecommendationsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutCreatedByNestedInput
   planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutCreatedByNestedInput
+  restockRequested?: Prisma.RestockRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  restockDecided?: Prisma.RestockRequestUncheckedUpdateManyWithoutDecidedByNestedInput
 }
 
 export type UserCreateWithoutRoleInput = {
@@ -879,6 +953,8 @@ export type UserCreateWithoutRoleInput = {
   scenarios?: Prisma.ScenarioCreateNestedManyWithoutCreatedByInput
   planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutCreatedByInput
   actedRecommendations?: Prisma.RecommendationCreateNestedManyWithoutActedByInput
+  restockRequested?: Prisma.RestockRequestCreateNestedManyWithoutRequestedByInput
+  restockDecided?: Prisma.RestockRequestCreateNestedManyWithoutDecidedByInput
 }
 
 export type UserUncheckedCreateWithoutRoleInput = {
@@ -893,6 +969,8 @@ export type UserUncheckedCreateWithoutRoleInput = {
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutCreatedByInput
   planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutCreatedByInput
   actedRecommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutActedByInput
+  restockRequested?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  restockDecided?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutDecidedByInput
 }
 
 export type UserCreateOrConnectWithoutRoleInput = {
@@ -921,6 +999,166 @@ export type UserUpdateManyWithWhereWithoutRoleInput = {
   data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutRoleInput>
 }
 
+export type UserCreateWithoutRestockRequestedInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isActive?: boolean
+  role: Prisma.RoleCreateNestedOneWithoutUsersInput
+  warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  scenarios?: Prisma.ScenarioCreateNestedManyWithoutCreatedByInput
+  planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutCreatedByInput
+  actedRecommendations?: Prisma.RecommendationCreateNestedManyWithoutActedByInput
+  restockDecided?: Prisma.RestockRequestCreateNestedManyWithoutDecidedByInput
+}
+
+export type UserUncheckedCreateWithoutRestockRequestedInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  roleId: string
+  warehouseId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isActive?: boolean
+  scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutCreatedByInput
+  planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutCreatedByInput
+  actedRecommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutActedByInput
+  restockDecided?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutDecidedByInput
+}
+
+export type UserCreateOrConnectWithoutRestockRequestedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutRestockRequestedInput, Prisma.UserUncheckedCreateWithoutRestockRequestedInput>
+}
+
+export type UserCreateWithoutRestockDecidedInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isActive?: boolean
+  role: Prisma.RoleCreateNestedOneWithoutUsersInput
+  warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  scenarios?: Prisma.ScenarioCreateNestedManyWithoutCreatedByInput
+  planningRuns?: Prisma.PlanningRunCreateNestedManyWithoutCreatedByInput
+  actedRecommendations?: Prisma.RecommendationCreateNestedManyWithoutActedByInput
+  restockRequested?: Prisma.RestockRequestCreateNestedManyWithoutRequestedByInput
+}
+
+export type UserUncheckedCreateWithoutRestockDecidedInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  roleId: string
+  warehouseId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isActive?: boolean
+  scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutCreatedByInput
+  planningRuns?: Prisma.PlanningRunUncheckedCreateNestedManyWithoutCreatedByInput
+  actedRecommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutActedByInput
+  restockRequested?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutRequestedByInput
+}
+
+export type UserCreateOrConnectWithoutRestockDecidedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutRestockDecidedInput, Prisma.UserUncheckedCreateWithoutRestockDecidedInput>
+}
+
+export type UserUpsertWithoutRestockRequestedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutRestockRequestedInput, Prisma.UserUncheckedUpdateWithoutRestockRequestedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutRestockRequestedInput, Prisma.UserUncheckedCreateWithoutRestockRequestedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutRestockRequestedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutRestockRequestedInput, Prisma.UserUncheckedUpdateWithoutRestockRequestedInput>
+}
+
+export type UserUpdateWithoutRestockRequestedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  scenarios?: Prisma.ScenarioUpdateManyWithoutCreatedByNestedInput
+  planningRuns?: Prisma.PlanningRunUpdateManyWithoutCreatedByNestedInput
+  actedRecommendations?: Prisma.RecommendationUpdateManyWithoutActedByNestedInput
+  restockDecided?: Prisma.RestockRequestUpdateManyWithoutDecidedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutRestockRequestedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  roleId?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutCreatedByNestedInput
+  planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutCreatedByNestedInput
+  actedRecommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutActedByNestedInput
+  restockDecided?: Prisma.RestockRequestUncheckedUpdateManyWithoutDecidedByNestedInput
+}
+
+export type UserUpsertWithoutRestockDecidedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutRestockDecidedInput, Prisma.UserUncheckedUpdateWithoutRestockDecidedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutRestockDecidedInput, Prisma.UserUncheckedCreateWithoutRestockDecidedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutRestockDecidedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutRestockDecidedInput, Prisma.UserUncheckedUpdateWithoutRestockDecidedInput>
+}
+
+export type UserUpdateWithoutRestockDecidedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  scenarios?: Prisma.ScenarioUpdateManyWithoutCreatedByNestedInput
+  planningRuns?: Prisma.PlanningRunUpdateManyWithoutCreatedByNestedInput
+  actedRecommendations?: Prisma.RecommendationUpdateManyWithoutActedByNestedInput
+  restockRequested?: Prisma.RestockRequestUpdateManyWithoutRequestedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutRestockDecidedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  roleId?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutCreatedByNestedInput
+  planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutCreatedByNestedInput
+  actedRecommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutActedByNestedInput
+  restockRequested?: Prisma.RestockRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+}
+
 export type UserCreateManyWarehouseInput = {
   id?: string
   name: string
@@ -944,6 +1182,8 @@ export type UserUpdateWithoutWarehouseInput = {
   scenarios?: Prisma.ScenarioUpdateManyWithoutCreatedByNestedInput
   planningRuns?: Prisma.PlanningRunUpdateManyWithoutCreatedByNestedInput
   actedRecommendations?: Prisma.RecommendationUpdateManyWithoutActedByNestedInput
+  restockRequested?: Prisma.RestockRequestUpdateManyWithoutRequestedByNestedInput
+  restockDecided?: Prisma.RestockRequestUpdateManyWithoutDecidedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWarehouseInput = {
@@ -958,6 +1198,8 @@ export type UserUncheckedUpdateWithoutWarehouseInput = {
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutCreatedByNestedInput
   planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutCreatedByNestedInput
   actedRecommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutActedByNestedInput
+  restockRequested?: Prisma.RestockRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  restockDecided?: Prisma.RestockRequestUncheckedUpdateManyWithoutDecidedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutWarehouseInput = {
@@ -994,6 +1236,8 @@ export type UserUpdateWithoutRoleInput = {
   scenarios?: Prisma.ScenarioUpdateManyWithoutCreatedByNestedInput
   planningRuns?: Prisma.PlanningRunUpdateManyWithoutCreatedByNestedInput
   actedRecommendations?: Prisma.RecommendationUpdateManyWithoutActedByNestedInput
+  restockRequested?: Prisma.RestockRequestUpdateManyWithoutRequestedByNestedInput
+  restockDecided?: Prisma.RestockRequestUpdateManyWithoutDecidedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRoleInput = {
@@ -1008,6 +1252,8 @@ export type UserUncheckedUpdateWithoutRoleInput = {
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutCreatedByNestedInput
   planningRuns?: Prisma.PlanningRunUncheckedUpdateManyWithoutCreatedByNestedInput
   actedRecommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutActedByNestedInput
+  restockRequested?: Prisma.RestockRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  restockDecided?: Prisma.RestockRequestUncheckedUpdateManyWithoutDecidedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutRoleInput = {
@@ -1030,12 +1276,16 @@ export type UserCountOutputType = {
   scenarios: number
   planningRuns: number
   actedRecommendations: number
+  restockRequested: number
+  restockDecided: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   scenarios?: boolean | UserCountOutputTypeCountScenariosArgs
   planningRuns?: boolean | UserCountOutputTypeCountPlanningRunsArgs
   actedRecommendations?: boolean | UserCountOutputTypeCountActedRecommendationsArgs
+  restockRequested?: boolean | UserCountOutputTypeCountRestockRequestedArgs
+  restockDecided?: boolean | UserCountOutputTypeCountRestockDecidedArgs
 }
 
 /**
@@ -1069,6 +1319,20 @@ export type UserCountOutputTypeCountActedRecommendationsArgs<ExtArgs extends run
   where?: Prisma.RecommendationWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountRestockRequestedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RestockRequestWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountRestockDecidedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RestockRequestWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1085,6 +1349,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   scenarios?: boolean | Prisma.User$scenariosArgs<ExtArgs>
   planningRuns?: boolean | Prisma.User$planningRunsArgs<ExtArgs>
   actedRecommendations?: boolean | Prisma.User$actedRecommendationsArgs<ExtArgs>
+  restockRequested?: boolean | Prisma.User$restockRequestedArgs<ExtArgs>
+  restockDecided?: boolean | Prisma.User$restockDecidedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1135,6 +1401,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   scenarios?: boolean | Prisma.User$scenariosArgs<ExtArgs>
   planningRuns?: boolean | Prisma.User$planningRunsArgs<ExtArgs>
   actedRecommendations?: boolean | Prisma.User$actedRecommendationsArgs<ExtArgs>
+  restockRequested?: boolean | Prisma.User$restockRequestedArgs<ExtArgs>
+  restockDecided?: boolean | Prisma.User$restockDecidedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1154,6 +1422,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     scenarios: Prisma.$ScenarioPayload<ExtArgs>[]
     planningRuns: Prisma.$PlanningRunPayload<ExtArgs>[]
     actedRecommendations: Prisma.$RecommendationPayload<ExtArgs>[]
+    restockRequested: Prisma.$RestockRequestPayload<ExtArgs>[]
+    restockDecided: Prisma.$RestockRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1564,6 +1834,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   scenarios<T extends Prisma.User$scenariosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$scenariosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScenarioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   planningRuns<T extends Prisma.User$planningRunsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$planningRunsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlanningRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   actedRecommendations<T extends Prisma.User$actedRecommendationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$actedRecommendationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecommendationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  restockRequested<T extends Prisma.User$restockRequestedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$restockRequestedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RestockRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  restockDecided<T extends Prisma.User$restockDecidedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$restockDecidedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RestockRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2091,6 +2363,54 @@ export type User$actedRecommendationsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.RecommendationScalarFieldEnum | Prisma.RecommendationScalarFieldEnum[]
+}
+
+/**
+ * User.restockRequested
+ */
+export type User$restockRequestedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RestockRequest
+   */
+  select?: Prisma.RestockRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RestockRequest
+   */
+  omit?: Prisma.RestockRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RestockRequestInclude<ExtArgs> | null
+  where?: Prisma.RestockRequestWhereInput
+  orderBy?: Prisma.RestockRequestOrderByWithRelationInput | Prisma.RestockRequestOrderByWithRelationInput[]
+  cursor?: Prisma.RestockRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RestockRequestScalarFieldEnum | Prisma.RestockRequestScalarFieldEnum[]
+}
+
+/**
+ * User.restockDecided
+ */
+export type User$restockDecidedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RestockRequest
+   */
+  select?: Prisma.RestockRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RestockRequest
+   */
+  omit?: Prisma.RestockRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RestockRequestInclude<ExtArgs> | null
+  where?: Prisma.RestockRequestWhereInput
+  orderBy?: Prisma.RestockRequestOrderByWithRelationInput | Prisma.RestockRequestOrderByWithRelationInput[]
+  cursor?: Prisma.RestockRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RestockRequestScalarFieldEnum | Prisma.RestockRequestScalarFieldEnum[]
 }
 
 /**

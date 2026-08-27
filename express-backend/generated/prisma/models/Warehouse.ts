@@ -43,6 +43,7 @@ export type WarehouseMinAggregateOutputType = {
   location: string | null
   capacity: number | null
   isActive: boolean | null
+  lastSyncedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +57,7 @@ export type WarehouseMaxAggregateOutputType = {
   location: string | null
   capacity: number | null
   isActive: boolean | null
+  lastSyncedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -69,6 +71,7 @@ export type WarehouseCountAggregateOutputType = {
   location: number
   capacity: number
   isActive: number
+  lastSyncedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -92,6 +95,7 @@ export type WarehouseMinAggregateInputType = {
   location?: true
   capacity?: true
   isActive?: true
+  lastSyncedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -105,6 +109,7 @@ export type WarehouseMaxAggregateInputType = {
   location?: true
   capacity?: true
   isActive?: true
+  lastSyncedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -118,6 +123,7 @@ export type WarehouseCountAggregateInputType = {
   location?: true
   capacity?: true
   isActive?: true
+  lastSyncedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -218,6 +224,7 @@ export type WarehouseGroupByOutputType = {
   location: string | null
   capacity: number | null
   isActive: boolean
+  lastSyncedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: WarehouseCountAggregateOutputType | null
@@ -254,6 +261,7 @@ export type WarehouseWhereInput = {
   location?: Prisma.StringNullableFilter<"Warehouse"> | string | null
   capacity?: Prisma.IntNullableFilter<"Warehouse"> | number | null
   isActive?: Prisma.BoolFilter<"Warehouse"> | boolean
+  lastSyncedAt?: Prisma.DateTimeNullableFilter<"Warehouse"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Warehouse"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Warehouse"> | Date | string
   demandHistory?: Prisma.DemandHistoryListRelationFilter
@@ -272,6 +280,7 @@ export type WarehouseWhereInput = {
   alerts?: Prisma.AlertListRelationFilter
   stockMovements?: Prisma.StockMovementListRelationFilter
   wastePrevention?: Prisma.WastePreventionRecordListRelationFilter
+  restockRequests?: Prisma.RestockRequestListRelationFilter
   users?: Prisma.UserListRelationFilter
 }
 
@@ -284,6 +293,7 @@ export type WarehouseOrderByWithRelationInput = {
   location?: Prisma.SortOrderInput | Prisma.SortOrder
   capacity?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   demandHistory?: Prisma.DemandHistoryOrderByRelationAggregateInput
@@ -302,6 +312,7 @@ export type WarehouseOrderByWithRelationInput = {
   alerts?: Prisma.AlertOrderByRelationAggregateInput
   stockMovements?: Prisma.StockMovementOrderByRelationAggregateInput
   wastePrevention?: Prisma.WastePreventionRecordOrderByRelationAggregateInput
+  restockRequests?: Prisma.RestockRequestOrderByRelationAggregateInput
   users?: Prisma.UserOrderByRelationAggregateInput
 }
 
@@ -317,6 +328,7 @@ export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
   location?: Prisma.StringNullableFilter<"Warehouse"> | string | null
   capacity?: Prisma.IntNullableFilter<"Warehouse"> | number | null
   isActive?: Prisma.BoolFilter<"Warehouse"> | boolean
+  lastSyncedAt?: Prisma.DateTimeNullableFilter<"Warehouse"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Warehouse"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Warehouse"> | Date | string
   demandHistory?: Prisma.DemandHistoryListRelationFilter
@@ -335,6 +347,7 @@ export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
   alerts?: Prisma.AlertListRelationFilter
   stockMovements?: Prisma.StockMovementListRelationFilter
   wastePrevention?: Prisma.WastePreventionRecordListRelationFilter
+  restockRequests?: Prisma.RestockRequestListRelationFilter
   users?: Prisma.UserListRelationFilter
 }, "id" | "code">
 
@@ -347,6 +360,7 @@ export type WarehouseOrderByWithAggregationInput = {
   location?: Prisma.SortOrderInput | Prisma.SortOrder
   capacity?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.WarehouseCountOrderByAggregateInput
@@ -368,6 +382,7 @@ export type WarehouseScalarWhereWithAggregatesInput = {
   location?: Prisma.StringNullableWithAggregatesFilter<"Warehouse"> | string | null
   capacity?: Prisma.IntNullableWithAggregatesFilter<"Warehouse"> | number | null
   isActive?: Prisma.BoolWithAggregatesFilter<"Warehouse"> | boolean
+  lastSyncedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Warehouse"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Warehouse"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Warehouse"> | Date | string
 }
@@ -381,6 +396,7 @@ export type WarehouseCreateInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -399,6 +415,7 @@ export type WarehouseCreateInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -411,6 +428,7 @@ export type WarehouseUncheckedCreateInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -429,6 +447,7 @@ export type WarehouseUncheckedCreateInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -441,6 +460,7 @@ export type WarehouseUpdateInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -459,6 +479,7 @@ export type WarehouseUpdateInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -471,6 +492,7 @@ export type WarehouseUncheckedUpdateInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -489,6 +511,7 @@ export type WarehouseUncheckedUpdateInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -501,6 +524,7 @@ export type WarehouseCreateManyInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -514,6 +538,7 @@ export type WarehouseUpdateManyMutationInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -527,6 +552,7 @@ export type WarehouseUncheckedUpdateManyInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -545,6 +571,7 @@ export type WarehouseCountOrderByAggregateInput = {
   location?: Prisma.SortOrder
   capacity?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -562,6 +589,7 @@ export type WarehouseMaxOrderByAggregateInput = {
   location?: Prisma.SortOrder
   capacity?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -575,6 +603,7 @@ export type WarehouseMinOrderByAggregateInput = {
   location?: Prisma.SortOrder
   capacity?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  lastSyncedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -606,6 +635,10 @@ export type WarehouseUpdateOneWithoutUsersNestedInput = {
 
 export type EnumWarehouseTierFieldUpdateOperationsInput = {
   set?: $Enums.WarehouseTier
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type WarehouseCreateNestedOneWithoutDemandHistoryInput = {
@@ -816,14 +849,26 @@ export type WarehouseCreateNestedOneWithoutStockMovementsInput = {
   connect?: Prisma.WarehouseWhereUniqueInput
 }
 
-export type WarehouseUpdateOneWithoutStockMovementsNestedInput = {
+export type WarehouseUpdateOneRequiredWithoutStockMovementsNestedInput = {
   create?: Prisma.XOR<Prisma.WarehouseCreateWithoutStockMovementsInput, Prisma.WarehouseUncheckedCreateWithoutStockMovementsInput>
   connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutStockMovementsInput
   upsert?: Prisma.WarehouseUpsertWithoutStockMovementsInput
-  disconnect?: Prisma.WarehouseWhereInput | boolean
-  delete?: Prisma.WarehouseWhereInput | boolean
   connect?: Prisma.WarehouseWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutStockMovementsInput, Prisma.WarehouseUpdateWithoutStockMovementsInput>, Prisma.WarehouseUncheckedUpdateWithoutStockMovementsInput>
+}
+
+export type WarehouseCreateNestedOneWithoutRestockRequestsInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutRestockRequestsInput, Prisma.WarehouseUncheckedCreateWithoutRestockRequestsInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutRestockRequestsInput
+  connect?: Prisma.WarehouseWhereUniqueInput
+}
+
+export type WarehouseUpdateOneRequiredWithoutRestockRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutRestockRequestsInput, Prisma.WarehouseUncheckedCreateWithoutRestockRequestsInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutRestockRequestsInput
+  upsert?: Prisma.WarehouseUpsertWithoutRestockRequestsInput
+  connect?: Prisma.WarehouseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutRestockRequestsInput, Prisma.WarehouseUpdateWithoutRestockRequestsInput>, Prisma.WarehouseUncheckedUpdateWithoutRestockRequestsInput>
 }
 
 export type WarehouseCreateNestedOneWithoutWastePreventionInput = {
@@ -851,6 +896,7 @@ export type WarehouseCreateWithoutUsersInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -869,6 +915,7 @@ export type WarehouseCreateWithoutUsersInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutUsersInput = {
@@ -880,6 +927,7 @@ export type WarehouseUncheckedCreateWithoutUsersInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -898,6 +946,7 @@ export type WarehouseUncheckedCreateWithoutUsersInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutUsersInput = {
@@ -925,6 +974,7 @@ export type WarehouseUpdateWithoutUsersInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -943,6 +993,7 @@ export type WarehouseUpdateWithoutUsersInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutUsersInput = {
@@ -954,6 +1005,7 @@ export type WarehouseUncheckedUpdateWithoutUsersInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -972,6 +1024,7 @@ export type WarehouseUncheckedUpdateWithoutUsersInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutDemandHistoryInput = {
@@ -983,6 +1036,7 @@ export type WarehouseCreateWithoutDemandHistoryInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   inventory?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput
@@ -1000,6 +1054,7 @@ export type WarehouseCreateWithoutDemandHistoryInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1012,6 +1067,7 @@ export type WarehouseUncheckedCreateWithoutDemandHistoryInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -1029,6 +1085,7 @@ export type WarehouseUncheckedCreateWithoutDemandHistoryInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1057,6 +1114,7 @@ export type WarehouseUpdateWithoutDemandHistoryInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventory?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput
@@ -1074,6 +1132,7 @@ export type WarehouseUpdateWithoutDemandHistoryInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1086,6 +1145,7 @@ export type WarehouseUncheckedUpdateWithoutDemandHistoryInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventory?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -1103,6 +1163,7 @@ export type WarehouseUncheckedUpdateWithoutDemandHistoryInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1115,6 +1176,7 @@ export type WarehouseCreateWithoutInventoryInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -1132,6 +1194,7 @@ export type WarehouseCreateWithoutInventoryInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1144,6 +1207,7 @@ export type WarehouseUncheckedCreateWithoutInventoryInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -1161,6 +1225,7 @@ export type WarehouseUncheckedCreateWithoutInventoryInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1189,6 +1254,7 @@ export type WarehouseUpdateWithoutInventoryInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -1206,6 +1272,7 @@ export type WarehouseUpdateWithoutInventoryInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1218,6 +1285,7 @@ export type WarehouseUncheckedUpdateWithoutInventoryInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -1235,6 +1303,7 @@ export type WarehouseUncheckedUpdateWithoutInventoryInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1247,6 +1316,7 @@ export type WarehouseCreateWithoutBatchesInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -1264,6 +1334,7 @@ export type WarehouseCreateWithoutBatchesInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1276,6 +1347,7 @@ export type WarehouseUncheckedCreateWithoutBatchesInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -1293,6 +1365,7 @@ export type WarehouseUncheckedCreateWithoutBatchesInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1321,6 +1394,7 @@ export type WarehouseUpdateWithoutBatchesInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -1338,6 +1412,7 @@ export type WarehouseUpdateWithoutBatchesInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1350,6 +1425,7 @@ export type WarehouseUncheckedUpdateWithoutBatchesInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -1367,6 +1443,7 @@ export type WarehouseUncheckedUpdateWithoutBatchesInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1379,6 +1456,7 @@ export type WarehouseCreateWithoutPlanningParametersInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -1396,6 +1474,7 @@ export type WarehouseCreateWithoutPlanningParametersInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1408,6 +1487,7 @@ export type WarehouseUncheckedCreateWithoutPlanningParametersInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -1425,6 +1505,7 @@ export type WarehouseUncheckedCreateWithoutPlanningParametersInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1453,6 +1534,7 @@ export type WarehouseUpdateWithoutPlanningParametersInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -1470,6 +1552,7 @@ export type WarehouseUpdateWithoutPlanningParametersInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1482,6 +1565,7 @@ export type WarehouseUncheckedUpdateWithoutPlanningParametersInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -1499,6 +1583,7 @@ export type WarehouseUncheckedUpdateWithoutPlanningParametersInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1511,6 +1596,7 @@ export type WarehouseCreateWithoutPromotionEventsInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -1528,6 +1614,7 @@ export type WarehouseCreateWithoutPromotionEventsInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1540,6 +1627,7 @@ export type WarehouseUncheckedCreateWithoutPromotionEventsInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -1557,6 +1645,7 @@ export type WarehouseUncheckedCreateWithoutPromotionEventsInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1585,6 +1674,7 @@ export type WarehouseUpdateWithoutPromotionEventsInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -1602,6 +1692,7 @@ export type WarehouseUpdateWithoutPromotionEventsInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1614,6 +1705,7 @@ export type WarehouseUncheckedUpdateWithoutPromotionEventsInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -1631,6 +1723,7 @@ export type WarehouseUncheckedUpdateWithoutPromotionEventsInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1643,6 +1736,7 @@ export type WarehouseCreateWithoutDistributorsInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -1660,6 +1754,7 @@ export type WarehouseCreateWithoutDistributorsInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1672,6 +1767,7 @@ export type WarehouseUncheckedCreateWithoutDistributorsInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -1689,6 +1785,7 @@ export type WarehouseUncheckedCreateWithoutDistributorsInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1717,6 +1814,7 @@ export type WarehouseUpdateWithoutDistributorsInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -1734,6 +1832,7 @@ export type WarehouseUpdateWithoutDistributorsInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1746,6 +1845,7 @@ export type WarehouseUncheckedUpdateWithoutDistributorsInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -1763,6 +1863,7 @@ export type WarehouseUncheckedUpdateWithoutDistributorsInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1775,6 +1876,7 @@ export type WarehouseCreateWithoutDistributorOrdersInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -1792,6 +1894,7 @@ export type WarehouseCreateWithoutDistributorOrdersInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1804,6 +1907,7 @@ export type WarehouseUncheckedCreateWithoutDistributorOrdersInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -1821,6 +1925,7 @@ export type WarehouseUncheckedCreateWithoutDistributorOrdersInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1849,6 +1954,7 @@ export type WarehouseUpdateWithoutDistributorOrdersInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -1866,6 +1972,7 @@ export type WarehouseUpdateWithoutDistributorOrdersInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1878,6 +1985,7 @@ export type WarehouseUncheckedUpdateWithoutDistributorOrdersInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -1895,6 +2003,7 @@ export type WarehouseUncheckedUpdateWithoutDistributorOrdersInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -1907,6 +2016,7 @@ export type WarehouseCreateWithoutForecastsInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -1924,6 +2034,7 @@ export type WarehouseCreateWithoutForecastsInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1936,6 +2047,7 @@ export type WarehouseUncheckedCreateWithoutForecastsInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -1953,6 +2065,7 @@ export type WarehouseUncheckedCreateWithoutForecastsInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -1981,6 +2094,7 @@ export type WarehouseUpdateWithoutForecastsInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -1998,6 +2112,7 @@ export type WarehouseUpdateWithoutForecastsInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2010,6 +2125,7 @@ export type WarehouseUncheckedUpdateWithoutForecastsInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -2027,6 +2143,7 @@ export type WarehouseUncheckedUpdateWithoutForecastsInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2039,6 +2156,7 @@ export type WarehouseCreateWithoutInventoryPlansInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -2056,6 +2174,7 @@ export type WarehouseCreateWithoutInventoryPlansInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2068,6 +2187,7 @@ export type WarehouseUncheckedCreateWithoutInventoryPlansInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -2085,6 +2205,7 @@ export type WarehouseUncheckedCreateWithoutInventoryPlansInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2113,6 +2234,7 @@ export type WarehouseUpdateWithoutInventoryPlansInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -2130,6 +2252,7 @@ export type WarehouseUpdateWithoutInventoryPlansInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2142,6 +2265,7 @@ export type WarehouseUncheckedUpdateWithoutInventoryPlansInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -2159,6 +2283,7 @@ export type WarehouseUncheckedUpdateWithoutInventoryPlansInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2171,6 +2296,7 @@ export type WarehouseCreateWithoutSupplyPlansInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -2188,6 +2314,7 @@ export type WarehouseCreateWithoutSupplyPlansInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2200,6 +2327,7 @@ export type WarehouseUncheckedCreateWithoutSupplyPlansInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -2217,6 +2345,7 @@ export type WarehouseUncheckedCreateWithoutSupplyPlansInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2245,6 +2374,7 @@ export type WarehouseUpdateWithoutSupplyPlansInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -2262,6 +2392,7 @@ export type WarehouseUpdateWithoutSupplyPlansInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2274,6 +2405,7 @@ export type WarehouseUncheckedUpdateWithoutSupplyPlansInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -2291,6 +2423,7 @@ export type WarehouseUncheckedUpdateWithoutSupplyPlansInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2303,6 +2436,7 @@ export type WarehouseCreateWithoutDrpFromInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -2320,6 +2454,7 @@ export type WarehouseCreateWithoutDrpFromInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2332,6 +2467,7 @@ export type WarehouseUncheckedCreateWithoutDrpFromInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -2349,6 +2485,7 @@ export type WarehouseUncheckedCreateWithoutDrpFromInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2366,6 +2503,7 @@ export type WarehouseCreateWithoutDrpToInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -2383,6 +2521,7 @@ export type WarehouseCreateWithoutDrpToInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2395,6 +2534,7 @@ export type WarehouseUncheckedCreateWithoutDrpToInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -2412,6 +2552,7 @@ export type WarehouseUncheckedCreateWithoutDrpToInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2440,6 +2581,7 @@ export type WarehouseUpdateWithoutDrpFromInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -2457,6 +2599,7 @@ export type WarehouseUpdateWithoutDrpFromInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2469,6 +2612,7 @@ export type WarehouseUncheckedUpdateWithoutDrpFromInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -2486,6 +2630,7 @@ export type WarehouseUncheckedUpdateWithoutDrpFromInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2509,6 +2654,7 @@ export type WarehouseUpdateWithoutDrpToInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -2526,6 +2672,7 @@ export type WarehouseUpdateWithoutDrpToInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2538,6 +2685,7 @@ export type WarehouseUncheckedUpdateWithoutDrpToInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -2555,6 +2703,7 @@ export type WarehouseUncheckedUpdateWithoutDrpToInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2567,6 +2716,7 @@ export type WarehouseCreateWithoutRecommendationsInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -2584,6 +2734,7 @@ export type WarehouseCreateWithoutRecommendationsInput = {
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2596,6 +2747,7 @@ export type WarehouseUncheckedCreateWithoutRecommendationsInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -2613,6 +2765,7 @@ export type WarehouseUncheckedCreateWithoutRecommendationsInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2641,6 +2794,7 @@ export type WarehouseUpdateWithoutRecommendationsInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -2658,6 +2812,7 @@ export type WarehouseUpdateWithoutRecommendationsInput = {
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2670,6 +2825,7 @@ export type WarehouseUncheckedUpdateWithoutRecommendationsInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -2687,6 +2843,7 @@ export type WarehouseUncheckedUpdateWithoutRecommendationsInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2699,6 +2856,7 @@ export type WarehouseCreateWithoutAlertsInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -2716,6 +2874,7 @@ export type WarehouseCreateWithoutAlertsInput = {
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2728,6 +2887,7 @@ export type WarehouseUncheckedCreateWithoutAlertsInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -2745,6 +2905,7 @@ export type WarehouseUncheckedCreateWithoutAlertsInput = {
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2773,6 +2934,7 @@ export type WarehouseUpdateWithoutAlertsInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -2790,6 +2952,7 @@ export type WarehouseUpdateWithoutAlertsInput = {
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2802,6 +2965,7 @@ export type WarehouseUncheckedUpdateWithoutAlertsInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -2819,6 +2983,7 @@ export type WarehouseUncheckedUpdateWithoutAlertsInput = {
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2831,6 +2996,7 @@ export type WarehouseCreateWithoutStockMovementsInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -2848,6 +3014,7 @@ export type WarehouseCreateWithoutStockMovementsInput = {
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2860,6 +3027,7 @@ export type WarehouseUncheckedCreateWithoutStockMovementsInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -2877,6 +3045,7 @@ export type WarehouseUncheckedCreateWithoutStockMovementsInput = {
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -2905,6 +3074,7 @@ export type WarehouseUpdateWithoutStockMovementsInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -2922,6 +3092,7 @@ export type WarehouseUpdateWithoutStockMovementsInput = {
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -2934,6 +3105,7 @@ export type WarehouseUncheckedUpdateWithoutStockMovementsInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -2951,10 +3123,11 @@ export type WarehouseUncheckedUpdateWithoutStockMovementsInput = {
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
-export type WarehouseCreateWithoutWastePreventionInput = {
+export type WarehouseCreateWithoutRestockRequestsInput = {
   id?: string
   code: string
   name: string
@@ -2963,6 +3136,7 @@ export type WarehouseCreateWithoutWastePreventionInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
@@ -2980,10 +3154,11 @@ export type WarehouseCreateWithoutWastePreventionInput = {
   distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
 }
 
-export type WarehouseUncheckedCreateWithoutWastePreventionInput = {
+export type WarehouseUncheckedCreateWithoutRestockRequestsInput = {
   id?: string
   code: string
   name: string
@@ -2992,6 +3167,7 @@ export type WarehouseUncheckedCreateWithoutWastePreventionInput = {
   location?: string | null
   capacity?: number | null
   isActive?: boolean
+  lastSyncedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
@@ -3009,6 +3185,147 @@ export type WarehouseUncheckedCreateWithoutWastePreventionInput = {
   distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
   stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseCreateOrConnectWithoutRestockRequestsInput = {
+  where: Prisma.WarehouseWhereUniqueInput
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutRestockRequestsInput, Prisma.WarehouseUncheckedCreateWithoutRestockRequestsInput>
+}
+
+export type WarehouseUpsertWithoutRestockRequestsInput = {
+  update: Prisma.XOR<Prisma.WarehouseUpdateWithoutRestockRequestsInput, Prisma.WarehouseUncheckedUpdateWithoutRestockRequestsInput>
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutRestockRequestsInput, Prisma.WarehouseUncheckedCreateWithoutRestockRequestsInput>
+  where?: Prisma.WarehouseWhereInput
+}
+
+export type WarehouseUpdateToOneWithWhereWithoutRestockRequestsInput = {
+  where?: Prisma.WarehouseWhereInput
+  data: Prisma.XOR<Prisma.WarehouseUpdateWithoutRestockRequestsInput, Prisma.WarehouseUncheckedUpdateWithoutRestockRequestsInput>
+}
+
+export type WarehouseUpdateWithoutRestockRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.EnumWarehouseTierFieldUpdateOperationsInput | $Enums.WarehouseTier
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
+  inventory?: Prisma.InventoryUpdateManyWithoutWarehouseNestedInput
+  batches?: Prisma.InventoryBatchUpdateManyWithoutWarehouseNestedInput
+  planningParameters?: Prisma.PlanningParameterUpdateManyWithoutWarehouseNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutWarehouseNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUpdateManyWithoutWarehouseNestedInput
+  supplyPlans?: Prisma.SupplyPlanUpdateManyWithoutWarehouseNestedInput
+  drpFrom?: Prisma.DRPPlanUpdateManyWithoutFromWarehouseNestedInput
+  drpTo?: Prisma.DRPPlanUpdateManyWithoutToWarehouseNestedInput
+  recommendations?: Prisma.RecommendationUpdateManyWithoutWarehouseNestedInput
+  promotionEvents?: Prisma.PromotionEventUpdateManyWithoutWarehouseNestedInput
+  distributors?: Prisma.DistributorUpdateManyWithoutWarehouseNestedInput
+  distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
+  alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseUncheckedUpdateWithoutRestockRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.EnumWarehouseTierFieldUpdateOperationsInput | $Enums.WarehouseTier
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
+  inventory?: Prisma.InventoryUncheckedUpdateManyWithoutWarehouseNestedInput
+  batches?: Prisma.InventoryBatchUncheckedUpdateManyWithoutWarehouseNestedInput
+  planningParameters?: Prisma.PlanningParameterUncheckedUpdateManyWithoutWarehouseNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutWarehouseNestedInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedUpdateManyWithoutWarehouseNestedInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedUpdateManyWithoutWarehouseNestedInput
+  drpFrom?: Prisma.DRPPlanUncheckedUpdateManyWithoutFromWarehouseNestedInput
+  drpTo?: Prisma.DRPPlanUncheckedUpdateManyWithoutToWarehouseNestedInput
+  recommendations?: Prisma.RecommendationUncheckedUpdateManyWithoutWarehouseNestedInput
+  promotionEvents?: Prisma.PromotionEventUncheckedUpdateManyWithoutWarehouseNestedInput
+  distributors?: Prisma.DistributorUncheckedUpdateManyWithoutWarehouseNestedInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
+  alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  wastePrevention?: Prisma.WastePreventionRecordUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseCreateWithoutWastePreventionInput = {
+  id?: string
+  code: string
+  name: string
+  region?: string | null
+  tier: $Enums.WarehouseTier
+  location?: string | null
+  capacity?: number | null
+  isActive?: boolean
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryCreateNestedManyWithoutWarehouseInput
+  inventory?: Prisma.InventoryCreateNestedManyWithoutWarehouseInput
+  batches?: Prisma.InventoryBatchCreateNestedManyWithoutWarehouseInput
+  planningParameters?: Prisma.PlanningParameterCreateNestedManyWithoutWarehouseInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutWarehouseInput
+  inventoryPlans?: Prisma.InventoryPlanCreateNestedManyWithoutWarehouseInput
+  supplyPlans?: Prisma.SupplyPlanCreateNestedManyWithoutWarehouseInput
+  drpFrom?: Prisma.DRPPlanCreateNestedManyWithoutFromWarehouseInput
+  drpTo?: Prisma.DRPPlanCreateNestedManyWithoutToWarehouseInput
+  recommendations?: Prisma.RecommendationCreateNestedManyWithoutWarehouseInput
+  promotionEvents?: Prisma.PromotionEventCreateNestedManyWithoutWarehouseInput
+  distributors?: Prisma.DistributorCreateNestedManyWithoutWarehouseInput
+  distributorOrders?: Prisma.DistributorOrderCreateNestedManyWithoutWarehouseInput
+  alerts?: Prisma.AlertCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseUncheckedCreateWithoutWastePreventionInput = {
+  id?: string
+  code: string
+  name: string
+  region?: string | null
+  tier: $Enums.WarehouseTier
+  location?: string | null
+  capacity?: number | null
+  isActive?: boolean
+  lastSyncedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  demandHistory?: Prisma.DemandHistoryUncheckedCreateNestedManyWithoutWarehouseInput
+  inventory?: Prisma.InventoryUncheckedCreateNestedManyWithoutWarehouseInput
+  batches?: Prisma.InventoryBatchUncheckedCreateNestedManyWithoutWarehouseInput
+  planningParameters?: Prisma.PlanningParameterUncheckedCreateNestedManyWithoutWarehouseInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutWarehouseInput
+  inventoryPlans?: Prisma.InventoryPlanUncheckedCreateNestedManyWithoutWarehouseInput
+  supplyPlans?: Prisma.SupplyPlanUncheckedCreateNestedManyWithoutWarehouseInput
+  drpFrom?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutFromWarehouseInput
+  drpTo?: Prisma.DRPPlanUncheckedCreateNestedManyWithoutToWarehouseInput
+  recommendations?: Prisma.RecommendationUncheckedCreateNestedManyWithoutWarehouseInput
+  promotionEvents?: Prisma.PromotionEventUncheckedCreateNestedManyWithoutWarehouseInput
+  distributors?: Prisma.DistributorUncheckedCreateNestedManyWithoutWarehouseInput
+  distributorOrders?: Prisma.DistributorOrderUncheckedCreateNestedManyWithoutWarehouseInput
+  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutWarehouseInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutWarehouseInput
+  restockRequests?: Prisma.RestockRequestUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
@@ -3037,6 +3354,7 @@ export type WarehouseUpdateWithoutWastePreventionInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUpdateManyWithoutWarehouseNestedInput
@@ -3054,6 +3372,7 @@ export type WarehouseUpdateWithoutWastePreventionInput = {
   distributorOrders?: Prisma.DistributorOrderUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -3066,6 +3385,7 @@ export type WarehouseUncheckedUpdateWithoutWastePreventionInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   capacity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   demandHistory?: Prisma.DemandHistoryUncheckedUpdateManyWithoutWarehouseNestedInput
@@ -3083,6 +3403,7 @@ export type WarehouseUncheckedUpdateWithoutWastePreventionInput = {
   distributorOrders?: Prisma.DistributorOrderUncheckedUpdateManyWithoutWarehouseNestedInput
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutWarehouseNestedInput
   stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutWarehouseNestedInput
+  restockRequests?: Prisma.RestockRequestUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
@@ -3108,6 +3429,7 @@ export type WarehouseCountOutputType = {
   alerts: number
   stockMovements: number
   wastePrevention: number
+  restockRequests: number
   users: number
 }
 
@@ -3128,6 +3450,7 @@ export type WarehouseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   alerts?: boolean | WarehouseCountOutputTypeCountAlertsArgs
   stockMovements?: boolean | WarehouseCountOutputTypeCountStockMovementsArgs
   wastePrevention?: boolean | WarehouseCountOutputTypeCountWastePreventionArgs
+  restockRequests?: boolean | WarehouseCountOutputTypeCountRestockRequestsArgs
   users?: boolean | WarehouseCountOutputTypeCountUsersArgs
 }
 
@@ -3256,6 +3579,13 @@ export type WarehouseCountOutputTypeCountWastePreventionArgs<ExtArgs extends run
 /**
  * WarehouseCountOutputType without action
  */
+export type WarehouseCountOutputTypeCountRestockRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RestockRequestWhereInput
+}
+
+/**
+ * WarehouseCountOutputType without action
+ */
 export type WarehouseCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.UserWhereInput
 }
@@ -3270,6 +3600,7 @@ export type WarehouseSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   location?: boolean
   capacity?: boolean
   isActive?: boolean
+  lastSyncedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   demandHistory?: boolean | Prisma.Warehouse$demandHistoryArgs<ExtArgs>
@@ -3288,6 +3619,7 @@ export type WarehouseSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   alerts?: boolean | Prisma.Warehouse$alertsArgs<ExtArgs>
   stockMovements?: boolean | Prisma.Warehouse$stockMovementsArgs<ExtArgs>
   wastePrevention?: boolean | Prisma.Warehouse$wastePreventionArgs<ExtArgs>
+  restockRequests?: boolean | Prisma.Warehouse$restockRequestsArgs<ExtArgs>
   users?: boolean | Prisma.Warehouse$usersArgs<ExtArgs>
   _count?: boolean | Prisma.WarehouseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["warehouse"]>
@@ -3301,6 +3633,7 @@ export type WarehouseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   location?: boolean
   capacity?: boolean
   isActive?: boolean
+  lastSyncedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["warehouse"]>
@@ -3314,6 +3647,7 @@ export type WarehouseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   location?: boolean
   capacity?: boolean
   isActive?: boolean
+  lastSyncedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["warehouse"]>
@@ -3327,11 +3661,12 @@ export type WarehouseSelectScalar = {
   location?: boolean
   capacity?: boolean
   isActive?: boolean
+  lastSyncedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type WarehouseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "region" | "tier" | "location" | "capacity" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["warehouse"]>
+export type WarehouseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "region" | "tier" | "location" | "capacity" | "isActive" | "lastSyncedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["warehouse"]>
 export type WarehouseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   demandHistory?: boolean | Prisma.Warehouse$demandHistoryArgs<ExtArgs>
   inventory?: boolean | Prisma.Warehouse$inventoryArgs<ExtArgs>
@@ -3349,6 +3684,7 @@ export type WarehouseInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   alerts?: boolean | Prisma.Warehouse$alertsArgs<ExtArgs>
   stockMovements?: boolean | Prisma.Warehouse$stockMovementsArgs<ExtArgs>
   wastePrevention?: boolean | Prisma.Warehouse$wastePreventionArgs<ExtArgs>
+  restockRequests?: boolean | Prisma.Warehouse$restockRequestsArgs<ExtArgs>
   users?: boolean | Prisma.Warehouse$usersArgs<ExtArgs>
   _count?: boolean | Prisma.WarehouseCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -3374,6 +3710,7 @@ export type $WarehousePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     alerts: Prisma.$AlertPayload<ExtArgs>[]
     stockMovements: Prisma.$StockMovementPayload<ExtArgs>[]
     wastePrevention: Prisma.$WastePreventionRecordPayload<ExtArgs>[]
+    restockRequests: Prisma.$RestockRequestPayload<ExtArgs>[]
     users: Prisma.$UserPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -3385,6 +3722,12 @@ export type $WarehousePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     location: string | null
     capacity: number | null
     isActive: boolean
+    /**
+     * *
+     *    * When this DC last reported in. Null means it never has - the hub shows that as
+     *    * "never synced" rather than as a stale timestamp. Phase 3.3.
+     */
+    lastSyncedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["warehouse"]>
@@ -3797,6 +4140,7 @@ export interface Prisma__WarehouseClient<T, Null = never, ExtArgs extends runtim
   alerts<T extends Prisma.Warehouse$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stockMovements<T extends Prisma.Warehouse$stockMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$stockMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   wastePrevention<T extends Prisma.Warehouse$wastePreventionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$wastePreventionArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WastePreventionRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  restockRequests<T extends Prisma.Warehouse$restockRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$restockRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RestockRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   users<T extends Prisma.Warehouse$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3835,6 +4179,7 @@ export interface WarehouseFieldRefs {
   readonly location: Prisma.FieldRef<"Warehouse", 'String'>
   readonly capacity: Prisma.FieldRef<"Warehouse", 'Int'>
   readonly isActive: Prisma.FieldRef<"Warehouse", 'Boolean'>
+  readonly lastSyncedAt: Prisma.FieldRef<"Warehouse", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Warehouse", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Warehouse", 'DateTime'>
 }
@@ -4611,6 +4956,30 @@ export type Warehouse$wastePreventionArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.WastePreventionRecordScalarFieldEnum | Prisma.WastePreventionRecordScalarFieldEnum[]
+}
+
+/**
+ * Warehouse.restockRequests
+ */
+export type Warehouse$restockRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RestockRequest
+   */
+  select?: Prisma.RestockRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RestockRequest
+   */
+  omit?: Prisma.RestockRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RestockRequestInclude<ExtArgs> | null
+  where?: Prisma.RestockRequestWhereInput
+  orderBy?: Prisma.RestockRequestOrderByWithRelationInput | Prisma.RestockRequestOrderByWithRelationInput[]
+  cursor?: Prisma.RestockRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RestockRequestScalarFieldEnum | Prisma.RestockRequestScalarFieldEnum[]
 }
 
 /**
