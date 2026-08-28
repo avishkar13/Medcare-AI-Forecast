@@ -1,6 +1,7 @@
 "use client";
 
 import { useWarehouses } from "@/hooks/use-masterdata";
+import { useScope } from "@/hooks/use-scope";
 
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -28,6 +29,7 @@ export function RecommendationsFilters({
   location, setLocation, status, setStatus, sortBy, setSortBy
 }: RecommendationsFiltersProps) {
   const { data: warehouses } = useWarehouses();
+  const { dc: activeDc } = useScope();
 
   const hasFilters = search || priority !== "all priority" || actionType !== "all actions" || location !== "all locations" || status !== "Pending";
 
@@ -79,23 +81,21 @@ export function RecommendationsFilters({
           </SelectContent>
         </Select>
 
-        <Select value={location} onValueChange={(val) => setLocation(val as string)}>
-          <SelectTrigger className={`w-[140px] h-9 text-xs font-medium border-border/50 ${location !== "all locations" ? "bg-ai/10 border-ai/20 text-ai" : "bg-background hover:bg-muted/50"}`}>
-            <SelectValue placeholder="Location" />
-          </SelectTrigger>
-          <SelectContent>
-            {/*
-              From the warehouse list. The four names hardcoded here did not exist in
-              the database, so every option produced "No recommendations found."
-            */}
-            <SelectItem value="all locations">All Locations</SelectItem>
-            {(warehouses ?? []).map((warehouse) => (
-              <SelectItem key={warehouse.id} value={warehouse.name}>
-                {warehouse.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {!activeDc && (
+          <Select value={location} onValueChange={(val) => setLocation(val as string)}>
+            <SelectTrigger className={`w-[140px] h-9 text-xs font-medium border-border/50 ${location !== "all locations" ? "bg-ai/10 border-ai/20 text-ai" : "bg-background hover:bg-muted/50"}`}>
+              <SelectValue placeholder="Location" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all locations">All Locations</SelectItem>
+              {(warehouses ?? []).map((warehouse) => (
+                <SelectItem key={warehouse.id} value={warehouse.name}>
+                  {warehouse.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
         <Select value={status} onValueChange={(val) => setStatus(val as string)}>
           <SelectTrigger className={`w-[120px] h-9 text-xs font-medium border-border/50 ${status !== "all statuses" ? "bg-ai/10 border-ai/20 text-ai" : "bg-background hover:bg-muted/50"}`}>

@@ -15,6 +15,7 @@ export function RecommendationIntelligenceCard({ data }: { data: RecommendationI
       </CardHeader>
       <CardContent className="pt-4 space-y-5">
         
+        {/* 
         <div className="flex items-center justify-between bg-gradient-to-r from-ai/10 to-background p-3.5 rounded-xl border border-ai/20 shadow-sm">
           <div>
             <p className="text-[10px] font-bold text-ai uppercase tracking-widest mb-0.5">Model Confidence</p>
@@ -24,6 +25,7 @@ export function RecommendationIntelligenceCard({ data }: { data: RecommendationI
             {data.modelConfidence}<span className="text-sm font-bold opacity-80">%</span>
           </div>
         </div>
+        */}
 
         <div>
           <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 border-b border-border/50 pb-1.5">Signal Weighting</h4>

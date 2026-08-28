@@ -19,7 +19,8 @@ export function ForecastPerformance() {
     mae: m.mae ?? 0,
     rmse: m.rmse ?? 0,
     accuracy: m.accuracyPercent ?? 0,
-    bias: 0,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    bias: (m as any).biasPercent ?? 0,
     isPrimary: m.isPrimary,
   }));
 

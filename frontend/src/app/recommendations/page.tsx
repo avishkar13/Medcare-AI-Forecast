@@ -166,16 +166,33 @@ function RecommendationsView() {
               },
             }}
           />
-          <RecommendationIntelligenceCard
-            data={{
-              // signalsCited is empty until the executor attaches signal rows
-              signals: { demandForecast: 0, inventoryPosition: 0, leadTime: 0, expiryRisk: 0 },
-              modelConfidence: intelligence.data?.averageConfidence ?? 0,
-              explanation: intelligence.data?.modelVersion
-                ? `${intelligence.data.recommendationCount} recommendations from ${intelligence.data.modelVersion} over a ${intelligence.data.horizonDays}-day horizon.`
-                : "No completed planning run yet.",
-            }}
-          />
+          {(() => {
+            const signalsCited = intelligence.data?.signalsCited ?? [];
+            const totalSignals = signalsCited.reduce((sum, s) => sum + s.count, 0);
+
+            const getSignalWeight = (type: string) => {
+              if (totalSignals === 0) return 0;
+              const count = signalsCited.find((s) => s.type === type)?.count ?? 0;
+              return Math.round((count / totalSignals) * 100);
+            };
+
+            return (
+              <RecommendationIntelligenceCard
+                data={{
+                  signals: {
+                    demandForecast: getSignalWeight("Demand"),
+                    inventoryPosition: getSignalWeight("Inventory"),
+                    leadTime: getSignalWeight("LeadTime"),
+                    expiryRisk: getSignalWeight("Expiry"),
+                  },
+                  modelConfidence: intelligence.data?.averageConfidence ?? 0,
+                  explanation: intelligence.data?.modelVersion
+                    ? `${intelligence.data.recommendationCount} recommendations from ${intelligence.data.modelVersion} over a ${intelligence.data.horizonDays}-day horizon.`
+                    : "No completed planning run yet.",
+                }}
+              />
+            );
+          })()}
           <RecommendationSummary />
         </div>
 
