@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Activity, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Activity, Eye, EyeOff, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/store/auth.store";
@@ -64,164 +65,182 @@ export default function AuthPage() {
   const isFormValid = email.trim() !== "" && password.trim() !== "";
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center bg-slate-50 selection:bg-primary/10">
-      {/* Decorative Background Orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[25%] -left-[10%] w-[60%] h-[60%] rounded-full bg-blue-400/10 blur-[100px]" />
-        <div className="absolute -bottom-[25%] -right-[10%] w-[60%] h-[60%] rounded-full bg-teal-400/10 blur-[100px]" />
-        
-        {/* Very subtle noise texture for premium feel */}
-        <div className="absolute inset-0 opacity-[0.015] mix-blend-overlay bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjYiIG51bU9jdGF2ZXM9IjMiIHN0aXRjaFRpbGVzPSJzdGl0Y2giLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjYSkiLz48L3N2Zz4=')]" />
-      </div>
-
-      <div className="relative z-10 w-full max-w-[420px] px-6">
-        
-        {/* Brand Header */}
-        <div className="flex flex-col items-center mb-10">
-          <div className="relative flex h-14 w-14 items-center justify-center rounded-[1rem] bg-gradient-to-b from-blue-600 to-blue-700 shadow-lg shadow-blue-600/20 ring-1 ring-white/20">
-            <Activity className="h-7 w-7 text-white" />
+    <div className="flex min-h-screen w-full bg-slate-50 selection:bg-primary/10">
+      {/* Left Column - Form */}
+      <div className="flex w-full flex-col justify-center px-6 sm:px-12 lg:w-[55%] xl:w-1/2 lg:px-24">
+        <div className="mx-auto w-full max-w-[420px]">
+          {/* Brand Header */}
+          <div className="flex items-center gap-3 mb-12">
+            <div className="flex h-12 w-12 items-center justify-center rounded-[0.8rem] bg-gradient-to-b from-primary to-blue-700 shadow-md shadow-primary/20 ring-1 ring-primary/10">
+              <Activity className="h-6 w-6 text-white" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold tracking-tight text-slate-900 leading-none">MedCare Pharma</span>
+              <span className="text-[10px] font-bold text-slate-500 tracking-[0.2em] uppercase mt-1.5">Command Center</span>
+            </div>
           </div>
-          <h1 className="mt-6 text-[28px] font-semibold tracking-tight text-slate-900">
-            MedCare Pharma
-          </h1>
-          <p className="mt-1.5 text-xs font-semibold text-slate-500 tracking-[0.2em] uppercase">
-            Command Center
-          </p>
-        </div>
 
-        {/* Glassmorphic Login Card */}
-        <div className="bg-white/80 backdrop-blur-xl shadow-[0_8px_40px_rgb(0,0,0,0.04)] ring-1 ring-slate-900/5 rounded-2xl overflow-hidden">
-          
-          <div className="px-8 pt-8 pb-10">
-            <div className="mb-8 text-center">
-              <h2 className="text-xl font-semibold tracking-tight text-slate-900">Secure Sign In</h2>
-              <p className="text-sm text-slate-500 mt-1">Enter your enterprise credentials</p>
+          <div className="mb-10">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">Sign in to your account</h2>
+            <p className="text-sm text-slate-500 mt-2.5">Enter your enterprise credentials to access the AI Engine.</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+                {error}
+              </div>
+            )}
+            
+            <div className="space-y-2.5">
+              <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                inputMode="email"
+                placeholder="you@medcare.com"
+                value={email}
+                onChange={(e) => onEmailChange(e.target.value)}
+                disabled={isPending}
+                aria-invalid={fieldErrors.email !== undefined}
+                aria-describedby={fieldErrors.email ? "email-error" : undefined}
+                className={`h-12 bg-white shadow-sm focus-visible:ring-2 focus-visible:ring-offset-0 transition-all text-sm rounded-xl ${
+                  fieldErrors.email
+                    ? "border-red-300 focus-visible:ring-red-400 focus-visible:border-red-400"
+                    : "border-slate-200 focus-visible:ring-primary/20 focus-visible:border-primary"
+                }`}
+                autoComplete="username"
+              />
+              {fieldErrors.email && (
+                <p id="email-error" className="text-xs font-medium text-red-600">
+                  {fieldErrors.email}
+                </p>
+              )}
+            </div>
+            
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                  Password
+                </Label>
+                <span className="text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors cursor-help">
+                  Lost access?
+                </span>
+              </div>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••••••"
+                  value={password}
+                  onChange={(e) => onPasswordChange(e.target.value)}
+                  disabled={isPending}
+                  aria-invalid={fieldErrors.password !== undefined}
+                  aria-describedby={fieldErrors.password ? "password-error" : undefined}
+                  className={`h-12 bg-white shadow-sm focus-visible:ring-2 focus-visible:ring-offset-0 transition-all pr-12 text-sm rounded-xl ${
+                    fieldErrors.password
+                      ? "border-red-300 focus-visible:ring-red-400 focus-visible:border-red-400"
+                      : "border-slate-200 focus-visible:ring-primary/20 focus-visible:border-primary"
+                  }`}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md transition-all"
+                  disabled={isPending}
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                  <span className="sr-only">
+                    {showPassword ? "Hide password" : "Show password"}
+                  </span>
+                </button>
+              </div>
+              {fieldErrors.password && (
+                <p id="password-error" className="text-xs font-medium text-red-600">
+                  {fieldErrors.password}
+                </p>
+              )}
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {error && (
-                <div className="p-3.5 rounded-lg bg-red-50 border border-red-100 text-red-600 text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
-                  {error}
-                </div>
-              )}
-              
-              <div className="space-y-2">
-                {/*
-                  Email only. The label used to offer "Employee ID / Email" and the
-                  placeholder suggested `ID-8924`, but the API validates this field as
-                  an email address, so an employee ID could only ever be rejected.
-                */}
-                <Label htmlFor="email" className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  inputMode="email"
-                  placeholder="you@medcare.com"
-                  value={email}
-                  onChange={(e) => onEmailChange(e.target.value)}
-                  disabled={isPending}
-                  aria-invalid={fieldErrors.email !== undefined}
-                  aria-describedby={fieldErrors.email ? "email-error" : undefined}
-                  className={`h-11 bg-white shadow-sm focus-visible:ring-1 transition-all text-sm rounded-lg ${
-                    fieldErrors.email
-                      ? "border-red-300 focus-visible:ring-red-400 focus-visible:border-red-400"
-                      : "border-slate-200 focus-visible:ring-primary focus-visible:border-primary"
-                  }`}
-                  autoComplete="username"
-                />
-                {fieldErrors.email && (
-                  <p id="email-error" className="text-xs font-medium text-red-600">
-                    {fieldErrors.email}
-                  </p>
+            <div className="pt-2">
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-[15px] font-semibold rounded-xl bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20 transition-all active:scale-[0.98] cursor-pointer" 
+                disabled={isPending || !isFormValid}
+              >
+                {isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Authenticating securely...
+                  </>
+                ) : (
+                  "Access System"
                 )}
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                    Password
-                  </Label>
-                  {/*
-                    Was a styled button with no handler and nowhere to go: there is no
-                    recovery route, and `POST /settings/security/reset-password` was
-                    removed from the backend precisely because it reported sending an
-                    email it never sent. Saying who to ask is the honest version.
-                  */}
-                  <span className="text-[11px] font-medium text-slate-400">
-                    Lost access? Ask an administrator
-                  </span>
-                </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••••••"
-                    value={password}
-                    onChange={(e) => onPasswordChange(e.target.value)}
-                    disabled={isPending}
-                    aria-invalid={fieldErrors.password !== undefined}
-                    aria-describedby={fieldErrors.password ? "password-error" : undefined}
-                    className={`h-11 bg-white shadow-sm focus-visible:ring-1 transition-all pr-10 text-sm rounded-lg ${
-                      fieldErrors.password
-                        ? "border-red-300 focus-visible:ring-red-400 focus-visible:border-red-400"
-                        : "border-slate-200 focus-visible:ring-primary focus-visible:border-primary"
-                    }`}
-                    autoComplete="current-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 transition-colors"
-                    disabled={isPending}
-                    tabIndex={-1}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                    <span className="sr-only">
-                      {showPassword ? "Hide password" : "Show password"}
-                    </span>
-                  </button>
-                </div>
-                {fieldErrors.password && (
-                  <p id="password-error" className="text-xs font-medium text-red-600">
-                    {fieldErrors.password}
-                  </p>
-                )}
-              </div>
+              </Button>
+            </div>
+          </form>
 
-              <div className="pt-4">
-                <Button 
-                  type="submit" 
-                  className="w-full h-11 text-sm font-semibold rounded-lg bg-primary hover:bg-primary/90 text-white shadow-sm shadow-primary/20 transition-all" 
-                  disabled={isPending || !isFormValid}
-                >
-                  {isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Authenticating...
-                    </>
-                  ) : (
-                    "Access System"
-                  )}
-                </Button>
-              </div>
-            </form>
+          {/* Security Footer */}
+          <div className="mt-16 pt-8 border-t border-slate-200">
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+              Internal Network Only
+            </p>
+            <p className="text-xs text-slate-500 max-w-sm leading-relaxed font-medium">
+              Unauthorized access is strictly prohibited and actively monitored by MedCare InfoSec.
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* Security Footer */}
-        <div className="mt-10 flex flex-col items-center">
-          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
-            MedCare Internal Network
-          </p>
-          <p className="text-[11px] text-slate-400 mt-2 max-w-[260px] text-center leading-relaxed">
-            Unauthorized access is strictly prohibited and actively monitored.
-          </p>
+      {/* Right Column - Branding/Visual */}
+      <div className="hidden lg:flex lg:w-[45%] xl:w-1/2 relative bg-slate-900 items-center justify-center overflow-hidden">
+        {/* Dynamic Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-slate-900 to-slate-950" />
+        <div className="absolute -top-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-blue-500/20 blur-[120px] mix-blend-screen" />
+        <div className="absolute -bottom-[10%] -left-[10%] w-[60%] h-[60%] rounded-full bg-teal-400/10 blur-[120px] mix-blend-screen" />
+        
+        {/* Subtle grid pattern overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CjxwYXRoIGQ9Ik0gNDAgMCBMIDAgMCAwIDQwIiBmaWxsPSJub25lIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiIHN0cm9rZS13aWR0aD0iMSIvPgo8L3N2Zz4=')] opacity-30" />
+
+        <div className="relative z-10 w-full max-w-lg p-12 text-white">
+           <div className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-bold tracking-wide backdrop-blur-md mb-8 shadow-2xl">
+             <Sparkles className="mr-2 h-4 w-4 text-blue-300" />
+             MedCare AI Forecast Engine v2.0
+           </div>
+           
+           <h2 className="text-[2.75rem] font-extrabold tracking-tight mb-6 leading-[1.1] text-white">
+             Intelligent Supply Chain <br/>
+             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-teal-200">Decision Intelligence</span>
+           </h2>
+           
+           <p className="text-lg text-blue-100/70 leading-relaxed mb-12 font-medium">
+             Unify demand forecasting and inventory replenishment using powerful machine learning models to minimize stockouts and reduce expiry risks across your entire distribution network.
+           </p>
+
+           <div className="flex items-center gap-5 border-t border-white/10 pt-8">
+             <div className="flex -space-x-3">
+                <Avatar className="h-11 w-11 border-2 border-slate-900 shadow-sm">
+                  <AvatarFallback className="bg-blue-600 text-white text-xs font-bold">AK</AvatarFallback>
+                </Avatar>
+                <Avatar className="h-11 w-11 border-2 border-slate-900 shadow-sm">
+                  <AvatarFallback className="bg-teal-600 text-white text-xs font-bold">JD</AvatarFallback>
+                </Avatar>
+                <Avatar className="h-11 w-11 border-2 border-slate-900 shadow-sm">
+                  <AvatarFallback className="bg-indigo-600 text-white text-xs font-bold">MR</AvatarFallback>
+                </Avatar>
+             </div>
+             <p className="text-sm font-semibold text-blue-200/80">
+               Trusted by 2,000+ planners globally
+             </p>
+           </div>
         </div>
       </div>
     </div>

@@ -16,6 +16,8 @@ export interface RecommendationItem {
   confidence: number;
   reason: string;
   sku: string;
+  productName: string;
+  category: string;
   location: string;
   fromLocation?: string; // For transfers
   toLocation?: string; // For transfers

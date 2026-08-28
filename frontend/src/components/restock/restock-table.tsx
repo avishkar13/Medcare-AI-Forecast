@@ -66,7 +66,7 @@ export function RestockTable({
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-auto max-h-[600px] relative border rounded-md">
       <Table>
         <TableHeader>
           <TableRow>
@@ -98,7 +98,10 @@ export function RestockTable({
                 <TableCell className="text-right text-xs font-semibold tabular-nums">
                   {formatNumber(request.quantity)}
                 </TableCell>
-                <TableCell className="max-w-sm text-xs text-muted-foreground">
+                <TableCell 
+                  className="max-w-[150px] sm:max-w-[250px] truncate text-xs text-muted-foreground" 
+                  title={request.reason ?? undefined}
+                >
                   {request.reason ?? "—"}
                 </TableCell>
                 <TableCell>

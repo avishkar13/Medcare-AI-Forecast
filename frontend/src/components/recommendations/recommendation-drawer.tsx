@@ -56,14 +56,17 @@ export function RecommendationDrawer({ isOpen, onOpenChange, recommendation, onE
               <Zap className="h-4 w-4" />
               Expected Impact
             </h4>
-            <p className="text-base font-semibold text-foreground">{recommendation.expectedImpact}</p>
+            <p className="text-base font-semibold text-foreground">
+              {recommendation.expectedImpact || `$${(recommendation.impactValue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            </p>
           </div>
 
           {/* Details Grid */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 p-4 sm:p-5 bg-muted/20 border border-border/50 rounded-xl">
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">SKU</p>
-              <p className="font-semibold text-sm">{recommendation.sku}</p>
+            <div className="col-span-2">
+              <p className="text-xs text-muted-foreground mb-1">Product</p>
+              <p className="font-semibold text-sm">{recommendation.productName}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{recommendation.sku} • {recommendation.category}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground mb-1">Location</p>
@@ -127,12 +130,14 @@ export function RecommendationDrawer({ isOpen, onOpenChange, recommendation, onE
           </div>
 
           {/* Confidence */}
-          <div className="p-4 sm:p-5 bg-gradient-to-r from-ai/10 to-background border border-ai/20 rounded-xl flex items-center justify-between shadow-sm">
-            <span className="text-sm font-bold uppercase tracking-wider text-foreground">AI Confidence Score</span>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-black text-ai">{recommendation.confidence}%</span>
+          {recommendation.confidence > 0 && (
+            <div className="p-4 sm:p-5 bg-gradient-to-r from-ai/10 to-background border border-ai/20 rounded-xl flex items-center justify-between shadow-sm">
+              <span className="text-sm font-bold uppercase tracking-wider text-foreground">AI Confidence Score</span>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-black text-ai">{recommendation.confidence}%</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Action Buttons */}

@@ -111,6 +111,8 @@ export const toRecommendationItem = (rec: Recommendation) => ({
   confidence: rec.confidence ?? 0,
   reason: rec.message,
   sku: rec.sku,
+  productName: rec.productName,
+  category: rec.category,
   location: rec.warehouseName,
   recommendedQuantity: rec.quantity ?? 0,
   expectedImpact: rec.expectedImpact ?? "",

@@ -65,9 +65,11 @@ export function RecommendationCard({ recommendation, onExecute, onDismiss }: Rec
               <Badge variant="outline" className={`${getPriorityColor(recommendation.priority)} px-2 py-0.5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider`}>
                 {recommendation.priority} Priority
               </Badge>
-              <div className="flex items-center gap-1 text-[11px] sm:text-xs font-medium text-muted-foreground bg-muted/40 px-1.5 py-0.5 rounded border border-border/50">
-                <Zap className="h-3 w-3 text-ai" /> {recommendation.confidence}% Conf.
-              </div>
+              {recommendation.confidence > 0 && (
+                <div className="flex items-center gap-1 text-[11px] sm:text-xs font-medium text-muted-foreground bg-muted/40 px-1.5 py-0.5 rounded border border-border/50">
+                  <Zap className="h-3 w-3 text-ai" /> {recommendation.confidence}% Conf.
+                </div>
+              )}
             </div>
             
             <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 tracking-tight">{recommendation.title}</h3>
@@ -93,7 +95,7 @@ export function RecommendationCard({ recommendation, onExecute, onDismiss }: Rec
               
               <div className="flex items-center gap-1 text-xs font-semibold text-success bg-success/10 px-2 py-0.5 rounded-md">
                 <TrendingDown className="h-3 w-3" />
-                {recommendation.expectedImpact}
+                {recommendation.expectedImpact || `$${(recommendation.impactValue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
               </div>
             </div>
 

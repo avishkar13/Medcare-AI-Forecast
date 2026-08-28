@@ -23,6 +23,8 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
+import { useDashboardSummary } from "@/hooks/use-dashboard";
+import { useScopedHref } from "@/hooks/use-scope";
 
 function getInitials(name?: string) {
   if (!name) return "U";
@@ -113,6 +115,9 @@ export function SidebarContent() {
   };
 
   const initials = getInitials(user?.name);
+  const scopedHref = useScopedHref();
+  const { data: summaryData } = useDashboardSummary();
+  const kpis = summaryData?.kpis;
 
   return (
     <div className="flex h-full flex-col bg-sidebar border-r border-sidebar-border">
@@ -161,19 +166,36 @@ export function SidebarContent() {
               return (
                 <div key={item.href} className="flex flex-col gap-1">
                   <Link
-                    href={item.href}
+                    href={scopedHref(item.href)}
                     className={cn(
-                      "group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors relative",
+                      "group flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors relative",
                       isActive
                         ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     )}
                   >
-                    {isActive && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-md" />
+                    <div className="flex items-center gap-3">
+                      {isActive && (
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-r-md" />
+                      )}
+                      <Icon className={cn("h-4 w-4", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+                      {item.title}
+                    </div>
+                    {item.title === "Alerts" && kpis?.activeAlerts !== undefined && kpis.activeAlerts > 0 && (
+                      <span className="bg-destructive text-muted text-[10px] font-bold px-1.5 py-0.5 rounded-md min-w-5 text-center">
+                        {kpis.activeAlerts}
+                      </span>
                     )}
-                    <Icon className={cn("h-4 w-4", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
-                    {item.title}
+                    {item.title === "Recommendations" && kpis?.pendingRecommendations !== undefined && kpis.pendingRecommendations > 0 && (
+                      <span className="bg-ai/20 text-ai text-[10px] font-bold px-1.5 py-0.5 rounded-md min-w-5 text-center">
+                        {kpis.pendingRecommendations}
+                      </span>
+                    )}
+                    {item.title === "Expiry Risk" && kpis?.expiryRiskItems !== undefined && kpis.expiryRiskItems > 0 && (
+                      <span className="bg-warning text-muted text-[10px] font-bold px-1.5 py-0.5 rounded-md min-w-5 text-center">
+                        {kpis.expiryRiskItems}
+                      </span>
+                    )}
                   </Link>
 
                   {/* Sub-navigation, shown only while its parent section is open. */}
@@ -184,7 +206,7 @@ export function SidebarContent() {
                         return (
                           <Link
                             key={child.href}
-                            href={child.href}
+                            href={scopedHref(child.href)}
                             className={cn(
                               "rounded-md px-2 py-1.5 text-[13px] font-medium transition-colors",
                               childActive

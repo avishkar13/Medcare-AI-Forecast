@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { Check, Loader2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -48,6 +50,7 @@ export function SupplyPlanTable({
   onReject,
 }: SupplyPlanTableProps) {
   const { formatNumber } = useFormatters();
+  const [currentPage, setCurrentPage] = useState(1);
 
   if (isError) return <QueryErrorInline label="supply plans" />;
   if (isPending) return <p className="py-6 text-sm text-muted-foreground">Loading supply plans…</p>;
@@ -60,23 +63,29 @@ export function SupplyPlanTable({
     );
   }
 
+  const pageSize = 15;
+  const maxPage = Math.max(1, Math.ceil(plans.length / pageSize));
+  const safePage = Math.min(currentPage, maxPage);
+  const displayPlans = plans.slice((safePage - 1) * pageSize, safePage * pageSize);
+
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Arrives</TableHead>
-            <TableHead>SKU</TableHead>
-            <TableHead>DC</TableHead>
-            <TableHead>Source</TableHead>
-            <TableHead className="text-right">Quantity</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Decision</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {plans.map((plan) => {
-            const deciding = decidingId === plan.id;
+    <div className="flex flex-col gap-3">
+      <div className="overflow-x-auto border rounded-md">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Arrives</TableHead>
+              <TableHead>SKU</TableHead>
+              <TableHead>DC</TableHead>
+              <TableHead>Source</TableHead>
+              <TableHead className="text-right">Quantity</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Decision</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {displayPlans.map((plan) => {
+              const deciding = decidingId === plan.id;
             const actionable = plan.status === "PROPOSED";
 
             return (
@@ -144,7 +153,35 @@ export function SupplyPlanTable({
             );
           })}
         </TableBody>
-      </Table>
+        </Table>
+      </div>
+      {maxPage > 1 && (
+        <div className="flex items-center justify-between px-1">
+          <p className="text-xs text-muted-foreground">
+            Showing {(safePage - 1) * pageSize + 1} to {Math.min(safePage * pageSize, plans.length)} of {plans.length} entries
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs cursor-pointer"
+              disabled={safePage === 1}
+              onClick={() => setCurrentPage(safePage - 1)}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs cursor-pointer"
+              disabled={safePage === maxPage}
+              onClick={() => setCurrentPage(safePage + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
