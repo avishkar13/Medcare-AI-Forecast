@@ -272,11 +272,29 @@ describe("envSchema", () => {
     failedOn(envSchema.safeParse({ ...base, API_PREFIX: "api" }), "API_PREFIX");
   });
 
+  /** Everything a production boot needs beyond the development baseline. */
+  const production = {
+    ...base,
+    NODE_ENV: "production",
+    REDIS_URL: "redis://localhost:6379",
+    TRAINING_API_KEY: "a-service-key",
+  };
+
   test("requires Redis in production so limits are shared across instances", () => {
-    failedOn(envSchema.safeParse({ ...base, NODE_ENV: "production" }), "REDIS_URL");
-    assert.ok(
-      envSchema.safeParse({ ...base, NODE_ENV: "production", REDIS_URL: "redis://localhost:6379" }).success,
-    );
+    const { REDIS_URL: _omitted, ...withoutRedis } = production;
+    failedOn(envSchema.safeParse(withoutRedis), "REDIS_URL");
+    assert.ok(envSchema.safeParse(production).success);
+  });
+
+  /**
+   * `/api/training-data` is gated on this key rather than on RBAC, so an unset key in
+   * production would leave the whole demand history readable by anyone who finds the
+   * route. Refusing to boot is the only safe reading.
+   */
+  test("requires a training service key in production", () => {
+    const { TRAINING_API_KEY: _omitted, ...withoutKey } = production;
+    failedOn(envSchema.safeParse(withoutKey), "TRAINING_API_KEY");
+    assert.ok(envSchema.safeParse(production).success);
   });
 
   test("allows a development instance with no Redis", () => {

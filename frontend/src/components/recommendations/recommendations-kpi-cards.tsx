@@ -22,9 +22,11 @@ export function RecommendationsKpiCards() {
   const criticalCount =
     summary?.byPriority.find((row) => row.priority === "CRITICAL")?.count ?? 0;
 
+  // Before the null guard: on failure `data` is undefined, so a guard that
+  // returns null on falsy data swallows the error and the panel just vanishes.
+  if (isError) return <QueryError label="the recommendation KPIs" />;
   if (isPending || !kpi) return null;
 
-  if (isError) return <QueryError label="the recommendation KPIs" />;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

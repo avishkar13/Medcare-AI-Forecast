@@ -100,6 +100,8 @@ export const NOTIFY = {
   },
 } as const;
 
+export const TRAINING_API_KEY = env.TRAINING_API_KEY;
+
 export const DATABASE_URL = env.DATABASE_URL;
 export const REDIS_URL = env.REDIS_URL;
 export const NODE_ENV = env.NODE_ENV;

@@ -138,7 +138,14 @@ export const inventoryHealthSchema = z.object({
   byCategory: z.array(
     z.object({
       category: z.string(),
+      /** Distinct products in this category, within the current scope. */
       skuCount: z.number(),
+      /**
+       * Product-warehouse pairs. Four times `skuCount` network-wide, equal to it per DC.
+       * These were one field called `skuCount` that actually counted positions, which is
+       * why the category figures looked identical whichever DC was selected.
+       */
+      positionCount: z.number(),
       inventoryValue: z.number(),
       atRiskCount: z.number(),
       expiringValue: z.number(),

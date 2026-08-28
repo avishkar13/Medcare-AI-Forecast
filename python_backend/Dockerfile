@@ -17,9 +17,17 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src ./src
 
-# The fitted model lands here. Mount it as a volume so a rebuild does not throw the
-# trained bundle away; without one the engine answers MODEL_NOT_TRAINED and Express
-# falls back to its naive forecast.
+# The fitted model ships *in the image*, so a release is atomic: the engine answers a
+# forecast the moment it is up, with a model whose provenance is the commit that built
+# it. The alternative - an empty artifacts dir and a volume - loses the model on every
+# deploy here, because the workflow runs `docker system prune -af --volumes` and an
+# artifact volume belonging to a stopped container is unused by that definition.
+#
+# `POST /train` still works at runtime and overwrites this copy for the life of the
+# container; it just does not survive the next release, which is correct when the
+# image is the source of truth.
+COPY artifacts ./artifacts
+
 RUN mkdir -p artifacts outputs && chown -R engine:engine /app
 USER engine
 

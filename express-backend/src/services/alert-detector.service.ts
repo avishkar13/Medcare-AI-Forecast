@@ -1,11 +1,17 @@
 import { prisma } from "../config/prisma.js";
 import { loadPositions, type InventoryPosition } from "./dashboard.service.js";
 import { getSettings } from "./settings.service.js";
-import { projectFefoWaste, round } from "../utils/inventory.js";
+import { availableStock, inventoryPosition, projectFefoWaste, round } from "../utils/inventory.js";
 import { aggregateOverdueSupply, type OverdueSupply } from "../utils/supply.js";
+import { moneyFormatter, type MoneyFormatter } from "../utils/currency.js";
 import { OPEN_STATUSES, broadcastCounts } from "./alert.service.js";
 import { routeAlert, routeAlerts } from "./notification.service.js";
 import { emitAlert } from "../lib/realtime.js";
+import {
+  resolveThresholds,
+  widestExpiryWindow,
+  type GlobalAlertThresholds,
+} from "../utils/alert-thresholds.js";
 
 /**
  * The producer behind `/api/alerts`.
@@ -60,7 +66,6 @@ interface AlertDraft {
 }
 
 const units = (value: number) => Math.round(value).toLocaleString("en-US");
-const money = (value: number) => `$${Math.round(value).toLocaleString("en-US")}`;
 
 /**
  * Keyed on ids, never on the display name.
@@ -95,18 +100,29 @@ const stockoutProbabilityPercent = (position: InventoryPosition): number => {
 
 const detectStockoutRisk = (
   positions: InventoryPosition[],
-  thresholdPercent: number,
+  global: GlobalAlertThresholds,
+  money: MoneyFormatter,
 ): AlertDraft[] => {
   const drafts: AlertDraft[] = [];
 
   for (const position of positions) {
+    // Per item-location, falling back to the global value. A single number governing 160
+    // positions could only ever be right for a few of them.
+    const { stockoutProbability: thresholdPercent, overridden } = resolveThresholds(
+      global,
+      position,
+    );
+
     const probability = stockoutProbabilityPercent(position);
     if (probability < thresholdPercent) continue;
 
-    const shortfall = Math.max(0, position.reorderPoint - position.onHand);
+    // Judged on the same two quantities the dashboard uses, so an alert and the KPI it
+    // rolls into can never disagree: replenishment against the inventory position
+    // (on-hand plus what is already inbound), cover against what is actually available.
+    const shortfall = Math.max(0, position.reorderPoint - inventoryPosition(position));
     if (shortfall < MIN_ACTIONABLE_UNITS) continue;
 
-    const bufferBreached = position.onHand < position.safetyStock;
+    const bufferBreached = availableStock(position) < position.safetyStock;
     const severity: Severity = bufferBreached
       ? escalates(position)
         ? "critical"
@@ -132,11 +148,19 @@ const detectStockoutRisk = (
       explanation: `${position.daysOfSupply} days of supply remain against a ${position.leadTimeDays}-day lead time, so a standard order placed today arrives after stock runs out.`,
       metrics: [
         { label: "On hand", value: units(position.onHand) },
+        // Both shown, because the verdict is made on them rather than on on-hand, and a
+        // reader comparing on-hand to the reorder point would otherwise dispute the alert.
+        { label: "Available", value: units(availableStock(position)) },
+        { label: "Inventory position", value: units(inventoryPosition(position)) },
         { label: "Safety stock", value: units(position.safetyStock) },
         { label: "Reorder point", value: units(position.reorderPoint) },
         { label: "Days of supply", value: `${position.daysOfSupply}` },
         { label: "Lead time", value: `${position.leadTimeDays} days` },
         { label: "Stockout probability", value: `${probability}%` },
+        {
+          label: "Threshold",
+          value: `${thresholdPercent}%${overridden.stockoutProbability ? " (set for this SKU)" : " (global)"}`,
+        },
       ],
     });
   }
@@ -155,7 +179,8 @@ interface BatchRow {
 const detectExpiryRisk = (
   positions: InventoryPosition[],
   batches: BatchRow[],
-  windowDays: number,
+  global: GlobalAlertThresholds,
+  money: MoneyFormatter,
 ): AlertDraft[] => {
   const drafts: AlertDraft[] = [];
   const byPair = new Map<string, BatchRow[]>();
@@ -174,6 +199,11 @@ const detectExpiryRisk = (
     const daysToExpiry = group.map((batch) =>
       Math.ceil((batch.expiryDate.getTime() - Date.now()) / MS_PER_DAY),
     );
+    // The batch query reached as wide as the most generous override, so each pair is
+    // narrowed back to its own window here. Shelf life differs enormously by product: 30
+    // days is far too late for a short-dated item and meaningless for a 24-month one.
+    const { expiryWindow: windowDays } = resolveThresholds(global, position);
+
     const earliestDays = Math.min(...daysToExpiry);
     if (earliestDays > windowDays) continue;
 
@@ -221,7 +251,7 @@ const detectExpiryRisk = (
   return drafts;
 };
 
-const detectOverstock = (positions: InventoryPosition[]): AlertDraft[] => {
+const detectOverstock = (positions: InventoryPosition[], money: MoneyFormatter): AlertDraft[] => {
   const drafts: AlertDraft[] = [];
 
   for (const position of positions) {
@@ -432,6 +462,7 @@ const detectSupplierDelay = (
   positions: InventoryPosition[],
   overdue: OverdueSupply[],
   thresholdDays: number,
+  money: MoneyFormatter,
 ): AlertDraft[] => {
   const positionByPair = new Map(
     positions.map((position) => [pairKey(position.productId, position.warehouseId), position]),
@@ -569,13 +600,32 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
     return { detected: 0, created: 0, retained: 0, resolved: 0, notified: 0, skipped: true };
   }
 
-  const [positions, batches, spikes, overdue] = await Promise.all([
-    loadPositions(),
+  /**
+   * Built once per cycle from the workspace's configured currency.
+   *
+   * Alerts store prose, so the symbol is fixed at detection time rather than by the
+   * client. It was hardcoded to `$`, which read as "$3,962 of stock is projected to
+   * be written off" across an Indian network on a workspace set to INR. Changing the
+   * setting rewrites existing alerts on the next cycle, because the text differs and
+   * reconciliation takes the update path.
+   */
+  const money = moneyFormatter(settings.general?.currency);
+
+  /**
+   * Positions load first rather than beside the batch query, because they carry the
+   * per-item expiry overrides and the query has to reach as far as the most generous one.
+   * Loading both in parallel would silently miss the batches a widened override just
+   * asked about. One extra round trip buys that correctness.
+   */
+  const positions = await loadPositions();
+  const expiryHorizonDays = widestExpiryWindow(thresholds, positions);
+
+  const [batches, spikes, overdue] = await Promise.all([
     types.expiryRisk
       ? prisma.inventoryBatch.findMany({
           where: {
             quantity: { gt: 0 },
-            expiryDate: { lte: new Date(Date.now() + thresholds.expiryWindow * MS_PER_DAY) },
+            expiryDate: { lte: new Date(Date.now() + expiryHorizonDays * MS_PER_DAY) },
           },
           select: {
             productId: true,
@@ -595,16 +645,16 @@ export const refreshAlerts = async (): Promise<DetectionOutcome> => {
 
   const drafts = [
     ...(types.stockoutRisk
-      ? detectStockoutRisk(positions, thresholds.stockoutProbability)
+      ? detectStockoutRisk(positions, thresholds, money)
       : []),
-    ...(types.expiryRisk ? detectExpiryRisk(positions, batches, thresholds.expiryWindow) : []),
-    ...(types.overstock ? detectOverstock(positions) : []),
+    ...(types.expiryRisk ? detectExpiryRisk(positions, batches, thresholds, money) : []),
+    ...(types.overstock ? detectOverstock(positions, money) : []),
     ...(types.capacityBreach
       ? detectCapacityBreach(positions, thresholds.capacityUtilization)
       : []),
     ...(types.demandSpike ? detectDemandSpike(positions, spikes, thresholds.demandDeviation) : []),
     ...(types.supplierDelay
-      ? detectSupplierDelay(positions, overdue, thresholds.supplierDelay)
+      ? detectSupplierDelay(positions, overdue, thresholds.supplierDelay, money)
       : []),
   ];
 

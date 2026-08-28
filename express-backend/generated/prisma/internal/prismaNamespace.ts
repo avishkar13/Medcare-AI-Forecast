@@ -4010,7 +4010,9 @@ export const PlanningParameterScalarFieldEnum = {
   maximumInventory: 'maximumInventory',
   holdingCostPerUnit: 'holdingCostPerUnit',
   stockoutCostPerUnit: 'stockoutCostPerUnit',
-  expiryCostPerUnit: 'expiryCostPerUnit'
+  expiryCostPerUnit: 'expiryCostPerUnit',
+  alertStockoutProbability: 'alertStockoutProbability',
+  alertExpiryWindowDays: 'alertExpiryWindowDays'
 } as const
 
 export type PlanningParameterScalarFieldEnum = (typeof PlanningParameterScalarFieldEnum)[keyof typeof PlanningParameterScalarFieldEnum]
@@ -4166,7 +4168,8 @@ export const DRPPlanScalarFieldEnum = {
   toWarehouseId: 'toWarehouseId',
   date: 'date',
   quantity: 'quantity',
-  reason: 'reason'
+  reason: 'reason',
+  status: 'status'
 } as const
 
 export type DRPPlanScalarFieldEnum = (typeof DRPPlanScalarFieldEnum)[keyof typeof DRPPlanScalarFieldEnum]
@@ -4337,6 +4340,7 @@ export const RestockRequestScalarFieldEnum = {
   status: 'status',
   reason: 'reason',
   notes: 'notes',
+  recommendationId: 'recommendationId',
   requestedById: 'requestedById',
   decidedById: 'decidedById',
   decidedAt: 'decidedAt',

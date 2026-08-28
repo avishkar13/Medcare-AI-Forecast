@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useDcExposure, useExpiryBatches, useWastePrevention } from "@/hooks/use-expiry";
-import { ExpiryBatch } from "@/types/expiry";
+import { ExpiryBatch, ExpiryStatus } from "@/types/expiry";
 
 import { ExpiryHeader } from "@/components/expiry/expiry-header";
 import { ExpiryOverview } from "@/components/expiry/expiry-overview";
@@ -17,6 +17,29 @@ import { WastePreventionImpact } from "@/components/expiry/waste-prevention-impa
 import { DCExpiryExposure } from "@/components/expiry/dc-expiry-exposure";
 import { PreventedWaste } from "@/components/expiry/prevented-waste";
 import { BatchDetailsSheet } from "@/components/expiry/batch-details-sheet";
+
+/** Inside this window a consumable batch has to be pushed out first, not merely watched. */
+const FEFO_URGENT_DAYS = 30;
+
+/**
+ * What to do with a batch, derived from whether local demand can consume it in time.
+ *
+ * Every batch used to be stamped `"at-risk"` - a value not even in `ExpiryStatus` - so the
+ * action column fell to its default for all of them and said nothing useful. These four
+ * outcomes are the ones the FEFO queue already knows how to label.
+ */
+const statusOf = (demandCoveragePercent: number, daysRemaining: number): ExpiryStatus => {
+  // Demand will absorb the whole batch before it expires; nothing to intervene in.
+  if (demandCoveragePercent >= 100) return "normal";
+
+  // Local demand cannot consume most of it, so the units have to go where demand is.
+  if (demandCoveragePercent < 60) return "transfer";
+
+  // Consumable in principle, but only if it moves first - which is what FEFO is for.
+  if (daysRemaining <= FEFO_URGENT_DAYS) return "prioritized";
+
+  return "monitor";
+};
 
 export default function ExpiryRiskPage() {
   const batchQuery = useExpiryBatches();
@@ -43,7 +66,7 @@ export default function ExpiryRiskPage() {
     wasteSharePercent: b.projectedWasteSharePercent,
     projectedWasteUnits: b.projectedWasteUnits,
     wasteValue: b.projectedWasteValue,
-        status: "at-risk" as ExpiryBatch["status"],
+        status: statusOf(b.demandCoveragePercent, b.daysRemaining),
       })),
     [batchQuery.data],
   );
@@ -182,7 +205,7 @@ export default function ExpiryRiskPage() {
         </div>
         
         <div className="flex flex-col gap-6">
-          <FEFOPriorityQueue batches={batches} />
+          <FEFOPriorityQueue batches={filteredAndSortedBatches} />
           <AIExpiryAssessment />
         </div>
       </div>

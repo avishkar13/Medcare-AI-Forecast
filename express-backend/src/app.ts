@@ -56,6 +56,16 @@ app.get("/", (_req, res) => {
 app.use(`${SERVER.apiPrefix}/health`, healthRouter);
 app.use(`${SERVER.apiPrefix}/auth`, authRouter);
 
+/**
+ * The forecasting engine's data feed, mounted ahead of `authenticate` because it
+ * carries its own credential.
+ *
+ * The engine is a service, not a user - it has no session and no role - so it is
+ * gated on a shared key instead of the RBAC chain below. See `middleware/serviceKey.ts`
+ * for why that is a swap of credentials rather than an open door.
+ */
+app.use(`${SERVER.apiPrefix}/training-data`, trainingRouter);
+
 // After the parsers and public routes, before the protected routes:
 app.use(SERVER.apiPrefix, authenticate);
 app.use(SERVER.apiPrefix, scopeDc);
@@ -71,7 +81,6 @@ app.use(SERVER.apiPrefix, plansRouter);
 app.use(`${SERVER.apiPrefix}/inventory`, inventoryRouter);
 app.use(`${SERVER.apiPrefix}/dc`, dcRouter);
 app.use(`${SERVER.apiPrefix}/restock-requests`, restockRouter);
-app.use(`${SERVER.apiPrefix}/training-data`, trainingRouter);
 app.use(`${SERVER.apiPrefix}/alerts`, alertsRouter);
 app.use(`${SERVER.apiPrefix}/expiry`, expiryRouter);
 app.use(`${SERVER.apiPrefix}/forecast`, forecastRouter);

@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, TrendingUp, Package, Bell, MessageSquare, Zap, Database, Shield } from "lucide-react";
+import { Settings, TrendingUp, Package, Bell, SlidersHorizontal, MessageSquare, Zap, Database, Shield } from "lucide-react";
 
-export type SettingsSectionKey = "general" | "forecast" | "inventory" | "alerts" | "notifications" | "ai" | "integrations" | "security";
+export type SettingsSectionKey = "general" | "forecast" | "inventory" | "alerts" | "thresholds" | "notifications" | "ai" | "integrations" | "security";
 
 interface NavItem {
   id: SettingsSectionKey;
@@ -15,6 +15,8 @@ const navItems: NavItem[] = [
   { id: "forecast", label: "Forecasting", icon: TrendingUp },
   { id: "inventory", label: "Inventory", icon: Package },
   { id: "alerts", label: "Alerts & Monitoring", icon: Bell },
+  // Directly under the global thresholds it overrides, so the relationship is obvious.
+  { id: "thresholds", label: "Thresholds by SKU", icon: SlidersHorizontal },
   { id: "notifications", label: "Notifications", icon: MessageSquare },
   { id: "ai", label: "AI & Models", icon: Zap },
   { id: "integrations", label: "Data & Integrations", icon: Database },

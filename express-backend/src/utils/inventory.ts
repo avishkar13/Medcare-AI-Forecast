@@ -123,6 +123,49 @@ export const projectFefoWaste = (batches: FefoBatch[], avgDailyDemand: number): 
   });
 };
 
+export interface ConsumableBatch {
+  id: string;
+  quantity: number;
+}
+
+export interface BatchDraw {
+  id: string;
+  /** Units taken from this batch. Never more than it held. */
+  units: number;
+  remaining: number;
+}
+
+export interface FefoConsumption {
+  draws: BatchDraw[];
+  /** Units the sub-ledger could not cover. Inventory.onHand stays authoritative. */
+  shortfall: number;
+}
+
+/**
+ * Draws units from batches in the order given - earliest expiry first, so the caller
+ * sorts and this stays arithmetic.
+ *
+ * `shortfall` is reported rather than thrown on: the batch table is a sub-ledger that
+ * can legitimately hold less than `Inventory.onHand` (stock received before batches
+ * were tracked, or a seeded position), and refusing the sale over that would make the
+ * ledger unable to record something that physically happened.
+ */
+export const consumeFefo = (batches: ConsumableBatch[], units: number): FefoConsumption => {
+  let outstanding = Math.max(0, units);
+  const draws: BatchDraw[] = [];
+
+  for (const batch of batches) {
+    if (outstanding <= 0) break;
+    const taken = Math.min(batch.quantity, outstanding);
+    if (taken <= 0) continue;
+
+    outstanding = round(outstanding - taken);
+    draws.push({ id: batch.id, units: round(taken), remaining: round(batch.quantity - taken) });
+  }
+
+  return { draws, shortfall: round(outstanding) };
+};
+
 export const round = (value: number, decimals = 2): number => {
   const factor = 10 ** decimals;
   return Math.round(value * factor) / factor;
@@ -130,6 +173,37 @@ export const round = (value: number, decimals = 2): number => {
 
 export const percentage = (part: number, whole: number): number =>
   whole <= 0 ? 0 : round((part / whole) * 100);
+
+/**
+ * The three ways to count the stock at a position, and which question each answers.
+ *
+ * `onHand` alone answers neither well. Reserved units are already committed to orders, so
+ * counting them as cover **under-reports** stockout risk; in-transit units are already
+ * bought and arriving, so ignoring them **over-triggers** replenishment - re-ordering
+ * against stock that is on its way is double-ordering.
+ *
+ *   available          = onHand - reserved                what can serve demand right now
+ *   inventory position = onHand + inTransit - reserved    what to judge the reorder point on
+ *
+ * Both floor at zero: a position cannot hold negative stock, and a reserved quantity that
+ * exceeds what is on the shelf is an over-commitment, not a negative balance.
+ */
+export interface StockLevels {
+  onHand: number;
+  reserved: number;
+  inTransit: number;
+}
+
+/** What can actually serve demand today. Judge stockout risk on this. */
+export const availableStock = ({ onHand, reserved }: StockLevels): number =>
+  Math.max(0, onHand - reserved);
+
+/**
+ * What the position will hold once everything already bought has arrived.
+ * Judge the reorder point on this - it is the standard inventory position.
+ */
+export const inventoryPosition = ({ onHand, reserved, inTransit }: StockLevels): number =>
+  Math.max(0, onHand + inTransit - reserved);
 
 export interface StockCondition {
   belowSafetyStock: boolean;

@@ -49,6 +49,8 @@ const parameterSelect = {
   holdingCostPerUnit: true,
   stockoutCostPerUnit: true,
   expiryCostPerUnit: true,
+  alertStockoutProbability: true,
+  alertExpiryWindowDays: true,
   product: { select: { sku: true, name: true, criticality: true } },
   warehouse: { select: { code: true, name: true, tier: true } },
 } satisfies Prisma.PlanningParameterSelect;
@@ -74,6 +76,10 @@ const toParameter = (row: ParameterRow) => ({
   holdingCostPerUnit: row.holdingCostPerUnit,
   stockoutCostPerUnit: row.stockoutCostPerUnit,
   expiryCostPerUnit: row.expiryCostPerUnit,
+  // Null means this pair inherits the global alert setting; the client renders that as
+  // "inherited" rather than as a blank or as the global number styled as if set here.
+  alertStockoutProbability: row.alertStockoutProbability,
+  alertExpiryWindowDays: row.alertExpiryWindowDays,
 });
 
 export const listParameters = async (query: ParametersQuery, authScope?: { warehouseId?: string | null }) => {
@@ -125,6 +131,8 @@ export const upsertParameters = async (body: UpsertParametersBody) => {
     holdingCostPerUnit: body.holdingCostPerUnit,
     stockoutCostPerUnit: body.stockoutCostPerUnit,
     expiryCostPerUnit: body.expiryCostPerUnit,
+    alertStockoutProbability: body.alertStockoutProbability,
+    alertExpiryWindowDays: body.alertExpiryWindowDays,
   };
 
   const row = await prisma.planningParameter.upsert({

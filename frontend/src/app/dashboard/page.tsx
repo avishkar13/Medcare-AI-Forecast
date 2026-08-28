@@ -9,6 +9,7 @@ import { ExpiryRiskPanel } from "@/components/dashboard/expiry-risk-panel";
 import { InventoryDistribution } from "@/components/dashboard/inventory-distribution";
 import { AIRecommendations } from "@/components/dashboard/ai-recommendations";
 import { OptimizationSummary } from "@/components/dashboard/optimization-summary";
+import { PlanVsActual } from "@/components/dashboard/plan-vs-actual";
 import { WhatIfSimulation } from "@/components/dashboard/what-if-simulation";
 import { ExecutiveDecisionPanel } from "@/components/dashboard/executive-decision-panel";
 import { LiveActivity } from "@/components/dashboard/live-activity";
@@ -22,7 +23,7 @@ export default function DashboardPage() {
       <div className="flex flex-col gap-6">
         <KpiCards />
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid [&>*]:min-w-0 grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <PriorityActions />
           </div>
@@ -33,7 +34,7 @@ export default function DashboardPage() {
         </div>
 
         {/* The execution loop - what just moved, and what the plan says happens next. */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid [&>*]:min-w-0 grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <PositionProjection />
           </div>
@@ -47,7 +48,7 @@ export default function DashboardPage() {
           <DemandForecastChart />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid [&>*]:min-w-0 grid-cols-1 lg:grid-cols-2 gap-6">
           <InventoryHealthChart />
           <InventoryDistribution />
         </div>
@@ -57,7 +58,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Decision & Optimization Layer */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid [&>*]:min-w-0 grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 h-[600px] lg:h-auto lg:relative">
             <div className="h-full lg:absolute lg:inset-0">
               <AIRecommendations />
@@ -65,6 +66,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex flex-col gap-6 lg:col-span-1">
             <OptimizationSummary />
+            <PlanVsActual />
             <WhatIfSimulation />
           </div>
         </div>

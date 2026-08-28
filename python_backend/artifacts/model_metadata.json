@@ -45,7 +45,7 @@
     "uplift_x_seasonality",
     "signal_x_seasonality"
   ],
-  "cutoff": "2026-07-24",
+  "cutoff": "2026-08-09",
   "centre": "point model (expected demand, not the median)",
   "uncertainty_method": "direct quantile regression + conformal calibration",
   "quantiles": [
@@ -54,14 +54,14 @@
     0.9
   ],
   "interval_method": "conformalized quantile regression (split CQR)",
-  "conformal_delta": -0.011791298675537092,
-  "calibration_from": "2026-06-29",
-  "calibration_ok": true,
+  "conformal_delta": 0.15970386695861857,
+  "calibration_from": "2026-07-25",
+  "calibration_ok": false,
   "target_coverage_percent": 80,
   "cv_folds": 3,
-  "p10_p90_coverage_percent": 79.83870967741935,
-  "training_rows": 19360,
-  "test_rows": 4960,
+  "p10_p90_coverage_percent": 67.54599097535578,
+  "training_rows": 11840,
+  "test_rows": 2881,
   "unique_skus": 40,
   "unique_warehouses": 4
 }

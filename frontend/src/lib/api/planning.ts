@@ -4,6 +4,7 @@ import {
   planningRunSchema,
   runComparisonSchema,
   runOptimizationSchema,
+  runOutcomeSchema,
   runSimulationSchema,
   type PlanningRun,
 } from "@/schemas/planning";
@@ -14,6 +15,7 @@ export type {
   PlanningRunStatus,
   RunComparison,
   RunOptimization,
+  RunOutcome,
   RunSimulation,
 } from "@/schemas/planning";
 
@@ -56,6 +58,9 @@ export const getRunSimulation = async (id: string) =>
 
 export const getRunOptimization = async (id: string) =>
   runOptimizationSchema.parse(await api.get<unknown>(`/planning/runs/${id}/optimization`));
+
+export const getRunOutcome = async (id: string) =>
+  runOutcomeSchema.parse(await api.get<unknown>(`/planning/runs/${id}/outcome`));
 
 /**
  * Starts a run. Answers `202` with the run to poll - it does not wait for completion.

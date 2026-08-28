@@ -176,6 +176,18 @@ model PlanningParameter {
   stockoutCostPerUnit Float
   expiryCostPerUnit   Float
 
+  /**
+   * Per item-location alert thresholds. **Null means inherit** the global value in
+   * `AlertSettings`, not "zero" and not "disabled".
+   *
+   * An override, never a default - the same shape `ScenarioSettings.serviceLevelTarget`
+   * settled on. A default here would silently flatten every pair onto one number, which
+   * is the bug this exists to fix: a critical antibiotic at a Tier-2 DC with a 14-day
+   * lead time cannot be judged by the same trigger as a routine analgesic at a metro DC.
+   */
+  alertStockoutProbability Float? // 0-100
+  alertExpiryWindowDays    Int? // days
+
   product   Product   @relation(fields: [productId], references: [id])
   warehouse Warehouse @relation(fields: [warehouseId], references: [id])
 
@@ -380,6 +392,8 @@ model DRPPlan {
   date            DateTime
   quantity        Float
   reason          String?
+  /// A transfer is a proposal like a SupplyPlan is, so it decides the same way.
+  status          PlanStatus @default(PROPOSED)
 
   planningRun   PlanningRun @relation(fields: [planningRunId], references: [id])
   product       Product     @relation(fields: [productId], references: [id])
@@ -448,6 +462,7 @@ model Recommendation {
   expectedImpact String?
   impactValue    Float?
   signals        RecommendationSignal[]
+  restockRequest RestockRequest?
 
   createdAt DateTime @default(now())
 
@@ -700,6 +715,10 @@ model RestockRequest {
   reason      String?
   notes       String?
 
+  /// Set when executing a recommendation raised this request, which is what makes
+  /// "execute" produce something a warehouse can act on rather than a status change.
+  recommendationId String? @unique
+
   requestedById String?
   decidedById   String?
   decidedAt     DateTime?
@@ -707,8 +726,9 @@ model RestockRequest {
   fulfilledAt      DateTime?
   fulfillmentMovementId String?
 
-  product     Product   @relation(fields: [productId], references: [id])
-  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  product        Product         @relation(fields: [productId], references: [id])
+  warehouse      Warehouse       @relation(fields: [warehouseId], references: [id])
+  recommendation Recommendation? @relation(fields: [recommendationId], references: [id], onDelete: SetNull)
   requestedBy User?     @relation("RestockRequestedBy", fields: [requestedById], references: [id])
   decidedBy   User?     @relation("RestockDecidedBy", fields: [decidedById], references: [id])
 

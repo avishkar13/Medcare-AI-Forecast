@@ -10,9 +10,11 @@ export function ExpiryOverview() {
   const { data: overview, isPending, isError } = useExpiryOverview();
   const { formatCompactCurrency, formatNumber } = useFormatters();
 
+  // Before the null guard: on failure `data` is undefined, so a guard that
+  // returns null on falsy data swallows the error and the panel just vanishes.
+  if (isError) return <QueryError label="the expiry overview" />;
   if (isPending || !overview) return null;
 
-  if (isError) return <QueryError label="the expiry overview" />;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">

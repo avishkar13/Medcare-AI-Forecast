@@ -333,7 +333,10 @@ export interface InventoryConditionCounts {
 
 export interface CategoryHealth {
   category: string;
+  /** Distinct products in this category, within scope. */
   skuCount: number;
+  /** Product-warehouse pairs. Four times `skuCount` network-wide, equal to it per DC. */
+  positionCount: number;
   inventoryValue: number;
   atRiskCount: number;
   expiringValue: number;
@@ -387,7 +390,10 @@ export interface InventoryPositionItem {
   onHand: number;
   reserved: number;
   inTransit: number;
+  /** onHand - reserved. What can serve demand now; stockout risk is judged on this. */
   available: number;
+  /** onHand + inTransit - reserved. The reorder point is judged on this. */
+  inventoryPosition: number;
   safetyStock: number;
   reorderPoint: number;
   maximumInventory: number | null;

@@ -10,9 +10,11 @@ export function DemandExpiryAnalysis() {
   const { formatCompactCurrency, formatNumber } = useFormatters();
   const { data, isPending, isError } = useExpiryDemandCoverage();
 
+  // Before the null guard: on failure `data` is undefined, so a guard that
+  // returns null on falsy data swallows the error and the panel just vanishes.
+  if (isError) return <QueryError label="demand coverage" />;
   if (isPending || !data) return null;
 
-  if (isError) return <QueryError label="demand coverage" />;
 
   return (
     <Card className="border-border/60 shadow-sm bg-background h-full flex flex-col">

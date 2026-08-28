@@ -95,6 +95,7 @@ export const queryKeys = {
     compare: (id: string, baseline: string) => ["planning", "compare", id, baseline] as const,
     optimization: (id: string) => ["planning", "optimization", id] as const,
     simulation: (id: string) => ["planning", "simulation", id] as const,
+    outcome: (id: string) => ["planning", "outcome", id] as const,
     inventoryPlans: (id: string, params?: QueryParams) =>
       ["planning", "inventory-plans", id, params ?? {}] as const,
   },

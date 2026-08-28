@@ -4,6 +4,8 @@ __pycache__/
 .env
 data/
 outputs/
-artifacts/
+# `artifacts/` is deliberately NOT excluded: the fitted model ships in the image so a
+# release carries a known-good bundle. Excluding it was correct while the plan was to
+# mount a volume and train after deploy.
 *.md
 .git

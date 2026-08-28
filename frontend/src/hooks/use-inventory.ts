@@ -11,6 +11,15 @@ import {
 } from "@/lib/api/inventory";
 
 /**
+ * These queries refresh on their own.
+ *
+ * Another planner's movement changes these figures, and the socket carries alert events
+ * only - so a movement that raises nothing would otherwise sit unseen until the page was
+ * touched. `LIVE` is applied to every query below rather than repeated per hook.
+ */
+const LIVE = { refetchInterval: 30_000, refetchOnWindowFocus: true } as const;
+
+/**
  * Filters go to the server.
  *
  * This used to fetch a fixed 200 rows and let the page narrow them in the browser,
@@ -22,6 +31,7 @@ export function useInventory(params: InventoryListParams = {}) {
     queryKey: queryKeys.inventory.list(params),
     queryFn: () => listInventory(params),
     staleTime: STALE_TIME.list,
+    ...LIVE,
   });
 }
 
@@ -30,6 +40,7 @@ export function useInventoryHealth(warehouseId?: string) {
     queryKey: queryKeys.dashboard.inventoryHealth(warehouseId),
     queryFn: () => getInventoryHealth(warehouseId ? { warehouseId } : undefined),
     staleTime: STALE_TIME.dashboard,
+    ...LIVE,
   });
 }
 
@@ -39,5 +50,6 @@ export function useInventoryDetail(sku: string | null) {
     queryFn: () => getInventoryDetail(sku!),
     enabled: Boolean(sku),
     staleTime: STALE_TIME.list,
+    ...LIVE,
   });
 }

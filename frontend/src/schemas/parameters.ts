@@ -27,6 +27,13 @@ export const planningParameterSchema = z.object({
   holdingCostPerUnit: z.number(),
   stockoutCostPerUnit: z.number(),
   expiryCostPerUnit: z.number(),
+  /**
+   * Per item-location alert overrides. **Null means inherit** the global setting in
+   * Settings > Alerts - not zero, and not disabled. Nullable rather than optional
+   * because the server always sends the field; the value itself is the signal.
+   */
+  alertStockoutProbability: z.number().nullable(),
+  alertExpiryWindowDays: z.number().nullable(),
 });
 
 export type PlanningParameter = z.infer<typeof planningParameterSchema>;

@@ -49,6 +49,7 @@ export const drpPlanSchema = z.object({
   date: z.string(),
   quantity: z.number(),
   reason: z.string().nullable(),
+  status: planStatusSchema,
 });
 
 /**

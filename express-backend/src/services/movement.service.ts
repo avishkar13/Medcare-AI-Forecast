@@ -1,7 +1,7 @@
 import { prisma } from "../config/prisma.js";
 import type { Prisma } from "../../generated/prisma/client.js";
 import { BadRequestError, ConflictError, NotFoundError } from "../utils/errors.js";
-import { round } from "../utils/inventory.js";
+import { consumeFefo, round } from "../utils/inventory.js";
 import {
   applyDelta,
   deltaFor,
@@ -38,7 +38,7 @@ const MS_PER_DAY = 86_400_000;
 const resolveProduct = async (sku: string) => {
   const product = await prisma.product.findFirst({
     where: { OR: [{ id: sku }, { sku }] },
-    select: { id: true, sku: true, name: true },
+    select: { id: true, sku: true, name: true, shelfLifeDays: true },
   });
   if (!product) throw new NotFoundError(`Product '${sku}' not found`);
   return product;
@@ -126,6 +126,81 @@ const mostSevere = (alerts: RaisedAlert[]): RaisedAlert =>
   [...alerts].sort((a, b) => severityRank(a.severity) - severityRank(b.severity))[0]!;
 
 /**
+ * Arrivals that carry a known expiry, so a batch can be opened for them.
+ *
+ * A positive ADJUSTMENT is deliberately not one: a stock count correcting upwards has
+ * no provenance, and dating a batch from the shelf life would invent an expiry the
+ * warehouse never stated. A RETURN is the same - the units came back from somewhere,
+ * and their original batch is not knowable from this request.
+ */
+const OPENS_BATCH = new Set<MovementType>(["RECEIPT", "TRANSFER_IN"]);
+
+const batchNumberFor = (sku: string, date: Date) =>
+  `B-${sku.split("-")[1] ?? "GEN"}-${date.toISOString().slice(0, 10).replace(/-/g, "")}`;
+
+/**
+ * Keeps the batch sub-ledger in step with the position.
+ *
+ * `InventoryBatch` was written by the seed and by nothing else, so every FEFO
+ * projection, expiry exposure and waste figure read a table frozen at seed time while
+ * `Inventory.onHand` moved underneath it. Outward stock now draws down batches
+ * earliest-expiry-first, which is the order those same readers assume.
+ *
+ * Batches drained to zero are deleted rather than left at zero: none of the expiry
+ * reads filter on quantity, so a spent batch would keep appearing as at-risk stock.
+ * The movement ledger is where the history lives.
+ *
+ * Returns how many units the sub-ledger could not account for, which is expected on a
+ * position seeded without batches and is not an error.
+ */
+const syncBatches = async (
+  tx: Prisma.TransactionClient,
+  input: {
+    productId: string;
+    warehouseId: string;
+    sku: string;
+    movementType: MovementType;
+    delta: number;
+    date: Date;
+    shelfLifeDays: number | null;
+  },
+): Promise<number> => {
+  if (input.delta < 0) {
+    const batches = await tx.inventoryBatch.findMany({
+      where: { productId: input.productId, warehouseId: input.warehouseId, quantity: { gt: 0 } },
+      select: { id: true, quantity: true },
+      orderBy: [{ expiryDate: "asc" }, { createdAt: "asc" }],
+    });
+
+    const { draws, shortfall } = consumeFefo(batches, Math.abs(input.delta));
+
+    for (const draw of draws) {
+      if (draw.remaining <= 0) await tx.inventoryBatch.delete({ where: { id: draw.id } });
+      else await tx.inventoryBatch.update({ where: { id: draw.id }, data: { quantity: draw.remaining } });
+    }
+
+    return shortfall;
+  }
+
+  if (input.delta > 0 && OPENS_BATCH.has(input.movementType) && input.shelfLifeDays !== null) {
+    const expiryDate = new Date(input.date.getTime() + input.shelfLifeDays * MS_PER_DAY);
+
+    await tx.inventoryBatch.create({
+      data: {
+        productId: input.productId,
+        warehouseId: input.warehouseId,
+        batchNumber: batchNumberFor(input.sku, input.date),
+        quantity: round(input.delta),
+        manufacturingDate: input.date,
+        expiryDate,
+      },
+    });
+  }
+
+  return 0;
+};
+
+/**
  * Records one movement.
  *
  * The stock read, the ledger write and the position update are **one transaction**:
@@ -164,7 +239,7 @@ const recordMovementOnce = async (
   const requested = deltaFor(body.movementType as MovementType, body.quantity);
   const date = body.date ?? new Date();
 
-  const { movement, inventory, clamped } = await prisma.$transaction(async (tx) => {
+  const { movement, inventory, clamped, batchShortfall } = await prisma.$transaction(async (tx) => {
     // The position is created on first movement rather than assumed to exist: a DC can
     // legitimately receive a SKU it has never held.
     const position = await tx.inventory.upsert({
@@ -202,11 +277,27 @@ const recordMovementOnce = async (
       select: { onHand: true, reserved: true, inTransit: true, updatedAt: true },
     });
 
+    const batchShortfall = await syncBatches(tx, {
+      productId: product.id,
+      warehouseId: warehouse.id,
+      sku: product.sku,
+      movementType: body.movementType as MovementType,
+      delta: change.delta,
+      date,
+      shelfLifeDays: product.shelfLifeDays,
+    });
+
     // A sale is realised demand, so it belongs in the history the forecaster trains
     // on. Accumulated per day rather than overwritten: two sales on one day are one
     // day's demand, and `@@unique([productId, warehouseId, date])` makes that an upsert.
     if (isDemand(body.movementType as MovementType)) {
-      const sold = Math.abs(change.delta);
+      // Ordered is what the customer asked for; fulfilled is what stock allowed. They
+      // used to both be the shipped figure, which made unmet demand unrecoverable:
+      // every fill rate computed off this table was 100% by construction, and the
+      // forecaster trained on demand censored by whatever happened to be on the shelf.
+      const ordered = Math.abs(requested);
+      const shipped = Math.abs(change.delta);
+
       await tx.demandHistory.upsert({
         where: {
           productId_warehouseId_date: {
@@ -219,14 +310,16 @@ const recordMovementOnce = async (
           productId: product.id,
           warehouseId: warehouse.id,
           date: startOfDay(date),
-          orderedQuantity: sold,
-          fulfilledQuantity: sold,
+          orderedQuantity: ordered,
+          fulfilledQuantity: shipped,
           // The request was cut short by available stock, which is what a stockout is.
           stockoutFlag: wasClamped(position.onHand, requested),
         },
         update: {
-          orderedQuantity: { increment: sold },
-          fulfilledQuantity: { increment: sold },
+          orderedQuantity: { increment: ordered },
+          fulfilledQuantity: { increment: shipped },
+          // Sticky for the day: one cut-short order makes the day a stockout day.
+          ...(wasClamped(position.onHand, requested) ? { stockoutFlag: true } : {}),
         },
       });
     }
@@ -241,8 +334,18 @@ const recordMovementOnce = async (
       movement: written,
       inventory: updated,
       clamped: wasClamped(position.onHand, requested),
+      batchShortfall,
     };
   });
+
+  // Expected on a position seeded without batches, so it is reported and not raised.
+  if (batchShortfall > 0) {
+    console.warn("batch ledger did not cover the movement", {
+      movementId: movement.id,
+      sku: product.sku,
+      units: batchShortfall,
+    });
+  }
 
   const alertsRaised = await raiseAlertsFor(movement.id, product.id, warehouse.id);
 

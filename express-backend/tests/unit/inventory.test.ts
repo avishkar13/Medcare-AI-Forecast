@@ -2,10 +2,12 @@ import { strict as assert } from "node:assert";
 import { describe, test } from "node:test";
 import {
   allocateTransfers,
+  availableStock,
   classifyRisk,
   classifyStock,
   expectedShortfall,
   expirySeverity,
+  inventoryPosition,
   normalCdf,
   normalPdf,
   orderUpToLevel,
@@ -16,8 +18,8 @@ import {
   safetyStock,
   stdDevFromBand,
   supplyUrgency,
-  zScore,
   type DemandProfile,
+  zScore,
 } from "../../src/utils/inventory.js";
 import { closeTo } from "../helpers/assertions.js";
 
@@ -595,5 +597,71 @@ describe("expectedShortfall", () => {
       const shortfall = expectedShortfall({ demandMean: 100, demandStdDev: 30, availableUnits });
       assert.ok(shortfall >= 0, "negative shortfall at " + availableUnits);
     }
+  });
+});
+
+describe("availableStock and inventoryPosition", () => {
+  const levels = (onHand: number, reserved: number, inTransit: number) => ({
+    onHand,
+    reserved,
+    inTransit,
+  });
+
+  test("available never exceeds what is on the shelf", () => {
+    for (const [onHand, reserved, inTransit] of [
+      [500, 0, 0],
+      [500, 180, 0],
+      [500, 180, 900],
+      [0, 0, 400],
+    ] as const) {
+      const stock = levels(onHand, reserved, inTransit);
+      assert.ok(
+        availableStock(stock) <= onHand,
+        `available exceeded on-hand for ${onHand}/${reserved}/${inTransit}`,
+      );
+    }
+  });
+
+  test("inventory position is never below available - inbound stock only ever adds", () => {
+    for (const [onHand, reserved, inTransit] of [
+      [500, 180, 0],
+      [500, 180, 199],
+      [100, 90, 1000],
+      [0, 0, 0],
+    ] as const) {
+      const stock = levels(onHand, reserved, inTransit);
+      assert.ok(
+        inventoryPosition(stock) >= availableStock(stock),
+        `position below available for ${onHand}/${reserved}/${inTransit}`,
+      );
+    }
+  });
+
+  test("reserved units do not count as cover", () => {
+    // 500 on the shelf but 400 promised away is 100 of cover, not 500.
+    assert.equal(availableStock(levels(500, 400, 0)), 100);
+  });
+
+  test("an over-commitment floors at zero rather than going negative", () => {
+    assert.equal(availableStock(levels(100, 250, 0)), 0);
+    assert.equal(inventoryPosition(levels(100, 250, 0)), 0);
+  });
+
+  test("inbound stock counts towards the reorder decision", () => {
+    // The live case: on-hand 151 against a reorder point of 176 looks short, but 199
+    // units are already inbound, so the position is 350 and no order is due.
+    const stock = levels(151, 0, 199);
+    assert.ok(stock.onHand < 176, "precondition: on-hand alone looks short");
+    assert.ok(
+      inventoryPosition(stock) >= 176,
+      "inbound stock should have cleared the reorder point",
+    );
+  });
+
+  test("inbound stock does not make an empty shelf available", () => {
+    // The distinction that matters: 400 arriving tomorrow serves nobody today.
+    const stock = levels(0, 0, 400);
+    assert.equal(availableStock(stock), 0);
+    assert.equal(inventoryPosition(stock), 400);
   });
 });

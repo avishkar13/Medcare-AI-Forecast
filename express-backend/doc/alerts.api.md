@@ -6,6 +6,43 @@ Shared conventions are in [`conventions.api.md`](conventions.api.md).
 
 ---
 
+## Thresholds: global, overridable per item-location
+
+Two thresholds decide whether a condition becomes an alert, and both resolve the same way:
+**an override on the item-location wins; null inherits the global value.**
+
+| Threshold | Global home | Override |
+| --- | --- | --- |
+| Stockout probability | `AlertSettings.thresholdStockoutProb`, edited at `PATCH /api/settings` | `PlanningParameter.alertStockoutProbability` (0-100) |
+| Expiry window | `AlertSettings.thresholdExpiryWindow` | `PlanningParameter.alertExpiryWindowDays` (1-365) |
+
+Overrides are written through `PUT /api/planning/parameters`, which upserts the whole row on
+`(productId, warehouseId)` - so a caller editing a threshold must send the other planning
+values back unchanged. Sending `null` clears the override and restores inheritance.
+
+**Null means inherit, per field.** A position overriding only its expiry window keeps the
+global stockout probability. Zero is a real override, not an absent one: 0% means "alert on any
+uncovered lead time", which is a legitimate setting for a critical line.
+
+Every `stockout_risk` alert reports a **Threshold** metric naming the value it was judged
+against and whether it came from the global setting or the SKU:
+
+```
+{ "label": "Threshold", "value": "40% (global)" }
+{ "label": "Threshold", "value": "70% (set for this SKU)" }
+```
+
+### What the probability is measured on
+
+`stockoutProbabilityPercent` is derived from days of supply, and days of supply is
+**available** stock over average daily demand - `onHand - reserved`, not bare on-hand. Reserved
+units are promised to orders and cannot serve new demand, so counting them as cover would
+report 500 units of protection on a position holding 500 with 400 already committed.
+
+Alerts also carry **Available** and **Inventory position** beside **On hand**, so a reader can
+check the verdict rather than compare on-hand to the reorder point and disagree with it.
+
+
 ## Open values, not enums
 
 `Alert.severity`, `type` and `status` are plain `String` columns in the schema — there is no database enum behind them. Filters are therefore **open strings**: a new severity added by a producer must not make the read route reject it.

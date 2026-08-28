@@ -41,6 +41,17 @@ def api_base_url() -> str:
     return url
 
 
+def training_api_key() -> str | None:
+    """Shared key for /training-data, sent as `x-service-key`.
+
+    The engine is a service, not a user: it has no session and no role, so the route
+    is gated on this rather than on the RBAC chain every human request goes through.
+    Optional here because the backend only enforces it in production.
+    """
+    key = os.getenv("TRAINING_API_KEY", "").strip()
+    return key or None
+
+
 MODEL_VERSION = os.getenv("MODEL_VERSION", "medcare-xgb-qrf-v1")
 ENGINE_PORT = _int("ENGINE_PORT", 8000)
 # Only ~180 days of history exist, so a longer horizon has no annual seasonality to

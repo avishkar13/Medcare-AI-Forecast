@@ -30,6 +30,9 @@ export interface UpsertParametersBody {
   holdingCostPerUnit: number;
   stockoutCostPerUnit: number;
   expiryCostPerUnit: number;
+  /** Null clears the override and restores inheritance from the global setting. */
+  alertStockoutProbability?: number | null;
+  alertExpiryWindowDays?: number | null;
 }
 
 /**

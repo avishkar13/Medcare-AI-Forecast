@@ -21,6 +21,7 @@ from src.config import (
     TRAINING_CACHE_TTL_SECONDS,
     TRAINING_TIMEOUT_SECONDS,
     api_base_url,
+    training_api_key,
 )
 
 ROW_COUNT_HEADER = "x-training-rows"
@@ -151,9 +152,18 @@ def fetch_training_data(
         return cached, cached_promos  # type: ignore[return-value]
 
     url = f"{api_base_url()}/training-data"
+
+    # `/training-data` is gated on a shared service key rather than on RBAC - the
+    # engine has no user account to authenticate as. Omitted when unset, which is the
+    # local-development case; the backend only enforces the key in production.
+    headers = {"accept": "application/x-ndjson"}
+    key = training_api_key()
+    if key:
+        headers["x-service-key"] = key
+
     try:
         with httpx.Client(timeout=TRAINING_TIMEOUT_SECONDS, follow_redirects=True) as client:
-            response = client.get(url, headers={"accept": "application/x-ndjson"})
+            response = client.get(url, headers=headers)
     except httpx.HTTPError as error:
         raise TrainingDataUnavailable(f"{url} is unreachable: {error}") from error
 

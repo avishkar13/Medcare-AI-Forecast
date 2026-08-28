@@ -325,6 +325,7 @@ export type RecommendationWhereInput = {
   warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
   actedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   signals?: Prisma.RecommendationSignalListRelationFilter
+  restockRequest?: Prisma.XOR<Prisma.RestockRequestNullableScalarRelationFilter, Prisma.RestockRequestWhereInput> | null
 }
 
 export type RecommendationOrderByWithRelationInput = {
@@ -350,6 +351,7 @@ export type RecommendationOrderByWithRelationInput = {
   warehouse?: Prisma.WarehouseOrderByWithRelationInput
   actedBy?: Prisma.UserOrderByWithRelationInput
   signals?: Prisma.RecommendationSignalOrderByRelationAggregateInput
+  restockRequest?: Prisma.RestockRequestOrderByWithRelationInput
 }
 
 export type RecommendationWhereUniqueInput = Prisma.AtLeast<{
@@ -378,6 +380,7 @@ export type RecommendationWhereUniqueInput = Prisma.AtLeast<{
   warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
   actedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   signals?: Prisma.RecommendationSignalListRelationFilter
+  restockRequest?: Prisma.XOR<Prisma.RestockRequestNullableScalarRelationFilter, Prisma.RestockRequestWhereInput> | null
 }, "id">
 
 export type RecommendationOrderByWithAggregationInput = {
@@ -447,6 +450,7 @@ export type RecommendationCreateInput = {
   warehouse: Prisma.WarehouseCreateNestedOneWithoutRecommendationsInput
   actedBy?: Prisma.UserCreateNestedOneWithoutActedRecommendationsInput
   signals?: Prisma.RecommendationSignalCreateNestedManyWithoutRecommendationInput
+  restockRequest?: Prisma.RestockRequestCreateNestedOneWithoutRecommendationInput
 }
 
 export type RecommendationUncheckedCreateInput = {
@@ -468,6 +472,7 @@ export type RecommendationUncheckedCreateInput = {
   impactValue?: number | null
   createdAt?: Date | string
   signals?: Prisma.RecommendationSignalUncheckedCreateNestedManyWithoutRecommendationInput
+  restockRequest?: Prisma.RestockRequestUncheckedCreateNestedOneWithoutRecommendationInput
 }
 
 export type RecommendationUpdateInput = {
@@ -489,6 +494,7 @@ export type RecommendationUpdateInput = {
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutRecommendationsNestedInput
   actedBy?: Prisma.UserUpdateOneWithoutActedRecommendationsNestedInput
   signals?: Prisma.RecommendationSignalUpdateManyWithoutRecommendationNestedInput
+  restockRequest?: Prisma.RestockRequestUpdateOneWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateInput = {
@@ -510,6 +516,7 @@ export type RecommendationUncheckedUpdateInput = {
   impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   signals?: Prisma.RecommendationSignalUncheckedUpdateManyWithoutRecommendationNestedInput
+  restockRequest?: Prisma.RestockRequestUncheckedUpdateOneWithoutRecommendationNestedInput
 }
 
 export type RecommendationCreateManyInput = {
@@ -648,6 +655,11 @@ export type RecommendationSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
   impactValue?: Prisma.SortOrder
+}
+
+export type RecommendationNullableScalarRelationFilter = {
+  is?: Prisma.RecommendationWhereInput | null
+  isNot?: Prisma.RecommendationWhereInput | null
 }
 
 export type RecommendationScalarRelationFilter = {
@@ -835,6 +847,22 @@ export type EnumRecommendationStatusFieldUpdateOperationsInput = {
   set?: $Enums.RecommendationStatus
 }
 
+export type RecommendationCreateNestedOneWithoutRestockRequestInput = {
+  create?: Prisma.XOR<Prisma.RecommendationCreateWithoutRestockRequestInput, Prisma.RecommendationUncheckedCreateWithoutRestockRequestInput>
+  connectOrCreate?: Prisma.RecommendationCreateOrConnectWithoutRestockRequestInput
+  connect?: Prisma.RecommendationWhereUniqueInput
+}
+
+export type RecommendationUpdateOneWithoutRestockRequestNestedInput = {
+  create?: Prisma.XOR<Prisma.RecommendationCreateWithoutRestockRequestInput, Prisma.RecommendationUncheckedCreateWithoutRestockRequestInput>
+  connectOrCreate?: Prisma.RecommendationCreateOrConnectWithoutRestockRequestInput
+  upsert?: Prisma.RecommendationUpsertWithoutRestockRequestInput
+  disconnect?: Prisma.RecommendationWhereInput | boolean
+  delete?: Prisma.RecommendationWhereInput | boolean
+  connect?: Prisma.RecommendationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RecommendationUpdateToOneWithWhereWithoutRestockRequestInput, Prisma.RecommendationUpdateWithoutRestockRequestInput>, Prisma.RecommendationUncheckedUpdateWithoutRestockRequestInput>
+}
+
 export type RecommendationCreateNestedOneWithoutSignalsInput = {
   create?: Prisma.XOR<Prisma.RecommendationCreateWithoutSignalsInput, Prisma.RecommendationUncheckedCreateWithoutSignalsInput>
   connectOrCreate?: Prisma.RecommendationCreateOrConnectWithoutSignalsInput
@@ -867,6 +895,7 @@ export type RecommendationCreateWithoutActedByInput = {
   product: Prisma.ProductCreateNestedOneWithoutRecommendationsInput
   warehouse: Prisma.WarehouseCreateNestedOneWithoutRecommendationsInput
   signals?: Prisma.RecommendationSignalCreateNestedManyWithoutRecommendationInput
+  restockRequest?: Prisma.RestockRequestCreateNestedOneWithoutRecommendationInput
 }
 
 export type RecommendationUncheckedCreateWithoutActedByInput = {
@@ -887,6 +916,7 @@ export type RecommendationUncheckedCreateWithoutActedByInput = {
   impactValue?: number | null
   createdAt?: Date | string
   signals?: Prisma.RecommendationSignalUncheckedCreateNestedManyWithoutRecommendationInput
+  restockRequest?: Prisma.RestockRequestUncheckedCreateNestedOneWithoutRecommendationInput
 }
 
 export type RecommendationCreateOrConnectWithoutActedByInput = {
@@ -956,6 +986,7 @@ export type RecommendationCreateWithoutProductInput = {
   warehouse: Prisma.WarehouseCreateNestedOneWithoutRecommendationsInput
   actedBy?: Prisma.UserCreateNestedOneWithoutActedRecommendationsInput
   signals?: Prisma.RecommendationSignalCreateNestedManyWithoutRecommendationInput
+  restockRequest?: Prisma.RestockRequestCreateNestedOneWithoutRecommendationInput
 }
 
 export type RecommendationUncheckedCreateWithoutProductInput = {
@@ -976,6 +1007,7 @@ export type RecommendationUncheckedCreateWithoutProductInput = {
   impactValue?: number | null
   createdAt?: Date | string
   signals?: Prisma.RecommendationSignalUncheckedCreateNestedManyWithoutRecommendationInput
+  restockRequest?: Prisma.RestockRequestUncheckedCreateNestedOneWithoutRecommendationInput
 }
 
 export type RecommendationCreateOrConnectWithoutProductInput = {
@@ -1022,6 +1054,7 @@ export type RecommendationCreateWithoutWarehouseInput = {
   product: Prisma.ProductCreateNestedOneWithoutRecommendationsInput
   actedBy?: Prisma.UserCreateNestedOneWithoutActedRecommendationsInput
   signals?: Prisma.RecommendationSignalCreateNestedManyWithoutRecommendationInput
+  restockRequest?: Prisma.RestockRequestCreateNestedOneWithoutRecommendationInput
 }
 
 export type RecommendationUncheckedCreateWithoutWarehouseInput = {
@@ -1042,6 +1075,7 @@ export type RecommendationUncheckedCreateWithoutWarehouseInput = {
   impactValue?: number | null
   createdAt?: Date | string
   signals?: Prisma.RecommendationSignalUncheckedCreateNestedManyWithoutRecommendationInput
+  restockRequest?: Prisma.RestockRequestUncheckedCreateNestedOneWithoutRecommendationInput
 }
 
 export type RecommendationCreateOrConnectWithoutWarehouseInput = {
@@ -1088,6 +1122,7 @@ export type RecommendationCreateWithoutPlanningRunInput = {
   warehouse: Prisma.WarehouseCreateNestedOneWithoutRecommendationsInput
   actedBy?: Prisma.UserCreateNestedOneWithoutActedRecommendationsInput
   signals?: Prisma.RecommendationSignalCreateNestedManyWithoutRecommendationInput
+  restockRequest?: Prisma.RestockRequestCreateNestedOneWithoutRecommendationInput
 }
 
 export type RecommendationUncheckedCreateWithoutPlanningRunInput = {
@@ -1108,6 +1143,7 @@ export type RecommendationUncheckedCreateWithoutPlanningRunInput = {
   impactValue?: number | null
   createdAt?: Date | string
   signals?: Prisma.RecommendationSignalUncheckedCreateNestedManyWithoutRecommendationInput
+  restockRequest?: Prisma.RestockRequestUncheckedCreateNestedOneWithoutRecommendationInput
 }
 
 export type RecommendationCreateOrConnectWithoutPlanningRunInput = {
@@ -1136,6 +1172,106 @@ export type RecommendationUpdateManyWithWhereWithoutPlanningRunInput = {
   data: Prisma.XOR<Prisma.RecommendationUpdateManyMutationInput, Prisma.RecommendationUncheckedUpdateManyWithoutPlanningRunInput>
 }
 
+export type RecommendationCreateWithoutRestockRequestInput = {
+  id?: string
+  type: $Enums.RecommendationType
+  priority: $Enums.Priority
+  message: string
+  quantity?: number | null
+  status?: $Enums.RecommendationStatus
+  acknowledgedAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
+  createdAt?: Date | string
+  planningRun: Prisma.PlanningRunCreateNestedOneWithoutRecommendationsInput
+  product: Prisma.ProductCreateNestedOneWithoutRecommendationsInput
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutRecommendationsInput
+  actedBy?: Prisma.UserCreateNestedOneWithoutActedRecommendationsInput
+  signals?: Prisma.RecommendationSignalCreateNestedManyWithoutRecommendationInput
+}
+
+export type RecommendationUncheckedCreateWithoutRestockRequestInput = {
+  id?: string
+  planningRunId: string
+  productId: string
+  warehouseId: string
+  type: $Enums.RecommendationType
+  priority: $Enums.Priority
+  message: string
+  quantity?: number | null
+  status?: $Enums.RecommendationStatus
+  acknowledgedAt?: Date | string | null
+  resolvedAt?: Date | string | null
+  actedById?: string | null
+  actionType?: string | null
+  confidence?: number | null
+  expectedImpact?: string | null
+  impactValue?: number | null
+  createdAt?: Date | string
+  signals?: Prisma.RecommendationSignalUncheckedCreateNestedManyWithoutRecommendationInput
+}
+
+export type RecommendationCreateOrConnectWithoutRestockRequestInput = {
+  where: Prisma.RecommendationWhereUniqueInput
+  create: Prisma.XOR<Prisma.RecommendationCreateWithoutRestockRequestInput, Prisma.RecommendationUncheckedCreateWithoutRestockRequestInput>
+}
+
+export type RecommendationUpsertWithoutRestockRequestInput = {
+  update: Prisma.XOR<Prisma.RecommendationUpdateWithoutRestockRequestInput, Prisma.RecommendationUncheckedUpdateWithoutRestockRequestInput>
+  create: Prisma.XOR<Prisma.RecommendationCreateWithoutRestockRequestInput, Prisma.RecommendationUncheckedCreateWithoutRestockRequestInput>
+  where?: Prisma.RecommendationWhereInput
+}
+
+export type RecommendationUpdateToOneWithWhereWithoutRestockRequestInput = {
+  where?: Prisma.RecommendationWhereInput
+  data: Prisma.XOR<Prisma.RecommendationUpdateWithoutRestockRequestInput, Prisma.RecommendationUncheckedUpdateWithoutRestockRequestInput>
+}
+
+export type RecommendationUpdateWithoutRestockRequestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumRecommendationTypeFieldUpdateOperationsInput | $Enums.RecommendationType
+  priority?: Prisma.EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumRecommendationStatusFieldUpdateOperationsInput | $Enums.RecommendationStatus
+  acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  planningRun?: Prisma.PlanningRunUpdateOneRequiredWithoutRecommendationsNestedInput
+  product?: Prisma.ProductUpdateOneRequiredWithoutRecommendationsNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutRecommendationsNestedInput
+  actedBy?: Prisma.UserUpdateOneWithoutActedRecommendationsNestedInput
+  signals?: Prisma.RecommendationSignalUpdateManyWithoutRecommendationNestedInput
+}
+
+export type RecommendationUncheckedUpdateWithoutRestockRequestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  planningRunId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumRecommendationTypeFieldUpdateOperationsInput | $Enums.RecommendationType
+  priority?: Prisma.EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumRecommendationStatusFieldUpdateOperationsInput | $Enums.RecommendationStatus
+  acknowledgedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  actionType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  signals?: Prisma.RecommendationSignalUncheckedUpdateManyWithoutRecommendationNestedInput
+}
+
 export type RecommendationCreateWithoutSignalsInput = {
   id?: string
   type: $Enums.RecommendationType
@@ -1154,6 +1290,7 @@ export type RecommendationCreateWithoutSignalsInput = {
   product: Prisma.ProductCreateNestedOneWithoutRecommendationsInput
   warehouse: Prisma.WarehouseCreateNestedOneWithoutRecommendationsInput
   actedBy?: Prisma.UserCreateNestedOneWithoutActedRecommendationsInput
+  restockRequest?: Prisma.RestockRequestCreateNestedOneWithoutRecommendationInput
 }
 
 export type RecommendationUncheckedCreateWithoutSignalsInput = {
@@ -1174,6 +1311,7 @@ export type RecommendationUncheckedCreateWithoutSignalsInput = {
   expectedImpact?: string | null
   impactValue?: number | null
   createdAt?: Date | string
+  restockRequest?: Prisma.RestockRequestUncheckedCreateNestedOneWithoutRecommendationInput
 }
 
 export type RecommendationCreateOrConnectWithoutSignalsInput = {
@@ -1210,6 +1348,7 @@ export type RecommendationUpdateWithoutSignalsInput = {
   product?: Prisma.ProductUpdateOneRequiredWithoutRecommendationsNestedInput
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutRecommendationsNestedInput
   actedBy?: Prisma.UserUpdateOneWithoutActedRecommendationsNestedInput
+  restockRequest?: Prisma.RestockRequestUpdateOneWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateWithoutSignalsInput = {
@@ -1230,6 +1369,7 @@ export type RecommendationUncheckedUpdateWithoutSignalsInput = {
   expectedImpact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  restockRequest?: Prisma.RestockRequestUncheckedUpdateOneWithoutRecommendationNestedInput
 }
 
 export type RecommendationCreateManyActedByInput = {
@@ -1269,6 +1409,7 @@ export type RecommendationUpdateWithoutActedByInput = {
   product?: Prisma.ProductUpdateOneRequiredWithoutRecommendationsNestedInput
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutRecommendationsNestedInput
   signals?: Prisma.RecommendationSignalUpdateManyWithoutRecommendationNestedInput
+  restockRequest?: Prisma.RestockRequestUpdateOneWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateWithoutActedByInput = {
@@ -1289,6 +1430,7 @@ export type RecommendationUncheckedUpdateWithoutActedByInput = {
   impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   signals?: Prisma.RecommendationSignalUncheckedUpdateManyWithoutRecommendationNestedInput
+  restockRequest?: Prisma.RestockRequestUncheckedUpdateOneWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateManyWithoutActedByInput = {
@@ -1347,6 +1489,7 @@ export type RecommendationUpdateWithoutProductInput = {
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutRecommendationsNestedInput
   actedBy?: Prisma.UserUpdateOneWithoutActedRecommendationsNestedInput
   signals?: Prisma.RecommendationSignalUpdateManyWithoutRecommendationNestedInput
+  restockRequest?: Prisma.RestockRequestUpdateOneWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateWithoutProductInput = {
@@ -1367,6 +1510,7 @@ export type RecommendationUncheckedUpdateWithoutProductInput = {
   impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   signals?: Prisma.RecommendationSignalUncheckedUpdateManyWithoutRecommendationNestedInput
+  restockRequest?: Prisma.RestockRequestUncheckedUpdateOneWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateManyWithoutProductInput = {
@@ -1425,6 +1569,7 @@ export type RecommendationUpdateWithoutWarehouseInput = {
   product?: Prisma.ProductUpdateOneRequiredWithoutRecommendationsNestedInput
   actedBy?: Prisma.UserUpdateOneWithoutActedRecommendationsNestedInput
   signals?: Prisma.RecommendationSignalUpdateManyWithoutRecommendationNestedInput
+  restockRequest?: Prisma.RestockRequestUpdateOneWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateWithoutWarehouseInput = {
@@ -1445,6 +1590,7 @@ export type RecommendationUncheckedUpdateWithoutWarehouseInput = {
   impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   signals?: Prisma.RecommendationSignalUncheckedUpdateManyWithoutRecommendationNestedInput
+  restockRequest?: Prisma.RestockRequestUncheckedUpdateOneWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateManyWithoutWarehouseInput = {
@@ -1503,6 +1649,7 @@ export type RecommendationUpdateWithoutPlanningRunInput = {
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutRecommendationsNestedInput
   actedBy?: Prisma.UserUpdateOneWithoutActedRecommendationsNestedInput
   signals?: Prisma.RecommendationSignalUpdateManyWithoutRecommendationNestedInput
+  restockRequest?: Prisma.RestockRequestUpdateOneWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateWithoutPlanningRunInput = {
@@ -1523,6 +1670,7 @@ export type RecommendationUncheckedUpdateWithoutPlanningRunInput = {
   impactValue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   signals?: Prisma.RecommendationSignalUncheckedUpdateManyWithoutRecommendationNestedInput
+  restockRequest?: Prisma.RestockRequestUncheckedUpdateOneWithoutRecommendationNestedInput
 }
 
 export type RecommendationUncheckedUpdateManyWithoutPlanningRunInput = {
@@ -1598,6 +1746,7 @@ export type RecommendationSelect<ExtArgs extends runtime.Types.Extensions.Intern
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   actedBy?: boolean | Prisma.Recommendation$actedByArgs<ExtArgs>
   signals?: boolean | Prisma.Recommendation$signalsArgs<ExtArgs>
+  restockRequest?: boolean | Prisma.Recommendation$restockRequestArgs<ExtArgs>
   _count?: boolean | Prisma.RecommendationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["recommendation"]>
 
@@ -1676,6 +1825,7 @@ export type RecommendationInclude<ExtArgs extends runtime.Types.Extensions.Inter
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   actedBy?: boolean | Prisma.Recommendation$actedByArgs<ExtArgs>
   signals?: boolean | Prisma.Recommendation$signalsArgs<ExtArgs>
+  restockRequest?: boolean | Prisma.Recommendation$restockRequestArgs<ExtArgs>
   _count?: boolean | Prisma.RecommendationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RecommendationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1699,6 +1849,7 @@ export type $RecommendationPayload<ExtArgs extends runtime.Types.Extensions.Inte
     warehouse: Prisma.$WarehousePayload<ExtArgs>
     actedBy: Prisma.$UserPayload<ExtArgs> | null
     signals: Prisma.$RecommendationSignalPayload<ExtArgs>[]
+    restockRequest: Prisma.$RestockRequestPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2117,6 +2268,7 @@ export interface Prisma__RecommendationClient<T, Null = never, ExtArgs extends r
   warehouse<T extends Prisma.WarehouseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WarehouseDefaultArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   actedBy<T extends Prisma.Recommendation$actedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Recommendation$actedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   signals<T extends Prisma.Recommendation$signalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Recommendation$signalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecommendationSignalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  restockRequest<T extends Prisma.Recommendation$restockRequestArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Recommendation$restockRequestArgs<ExtArgs>>): Prisma.Prisma__RestockRequestClient<runtime.Types.Result.GetResult<Prisma.$RestockRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2604,6 +2756,25 @@ export type Recommendation$signalsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.RecommendationSignalScalarFieldEnum | Prisma.RecommendationSignalScalarFieldEnum[]
+}
+
+/**
+ * Recommendation.restockRequest
+ */
+export type Recommendation$restockRequestArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RestockRequest
+   */
+  select?: Prisma.RestockRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RestockRequest
+   */
+  omit?: Prisma.RestockRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RestockRequestInclude<ExtArgs> | null
+  where?: Prisma.RestockRequestWhereInput
 }
 
 /**

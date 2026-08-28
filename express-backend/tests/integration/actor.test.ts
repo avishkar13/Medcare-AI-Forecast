@@ -96,8 +96,14 @@ const openRecommendation = async () => {
 describe("the acting user", () => {
   test("rejects unauthenticated requests", async () => {
     const id = await openRecommendation();
+    // `startServer` patches `global.fetch` to attach a default token to any request
+    // that does not carry one, so omitting the header does NOT make a request
+    // unauthenticated - it silently makes it authenticated, and this assertion was
+    // failing for that reason rather than for anything about the route. An explicit
+    // empty header opts out of the injection.
     const response = await fetch(`${server.url}/api/recommendations/${id}/execute`, {
       method: "PATCH",
+      headers: { authorization: "" },
     });
 
     assert.equal(response.status, 401, "unauthenticated requests must be rejected");

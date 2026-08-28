@@ -11,3 +11,7 @@ plansRouter.get("/drp-plans", rateLimiter.read, authorize("simulation:view"), pl
 // A decision on a proposal. It records intent - nothing here moves stock.
 plansRouter.patch("/supply-plans/:id/approve", rateLimiter.write, authorize("simulation:run"), plansController.approveSupplyPlan);
 plansRouter.patch("/supply-plans/:id/reject", rateLimiter.write, authorize("simulation:run"), plansController.rejectSupplyPlan);
+
+// A transfer is a proposal too, so it answers on the same terms as a supply plan.
+plansRouter.patch("/drp-plans/:id/approve", rateLimiter.write, authorize("simulation:run"), plansController.approveDrpPlan);
+plansRouter.patch("/drp-plans/:id/reject", rateLimiter.write, authorize("simulation:run"), plansController.rejectDrpPlan);
