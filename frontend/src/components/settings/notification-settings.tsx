@@ -3,6 +3,22 @@ import { SettingsSection, SettingsCard, SettingsRow, SettingsToggle } from "./se
 import { Input } from "@/components/ui/input";
 import { NotificationDeliveryLog } from "./notification-delivery-log";
 
+/**
+ * Rules are stored keyed on the alert type, because that is what the router matches
+ * against. This is only the display side of that - without it the table would read
+ * `stockout_risk` at a planner configuring it.
+ */
+const EVENT_LABELS: Record<string, string> = {
+  stockout_risk: "Stockout risk",
+  expiry_risk: "Expiry risk",
+  overstock: "Overstock",
+  capacity_breach: "Capacity breach",
+  demand_spike: "Demand spike",
+  supplier_delay: "Supplier delay",
+};
+
+const labelFor = (event: string) => EVENT_LABELS[event] ?? event;
+
 export function NotificationSettings({
   data,
   onChange,
@@ -57,7 +73,7 @@ export function NotificationSettings({
             <tbody className="divide-y divide-border/40">
               {data.rules.map((rule, index) => (
                 <tr key={rule.event} className="hover:bg-muted/20 transition-colors">
-                  <td className="py-4 px-4 font-semibold text-foreground text-[13px]">{rule.event}</td>
+                  <td className="py-4 px-4 font-semibold text-foreground text-[13px]">{labelFor(rule.event)}</td>
                   <td className="py-4 px-4 text-center">
                     <input type="checkbox" checked={rule.inApp} onChange={(e) => updateRule(index, "inApp", e.target.checked)} className="h-4 w-4 rounded border-border/50 text-primary focus:ring-primary accent-primary cursor-pointer transition-all" />
                   </td>

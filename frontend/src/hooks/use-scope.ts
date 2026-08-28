@@ -80,16 +80,26 @@ export function useScope(): Scope {
     (href: string, extra?: Record<string, string | undefined>) => {
       const [path, existing] = href.split("?");
       const next = new URLSearchParams(existing ?? "");
-      // Anything already on the href wins - a link that names its own SKU means it.
+      /**
+       * The DC travels; the SKU does not.
+       *
+       * `dc` is app-wide scope - the top bar names it, and every page that shows stock
+       * honours it - so carrying it across a navigation is the point of having it.
+       *
+       * `sku` is a drill-down context, and carrying it implicitly made it sticky for
+       * the rest of the session: open one product, then every link including every
+       * sidebar item dragged `?sku=` onto pages that never read it. A link that means
+       * a SKU says so - `withScope("/forecast", { sku })` - and those still work,
+       * because `extra` is applied below.
+       */
       if (dc && !next.has("dc")) next.set("dc", dc);
-      if (sku && !next.has("sku")) next.set("sku", sku);
       for (const [key, value] of Object.entries(extra ?? {})) {
         if (value !== undefined && value !== "") next.set(key, value);
       }
       const query = next.toString();
       return query ? `${path}?${query}` : path;
     },
-    [dc, sku],
+    [dc],
   );
 
   return {

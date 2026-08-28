@@ -6,6 +6,7 @@ import { ok, paginated } from "../utils/response.js";
 import {
   alertParamsSchema,
   alertQuerySchema,
+  alertScopeQuerySchema,
   alertTrendQuerySchema,
   deliveryQuerySchema,
 } from "../zod/alert.schemas.js";
@@ -22,16 +23,33 @@ export const getAlerts = async (req: Request, res: Response) => {
   paginated(res, items, query.page, query.pageSize, total);
 };
 
+/**
+ * The caller's own assignment wins over the query, exactly as it does on the list: a
+ * confined user must not be able to widen, but an unconfined one has to be able to
+ * narrow. These three read no query at all before, so they answered network-wide
+ * beside a list that was correctly filtered.
+ */
+const scopeOf = (requested: string | undefined, req: Request) => {
+  enforceScopeConflict(requested, req);
+  const warehouseId = req.warehouseScope ?? requested;
+  // `exactOptionalPropertyTypes` is on: an absent scope must omit the key rather than
+  // set it to undefined, or it stops matching `{ warehouseId?: string | null }`.
+  return warehouseId === undefined ? {} : { warehouseId };
+};
+
 export const getOverview = async (req: Request, res: Response) => {
-  ok(res, await alerts.getOverview({ warehouseId: req.warehouseScope }));
+  const { warehouseId } = alertScopeQuerySchema.parse(req.query);
+  ok(res, await alerts.getOverview(scopeOf(warehouseId, req)));
 };
 
 export const getTrends = async (req: Request, res: Response) => {
-  ok(res, await alerts.getTrends(alertTrendQuerySchema.parse(req.query), { warehouseId: req.warehouseScope }));
+  const query = alertTrendQuerySchema.parse(req.query);
+  ok(res, await alerts.getTrends(query, scopeOf(query.warehouseId, req)));
 };
 
 export const getDistribution = async (req: Request, res: Response) => {
-  ok(res, await alerts.getDistribution({ warehouseId: req.warehouseScope }));
+  const { warehouseId } = alertScopeQuerySchema.parse(req.query);
+  ok(res, await alerts.getDistribution(scopeOf(warehouseId, req)));
 };
 
 export const getHealth = async (req: Request, res: Response) => {

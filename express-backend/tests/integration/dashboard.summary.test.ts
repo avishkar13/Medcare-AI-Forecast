@@ -3,6 +3,7 @@ import { after, before, describe, test } from "node:test";
 import { app, teardown } from "../helpers/app.js";
 import { startServer, type TestServer } from "../helpers/server.js";
 import { expectEnvelope } from "../helpers/assertions.js";
+import { prisma } from "../../src/config/prisma.js";
 
 let server: TestServer;
 
@@ -37,6 +38,42 @@ interface Summary {
 
 const summary = async (): Promise<Summary> =>
   expectEnvelope<Summary>(await server.json("/api/dashboard/summary")).data;
+
+/**
+ * The sidebar badge beside "Alerts" carries this number, so it has to be the number of
+ * alerts. It used to be `belowSafetyStock + criticalExpiryItems` - a count of inventory
+ * positions with expiry folded in - which happened to read 7 beside a list of 8.
+ */
+describe("activeAlerts counts alerts", () => {
+  test("matches the alert list for the same scope", async () => {
+    const [summary, list] = await Promise.all([
+      server.json<{ data: { kpis: { activeAlerts: number } } }>("/api/dashboard/summary"),
+      server.json<{ meta: { total: number } }>("/api/alerts?status=open&pageSize=200"),
+    ]);
+
+    assert.equal(
+      summary.data.kpis.activeAlerts,
+      list.meta.total,
+      "the badge must count open alerts, not inventory positions",
+    );
+  });
+
+  test("narrows with the warehouse, like the list does", async () => {
+    const warehouse = await prisma.warehouse.findFirst({ select: { id: true } });
+    if (!warehouse) return;
+
+    const [summary, list] = await Promise.all([
+      server.json<{ data: { kpis: { activeAlerts: number } } }>(
+        `/api/dashboard/summary?warehouseId=${warehouse.id}`,
+      ),
+      server.json<{ meta: { total: number } }>(
+        `/api/alerts?status=open&pageSize=200&warehouseId=${warehouse.id}`,
+      ),
+    ]);
+
+    assert.equal(summary.data.kpis.activeAlerts, list.meta.total);
+  });
+});
 
 describe("GET /api/dashboard/summary", () => {
   test("returns both payloads in one response", async () => {

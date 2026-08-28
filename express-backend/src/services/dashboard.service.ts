@@ -25,6 +25,7 @@ import type {
   RiskLevel,
   WarehouseStats,
 } from "../types.js";
+import { OPEN_STATUSES } from "./alert.service.js";
 
 const DEMAND_WINDOW_DAYS = 90;
 const EXPIRY_HORIZON_DAYS = 90;
@@ -297,17 +298,32 @@ export const getSummary = async (scope?: { warehouseId?: string | null }): Promi
 }> => {
   await assertWarehouseExists(scope?.warehouseId);
 
-  const [positions, expiringBatches, pendingRecommendations, forecastAccuracy] = await Promise.all([
-    loadPositions(scope),
-    loadExpiringBatches(EXPIRY_HORIZON_DAYS, scope),
-    countOpenRecommendations(scope?.warehouseId),
-    currentAccuracyPercent(scope?.warehouseId),
-  ]);
+  const [positions, expiringBatches, pendingRecommendations, forecastAccuracy, activeAlerts] =
+    await Promise.all([
+      loadPositions(scope),
+      loadExpiringBatches(EXPIRY_HORIZON_DAYS, scope),
+      countOpenRecommendations(scope?.warehouseId),
+      currentAccuracyPercent(scope?.warehouseId),
+      /**
+       * Counted from the alert table, because that is what the name promises and what
+       * the badge carrying it links to.
+       *
+       * It used to be `belowSafetyStock.length + criticalExpiryItems.length` - a count
+       * of inventory *positions*, with expiry folded in - so the sidebar badge beside
+       * "Alerts" bore no relation to the page it opened: 7 against a list of 8, and
+       * the agreement of those two numbers was coincidence.
+       */
+      prisma.alert.count({
+        where: {
+          status: { in: [...OPEN_STATUSES] },
+          ...(scope?.warehouseId ? { warehouseId: scope.warehouseId } : {}),
+        },
+      }),
+    ]);
 
   const totalInventoryValue = sumBy(positions, (row) => row.inventoryValue);
   const belowReorderPoint = positions.filter(isBelowReorderPoint);
   const belowSafetyStock = positions.filter(isBelowSafetyStock);
-  const criticalExpiryItems = expiringBatches.filter((batch) => batch.daysToExpiry <= CRITICAL_EXPIRY_DAYS);
 
   const excessInventoryValue = sumBy(positions, excessOf);
   const shortageValue = sumBy(positions, shortageOf);
@@ -326,7 +342,7 @@ export const getSummary = async (scope?: { warehouseId?: string | null }): Promi
       onTimeDeliveryRate: null,
       // WP-19. Null when no run has a realised day to score - never a stand-in.
       forecastAccuracy,
-      activeAlerts: belowSafetyStock.length + criticalExpiryItems.length,
+      activeAlerts,
       pendingRecommendations,
     },
     networkHealth: {

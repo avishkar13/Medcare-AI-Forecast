@@ -19,6 +19,7 @@ import {
   sendTestNotification,
   type AlertListParams,
 } from "@/lib/api/alerts";
+import { useUiStore } from "@/store/ui.store";
 
 /**
  * When the socket is connected the server tells us what changed, so an interval on
@@ -47,10 +48,18 @@ export function useAlerts(params?: AlertListParams) {
 
 export function useAlertOverview() {
   const refetchInterval = usePollInterval();
+  /**
+   * The KPI strip follows the DC like the list does.
+   *
+   * It did not, and the summary routes ignored the query anyway, so a DC-scoped page
+   * showed 9 critical and 38 unresolved above a list of 8 alerts of which 5 were
+   * critical - the header contradicting the table directly beneath it.
+   */
+  const dc = useUiStore((state) => state.dc);
 
   return useQuery({
-    queryKey: queryKeys.alerts.overview(),
-    queryFn: getOverview,
+    queryKey: queryKeys.alerts.overview(dc),
+    queryFn: () => getOverview(dc),
     staleTime: STALE_TIME.dashboard,
     refetchInterval,
   });
@@ -136,17 +145,19 @@ export function useTestNotification() {
 }
 
 export function useAlertDistribution() {
+  const dc = useUiStore((state) => state.dc);
   return useQuery({
-    queryKey: queryKeys.alerts.distribution(),
-    queryFn: getDistribution,
+    queryKey: queryKeys.alerts.distribution(dc),
+    queryFn: () => getDistribution(dc),
     staleTime: STALE_TIME.dashboard,
   });
 }
 
 export function useAlertTrends(days = 14) {
+  const dc = useUiStore((state) => state.dc);
   return useQuery({
-    queryKey: queryKeys.alerts.trends({ days }),
-    queryFn: () => getTrends(days),
+    queryKey: queryKeys.alerts.trends({ days, dc: dc ?? "all" }),
+    queryFn: () => getTrends(days, dc),
     staleTime: STALE_TIME.dashboard,
   });
 }

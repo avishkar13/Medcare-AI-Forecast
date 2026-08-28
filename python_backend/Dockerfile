@@ -27,6 +27,10 @@ COPY src ./src
 # container; it just does not survive the next release, which is correct when the
 # image is the source of truth.
 COPY artifacts ./artifacts
+# The metrics report the model was scored with, so `/model/metrics` answers from the
+# first request rather than only after someone trains inside a container - which would
+# not survive the next `docker system prune -af --volumes` anyway.
+COPY outputs ./outputs
 
 RUN mkdir -p artifacts outputs && chown -R engine:engine /app
 USER engine

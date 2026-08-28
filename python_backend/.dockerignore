@@ -3,7 +3,14 @@ __pycache__/
 *.pyc
 .env
 data/
-outputs/
+# `outputs/model_metrics.json` ships with the model it describes. Excluding the whole
+# directory was correct while the plan was to train after deploy; once the fitted model
+# started shipping in the image, the metrics that go with it had to as well - otherwise
+# `GET /model/metrics` answers 404 "Train the engine first" for the life of the release
+# and the forecast page shows a failed request it can never recover from.
+#
+# The predictions dump stays out: 300 KB no route ever serves.
+outputs/test_predictions.csv
 # `artifacts/` is deliberately NOT excluded: the fitted model ships in the image so a
 # release carries a known-good bundle. Excluding it was correct while the plan was to
 # mount a volume and train after deploy.

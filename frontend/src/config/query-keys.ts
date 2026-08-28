@@ -51,9 +51,11 @@ export const queryKeys = {
   alerts: {
     all: ["alerts"] as const,
     list: (params?: QueryParams) => list("alerts", params),
-    overview: () => ["alerts", "overview"] as const,
+    // The DC is part of the key for the same reason it is on the dashboard keys:
+    // two scopes are two answers, and sharing one cache showed the previous DC.
+    overview: (dc?: string) => ["alerts", "overview", dc ?? "all"] as const,
     trends: (params?: QueryParams) => ["alerts", "trends", params ?? {}] as const,
-    distribution: () => ["alerts", "distribution"] as const,
+    distribution: (dc?: string) => ["alerts", "distribution", dc ?? "all"] as const,
     health: () => ["alerts", "health"] as const,
     deliveries: (params?: QueryParams) => ["alerts", "deliveries", params ?? {}] as const,
   },

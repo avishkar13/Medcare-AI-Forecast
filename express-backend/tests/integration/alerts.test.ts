@@ -65,6 +65,76 @@ describe("GET /api/alerts/overview", () => {
   });
 });
 
+/**
+ * The KPI strip and the list must answer the same question.
+ *
+ * `/overview`, `/trends` and `/distribution` read no query at all, so they answered
+ * network-wide while `/alerts` honoured `?warehouseId=`. On a DC-scoped page that put
+ * "9 critical, 38 unresolved" above a list of 8 alerts of which 5 were critical - the
+ * header contradicting the table directly beneath it.
+ */
+describe("the summary reads follow the same scope as the list", () => {
+  test("overview narrows to a warehouse and agrees with the list", async () => {
+    const warehouse = await prisma.warehouse.findFirst({ select: { id: true } });
+    if (!warehouse) return;
+
+    const [overview, list] = await Promise.all([
+      server.json<{ data: { totalCount: number } }>(
+        `/api/alerts/overview?warehouseId=${warehouse.id}`,
+      ),
+      server.json<{ meta: { total: number } }>(
+        `/api/alerts?warehouseId=${warehouse.id}&pageSize=200`,
+      ),
+    ]);
+
+    assert.equal(
+      overview.data.totalCount,
+      list.meta.total,
+      "the overview total must equal the number of alerts the list reports for the same DC",
+    );
+  });
+
+  test("a scoped overview is not simply the network answer", async () => {
+    const warehouse = await prisma.warehouse.findFirst({ select: { id: true } });
+    if (!warehouse) return;
+
+    const [scoped, network] = await Promise.all([
+      server.json<{ data: { totalCount: number } }>(
+        `/api/alerts/overview?warehouseId=${warehouse.id}`,
+      ),
+      server.json<{ data: { totalCount: number } }>("/api/alerts/overview"),
+    ]);
+
+    // Only meaningful when more than one DC actually holds alerts; otherwise the two
+    // legitimately match and there is nothing to prove.
+    const spread = await prisma.alert.groupBy({ by: ["warehouseId"], _count: true });
+    if (spread.filter((row) => row.warehouseId !== null).length < 2) return;
+
+    assert.ok(
+      scoped.data.totalCount <= network.data.totalCount,
+      "a scoped overview can never exceed the network one",
+    );
+    assert.notEqual(
+      scoped.data.totalCount,
+      network.data.totalCount,
+      "the warehouse filter was ignored - the scoped overview equals the network total",
+    );
+  });
+
+  test("distribution and trends accept the same filter without erroring", async () => {
+    const warehouse = await prisma.warehouse.findFirst({ select: { id: true } });
+    if (!warehouse) return;
+
+    for (const path of [
+      `/api/alerts/distribution?warehouseId=${warehouse.id}`,
+      `/api/alerts/trends?days=14&warehouseId=${warehouse.id}`,
+    ]) {
+      const response = await server.get(path);
+      assert.equal(response.status, 200, `${path} should accept a warehouse filter`);
+    }
+  });
+});
+
 describe("GET /api/alerts", () => {
   test("paginates and shapes rows rather than returning raw records", async () => {
     await makeAlert();

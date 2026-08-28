@@ -1,12 +1,19 @@
 "use client";
 
 import { AlertOverviewData } from "@/types/alert";
+import { useUiStore } from "@/store/ui.store";
+import { useWarehouses } from "@/hooks/use-masterdata";
 
 interface AlertOverviewProps {
   data: AlertOverviewData;
 }
 
 export function AlertOverview({ data }: AlertOverviewProps) {
+  const dc = useUiStore((state) => state.dc);
+  const { data: warehouses } = useWarehouses();
+  const scopeLabel = dc
+    ? `At ${warehouses?.find((w) => w.id === dc)?.name ?? "this DC"}`
+    : "Across the network";
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
       {/* Critical */}
@@ -29,7 +36,14 @@ export function AlertOverview({ data }: AlertOverviewProps) {
       <div className="p-4 rounded-xl border border-border/50 bg-background shadow-sm">
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Unresolved</p>
         <p className="text-3xl font-black text-foreground tracking-tight">{data.unresolvedCount}</p>
-        <p className="text-[10px] font-medium text-muted-foreground mt-1">Across the network</p>
+        {/*
+          Was "Across the network", which stopped being true once the KPI strip started
+          following the DC selector. The label now names whichever scope produced the
+          figure rather than asserting one.
+        */}
+        <p className="text-[10px] font-medium text-muted-foreground mt-1">
+          {scopeLabel}
+        </p>
       </div>
 
       {/* Alerts Today */}

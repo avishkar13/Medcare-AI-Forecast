@@ -56,8 +56,10 @@ export const listAlerts = async (params?: AlertListParams) => {
   return { ...page, data: parseList(page.data) };
 };
 
-export const getOverview = async (): Promise<AlertOverview> =>
-  alertOverviewSchema.parse(await api.get<unknown>("/alerts/overview"));
+export const getOverview = async (warehouseId?: string): Promise<AlertOverview> =>
+  alertOverviewSchema.parse(
+    await api.get<unknown>("/alerts/overview", warehouseId ? { warehouseId } : undefined),
+  );
 
 export const acknowledgeAlert = (id: string) =>
   api.patch<SystemAlert>(`/alerts/${id}/acknowledge`);
@@ -110,7 +112,8 @@ export interface AlertHealth {
   oldestOpenAgeDays: number | null;
 }
 
-export const getDistribution = () => api.get<AlertDistribution>("/alerts/distribution");
+export const getDistribution = (warehouseId?: string) =>
+  api.get<AlertDistribution>("/alerts/distribution", warehouseId ? { warehouseId } : undefined);
 
 export interface AlertTrends {
   points: AlertTrendPoint[];
@@ -122,7 +125,8 @@ export interface AlertTrends {
   };
 }
 
-export const getTrends = (days = 14) => api.get<AlertTrends>("/alerts/trends", { days });
+export const getTrends = (days = 14, warehouseId?: string) =>
+  api.get<AlertTrends>("/alerts/trends", { days, ...(warehouseId ? { warehouseId } : {}) });
 export const getHealth = () => api.get<AlertHealth>("/alerts/health");
 
 export type { AlertOverview };
