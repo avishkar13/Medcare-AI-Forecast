@@ -7,6 +7,8 @@ import { Navbar } from "./navbar";
 import { useAuthStore } from "@/store/auth.store";
 import { Loader2 } from "lucide-react";
 import { PermissionGuard } from "@/components/auth/permission-guard";
+import { useSettings } from "@/hooks/use-settings";
+import { useTheme } from "next-themes";
 
 const ROUTE_PERMISSIONS: Record<string, string> = {
   "/dashboard": "dashboard:view",
@@ -28,6 +30,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   
   const { isAuthenticated, isInitializing } = useAuthStore();
   const [mounted, setMounted] = useState(false);
+  const { data: settings } = useSettings();
+  const { setTheme, theme: currentTheme } = useTheme();
 
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 0);
@@ -43,6 +47,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       router.push("/dashboard");
     }
   }, [isAuthenticated, isInitializing, isAuth, router, mounted]);
+
+  // Sync user theme settings from API to next-themes
+  useEffect(() => {
+    if (mounted && settings?.general?.theme && settings.general.theme !== currentTheme) {
+      setTheme(settings.general.theme);
+    }
+  }, [mounted, settings?.general?.theme, currentTheme, setTheme]);
 
   // Show a subtle loading state during initial client-side hydration or while verifying auth
   if (!mounted || isInitializing) {
