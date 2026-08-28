@@ -89,16 +89,17 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    title: "SYSTEM",
-    items: [{ title: "Settings", href: "/settings", icon: Settings, requiredPermission: "settings:view" }],
-  },
-  {
     title: "ADMINISTRATION",
     items: [
       { title: "User Management", href: "/admin/users", icon: Users, requiredPermission: "users:view" },
       { title: "Roles & Permissions", href: "/admin/roles", icon: ShieldCheck, requiredPermission: "roles:view" },
     ],
   },
+  {
+    title: "SYSTEM",
+    items: [{ title: "Settings", href: "/settings", icon: Settings, requiredPermission: "settings:view" }],
+  },
+  
 ];
 
 export function SidebarContent() {
