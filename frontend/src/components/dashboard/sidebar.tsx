@@ -11,6 +11,7 @@ import {
   FlaskConical,
   Bell,
   CalendarClock,
+  ClipboardList,
   Settings,
   Activity,
   LogOut,
@@ -70,6 +71,8 @@ const navGroups: NavGroup[] = [
         children: [{ title: "Transactions", href: "/inventory/transactions" }],
       },
       { title: "Demand Forecast", href: "/forecast", icon: TrendingUp, requiredPermission: "forecast:view" },
+      // between forecasting and recommending, which is where the executor writes them
+      { title: "Supply & Transfers", href: "/plans", icon: ClipboardList, requiredPermission: "simulation:view" },
       { title: "Recommendations", href: "/recommendations", icon: Sparkles, requiredPermission: "recommendations:view" },
       { title: "Simulation", href: "/simulation", icon: FlaskConical, requiredPermission: "simulation:view" },
     ],

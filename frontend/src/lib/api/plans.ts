@@ -2,6 +2,7 @@ import { api } from "./client";
 import type { QueryParams } from "./types";
 import {
   drpPlanListSchema,
+  drpPlanSchema,
   supplyPlanListSchema,
   supplyPlanSchema,
 } from "@/schemas/plans";
@@ -52,3 +53,9 @@ export const approveSupplyPlan = async (id: string) =>
 
 export const rejectSupplyPlan = async (id: string) =>
   supplyPlanSchema.parse(await api.patch<unknown>(`/supply-plans/${id}/reject`));
+
+export const approveDrpPlan = async (id: string) =>
+  drpPlanSchema.parse(await api.patch<unknown>(`/drp-plans/${id}/approve`));
+
+export const rejectDrpPlan = async (id: string) =>
+  drpPlanSchema.parse(await api.patch<unknown>(`/drp-plans/${id}/reject`));

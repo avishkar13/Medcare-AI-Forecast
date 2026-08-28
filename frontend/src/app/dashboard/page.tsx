@@ -9,6 +9,7 @@ import { ExpiryRiskPanel } from "@/components/dashboard/expiry-risk-panel";
 import { InventoryDistribution } from "@/components/dashboard/inventory-distribution";
 import { AIRecommendations } from "@/components/dashboard/ai-recommendations";
 import { OptimizationSummary } from "@/components/dashboard/optimization-summary";
+import { PlanVsActual } from "@/components/dashboard/plan-vs-actual";
 import { WhatIfSimulation } from "@/components/dashboard/what-if-simulation";
 import { ExecutiveDecisionPanel } from "@/components/dashboard/executive-decision-panel";
 import { LiveActivity } from "@/components/dashboard/live-activity";
@@ -65,6 +66,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex flex-col gap-6 lg:col-span-1">
             <OptimizationSummary />
+            <PlanVsActual />
             <WhatIfSimulation />
           </div>
         </div>

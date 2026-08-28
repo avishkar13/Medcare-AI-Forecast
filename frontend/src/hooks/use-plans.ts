@@ -5,9 +5,11 @@ import { queryKeys } from "@/config/query-keys";
 import { STALE_TIME } from "@/config/constants";
 import { useUiStore } from "@/store/ui.store";
 import {
+  approveDrpPlan,
   approveSupplyPlan,
   listDrpPlans,
   listSupplyPlans,
+  rejectDrpPlan,
   rejectSupplyPlan,
   type PlanListParams,
 } from "@/lib/api/plans";
@@ -52,6 +54,17 @@ export function useSupplyPlanDecision() {
 
   const approve = useMutation({ mutationFn: approveSupplyPlan, onSuccess: settle });
   const reject = useMutation({ mutationFn: rejectSupplyPlan, onSuccess: settle });
+
+  return { approve, reject };
+}
+
+// a transfer is decided on the same terms, so it invalidates the same group
+export function useDrpPlanDecision() {
+  const client = useQueryClient();
+  const settle = () => client.invalidateQueries({ queryKey: queryKeys.plans.all });
+
+  const approve = useMutation({ mutationFn: approveDrpPlan, onSuccess: settle });
+  const reject = useMutation({ mutationFn: rejectDrpPlan, onSuccess: settle });
 
   return { approve, reject };
 }

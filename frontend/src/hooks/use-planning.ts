@@ -10,6 +10,7 @@ import {
   createRun,
   getRun,
   getRunOptimization,
+  getRunOutcome,
   getRunSimulation,
   listRuns,
 } from "@/lib/api/planning";
@@ -137,6 +138,31 @@ export function useLatestComparison() {
     isPending: runs.isPending || (Boolean(scenario && baseline) && comparison.isPending),
     completedRunCount: runs.data?.meta.total ?? 0,
     hasTwoRuns: Boolean(scenario && baseline),
+  };
+}
+
+/**
+ * how the most recent completed run actually turned out.
+ *
+ * separate from useLatestRunOutcome, which reads what the run predicted. this reads
+ * what the ledgers recorded afterwards, so the two together are plan vs actual.
+ */
+export function useRunOutcome() {
+  const runs = useCompletedRuns(1);
+  const runId = runs.data?.data[0]?.id ?? null;
+
+  const outcome = useQuery({
+    queryKey: queryKeys.planning.outcome(runId ?? "none"),
+    queryFn: () => getRunOutcome(runId!),
+    enabled: Boolean(runId),
+    staleTime: STALE_TIME.dashboard,
+  });
+
+  return {
+    ...outcome,
+    runId,
+    isPending: runs.isPending || (Boolean(runId) && outcome.isPending),
+    hasRun: Boolean(runId),
   };
 }
 

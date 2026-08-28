@@ -88,6 +88,52 @@ export const runOptimizationSchema = z.object({
   solver: z.string(),
 });
 
+/**
+ * Realised against planned, scored from the movement and demand ledgers.
+ *
+ * Every figure that needs evidence is nullable rather than zero: a run completed an
+ * hour ago has no elapsed days, and reporting a 0% service level for it would read as
+ * a total failure instead of "nothing has happened yet". `hasEvidence` is the flag to
+ * branch on.
+ */
+export const runOutcomeSchema = z.object({
+  planningRunId: z.string(),
+  window: z.object({
+    from: z.string(),
+    to: z.string(),
+    elapsedDays: z.number(),
+    horizonDays: z.number(),
+    coveragePercent: z.number(),
+  }),
+  demand: z.object({
+    orderedUnits: z.number(),
+    fulfilledUnits: z.number(),
+    unmetUnits: z.number(),
+    wasteUnits: z.number(),
+    transferUnits: z.number(),
+  }),
+  serviceLevel: z.object({
+    planned: z.number().nullable(),
+    achieved: z.number().nullable(),
+    achievedPercent: z.number().nullable(),
+    delta: z.number().nullable(),
+  }),
+  cost: z.object({
+    realised: z.object({
+      holding: z.number(),
+      stockout: z.number(),
+      transfer: z.number(),
+      expiry: z.number(),
+      total: z.number(),
+    }),
+    plannedToDate: z.number().nullable(),
+    plannedTotal: z.number().nullable(),
+  }),
+  hasEvidence: z.boolean(),
+});
+
+export type RunOutcome = z.infer<typeof runOutcomeSchema>;
+
 export type PlanningRunStatus = z.infer<typeof planningRunStatusSchema>;
 export type PlanningRun = z.infer<typeof planningRunSchema>;
 export type Delta = z.infer<typeof deltaSchema>;
