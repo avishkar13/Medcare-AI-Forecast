@@ -20,29 +20,29 @@ import {
   listRuns,
 } from "@/lib/api/planning";
 
-export function useSimulationHistory(limit = 20) {
+export function useSimulationHistory(limit = 20, warehouse?: string) {
   return useQuery({
-    queryKey: queryKeys.simulation.history({ limit }),
-    queryFn: () => listHistory(limit),
+    queryKey: queryKeys.simulation.history({ limit, warehouse }),
+    queryFn: () => listHistory(limit, warehouse),
     staleTime: STALE_TIME.list,
   });
 }
 
-export function useSavedScenarios(limit = 20) {
+export function useSavedScenarios(limit = 20, warehouse?: string) {
   return useQuery({
-    queryKey: queryKeys.simulation.saved({ limit }),
-    queryFn: () => listSaved(limit),
+    queryKey: queryKeys.simulation.saved({ limit, warehouse }),
+    queryFn: () => listSaved(limit, warehouse),
     staleTime: STALE_TIME.list,
   });
 }
 
-export function useScenarioMutations() {
+export function useScenarioMutations(warehouse?: string) {
   const client = useQueryClient();
   const settle = () => client.invalidateQueries({ queryKey: queryKeys.simulation.all });
 
   return {
-    save: useMutation({ mutationFn: saveScenario, onSuccess: settle }),
-    remove: useMutation({ mutationFn: deleteScenario, onSuccess: settle }),
+    save: useMutation({ mutationFn: (body: Parameters<typeof saveScenario>[0]) => saveScenario(body, warehouse), onSuccess: settle }),
+    remove: useMutation({ mutationFn: (id: string) => deleteScenario(id, warehouse), onSuccess: settle }),
   };
 }
 
@@ -50,13 +50,13 @@ export function useScenarioMutations() {
  * a what-if is a real planning run, so it is start-then-poll rather than
  * request-response. the run id is held here and the poll stops once it settles.
  */
-export function useWhatIf() {
+export function useWhatIf(warehouse?: string) {
   const client = useQueryClient();
   const [runId, setRunId] = useState<string | null>(null);
 
   const start = useMutation({
     mutationFn: (body: { name: string; horizonDays?: number; params: WhatIfRequestParams }) =>
-      runWhatIf(body),
+      runWhatIf(body, warehouse),
     onSuccess: (accepted) => {
       setRunId(accepted.run.id);
       void client.invalidateQueries({ queryKey: queryKeys.simulation.all });

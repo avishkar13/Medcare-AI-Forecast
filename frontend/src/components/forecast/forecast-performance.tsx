@@ -40,9 +40,9 @@ export function ForecastPerformance() {
         <CardDescription>Accuracy metrics and model comparison</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="p-3 bg-muted/50 rounded-lg border border-border">
-            <p className="text-xs text-muted-foreground mb-1">Overall Accuracy</p>
+            <p className="text-xs text-muted-foreground mb-1 whitespace-nowrap">Accuracy</p>
             <div className="flex items-center gap-1.5">
               <Target className="h-4 w-4 text-success" />
               <p className="text-xl font-bold">{kpis.forecastAccuracy === null ? "—" : `${kpis.forecastAccuracy}%`}</p>
@@ -58,17 +58,22 @@ export function ForecastPerformance() {
           </div>
           <div className="p-3 bg-muted/50 rounded-lg border border-border">
             <p className="text-xs text-muted-foreground mb-1">Bias</p>
-            <p className="text-xl font-bold text-foreground">+{models.find(m => m.isPrimary)?.bias}%</p>
+            <p className="text-xl font-bold text-foreground">
+              {(() => {
+                const bias = models.find(m => m.isPrimary)?.bias ?? 0;
+                return bias > 0 ? `+${bias}%` : `${bias}%`;
+              })()}
+            </p>
           </div>
         </div>
 
         <div>
-          <h4 className="text-sm font-medium mb-3">Model Performance Comparison</h4>
-          <div className="rounded-md border border-border overflow-hidden">
-            <Table>
+          <h4 className="text-sm font-medium mb-3">Model Performance</h4>
+          <div className="rounded-md border border-border overflow-x-auto">
+            <Table className="whitespace-nowrap text-xs">
               <TableHeader className="bg-muted/30">
                 <TableRow>
-                  <TableHead>Model</TableHead>
+                  <TableHead className="w-1/2">Model</TableHead>
                   <TableHead className="text-right">Accuracy</TableHead>
                   <TableHead className="text-right">MAPE</TableHead>
                   <TableHead className="text-right">RMSE</TableHead>
@@ -77,10 +82,10 @@ export function ForecastPerformance() {
               <TableBody>
                 {models.map((model) => (
                   <TableRow key={model.modelName} className={model.isPrimary ? "bg-ai/5" : ""}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
+                    <TableCell className="font-medium max-w-[140px] truncate" title={model.modelName}>
+                      <div className="flex items-center gap-1.5">
                         {model.modelName}
-                        {model.isPrimary && <CheckCircle2 className="h-3.5 w-3.5 text-ai" />}
+                        {model.isPrimary && <CheckCircle2 className="h-3.5 w-3.5 text-ai shrink-0" />}
                       </div>
                     </TableCell>
                     <TableCell className={`text-right ${model.isPrimary ? 'font-bold text-ai' : ''}`}>

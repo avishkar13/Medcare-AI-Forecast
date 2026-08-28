@@ -174,6 +174,40 @@ export interface RunComparisonSide {
   completedAt: string | null;
 }
 
+export interface DCImpact {
+  name: string;
+  currentCapacity: number;
+  simulatedCapacity: number;
+  currentStockoutRisk: number;
+  simulatedStockoutRisk: number;
+  currentAtRiskValue: number;
+  simulatedAtRiskValue: number;
+}
+
+export interface SKUImpact {
+  name: string;
+  sku: string;
+  currentInventory: number;
+  simulatedInventory: number;
+  optimalInventory: number;
+}
+
+export interface RiskIndicator {
+  name: string;
+  icon: string;
+  currentValue: number;
+  simulatedValue: number;
+  delta: number;
+  severity: "low" | "moderate" | "high" | "critical";
+}
+
+export interface AIInsight {
+  overallRisk: "low" | "moderate" | "high" | "critical";
+  confidence: number;
+  insights: string[];
+  suggestedResponse: string;
+}
+
 export interface RunComparison {
   scenario: RunComparisonSide;
   baseline: RunComparisonSide;
@@ -204,6 +238,10 @@ export interface RunComparison {
     | "recommendations",
     Delta
   >;
+  dcImpacts: DCImpact[];
+  skuImpacts: SKUImpact[];
+  risks: RiskIndicator[];
+  aiInsight: AIInsight;
   /** Reasons the numbers may not be like for like. Empty when they are. */
   warnings: string[];
 }

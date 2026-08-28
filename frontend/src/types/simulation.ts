@@ -103,6 +103,7 @@ export interface SimulationOutput {
 
 // ─── Saved / History ───────────────────────────────────────────────
 export interface SavedScenario {
+  createdAt: string;
   id: string;
   name: string;
   preset: ScenarioPreset;

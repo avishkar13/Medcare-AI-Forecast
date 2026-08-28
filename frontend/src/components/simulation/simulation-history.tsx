@@ -21,7 +21,13 @@ const SEVERITY_STYLES: Record<string, string> = {
 export function SimulationHistory({ history, onView }: SimulationHistoryProps) {
   const formatDate = (iso: string) => {
     const d = new Date(iso);
-    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return d.toLocaleDateString("en-US", { 
+      day: "2-digit", 
+      month: "short", 
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
   };
 
   return (

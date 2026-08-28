@@ -25,6 +25,17 @@ export function ScenarioComparison({ scenarios, onApply, onSaveCurrent }: Scenar
   const compareScenarios = scenarios.slice(0, 3);
   const metricLabels = ["Stockout Risk", "Supply Chain Cost", "Service Level", "Expiry Exposure"];
 
+  const formatDate = (iso: string) => {
+    const d = new Date(iso);
+    return d.toLocaleDateString("en-US", { 
+      day: "2-digit", 
+      month: "short", 
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  };
+
   return (
     <Card className="rounded-xl border-border/60 shadow-sm">
       <CardHeader className="pb-3">
@@ -54,7 +65,8 @@ export function ScenarioComparison({ scenarios, onApply, onSaveCurrent }: Scenar
                   <th className="text-left py-2 pr-4 font-bold text-muted-foreground uppercase tracking-wider text-[10px]">Metric</th>
                   {compareScenarios.map((s) => (
                     <th key={s.id} className="text-center py-2 px-3 font-bold text-foreground text-[10px] uppercase tracking-wider">
-                      {s.name}
+                      <div>{s.name}</div>
+                      <div className="text-[8px] text-muted-foreground mt-0.5 font-medium tracking-normal lowercase">{formatDate(s.createdAt)}</div>
                     </th>
                   ))}
                 </tr>
