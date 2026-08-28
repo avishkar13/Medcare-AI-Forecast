@@ -12,11 +12,9 @@ const schema = z.object({
     .transform((value) => value.replace(/\/+$/, "")),
 
   /**
-   * The socket connects to the backend origin, never through the `/api` rewrite.
+   * The socket connects directly to the backend origin.
    *
-   * A Next rewrite does not proxy a WebSocket upgrade, so routing the socket through
-   * it fails the handshake and then fails the polling fallback too. Unset simply
-   * means no live updates: the realtime provider falls back to polling.
+   * Unset simply means no live updates: the realtime provider falls back to polling.
    */
   NEXT_PUBLIC_WS_URL: z
     .string()
