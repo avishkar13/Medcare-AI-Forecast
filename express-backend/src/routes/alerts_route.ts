@@ -2,10 +2,15 @@ import { Router } from "express";
 import * as alertsController from "../controller/alertscontroller.js";
 import { rateLimiter } from "../middleware/rateLimiter.js";
 import { authorize } from "../middleware/authorize.js";
+import * as exportController from "../controller/exportcontroller.js";
 
 export const alertsRouter = Router();
 
 alertsRouter.get("/", rateLimiter.read, authorize("alerts:view"), alertsController.getAlerts);
+
+// Above any `/:id` route: Express matches in order, and a parameter segment would
+// otherwise swallow `/export` and answer it as a lookup for an item called "export".
+alertsRouter.get("/export", rateLimiter.read, authorize("alerts:view"), exportController.exportAlerts);
 alertsRouter.get("/overview", rateLimiter.read, authorize("alerts:view"), alertsController.getOverview);
 alertsRouter.get("/trends", rateLimiter.read, authorize("alerts:view"), alertsController.getTrends);
 alertsRouter.get("/distribution", rateLimiter.read, authorize("alerts:view"), alertsController.getDistribution);

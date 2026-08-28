@@ -25,7 +25,19 @@ const selectClass =
   "h-8 rounded-md border border-input bg-background px-2 text-xs font-medium shadow-sm " +
   "outline-none transition-colors focus-visible:ring-1 focus-visible:ring-ring cursor-pointer";
 
-type Edits = Record<string, { stockout: string; expiry: string }>;
+/** The three overridable fields, named once so the row helpers stay in step. */
+type Field = "stockout" | "expiry" | "minimum";
+
+type Edits = Record<string, Record<Field, string>>;
+
+/** Where each field's stored value lives on the row, so lookups are not restated. */
+const STORED: Record<Field, (row: PlanningParameter) => number | null> = {
+  stockout: (row) => row.alertStockoutProbability,
+  expiry: (row) => row.alertExpiryWindowDays,
+  minimum: (row) => row.minimumStockUnits,
+};
+
+const asText = (value: number | null) => (value === null ? "" : String(value));
 
 /**
  * Alert thresholds per SKU and DC.
@@ -63,20 +75,18 @@ export function ThresholdSettings() {
   const globals = settings?.alerts.thresholds;
   const rows = useMemo(() => data?.data ?? [], [data]);
 
-  const valueOf = (row: PlanningParameter, field: "stockout" | "expiry"): string => {
+  const valueOf = (row: PlanningParameter, field: Field): string => {
     const edit = edits[row.id]?.[field];
-    if (edit !== undefined) return edit;
-    const stored =
-      field === "stockout" ? row.alertStockoutProbability : row.alertExpiryWindowDays;
-    return stored === null ? "" : String(stored);
+    return edit !== undefined ? edit : asText(STORED[field](row));
   };
 
-  const setEdit = (row: PlanningParameter, field: "stockout" | "expiry", value: string) =>
+  const setEdit = (row: PlanningParameter, field: Field, value: string) =>
     setEdits((prev) => ({
       ...prev,
       [row.id]: {
-        stockout: prev[row.id]?.stockout ?? (row.alertStockoutProbability?.toString() ?? ""),
-        expiry: prev[row.id]?.expiry ?? (row.alertExpiryWindowDays?.toString() ?? ""),
+        stockout: prev[row.id]?.stockout ?? asText(STORED.stockout(row)),
+        expiry: prev[row.id]?.expiry ?? asText(STORED.expiry(row)),
+        minimum: prev[row.id]?.minimum ?? asText(STORED.minimum(row)),
         [field]: value,
       },
     }));
@@ -84,11 +94,9 @@ export function ThresholdSettings() {
   const isDirty = (row: PlanningParameter) => {
     const edit = edits[row.id];
     if (!edit) return false;
-    const stored = {
-      stockout: row.alertStockoutProbability === null ? "" : String(row.alertStockoutProbability),
-      expiry: row.alertExpiryWindowDays === null ? "" : String(row.alertExpiryWindowDays),
-    };
-    return edit.stockout !== stored.stockout || edit.expiry !== stored.expiry;
+    return (Object.keys(STORED) as Field[]).some(
+      (field) => edit[field] !== asText(STORED[field](row)),
+    );
   };
 
   /** Empty means inherit, so it is sent as null rather than skipped or coerced to zero. */
@@ -105,6 +113,7 @@ export function ThresholdSettings() {
 
     const stockout = toOverride(edit.stockout);
     const expiry = toOverride(edit.expiry);
+    const minimum = toOverride(edit.minimum);
 
     if (stockout !== null && (stockout < 0 || stockout > 100)) {
       toast.error("Stockout probability must be between 0 and 100%");
@@ -112,6 +121,10 @@ export function ThresholdSettings() {
     }
     if (expiry !== null && (expiry < 1 || expiry > 365)) {
       toast.error("Expiry window must be between 1 and 365 days");
+      return;
+    }
+    if (minimum !== null && minimum < 0) {
+      toast.error("Minimum stock cannot be negative");
       return;
     }
 
@@ -131,6 +144,7 @@ export function ThresholdSettings() {
       expiryCostPerUnit: row.expiryCostPerUnit,
       alertStockoutProbability: stockout,
       alertExpiryWindowDays: expiry,
+      minimumStockUnits: minimum,
     });
 
     setEdits((prev) => {
@@ -143,12 +157,12 @@ export function ThresholdSettings() {
       value === null ? `inherited (${fallback ?? "—"}${unit})` : `${value}${unit}`;
 
     toast.success(`${row.sku} at ${row.warehouseCode} updated`, {
-      description: `Stockout ${describe(stockout, "%", globals?.stockoutProbability)} · Expiry ${describe(expiry, "d", globals?.expiryWindow)}. Applies from the next detection cycle.`,
+      description: `Stockout ${describe(stockout, "%", globals?.stockoutProbability)} · Expiry ${describe(expiry, "d", globals?.expiryWindow)} · Minimum ${minimum === null ? "off" : `${minimum} units`}. Applies from the next detection cycle.`,
     });
   };
 
   const clearRow = (row: PlanningParameter) =>
-    setEdits((prev) => ({ ...prev, [row.id]: { stockout: "", expiry: "" } }));
+    setEdits((prev) => ({ ...prev, [row.id]: { stockout: "", expiry: "", minimum: "" } }));
 
   return (
     <div className="flex flex-col gap-4">
@@ -208,6 +222,7 @@ export function ThresholdSettings() {
                 <TableHead className="text-right">Lead time</TableHead>
                 <TableHead className="w-[150px]">Stockout probability</TableHead>
                 <TableHead className="w-[150px]">Expiry window</TableHead>
+                <TableHead className="w-[150px]">Minimum stock</TableHead>
                 <TableHead className="w-[130px]" />
               </TableRow>
             </TableHeader>
@@ -250,9 +265,25 @@ export function ThresholdSettings() {
                   </TableCell>
 
                   <TableCell>
+                    {/*
+                      No global to fall back on, so the placeholder says the rule is off
+                      rather than naming a value it would inherit.
+                    */}
+                    <Input
+                      type="number"
+                      min={0}
+                      className="h-8 text-right text-xs"
+                      placeholder="Off"
+                      value={valueOf(row, "minimum")}
+                      onChange={(event) => setEdit(row, "minimum", event.target.value)}
+                    />
+                  </TableCell>
+
+                  <TableCell>
                     <div className="flex items-center justify-end gap-1">
                       {(row.alertStockoutProbability !== null ||
                         row.alertExpiryWindowDays !== null ||
+                        row.minimumStockUnits !== null ||
                         isDirty(row)) && (
                         <Button
                           variant="ghost"

@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { ForecastHeader } from "@/components/forecast/forecast-header";
 import { ForecastControlBar } from "@/components/forecast/forecast-control-bar";
 import { ForecastKpiCards } from "@/components/forecast/forecast-kpi-cards";
@@ -13,7 +14,19 @@ import { ForecastPerformance } from "@/components/forecast/forecast-performance"
 import { ForecastImpact } from "@/components/forecast/forecast-impact";
 import { ForecastSkuTable } from "@/components/forecast/forecast-sku-table";
 
+/**
+ * The header's horizon selector writes scope to the URL, which means `useSearchParams`
+ * and therefore a Suspense boundary - the same shape `app/alerts/page.tsx` uses.
+ */
 export default function ForecastPage() {
+  return (
+    <Suspense fallback={<p className="p-6 text-sm text-muted-foreground">Loading forecast…</p>}>
+      <ForecastView />
+    </Suspense>
+  );
+}
+
+function ForecastView() {
   return (
     <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto pb-10">
       <ForecastHeader />

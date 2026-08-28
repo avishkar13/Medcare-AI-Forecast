@@ -2,6 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { ExportButton } from "@/components/ui/export-button";
 import { RefreshCw } from "lucide-react";
 import { queryKeys } from "@/config/query-keys";
 import { useCompletedRuns } from "@/hooks/use-planning";
@@ -45,6 +46,12 @@ export function RecommendationsHeader() {
           <RefreshCw className={`h-4 w-4 mr-2 ${kpi.isFetching ? "animate-spin" : ""}`} />
           Refresh
         </Button>
+        {/* E1 output 3: the reorder action summary. */}
+        <ExportButton
+          path="/recommendations/export"
+          fallbackName="reorder-action-summary.csv"
+          label="recommendations"
+        />
       </div>
     </div>
   );

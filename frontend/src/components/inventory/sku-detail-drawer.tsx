@@ -1,5 +1,6 @@
 "use client";
 
+import { useScopedHref } from "@/hooks/use-scope";
 import {
   Sheet,
   SheetContent,
@@ -35,6 +36,7 @@ interface SkuDetailDrawerProps {
 }
 
 export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps) {
+  const scopedHref = useScopedHref();
   const { formatCurrency, formatNumber } = useFormatters();
   const { data, isPending, isError } = useInventoryDetail(skuId);
   const { data: recs } = useRecommendations({ pageSize: 200 });
@@ -621,15 +623,20 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
         {/* FIXED FOOTER ACTION TOOLBAR */}
         <div className="p-4 border-t border-border bg-background/95 backdrop-blur shrink-0 flex flex-wrap items-center justify-between gap-3 z-10 shadow-lg">
           <div className="flex items-center gap-2">
+            {/*
+              Scoped to the SKU the drawer is open on. Both were bare hrefs, so the
+              reader was looking at one product and landed on the whole network -
+              `inventory-table.tsx` does this correctly two components away.
+            */}
             <Link
-              href="/forecast"
+              href={scopedHref("/forecast", { sku: item.sku })}
               className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-background hover:bg-muted hover:text-foreground text-xs font-medium h-8 px-3 transition-colors cursor-pointer"
             >
               <LineChart className="h-3.5 w-3.5 text-primary" />
               View Forecast
             </Link>
             <Link
-              href="/recommendations"
+              href={scopedHref("/recommendations", { sku: item.sku })}
               className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-background hover:bg-muted hover:text-foreground text-xs font-medium h-8 px-3 transition-colors cursor-pointer"
             >
               <Sparkles className="h-3.5 w-3.5 text-primary" />

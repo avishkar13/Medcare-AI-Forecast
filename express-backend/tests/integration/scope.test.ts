@@ -10,6 +10,7 @@ let server: TestServer;
 
 let globalAdminToken: string;
 let dc1UserToken: string;
+let dc1ControllerToken: string;
 let dc2UserToken: string;
 
 let warehouse1: { id: string; code: string };
@@ -41,6 +42,13 @@ before(async () => {
     { key: "alerts:view", name: "Alerts Read", module: "alerts", action: "view" },
     { key: "expiry:view", name: "Expiry Read", module: "expiry", action: "view" },
   ];
+  // Deliberately not added to the two roles above: an existing test asserting a 403
+  // for a missing permission must keep asserting the same thing.
+  const adjustPerm =
+    (await prisma.permission.findUnique({ where: { key: "inventory:adjust" } })) ??
+    (await prisma.permission.create({
+      data: { key: "inventory:adjust", name: "Inventory Adjust", module: "inventory", action: "adjust" },
+    }));
   const createdPerms = [];
   for (const p of perms) {
     let perm = await prisma.permission.findUnique({ where: { key: p.key } });
@@ -108,6 +116,30 @@ before(async () => {
   dc1UserToken = await login(dc1User.email);
   dc2UserToken = await login(dc2User.email);
 
+  // A stock controller confined to W1: holds `inventory:adjust`, so a refusal can only
+  // come from DC scope and never from a missing permission.
+  const controllerRole = await prisma.role.create({
+    data: { name: "SCOPE_STOCK_CONTROLLER", description: "Confined stock controller" },
+  });
+  roleIds.push(controllerRole.id);
+  await prisma.rolePermission.createMany({
+    data: [...createdPerms, adjustPerm].map((p) => ({
+      roleId: controllerRole.id,
+      permissionId: p.id,
+    })),
+  });
+
+  const dc1Controller = await prisma.user.create({
+    data: {
+      email: "dc1_controller@scope.test",
+      passwordHash: pwd,
+      name: "DC1 Controller",
+      warehouseId: warehouse1.id,
+      roleId: controllerRole.id,
+    },
+  });
+  dc1ControllerToken = await login(dc1Controller.email);
+
   // 6. Seed some test inventory positions to test filters
   await prisma.inventory.create({
     data: {
@@ -133,6 +165,9 @@ before(async () => {
 after(async () => {
   // Cleanup
   if (product) await prisma.inventory.deleteMany({ where: { productId: product.id } });
+  // Before the users: a restock request holds FKs to both the requester and the
+  // product, so deleting either first fails the constraint.
+  if (product) await prisma.restockRequest.deleteMany({ where: { productId: product.id } });
   await prisma.user.deleteMany({ where: { email: { endsWith: "@scope.test" } } });
   if (roleIds.length > 0) {
     await prisma.rolePermission.deleteMany({ where: { roleId: { in: roleIds } } });
@@ -293,6 +328,46 @@ describe("Phase 2 - scope on the routes that lacked it", () => {
       403,
       "another DC's id must be refused, not answered with an empty list",
     );
+  });
+
+  test("a confined caller cannot decide another DC's restock request", async () => {
+    // `create` and `list` narrowed by the caller's DC and approve/reject did not, so a
+    // planner confined to W1 could approve stock for W2 - a site they cannot even see.
+    const patch = (path: string, token: string) =>
+      fetch(`${server.url}${path}`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+    // Both rows are seeded directly: this asserts on the *decide* endpoint, and going
+    // through POST would only add a second permission's worth of setup to get there.
+    const [foreign, own] = await Promise.all([
+      prisma.restockRequest.create({
+        data: { productId: product.id, warehouseId: warehouse2.id, quantity: 25 },
+        select: { id: true },
+      }),
+      prisma.restockRequest.create({
+        data: { productId: product.id, warehouseId: warehouse1.id, quantity: 25 },
+        select: { id: true },
+      }),
+    ]);
+
+    const refused = await patch(`/api/restock-requests/${foreign.id}/approve`, dc1ControllerToken);
+    assert.equal(
+      refused.status,
+      404,
+      "another DC's request must not be decidable by a confined caller",
+    );
+
+    // Still REQUESTED: the refusal has to prevent the write, not merely report one.
+    const after = await prisma.restockRequest.findUniqueOrThrow({
+      where: { id: foreign.id },
+      select: { status: true },
+    });
+    assert.equal(after.status, "REQUESTED");
+
+    const allowed = await patch(`/api/restock-requests/${own.id}/approve`, dc1ControllerToken);
+    assert.equal(allowed.status, 200, "their own DC's request must still be decidable");
   });
 
   test("an unknown warehouseId is a 404, not a silently empty network", async () => {

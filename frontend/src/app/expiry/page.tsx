@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { useScopedHref } from "@/hooks/use-scope";
 import { useDcExposure, useExpiryBatches, useWastePrevention } from "@/hooks/use-expiry";
 import { ExpiryBatch, ExpiryStatus } from "@/types/expiry";
 
@@ -42,6 +44,8 @@ const statusOf = (demandCoveragePercent: number, daysRemaining: number): ExpiryS
 };
 
 export default function ExpiryRiskPage() {
+  const router = useRouter();
+  const scopedHref = useScopedHref();
   const batchQuery = useExpiryBatches();
   const exposure = useDcExposure();
   const waste = useWastePrevention();
@@ -135,6 +139,12 @@ export default function ExpiryRiskPage() {
     }
 
     // Location
+    // Was collected by the filter bar and read by nothing, so all four options did
+    // nothing while the control highlighted itself as active.
+    if (filters.status !== "all") {
+      result = result.filter(b => b.status === filters.status);
+    }
+
     if (filters.location !== "all") {
       result = result.filter(b => b.location === filters.location);
     }
@@ -175,14 +185,36 @@ export default function ExpiryRiskPage() {
     setIsSheetOpen(true);
   };
 
-  const handleActionClick = (batch: ExpiryBatch, action: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // prevent opening sheet
-    // In a real app, dispatch an action here
-    // alert(`Action: ${action} on batch ${batch.batchNumber}`);
+  /**
+   * Where each batch action actually happens.
+   *
+   * These two handlers were empty - `// In a real app, dispatch an action here` - so
+   * every action button on this page did nothing, and the sheet's closed itself
+   * afterwards so it looked like it had worked.
+   *
+   * There is no backend to call: every route on `/api/expiry` is a GET, and the batch
+   * `status` these buttons branch on is derived in this file rather than stored. So
+   * each action navigates to the surface where it can genuinely be carried out, which
+   * is the honest reading of "prioritise this batch".
+   */
+  const destinationFor = (batch: ExpiryBatch) => {
+    if (batch.status === "transfer") {
+      // An inter-DC move is a DRP lane, and that is what the Transfers tab shows.
+      return scopedHref("/plans", { sku: batch.sku });
+    }
+    if (batch.status === "prioritized") {
+      // FEFO priority is expressed as a recommendation against the SKU.
+      return scopedHref("/recommendations", { sku: batch.sku });
+    }
+    // Nothing to do but watch it: its stock position is where that is done.
+    return scopedHref("/inventory", { sku: batch.sku });
   };
 
-  const handlePrioritize = () => {
-    // Mock action
+  const handleActionClick = (batch: ExpiryBatch, _action: string, e: React.MouseEvent) => {
+    // The row opens the sheet; the button is a different destination, so it must not
+    // also trigger the row.
+    e.stopPropagation();
+    router.push(destinationFor(batch));
   };
 
   return (
@@ -239,7 +271,7 @@ export default function ExpiryRiskPage() {
         batch={selectedBatch} 
         isOpen={isSheetOpen} 
         onClose={() => setIsSheetOpen(false)} 
-        onPrioritize={handlePrioritize}
+        destinationFor={destinationFor}
       />
     </div>
   );

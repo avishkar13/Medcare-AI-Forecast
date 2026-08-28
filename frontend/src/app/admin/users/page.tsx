@@ -127,54 +127,61 @@ export default function AdminUsersPage() {
       <Card className="border-border/50 shadow-sm overflow-hidden">
         <CardHeader className="bg-muted/20 border-b border-border/50 pb-4">
           <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between">
+            {/*
+              Three equal cells. The Role filter had no wrapper of its own, so its
+              closing tag shut the grid early and the DC and Status filters - sized
+              `w-1/4` - fell outside it entirely, leaving the bar visibly broken.
+            */}
             <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Label className="mb-2 block text-xs font-semibold text-muted-foreground">Role</Label>
-          <Select value={roleFilter} onValueChange={(val) => setRoleFilter(val || "all")}>
-            <SelectTrigger>
+              <div>
+                <Label className="mb-2 block text-xs font-semibold text-muted-foreground">Role</Label>
+                <Select value={roleFilter} onValueChange={(val) => setRoleFilter(val || "all")}>
+                  <SelectTrigger>
               <SelectValue placeholder="All Roles">
                 {roleFilter === "all" ? "All Roles" : roles?.find(r => r.id === roleFilter)?.name || "All Roles"}
               </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
+                  </SelectTrigger>
+                  <SelectContent>
               <SelectItem value="all">All Roles</SelectItem>
               {roles?.map((r) => (
                 <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
               ))}
-            </SelectContent>
-          </Select>
+                  </SelectContent>
+                </Select>
         </div>
-        <div className="w-1/4">
-          <Label className="mb-2 block text-xs font-semibold text-muted-foreground">DC</Label>
-          <Select value={dcFilter} onValueChange={(val) => setDcFilter(val || "all")}>
-            <SelectTrigger>
+              <div>
+                <Label className="mb-2 block text-xs font-semibold text-muted-foreground">DC</Label>
+                <Select value={dcFilter} onValueChange={(val) => setDcFilter(val || "all")}>
+                  <SelectTrigger>
               <SelectValue placeholder="All DCs">
                 {dcFilter === "all" ? "All DCs" : warehouses?.find(w => w.id === dcFilter)?.name || "All DCs"}
               </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
+                  </SelectTrigger>
+                  <SelectContent>
               <SelectItem value="all">All DCs</SelectItem>
               {warehouses?.map((w) => (
                 <SelectItem key={w.id} value={w.id}>{w.code} - {w.name}</SelectItem>
               ))}
-            </SelectContent>
-          </Select>
+                  </SelectContent>
+                </Select>
         </div>
-        <div className="w-1/4">
-          <Label className="mb-2 block text-xs font-semibold text-muted-foreground">Status</Label>
-          <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val || "all")}>
-            <SelectTrigger>
+              <div>
+                <Label className="mb-2 block text-xs font-semibold text-muted-foreground">Status</Label>
+                <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val || "all")}>
+                  <SelectTrigger>
               <SelectValue placeholder="All">
                 {statusFilter === "all" ? "All Status" : statusFilter === "active" ? "Active" : "Inactive"}
               </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
+                  </SelectTrigger>
+                  <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        </div>
+                  </SelectContent>
+                </Select>
+              </div>
+                  </div>
+                </div>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">

@@ -58,17 +58,6 @@ export const listExpiryBatches = async (params?: ExpiryParams) => {
 
 // the page cap is 200 and there are more batches than that. anything that buckets
 // the whole book needs every page, not the first one.
-export const listAllExpiryBatches = async (params?: ExpiryParams) => {
-  const rows: ExpiryBatchRow[] = [];
-
-  for (let page = 1; page <= 20; page += 1) {
-    const result = await listExpiryBatches({ ...params, page, pageSize: 200 });
-    rows.push(...result.data);
-    if (result.data.length === 0 || rows.length >= (result.meta.total ?? rows.length)) break;
-  }
-
-  return rows;
-};
 
 export const getDcExposure = async (params?: ExpiryParams) =>
   z.array(dcExposureSchema).parse(await api.get<unknown>("/expiry/dc-exposure", params));

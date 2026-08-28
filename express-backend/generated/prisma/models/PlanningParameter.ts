@@ -38,6 +38,7 @@ export type PlanningParameterAvgAggregateOutputType = {
   expiryCostPerUnit: number | null
   alertStockoutProbability: number | null
   alertExpiryWindowDays: number | null
+  minimumStockUnits: number | null
 }
 
 export type PlanningParameterSumAggregateOutputType = {
@@ -52,6 +53,7 @@ export type PlanningParameterSumAggregateOutputType = {
   expiryCostPerUnit: number | null
   alertStockoutProbability: number | null
   alertExpiryWindowDays: number | null
+  minimumStockUnits: number | null
 }
 
 export type PlanningParameterMinAggregateOutputType = {
@@ -69,6 +71,7 @@ export type PlanningParameterMinAggregateOutputType = {
   expiryCostPerUnit: number | null
   alertStockoutProbability: number | null
   alertExpiryWindowDays: number | null
+  minimumStockUnits: number | null
 }
 
 export type PlanningParameterMaxAggregateOutputType = {
@@ -86,6 +89,7 @@ export type PlanningParameterMaxAggregateOutputType = {
   expiryCostPerUnit: number | null
   alertStockoutProbability: number | null
   alertExpiryWindowDays: number | null
+  minimumStockUnits: number | null
 }
 
 export type PlanningParameterCountAggregateOutputType = {
@@ -103,6 +107,7 @@ export type PlanningParameterCountAggregateOutputType = {
   expiryCostPerUnit: number
   alertStockoutProbability: number
   alertExpiryWindowDays: number
+  minimumStockUnits: number
   _all: number
 }
 
@@ -119,6 +124,7 @@ export type PlanningParameterAvgAggregateInputType = {
   expiryCostPerUnit?: true
   alertStockoutProbability?: true
   alertExpiryWindowDays?: true
+  minimumStockUnits?: true
 }
 
 export type PlanningParameterSumAggregateInputType = {
@@ -133,6 +139,7 @@ export type PlanningParameterSumAggregateInputType = {
   expiryCostPerUnit?: true
   alertStockoutProbability?: true
   alertExpiryWindowDays?: true
+  minimumStockUnits?: true
 }
 
 export type PlanningParameterMinAggregateInputType = {
@@ -150,6 +157,7 @@ export type PlanningParameterMinAggregateInputType = {
   expiryCostPerUnit?: true
   alertStockoutProbability?: true
   alertExpiryWindowDays?: true
+  minimumStockUnits?: true
 }
 
 export type PlanningParameterMaxAggregateInputType = {
@@ -167,6 +175,7 @@ export type PlanningParameterMaxAggregateInputType = {
   expiryCostPerUnit?: true
   alertStockoutProbability?: true
   alertExpiryWindowDays?: true
+  minimumStockUnits?: true
 }
 
 export type PlanningParameterCountAggregateInputType = {
@@ -184,6 +193,7 @@ export type PlanningParameterCountAggregateInputType = {
   expiryCostPerUnit?: true
   alertStockoutProbability?: true
   alertExpiryWindowDays?: true
+  minimumStockUnits?: true
   _all?: true
 }
 
@@ -288,6 +298,7 @@ export type PlanningParameterGroupByOutputType = {
   expiryCostPerUnit: number
   alertStockoutProbability: number | null
   alertExpiryWindowDays: number | null
+  minimumStockUnits: number | null
   _count: PlanningParameterCountAggregateOutputType | null
   _avg: PlanningParameterAvgAggregateOutputType | null
   _sum: PlanningParameterSumAggregateOutputType | null
@@ -328,6 +339,7 @@ export type PlanningParameterWhereInput = {
   expiryCostPerUnit?: Prisma.FloatFilter<"PlanningParameter"> | number
   alertStockoutProbability?: Prisma.FloatNullableFilter<"PlanningParameter"> | number | null
   alertExpiryWindowDays?: Prisma.IntNullableFilter<"PlanningParameter"> | number | null
+  minimumStockUnits?: Prisma.FloatNullableFilter<"PlanningParameter"> | number | null
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
   warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
 }
@@ -347,6 +359,7 @@ export type PlanningParameterOrderByWithRelationInput = {
   expiryCostPerUnit?: Prisma.SortOrder
   alertStockoutProbability?: Prisma.SortOrderInput | Prisma.SortOrder
   alertExpiryWindowDays?: Prisma.SortOrderInput | Prisma.SortOrder
+  minimumStockUnits?: Prisma.SortOrderInput | Prisma.SortOrder
   product?: Prisma.ProductOrderByWithRelationInput
   warehouse?: Prisma.WarehouseOrderByWithRelationInput
 }
@@ -370,6 +383,7 @@ export type PlanningParameterWhereUniqueInput = Prisma.AtLeast<{
   expiryCostPerUnit?: Prisma.FloatFilter<"PlanningParameter"> | number
   alertStockoutProbability?: Prisma.FloatNullableFilter<"PlanningParameter"> | number | null
   alertExpiryWindowDays?: Prisma.IntNullableFilter<"PlanningParameter"> | number | null
+  minimumStockUnits?: Prisma.FloatNullableFilter<"PlanningParameter"> | number | null
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
   warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
 }, "id" | "productId_warehouseId">
@@ -389,6 +403,7 @@ export type PlanningParameterOrderByWithAggregationInput = {
   expiryCostPerUnit?: Prisma.SortOrder
   alertStockoutProbability?: Prisma.SortOrderInput | Prisma.SortOrder
   alertExpiryWindowDays?: Prisma.SortOrderInput | Prisma.SortOrder
+  minimumStockUnits?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PlanningParameterCountOrderByAggregateInput
   _avg?: Prisma.PlanningParameterAvgOrderByAggregateInput
   _max?: Prisma.PlanningParameterMaxOrderByAggregateInput
@@ -414,6 +429,7 @@ export type PlanningParameterScalarWhereWithAggregatesInput = {
   expiryCostPerUnit?: Prisma.FloatWithAggregatesFilter<"PlanningParameter"> | number
   alertStockoutProbability?: Prisma.FloatNullableWithAggregatesFilter<"PlanningParameter"> | number | null
   alertExpiryWindowDays?: Prisma.IntNullableWithAggregatesFilter<"PlanningParameter"> | number | null
+  minimumStockUnits?: Prisma.FloatNullableWithAggregatesFilter<"PlanningParameter"> | number | null
 }
 
 export type PlanningParameterCreateInput = {
@@ -429,6 +445,7 @@ export type PlanningParameterCreateInput = {
   expiryCostPerUnit: number
   alertStockoutProbability?: number | null
   alertExpiryWindowDays?: number | null
+  minimumStockUnits?: number | null
   product: Prisma.ProductCreateNestedOneWithoutPlanningParametersInput
   warehouse: Prisma.WarehouseCreateNestedOneWithoutPlanningParametersInput
 }
@@ -448,6 +465,7 @@ export type PlanningParameterUncheckedCreateInput = {
   expiryCostPerUnit: number
   alertStockoutProbability?: number | null
   alertExpiryWindowDays?: number | null
+  minimumStockUnits?: number | null
 }
 
 export type PlanningParameterUpdateInput = {
@@ -463,6 +481,7 @@ export type PlanningParameterUpdateInput = {
   expiryCostPerUnit?: Prisma.FloatFieldUpdateOperationsInput | number
   alertStockoutProbability?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   alertExpiryWindowDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  minimumStockUnits?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   product?: Prisma.ProductUpdateOneRequiredWithoutPlanningParametersNestedInput
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutPlanningParametersNestedInput
 }
@@ -482,6 +501,7 @@ export type PlanningParameterUncheckedUpdateInput = {
   expiryCostPerUnit?: Prisma.FloatFieldUpdateOperationsInput | number
   alertStockoutProbability?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   alertExpiryWindowDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  minimumStockUnits?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type PlanningParameterCreateManyInput = {
@@ -499,6 +519,7 @@ export type PlanningParameterCreateManyInput = {
   expiryCostPerUnit: number
   alertStockoutProbability?: number | null
   alertExpiryWindowDays?: number | null
+  minimumStockUnits?: number | null
 }
 
 export type PlanningParameterUpdateManyMutationInput = {
@@ -514,6 +535,7 @@ export type PlanningParameterUpdateManyMutationInput = {
   expiryCostPerUnit?: Prisma.FloatFieldUpdateOperationsInput | number
   alertStockoutProbability?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   alertExpiryWindowDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  minimumStockUnits?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type PlanningParameterUncheckedUpdateManyInput = {
@@ -531,6 +553,7 @@ export type PlanningParameterUncheckedUpdateManyInput = {
   expiryCostPerUnit?: Prisma.FloatFieldUpdateOperationsInput | number
   alertStockoutProbability?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   alertExpiryWindowDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  minimumStockUnits?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type PlanningParameterListRelationFilter = {
@@ -563,6 +586,7 @@ export type PlanningParameterCountOrderByAggregateInput = {
   expiryCostPerUnit?: Prisma.SortOrder
   alertStockoutProbability?: Prisma.SortOrder
   alertExpiryWindowDays?: Prisma.SortOrder
+  minimumStockUnits?: Prisma.SortOrder
 }
 
 export type PlanningParameterAvgOrderByAggregateInput = {
@@ -577,6 +601,7 @@ export type PlanningParameterAvgOrderByAggregateInput = {
   expiryCostPerUnit?: Prisma.SortOrder
   alertStockoutProbability?: Prisma.SortOrder
   alertExpiryWindowDays?: Prisma.SortOrder
+  minimumStockUnits?: Prisma.SortOrder
 }
 
 export type PlanningParameterMaxOrderByAggregateInput = {
@@ -594,6 +619,7 @@ export type PlanningParameterMaxOrderByAggregateInput = {
   expiryCostPerUnit?: Prisma.SortOrder
   alertStockoutProbability?: Prisma.SortOrder
   alertExpiryWindowDays?: Prisma.SortOrder
+  minimumStockUnits?: Prisma.SortOrder
 }
 
 export type PlanningParameterMinOrderByAggregateInput = {
@@ -611,6 +637,7 @@ export type PlanningParameterMinOrderByAggregateInput = {
   expiryCostPerUnit?: Prisma.SortOrder
   alertStockoutProbability?: Prisma.SortOrder
   alertExpiryWindowDays?: Prisma.SortOrder
+  minimumStockUnits?: Prisma.SortOrder
 }
 
 export type PlanningParameterSumOrderByAggregateInput = {
@@ -625,6 +652,7 @@ export type PlanningParameterSumOrderByAggregateInput = {
   expiryCostPerUnit?: Prisma.SortOrder
   alertStockoutProbability?: Prisma.SortOrder
   alertExpiryWindowDays?: Prisma.SortOrder
+  minimumStockUnits?: Prisma.SortOrder
 }
 
 export type PlanningParameterCreateNestedManyWithoutProductInput = {
@@ -732,6 +760,7 @@ export type PlanningParameterCreateWithoutProductInput = {
   expiryCostPerUnit: number
   alertStockoutProbability?: number | null
   alertExpiryWindowDays?: number | null
+  minimumStockUnits?: number | null
   warehouse: Prisma.WarehouseCreateNestedOneWithoutPlanningParametersInput
 }
 
@@ -749,6 +778,7 @@ export type PlanningParameterUncheckedCreateWithoutProductInput = {
   expiryCostPerUnit: number
   alertStockoutProbability?: number | null
   alertExpiryWindowDays?: number | null
+  minimumStockUnits?: number | null
 }
 
 export type PlanningParameterCreateOrConnectWithoutProductInput = {
@@ -795,6 +825,7 @@ export type PlanningParameterScalarWhereInput = {
   expiryCostPerUnit?: Prisma.FloatFilter<"PlanningParameter"> | number
   alertStockoutProbability?: Prisma.FloatNullableFilter<"PlanningParameter"> | number | null
   alertExpiryWindowDays?: Prisma.IntNullableFilter<"PlanningParameter"> | number | null
+  minimumStockUnits?: Prisma.FloatNullableFilter<"PlanningParameter"> | number | null
 }
 
 export type PlanningParameterCreateWithoutWarehouseInput = {
@@ -810,6 +841,7 @@ export type PlanningParameterCreateWithoutWarehouseInput = {
   expiryCostPerUnit: number
   alertStockoutProbability?: number | null
   alertExpiryWindowDays?: number | null
+  minimumStockUnits?: number | null
   product: Prisma.ProductCreateNestedOneWithoutPlanningParametersInput
 }
 
@@ -827,6 +859,7 @@ export type PlanningParameterUncheckedCreateWithoutWarehouseInput = {
   expiryCostPerUnit: number
   alertStockoutProbability?: number | null
   alertExpiryWindowDays?: number | null
+  minimumStockUnits?: number | null
 }
 
 export type PlanningParameterCreateOrConnectWithoutWarehouseInput = {
@@ -869,6 +902,7 @@ export type PlanningParameterCreateManyProductInput = {
   expiryCostPerUnit: number
   alertStockoutProbability?: number | null
   alertExpiryWindowDays?: number | null
+  minimumStockUnits?: number | null
 }
 
 export type PlanningParameterUpdateWithoutProductInput = {
@@ -884,6 +918,7 @@ export type PlanningParameterUpdateWithoutProductInput = {
   expiryCostPerUnit?: Prisma.FloatFieldUpdateOperationsInput | number
   alertStockoutProbability?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   alertExpiryWindowDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  minimumStockUnits?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutPlanningParametersNestedInput
 }
 
@@ -901,6 +936,7 @@ export type PlanningParameterUncheckedUpdateWithoutProductInput = {
   expiryCostPerUnit?: Prisma.FloatFieldUpdateOperationsInput | number
   alertStockoutProbability?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   alertExpiryWindowDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  minimumStockUnits?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type PlanningParameterUncheckedUpdateManyWithoutProductInput = {
@@ -917,6 +953,7 @@ export type PlanningParameterUncheckedUpdateManyWithoutProductInput = {
   expiryCostPerUnit?: Prisma.FloatFieldUpdateOperationsInput | number
   alertStockoutProbability?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   alertExpiryWindowDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  minimumStockUnits?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type PlanningParameterCreateManyWarehouseInput = {
@@ -933,6 +970,7 @@ export type PlanningParameterCreateManyWarehouseInput = {
   expiryCostPerUnit: number
   alertStockoutProbability?: number | null
   alertExpiryWindowDays?: number | null
+  minimumStockUnits?: number | null
 }
 
 export type PlanningParameterUpdateWithoutWarehouseInput = {
@@ -948,6 +986,7 @@ export type PlanningParameterUpdateWithoutWarehouseInput = {
   expiryCostPerUnit?: Prisma.FloatFieldUpdateOperationsInput | number
   alertStockoutProbability?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   alertExpiryWindowDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  minimumStockUnits?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   product?: Prisma.ProductUpdateOneRequiredWithoutPlanningParametersNestedInput
 }
 
@@ -965,6 +1004,7 @@ export type PlanningParameterUncheckedUpdateWithoutWarehouseInput = {
   expiryCostPerUnit?: Prisma.FloatFieldUpdateOperationsInput | number
   alertStockoutProbability?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   alertExpiryWindowDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  minimumStockUnits?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type PlanningParameterUncheckedUpdateManyWithoutWarehouseInput = {
@@ -981,6 +1021,7 @@ export type PlanningParameterUncheckedUpdateManyWithoutWarehouseInput = {
   expiryCostPerUnit?: Prisma.FloatFieldUpdateOperationsInput | number
   alertStockoutProbability?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   alertExpiryWindowDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  minimumStockUnits?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 
@@ -1000,6 +1041,7 @@ export type PlanningParameterSelect<ExtArgs extends runtime.Types.Extensions.Int
   expiryCostPerUnit?: boolean
   alertStockoutProbability?: boolean
   alertExpiryWindowDays?: boolean
+  minimumStockUnits?: boolean
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["planningParameter"]>
@@ -1019,6 +1061,7 @@ export type PlanningParameterSelectCreateManyAndReturn<ExtArgs extends runtime.T
   expiryCostPerUnit?: boolean
   alertStockoutProbability?: boolean
   alertExpiryWindowDays?: boolean
+  minimumStockUnits?: boolean
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["planningParameter"]>
@@ -1038,6 +1081,7 @@ export type PlanningParameterSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   expiryCostPerUnit?: boolean
   alertStockoutProbability?: boolean
   alertExpiryWindowDays?: boolean
+  minimumStockUnits?: boolean
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["planningParameter"]>
@@ -1057,9 +1101,10 @@ export type PlanningParameterSelectScalar = {
   expiryCostPerUnit?: boolean
   alertStockoutProbability?: boolean
   alertExpiryWindowDays?: boolean
+  minimumStockUnits?: boolean
 }
 
-export type PlanningParameterOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productId" | "warehouseId" | "leadTimeDays" | "leadTimeStdDev" | "serviceLevel" | "reviewPeriodDays" | "minimumOrderQty" | "maximumInventory" | "holdingCostPerUnit" | "stockoutCostPerUnit" | "expiryCostPerUnit" | "alertStockoutProbability" | "alertExpiryWindowDays", ExtArgs["result"]["planningParameter"]>
+export type PlanningParameterOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productId" | "warehouseId" | "leadTimeDays" | "leadTimeStdDev" | "serviceLevel" | "reviewPeriodDays" | "minimumOrderQty" | "maximumInventory" | "holdingCostPerUnit" | "stockoutCostPerUnit" | "expiryCostPerUnit" | "alertStockoutProbability" | "alertExpiryWindowDays" | "minimumStockUnits", ExtArgs["result"]["planningParameter"]>
 export type PlanningParameterInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
@@ -1104,6 +1149,13 @@ export type $PlanningParameterPayload<ExtArgs extends runtime.Types.Extensions.I
      */
     alertStockoutProbability: number | null
     alertExpiryWindowDays: number | null
+    /**
+     * Raise a stockout alert as soon as available stock reaches this many units,
+     * whatever the probability rule says. Null means the probability rule alone
+     * decides. There is deliberately no global counterpart: one unit count across
+     * forty different SKUs could not be right for any of them.
+     */
+    minimumStockUnits: number | null
   }, ExtArgs["result"]["planningParameter"]>
   composites: {}
 }
@@ -1543,6 +1595,7 @@ export interface PlanningParameterFieldRefs {
   readonly expiryCostPerUnit: Prisma.FieldRef<"PlanningParameter", 'Float'>
   readonly alertStockoutProbability: Prisma.FieldRef<"PlanningParameter", 'Float'>
   readonly alertExpiryWindowDays: Prisma.FieldRef<"PlanningParameter", 'Int'>
+  readonly minimumStockUnits: Prisma.FieldRef<"PlanningParameter", 'Float'>
 }
     
 

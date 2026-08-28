@@ -187,6 +187,11 @@ model PlanningParameter {
    */
   alertStockoutProbability Float? // 0-100
   alertExpiryWindowDays    Int? // days
+  /// Raise a stockout alert as soon as available stock reaches this many units,
+  /// whatever the probability rule says. Null means the probability rule alone
+  /// decides. There is deliberately no global counterpart: one unit count across
+  /// forty different SKUs could not be right for any of them.
+  minimumStockUnits        Float?
 
   product   Product   @relation(fields: [productId], references: [id])
   warehouse Warehouse @relation(fields: [warehouseId], references: [id])

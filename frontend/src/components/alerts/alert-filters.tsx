@@ -1,5 +1,7 @@
 "use client";
 
+import { useWarehouses } from "@/hooks/use-masterdata";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, RotateCcw, ArrowUpDown } from "lucide-react";
@@ -11,8 +13,7 @@ export interface AlertFilterState {
   type: AlertType | "all";
   status: AlertStatus | "all" | "open";
   location: string;
-  time: string;
-  sortBy: "severity" | "newest" | "oldest" | "impact";
+  sortBy: "severity" | "newest" | "oldest";
 }
 
 /**
@@ -26,7 +27,6 @@ export const DEFAULT_ALERT_FILTERS: AlertFilterState = {
   type: "all",
   status: "open",
   location: "all",
-  time: "all",
   sortBy: "severity",
 };
 
@@ -37,6 +37,8 @@ interface AlertFiltersProps {
 }
 
 export function AlertFilters({ filters, onChange, onReset }: AlertFiltersProps) {
+  const { data: warehouses } = useWarehouses();
+
   const updateFilter = (key: keyof AlertFilterState, value: string) => {
     onChange({ ...filters, [key]: value });
   };
@@ -77,7 +79,12 @@ export function AlertFilters({ filters, onChange, onReset }: AlertFiltersProps) 
               <option value="severity">Sort by: Severity</option>
               <option value="newest">Sort by: Newest</option>
               <option value="oldest">Sort by: Oldest</option>
-              <option value="impact">Sort by: Business Impact</option>
+              {/*
+                "Business Impact" used to be a fourth option here and the page had no
+                branch for it, so choosing it silently gave you severity order.
+                `businessImpact` is a sentence, not a figure - there is nothing to sort
+                on - so the option is gone rather than quietly lying about the order.
+              */}
             </select>
           </div>
         </div>
@@ -132,23 +139,27 @@ export function AlertFilters({ filters, onChange, onReset }: AlertFiltersProps) 
           value={filters.location}
           onChange={(e) => updateFilter("location", e.target.value)}
         >
+          {/*
+            Built from the warehouse list, not hardcoded. The four names here were
+            "Northeast DC / South DC / West Coast DC / Midwest DC" - none of which
+            exist in this database - so every option returned zero rows. `location`
+            matches on the display name, which is what the backend filters on.
+          */}
           <option value="all">Location: All DCs</option>
-          <option value="Northeast DC">Northeast DC</option>
-          <option value="South DC">South DC</option>
-          <option value="West Coast DC">West Coast DC</option>
-          <option value="Midwest DC">Midwest DC</option>
+          {(warehouses ?? []).map((warehouse) => (
+            <option key={warehouse.id} value={warehouse.name}>
+              {warehouse.name}
+            </option>
+          ))}
         </select>
 
-        <select
-          className={`h-7 px-2 py-0 border rounded-[4px] text-[10px] font-bold uppercase tracking-wider outline-none focus:ring-1 focus:ring-primary/30 cursor-pointer transition-colors ${filters.time !== 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-muted/10 border-border/50 text-muted-foreground'}`}
-          value={filters.time}
-          onChange={(e) => updateFilter("time", e.target.value)}
-        >
-          <option value="all">Time: All Time</option>
-          <option value="1h">Last Hour</option>
-          <option value="today">Today</option>
-          <option value="7d">Last 7 Days</option>
-        </select>
+        {/*
+          The Time filter used to live here. `filters.time` was written by it and read
+          by nothing - not the query, not the client-side narrowing - so all four
+          options were decorative, and the control even highlighted itself as active.
+          Removed rather than wired: `/api/alerts` has no date-range parameter, so
+          honouring it would mean narrowing one page of results and calling it a filter.
+        */}
       </div>
     </div>
   );

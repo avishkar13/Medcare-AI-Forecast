@@ -12,6 +12,7 @@ import {
   Bell,
   CalendarClock,
   ClipboardList,
+  PackageCheck,
   Settings,
   Activity,
   LogOut,
@@ -73,6 +74,9 @@ const navGroups: NavGroup[] = [
       { title: "Demand Forecast", href: "/forecast", icon: TrendingUp, requiredPermission: "forecast:view" },
       // between forecasting and recommending, which is where the executor writes them
       { title: "Supply & Transfers", href: "/plans", icon: ClipboardList, requiredPermission: "simulation:view" },
+      // Gated on read: deciding needs inventory:adjust, and the buttons enforce that
+      // themselves rather than hiding the queue from everyone who cannot decide.
+      { title: "Restock Requests", href: "/restock", icon: PackageCheck, requiredPermission: "inventory:view" },
       { title: "Recommendations", href: "/recommendations", icon: Sparkles, requiredPermission: "recommendations:view" },
       { title: "Simulation", href: "/simulation", icon: FlaskConical, requiredPermission: "simulation:view" },
     ],
@@ -138,9 +142,19 @@ export function SidebarContent() {
               {group.title}
             </span>
             {visibleItems.map((item) => {
-              // Ensure exact match for /dashboard so child routes don't highlight it, 
-              // or simple startsWith logic
-              const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href.split("?")[0]));
+              /**
+                * A parent highlights only when no child of its own matches.
+                *
+                * Plain `startsWith` lit up both "Inventory" and its "Transactions"
+                * child on `/inventory/transactions`, so two entries looked current at
+                * once and neither told the reader where they actually were.
+                */
+              const base = item.href.split("?")[0]!;
+              const onChild = (item.children ?? []).some(
+                (child) => pathname === child.href.split("?")[0],
+              );
+              const isActive =
+                pathname === base || (!onChild && base !== "/" && pathname?.startsWith(`${base}/`));
               const Icon = item.icon;
 
               return (

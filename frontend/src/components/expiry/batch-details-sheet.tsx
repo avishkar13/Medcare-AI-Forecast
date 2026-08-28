@@ -13,10 +13,11 @@ interface BatchDetailsSheetProps {
   batch: ExpiryBatch | null;
   isOpen: boolean;
   onClose: () => void;
-  onPrioritize: (id: string) => void;
+  /** Where this batch's action leads. Owned by the page, which knows the routes. */
+  destinationFor: (batch: ExpiryBatch) => string;
 }
 
-export function BatchDetailsSheet({ batch, isOpen, onClose, onPrioritize }: BatchDetailsSheetProps) {
+export function BatchDetailsSheet({ batch, isOpen, onClose, destinationFor }: BatchDetailsSheetProps) {
   const scopedHref = useScopedHref();
   const { formatCurrency } = useFormatters();
 
@@ -164,18 +165,25 @@ export function BatchDetailsSheet({ batch, isOpen, onClose, onPrioritize }: Batc
 
             {/* Actions */}
             <div className="pt-6 border-t border-border/50 flex flex-col gap-2.5 pb-8">
-              <Button 
-                className={`w-full h-11 text-sm font-bold shadow-sm transition-all hover:scale-[1.01] ${batch.riskLevel === 'critical' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground' : 'bg-primary hover:bg-primary/90 text-primary-foreground'}`}
-                onClick={() => { onPrioritize(batch.id); onClose(); }}
-              >
-                {batch.status === "prioritized" ? (
-                  <><Star className="h-4 w-4 mr-2" /> Execute FEFO Priority</>
-                ) : batch.status === "transfer" ? (
-                  <><ArrowRightLeft className="h-4 w-4 mr-2" /> Initiate Transfer</>
-                ) : (
-                  <><Clock className="h-4 w-4 mr-2" /> Monitor Batch</>
-                )}
-              </Button>
+              {/*
+                A link, not a mutation. This used to call an empty `onPrioritize` and
+                then close the sheet, which read as success; there is no expiry action
+                endpoint to call, so it goes where the action is actually carried out.
+              */}
+              <Link href={destinationFor(batch)} passHref className="w-full">
+                <Button
+                  className={`w-full h-11 text-sm font-bold shadow-sm transition-all hover:scale-[1.01] ${batch.riskLevel === 'critical' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground' : 'bg-primary hover:bg-primary/90 text-primary-foreground'}`}
+                  onClick={onClose}
+                >
+                  {batch.status === "prioritized" ? (
+                    <><Star className="h-4 w-4 mr-2" /> Review FEFO recommendation</>
+                  ) : batch.status === "transfer" ? (
+                    <><ArrowRightLeft className="h-4 w-4 mr-2" /> Open the proposed transfer</>
+                  ) : (
+                    <><Clock className="h-4 w-4 mr-2" /> Open its stock position</>
+                  )}
+                </Button>
+              </Link>
               <Link href={scopedHref("/recommendations", { sku: batch.sku })} passHref className="w-full">
                 <Button variant="outline" className="w-full h-11 text-sm font-bold bg-background border-border/60 hover:bg-muted/30 transition-all" onClick={onClose}>
                   <Navigation className="h-4 w-4 mr-2 text-muted-foreground" />

@@ -2,9 +2,7 @@ import { api } from "./client";
 import type { QueryParams } from "./types";
 import { z } from "zod";
 import {
-  distributorSchema,
   productSchema,
-  promotionSchema,
   warehouseSchema,
 } from "@/schemas/masterdata";
 
@@ -27,11 +25,3 @@ export const listProducts = async (params?: MasterDataParams) => {
 
 export const listWarehouses = async (params?: MasterDataParams) =>
   z.array(warehouseSchema).parse(await api.get<unknown>("/warehouses", params));
-
-export const listDistributors = async (params?: MasterDataParams) =>
-  z.array(distributorSchema).parse(await api.get<unknown>("/distributors", params));
-
-export const listPromotions = async (params?: MasterDataParams) => {
-  const page = await api.getPage<unknown>("/promotions", params);
-  return { ...page, data: z.array(promotionSchema).parse(page.data) };
-};

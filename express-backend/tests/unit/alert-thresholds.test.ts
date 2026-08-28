@@ -8,6 +8,45 @@ import {
 
 const GLOBAL: GlobalAlertThresholds = { stockoutProbability: 40, expiryWindow: 30 };
 
+describe("resolveThresholds - minimum stock floor", () => {
+  // The floor has no global counterpart on purpose: one unit count across forty SKUs
+  // could not be right for any of them. So null means "rule off", never "inherit".
+  test("is null when the position sets none", () => {
+    for (const override of [undefined, null, {}, { minimumStockUnits: null }]) {
+      assert.equal(resolveThresholds(GLOBAL, override).minimumStockUnits, null);
+    }
+  });
+
+  test("carries the value the position set", () => {
+    assert.equal(resolveThresholds(GLOBAL, { minimumStockUnits: 500 }).minimumStockUnits, 500);
+  });
+
+  test("a floor of zero is treated as unset rather than as a floor", () => {
+    // Zero would arm on a position that is already empty and says nothing the
+    // probability rule has not already said.
+    assert.equal(resolveThresholds(GLOBAL, { minimumStockUnits: 0 }).minimumStockUnits, null);
+  });
+
+  test("setting only the floor leaves both inherited thresholds untouched", () => {
+    const resolved = resolveThresholds(GLOBAL, { minimumStockUnits: 250 });
+    assert.equal(resolved.stockoutProbability, GLOBAL.stockoutProbability);
+    assert.equal(resolved.expiryWindow, GLOBAL.expiryWindow);
+    assert.equal(resolved.overridden.stockoutProbability, false);
+    assert.equal(resolved.overridden.expiryWindow, false);
+  });
+
+  test("the floor does not disturb the other two overrides", () => {
+    const resolved = resolveThresholds(GLOBAL, {
+      alertStockoutProbability: 15,
+      alertExpiryWindowDays: 90,
+      minimumStockUnits: 500,
+    });
+    assert.equal(resolved.stockoutProbability, 15);
+    assert.equal(resolved.expiryWindow, 90);
+    assert.equal(resolved.minimumStockUnits, 500);
+  });
+});
+
 describe("resolveThresholds", () => {
   test("no override inherits the global set exactly", () => {
     for (const override of [undefined, null, {}, { alertStockoutProbability: null }]) {

@@ -37,12 +37,22 @@ export function DemandExpiryAnalysis() {
             </div>
 
             <div className="w-full h-8 rounded-md bg-muted overflow-hidden flex border border-border/50 shadow-inner">
-              <div className="h-full bg-success transition-all border-r border-background/20 relative group cursor-pointer" style={{ width: `${data.utilizationPercent}%` }}>
-                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors"/>
-              </div>
-              <div className="h-full bg-destructive transition-all relative group cursor-pointer" style={{ width: `${data.wastedSharePercent}%` }}>
-                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors"/>
-              </div>
+              {/*
+                Segments of a bar, not controls. They carried `cursor-pointer` and a
+                hover highlight with no handler behind either, so the chart invited a
+                click that did nothing. The figure each represents is on the labels
+                above and repeated in the title for a hover.
+              */}
+              <div
+                className="h-full bg-success transition-all border-r border-background/20"
+                style={{ width: `${data.utilizationPercent}%` }}
+                title={`${data.utilizationPercent}% of stock consumed before expiry`}
+              />
+              <div
+                className="h-full bg-destructive transition-all"
+                style={{ width: `${data.wastedSharePercent}%` }}
+                title={`${data.wastedSharePercent}% projected to expire unsold`}
+              />
             </div>
 
             <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-wider text-muted-foreground mt-2">

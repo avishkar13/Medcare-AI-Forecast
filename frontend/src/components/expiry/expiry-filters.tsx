@@ -1,5 +1,7 @@
 "use client";
 
+import { useWarehouses } from "@/hooks/use-masterdata";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, RotateCcw, ArrowUpDown } from "lucide-react";
@@ -12,6 +14,8 @@ interface ExpiryFiltersProps {
 }
 
 export function ExpiryFilters({ filters, updateFilter, onReset }: ExpiryFiltersProps) {
+  const { data: warehouses } = useWarehouses();
+
   const hasActiveFilters = 
     filters.search !== "" || 
     filters.window !== "all" || 
@@ -90,13 +94,17 @@ export function ExpiryFilters({ filters, updateFilter, onReset }: ExpiryFiltersP
           value={filters.category}
           onChange={(e) => updateFilter("category", e.target.value)}
         >
-          <option value="all">Category: All</option>
-          <option value="Antibiotics">Antibiotics</option>
-          <option value="Cardiovascular">Cardiovascular</option>
-          <option value="Pain Relief">Pain Relief</option>
-          <option value="Gastrointestinal">Gastrointestinal</option>
-          <option value="Allergy">Allergy</option>
-          <option value="Diabetes">Diabetes</option>
+          {/*
+            Labelled Criticality, because that is what the field holds. The page maps
+            `category: b.criticality`, and `/api/expiry/batches` returns no product
+            category at all - so this offered six drug categories that were compared
+            against CRITICAL/HIGH/MEDIUM/LOW and could never match one.
+          */}
+          <option value="all">Criticality: All</option>
+          <option value="CRITICAL">Critical</option>
+          <option value="HIGH">High</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="LOW">Low</option>
         </select>
 
         <select
@@ -104,11 +112,13 @@ export function ExpiryFilters({ filters, updateFilter, onReset }: ExpiryFiltersP
           value={filters.location}
           onChange={(e) => updateFilter("location", e.target.value)}
         >
+          {/* Real DCs, from the warehouse list. The four hardcoded names did not exist. */}
           <option value="all">Location: All DCs</option>
-          <option value="Northeast DC">Northeast DC</option>
-          <option value="South DC">South DC</option>
-          <option value="West Coast DC">West Coast DC</option>
-          <option value="Midwest DC">Midwest DC</option>
+          {(warehouses ?? []).map((warehouse) => (
+            <option key={warehouse.id} value={warehouse.name}>
+              {warehouse.name}
+            </option>
+          ))}
         </select>
 
         <select
@@ -116,10 +126,17 @@ export function ExpiryFilters({ filters, updateFilter, onReset }: ExpiryFiltersP
           value={filters.status}
           onChange={(e) => updateFilter("status", e.target.value)}
         >
+          {/*
+            The four statuses the page actually derives. These were "Overstock /
+            Normal / Below Safety Stock" - none of which the page produces - and
+            `filters.status` was read by nothing at all, so the control was doubly
+            decorative while still highlighting itself as active.
+          */}
           <option value="all">Status: All</option>
-          <option value="Overstock">Overstock</option>
-          <option value="Normal">Normal</option>
-          <option value="Below Safety Stock">Below Safety Stock</option>
+          <option value="prioritized">Prioritise</option>
+          <option value="transfer">Transfer</option>
+          <option value="monitor">Monitor</option>
+          <option value="normal">No action</option>
         </select>
       </div>
     </div>

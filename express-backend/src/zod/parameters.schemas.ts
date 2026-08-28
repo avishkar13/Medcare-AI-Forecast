@@ -39,6 +39,11 @@ export const upsertParametersBodySchema = z
      */
     alertStockoutProbability: z.number().min(0).max(100).nullable().default(null),
     alertExpiryWindowDays: z.number().int().min(1).max(365).nullable().default(null),
+    /**
+     * A floor in units, per item-location. No global counterpart exists, so null here
+     * means the rule is off for this position rather than "inherit".
+     */
+    minimumStockUnits: nonNegative.max(1_000_000).nullable().default(null),
   })
   .refine(
     (value) =>

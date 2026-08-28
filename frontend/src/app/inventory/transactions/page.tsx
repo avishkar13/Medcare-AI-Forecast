@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { QueryErrorInline } from "@/components/ui/query-state";
 import { RecordMovementDialog } from "@/components/inventory/record-movement-dialog";
+import { DcSyncStatus } from "@/components/inventory/dc-sync-status";
 import { useMovements } from "@/hooks/use-movements";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useScope } from "@/hooks/use-scope";
@@ -44,7 +45,7 @@ export default function TransactionsPage() {
 }
 
 function TransactionsView() {
-  const { withScope } = useScope();
+  const { withScope, dcCode } = useScope();
   const { formatNumber } = useFormatters();
 
   const [search, setSearch] = useState("");
@@ -70,6 +71,8 @@ function TransactionsView() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {/* Renders only when a DC is selected: "last synced" is per site. */}
+          <DcSyncStatus {...(dcCode ? { dcCode } : {})} />
           <Button
             variant="outline"
             size="sm"

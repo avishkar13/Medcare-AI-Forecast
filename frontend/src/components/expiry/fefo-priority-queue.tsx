@@ -2,14 +2,17 @@
 
 import { ExpiryBatch } from "@/types/expiry";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { ArrowRight, Star } from "lucide-react";
+import { useScopedHref } from "@/hooks/use-scope";
 
 interface FEFOPriorityQueueProps {
   batches: ExpiryBatch[];
 }
 
 export function FEFOPriorityQueue({ batches }: FEFOPriorityQueueProps) {
+  const scopedHref = useScopedHref();
+
   /**
    * First-Expired-First-Out, which is what the panel is named after.
    *
@@ -31,6 +34,17 @@ export function FEFOPriorityQueue({ batches }: FEFOPriorityQueueProps) {
     if (batch.status === "monitor") return "Accelerate Consumption";
     // `normal` - demand already covers the batch before it expires.
     return "No Action Needed";
+  };
+
+  /**
+   * Every label above named an action with no endpoint behind it and no handler on the
+   * button, so the whole queue was decorative. Each now leads to the surface where the
+   * action is really taken - the same mapping the table and the batch sheet use.
+   */
+  const destinationFor = (batch: ExpiryBatch) => {
+    if (batch.status === "transfer") return scopedHref("/plans", { sku: batch.sku });
+    if (batch.status === "prioritized") return scopedHref("/recommendations", { sku: batch.sku });
+    return scopedHref("/inventory", { sku: batch.sku });
   };
 
   return (
@@ -62,7 +76,11 @@ export function FEFOPriorityQueue({ batches }: FEFOPriorityQueueProps) {
             };
 
             return (
-            <div key={batch.id} className={`flex flex-col md:flex-row gap-4 p-4 items-start md:items-center transition-all group cursor-pointer ${getRankStyles(index)}`}>
+            <Link
+              key={batch.id}
+              href={destinationFor(batch)}
+              className={`flex flex-col md:flex-row gap-4 p-4 items-start md:items-center transition-all group cursor-pointer ${getRankStyles(index)}`}
+            >
               
               {/* Rank */}
               <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-black text-sm border ${getRankBadgeStyles(index)}`}>
@@ -87,13 +105,14 @@ export function FEFOPriorityQueue({ batches }: FEFOPriorityQueueProps) {
                     <span className="font-bold text-xs text-foreground">{batch.quantity.toLocaleString()} units</span>
                     <span className="text-[10px] font-medium text-muted-foreground">Coverage: {batch.demandCoverage}%</span>
                   </div>
-                  <Button size="sm" variant="secondary" className="w-full sm:w-auto h-8 px-3 text-[11px] font-bold bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer shadow-sm border border-primary/20 hover:border-primary">
+                  {/* The whole row is the link; this is its affordance, not a second target. */}
+                  <span className="inline-flex w-full items-center justify-center rounded-lg border border-primary/20 bg-primary/10 px-3 py-1.5 text-[11px] font-bold text-primary shadow-sm transition-colors group-hover:bg-primary group-hover:text-primary-foreground sm:w-auto">
                     {getAction(batch)}
-                    <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
-                  </Button>
+                    <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                  </span>
                 </div>
               </div>
-            </div>
+            </Link>
             );
           })}
           

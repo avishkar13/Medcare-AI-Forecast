@@ -12,7 +12,6 @@ import {
   getExpiryOverview,
   getExpiryTimeline,
   getWastePrevention,
-  listAllExpiryBatches,
   listExpiryBatches,
   type ExpiryParams,
 } from "@/lib/api/expiry";
@@ -27,7 +26,10 @@ import {
  */
 const useScopedParams = (params?: ExpiryParams): ExpiryParams => {
   const dc = useUiStore((state) => state.dc);
-  return { ...params, ...(dc ? { warehouse: dc } : {}) };
+  // As with the DC: a link that names a SKU means it, and dropping it landed the
+  // reader on every batch in the network instead of the one they asked about.
+  const sku = useUiStore((state) => state.sku);
+  return { ...params, ...(dc ? { warehouse: dc } : {}), ...(sku ? { sku } : {}) };
 };
 
 export function useExpiryBatches(pageSize = 200) {
@@ -83,14 +85,6 @@ export function useExpiryAssessment() {
   });
 }
 
-export function useAllExpiryBatches() {
-  const scoped = useScopedParams({ all: true });
-  return useQuery({
-    queryKey: queryKeys.expiry.batches(scoped),
-    queryFn: () => listAllExpiryBatches(scoped),
-    staleTime: STALE_TIME.list,
-  });
-}
 
 export function useExpiryExposure() {
   const scoped = useScopedParams();

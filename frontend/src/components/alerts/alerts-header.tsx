@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ExportButton } from "@/components/ui/export-button";
 import { RadarIcon, CheckCircle2, Loader2 } from "lucide-react";
 import { useAlertOverview, useRefreshAlerts } from "@/hooks/use-alerts";
 import { useReadiness } from "@/hooks/use-health";
@@ -9,9 +10,15 @@ import { useRealtime } from "@/providers/realtime-provider";
 interface AlertsHeaderProps {
   onMarkAllRead: () => void;
   isFetching?: boolean;
+  /** The page's live filters, so the export matches what is on screen. */
+  exportParams?: Record<string, string | number | boolean | null | undefined>;
 }
 
-export function AlertsHeader({ onMarkAllRead, isFetching = false }: AlertsHeaderProps) {
+export function AlertsHeader({
+  onMarkAllRead,
+  isFetching = false,
+  exportParams,
+}: AlertsHeaderProps) {
   const overview = useAlertOverview();
   const { data: readiness } = useReadiness();
   const { isLive } = useRealtime();
@@ -86,6 +93,13 @@ export function AlertsHeader({ onMarkAllRead, isFetching = false }: AlertsHeader
             <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
             Mark All Read
           </Button>
+          {/* E1 output 1: the low-stock alert log. */}
+          <ExportButton
+            path="/alerts/export"
+            fallbackName="low-stock-alert-log.csv"
+            label="alerts"
+            {...(exportParams ? { params: exportParams } : {})}
+          />
         </div>
       </div>
     </div>

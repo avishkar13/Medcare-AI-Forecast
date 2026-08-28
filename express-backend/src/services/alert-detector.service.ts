@@ -108,19 +108,30 @@ const detectStockoutRisk = (
   for (const position of positions) {
     // Per item-location, falling back to the global value. A single number governing 160
     // positions could only ever be right for a few of them.
-    const { stockoutProbability: thresholdPercent, overridden } = resolveThresholds(
-      global,
-      position,
-    );
+    const { stockoutProbability: thresholdPercent, minimumStockUnits, overridden } =
+      resolveThresholds(global, position);
 
     const probability = stockoutProbabilityPercent(position);
-    if (probability < thresholdPercent) continue;
+
+    // Two independent rules, either of which raises. The probability rule is the
+    // planning signal; the unit floor is the plain "tell me at 500 units" a stock
+    // controller asks for, and a slow-moving SKU can sit under its floor for weeks
+    // without the probability rule ever firing.
+    const belowFloor = minimumStockUnits !== null && availableStock(position) <= minimumStockUnits;
+    if (probability < thresholdPercent && !belowFloor) continue;
 
     // Judged on the same two quantities the dashboard uses, so an alert and the KPI it
     // rolls into can never disagree: replenishment against the inventory position
     // (on-hand plus what is already inbound), cover against what is actually available.
     const shortfall = Math.max(0, position.reorderPoint - inventoryPosition(position));
-    if (shortfall < MIN_ACTIONABLE_UNITS) continue;
+    // The floor is about stock on the shelf now, so it answers to available stock and
+    // not to the inventory position. Gating it on the reorder-point shortfall would let
+    // a position sitting under its floor go unreported whenever enough was inbound -
+    // which is the report the floor exists to produce.
+    const floorShortfall = belowFloor
+      ? Math.max(0, minimumStockUnits! - availableStock(position))
+      : 0;
+    if (!belowFloor && shortfall < MIN_ACTIONABLE_UNITS) continue;
 
     const bufferBreached = availableStock(position) < position.safetyStock;
     const severity: Severity = bufferBreached
@@ -135,17 +146,23 @@ const detectStockoutRisk = (
       fingerprint: fingerprintOf("stockout_risk", position.productId, position.warehouseId),
       severity,
       type: "stockout_risk",
-      title: `${position.productName} is ${probability}% likely to stock out at ${position.warehouseName}`,
+      title: belowFloor
+        ? `${position.productName} is below its minimum stock level at ${position.warehouseName}`
+        : `${position.productName} is ${probability}% likely to stock out at ${position.warehouseName}`,
       sku: position.sku,
       productName: position.productName,
       location: position.warehouseName,
       productId: position.productId,
       warehouseId: position.warehouseId,
-      businessImpact: `${units(shortfall)} units short of the reorder point, ${money(shortfall * position.stockoutCostPerUnit)} of stockout exposure`,
+      businessImpact: belowFloor
+        ? `${units(availableStock(position))} units available against a minimum of ${units(minimumStockUnits!)}, ${money(floorShortfall * position.stockoutCostPerUnit)} of stockout exposure`
+        : `${units(shortfall)} units short of the reorder point, ${money(shortfall * position.stockoutCostPerUnit)} of stockout exposure`,
       recommendedAction: bufferBreached
-        ? `Expedite ${units(shortfall)} units — stock is already below the safety buffer`
-        : `Raise a replenishment order for ${units(shortfall)} units`,
-      explanation: `${position.daysOfSupply} days of supply remain against a ${position.leadTimeDays}-day lead time, so a standard order placed today arrives after stock runs out.`,
+        ? `Expedite ${units(Math.max(shortfall, floorShortfall))} units — stock is already below the safety buffer`
+        : `Raise a replenishment order for ${units(Math.max(shortfall, floorShortfall))} units`,
+      explanation: belowFloor
+        ? `Available stock has reached the minimum level set for this item at this DC, so it is due a replenishment order whatever the forecast says.`
+        : `${position.daysOfSupply} days of supply remain against a ${position.leadTimeDays}-day lead time, so a standard order placed today arrives after stock runs out.`,
       metrics: [
         { label: "On hand", value: units(position.onHand) },
         // Both shown, because the verdict is made on them rather than on on-hand, and a
@@ -161,6 +178,11 @@ const detectStockoutRisk = (
           label: "Threshold",
           value: `${thresholdPercent}%${overridden.stockoutProbability ? " (set for this SKU)" : " (global)"}`,
         },
+        // Only shown when the rule is in play, so a reader is never told about a
+        // floor that was not part of the verdict.
+        ...(minimumStockUnits === null
+          ? []
+          : [{ label: "Minimum stock", value: `${units(minimumStockUnits)} (set for this SKU)` }]),
       ],
     });
   }

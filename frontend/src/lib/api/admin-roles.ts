@@ -62,7 +62,3 @@ export const listPermissions = async () => {
 export const assignRolePermissions = async (roleId: string, data: AssignPermissionsInput) => {
   return await api.put<Role>(`/admin/roles/${roleId}/permissions`, data);
 };
-
-export const removeRolePermission = async (roleId: string, permissionId: string) => {
-  return await api.delete<Role>(`/admin/roles/${roleId}/permissions/${permissionId}`);
-};

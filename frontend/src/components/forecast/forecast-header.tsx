@@ -6,14 +6,17 @@ import { RefreshCw, Clock } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { queryKeys } from "@/config/query-keys";
 import { useForecastKpi } from "@/hooks/use-forecast";
-import { useFiltersStore, useForecastScope } from "@/store/filters.store";
+import { useForecastScope } from "@/store/filters.store";
+import { useScope } from "@/hooks/use-scope";
 
 const HORIZONS = [7, 14, 30, 90];
 
 export function ForecastHeader() {
   const client = useQueryClient();
   const scope = useForecastScope();
-  const setScope = useFiltersStore((state) => state.setForecastScope);
+  // Writes the horizon to the URL, which is what every forecast panel reads. It used
+  // to write to a store copy the URL always won over, so the control was inert.
+  const { setHorizonDays } = useScope();
   const kpi = useForecastKpi(scope);
 
   const handleRefresh = () => {
@@ -29,7 +32,7 @@ export function ForecastHeader() {
       <div className="flex flex-wrap items-center gap-3">
         <Select
           value={String(scope.days)}
-          onValueChange={(value) => value && setScope({ days: Number(value) })}
+          onValueChange={(value) => value && setHorizonDays(Number(value))}
         >
           <SelectTrigger className="w-[120px] bg-background">
             <SelectValue placeholder="Horizon" />

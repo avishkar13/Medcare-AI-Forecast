@@ -82,6 +82,11 @@ export function ForecastControlBar() {
             </SelectContent>
           </Select>
 
+          {/*
+            Emits the warehouse **id**, not its code: `useForecastScope` resolves this
+            against `?dc=`, which carries an id, so the two halves of that precedence
+            rule were comparing different value spaces and never agreed.
+          */}
           <Select
             value={scope.warehouse ?? ALL}
             onValueChange={(value) =>
@@ -94,7 +99,7 @@ export function ForecastControlBar() {
             <SelectContent>
               <SelectItem value={ALL}>All DCs (Network)</SelectItem>
               {(warehouses ?? []).map((warehouse) => (
-                <SelectItem key={warehouse.code} value={warehouse.code}>
+                <SelectItem key={warehouse.id} value={warehouse.id}>
                   {warehouse.name}
                 </SelectItem>
               ))}

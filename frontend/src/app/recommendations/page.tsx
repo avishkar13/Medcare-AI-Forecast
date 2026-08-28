@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Suspense, useState, useMemo } from "react";
+import { useScope } from "@/hooks/use-scope";
 import { RecommendationsHeader } from "@/components/recommendations/recommendations-header";
 import { RecommendationsKpiCards } from "@/components/recommendations/recommendations-kpi-cards";
 import { RecommendationsFilters } from "@/components/recommendations/recommendations-filters";
@@ -23,7 +24,29 @@ const share = (
   type: string,
 ) => byType?.find((row) => row.type === type)?.sharePercent ?? 0;
 
+/**
+ * `useScope` reads `useSearchParams`, which opts a route out of static rendering
+ * unless it sits behind a Suspense boundary - the same shape `app/alerts/page.tsx` uses.
+ */
 export default function RecommendationsPage() {
+  return (
+    <Suspense
+      fallback={<p className="p-6 text-sm text-muted-foreground">Loading recommendations…</p>}
+    >
+      <RecommendationsView />
+    </Suspense>
+  );
+}
+
+function RecommendationsView() {
+  /**
+   * Called for its effect, not its return value: `useScope` is what writes `?dc=` and
+   * `?sku=` into the ui store, and this page never called it - so the store still held
+   * whichever SKU the *previous* page had set, and a deep link here was ignored while
+   * a stale scope was silently applied.
+   */
+  useScope();
+
   const { data, isPending, isError } = useRecommendations({ pageSize: 200 });
   const impact = useRecommendationImpact();
   const intelligence = useRecommendationIntelligence();

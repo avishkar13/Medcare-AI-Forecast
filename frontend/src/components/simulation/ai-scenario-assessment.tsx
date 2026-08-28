@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 // import { Badge } from "@/components/ui/badge";
 import { AIInsight } from "@/types/simulation";
@@ -60,9 +61,16 @@ export function AIScenarioAssessment({ insight }: AIScenarioAssessmentProps) {
               <Zap className="h-4 w-4 text-ai fill-ai/20" />
               <p className="text-[11px] font-black text-ai uppercase tracking-wider">Suggested Action Plan</p>
             </div>
-            <button className="flex items-center gap-1 mt-0 text-[10px] font-bold text-ai hover:text-ai/80 transition-colors">
+            {/*
+              Had no handler. The suggested plan is a recommendation, and the review
+              surface for those is where "details" actually live.
+            */}
+            <Link
+              href="/recommendations"
+              className="mt-0 flex cursor-pointer items-center gap-1 text-[10px] font-bold text-ai transition-colors hover:text-ai/80"
+            >
               View details <ArrowRight className="h-3 w-3" />
-            </button>
+            </Link>
           </div>
           <p className="text-sm font-semibold text-foreground leading-relaxed pl-1">{insight.suggestedResponse}</p>
         </div>

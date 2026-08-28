@@ -2,6 +2,7 @@ import { AppSettings } from "@/types/settings";
 import { SettingsSection, SettingsCard, SettingsRow, SettingsToggle } from "./settings-ui";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { RefreshCcw, Database, Key } from "lucide-react";
 
 export function IntegrationSettings({
@@ -39,11 +40,49 @@ export function IntegrationSettings({
               <span className="text-sm font-semibold text-foreground">{source.records.toLocaleString()} records synced</span>
             </div>
             
+            {/*
+              Disabled rather than silent. `POST /settings/integrations/test` was
+              deliberately removed from the backend because it reported "Connection
+              successful, latencyMs: 145" without contacting anything, and there is no
+              sync endpoint at all - so these say why instead of doing nothing when
+              pressed. Re-enable them when an ERP endpoint exists to reach.
+            */}
             <div className="flex gap-2 mt-5 pt-4 border-t border-border/50">
-              <Button variant="outline" size="sm" className="w-full text-xs font-semibold h-8 hover:bg-muted">Manage</Button>
-              <Button variant="secondary" size="sm" className="w-full text-xs font-semibold h-8 shadow-sm">
-                <RefreshCcw className="h-3 w-3 mr-2" /> Sync
-              </Button>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-xs font-semibold h-8"
+                      disabled
+                    />
+                  }
+                >
+                  Manage
+                </TooltipTrigger>
+                <TooltipContent>
+                  Needs a configured ERP connection — none is set up for this environment
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full text-xs font-semibold h-8 shadow-sm"
+                      disabled
+                    />
+                  }
+                >
+                  <RefreshCcw className="h-3 w-3 mr-2" /> Sync
+                </TooltipTrigger>
+                <TooltipContent>
+                  No sync endpoint exists yet; the figures above come from the last
+                  recorded import
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
         ))}
@@ -104,10 +143,20 @@ export function IntegrationSettings({
              <span className="text-sm font-bold text-foreground">{data.api.version}</span>
           </SettingsRow>
           <SettingsRow title="API Keys" description="Manage authentication keys for external systems.">
-            <Button variant="outline" size="sm" className="h-8 text-xs font-semibold">
-              <Key className="h-3.5 w-3.5 mr-2" />
-              Manage Keys
-            </Button>
+            {/* No key-management endpoint exists; the engine's own key is an env var. */}
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button variant="outline" size="sm" className="h-8 text-xs font-semibold" disabled />
+                }
+              >
+                <Key className="h-3.5 w-3.5 mr-2" />
+                Manage Keys
+              </TooltipTrigger>
+              <TooltipContent>
+                Service keys are set as environment variables, not managed from the app
+              </TooltipContent>
+            </Tooltip>
           </SettingsRow>
          </div>
       </SettingsCard>

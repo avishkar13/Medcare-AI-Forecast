@@ -19,9 +19,41 @@ let product: { id: string; sku: string };
 
 const created: string[] = [];
 
+/**
+ * Fixture identity, named once so setup and teardown cannot drift apart.
+ * `before` clears these before creating them, which is what makes a re-run possible
+ * after a previous run was interrupted: a leaked warehouse used to fail the unique
+ * constraint on `code` and take the whole suite down with it.
+ */
+const FIXTURE_SKU = "MOVE_P1";
+const FIXTURE_DC = "MOVE_W1";
+
+/** Removes the fixtures and everything hanging off them, in FK order. Idempotent. */
+const clearFixtures = async () => {
+  const stale = await prisma.product.findMany({
+    where: { sku: FIXTURE_SKU },
+    select: { id: true },
+  });
+  const ids = stale.map((row) => row.id);
+
+  if (ids.length > 0) {
+    await prisma.stockMovement.deleteMany({ where: { productId: { in: ids } } });
+    await prisma.restockRequest.deleteMany({ where: { productId: { in: ids } } });
+    await prisma.demandHistory.deleteMany({ where: { productId: { in: ids } } });
+    await prisma.inventory.deleteMany({ where: { productId: { in: ids } } });
+    await prisma.inventoryBatch.deleteMany({ where: { productId: { in: ids } } });
+    await prisma.alert.deleteMany({ where: { productId: { in: ids } } });
+    await prisma.product.deleteMany({ where: { id: { in: ids } } });
+  }
+
+  await prisma.warehouse.deleteMany({ where: { code: FIXTURE_DC } });
+};
+
 before(async () => {
   if (redis) await redis.flushdb();
   server = await startServer(app);
+
+  await clearFixtures();
 
   warehouse = await prisma.warehouse.create({
     data: { code: "MOVE_W1", name: "Movement Warehouse", region: "NA", tier: "TIER_1" },
@@ -44,14 +76,14 @@ before(async () => {
 });
 
 after(async () => {
-  await prisma.stockMovement.deleteMany({ where: { productId: product?.id } });
-  await prisma.restockRequest.deleteMany({ where: { productId: product?.id } });
-  await prisma.demandHistory.deleteMany({ where: { productId: product?.id } });
-  await prisma.inventory.deleteMany({ where: { productId: product?.id } });
-  await prisma.alert.deleteMany({ where: { productId: product?.id } });
-  if (product) await prisma.product.deleteMany({ where: { id: product.id } });
-  if (warehouse) await prisma.warehouse.deleteMany({ where: { id: warehouse.id } });
-  await server.close();
+  // Cleared by fixture *identity*, never by a captured id. The previous version
+  // filtered on `product?.id`, and Prisma reads `where: { productId: undefined }` as
+  // *no filter* - so whenever `before` threw, these became unfiltered deletes of five
+  // whole tables. That is not hypothetical: it emptied DemandHistory, Inventory and
+  // Alert on a shared database once.
+  await clearFixtures();
+  // `before` can throw before the server is assigned, so it is not guaranteed here.
+  if (server) await server.close();
   await teardown();
 });
 

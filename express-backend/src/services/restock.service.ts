@@ -154,12 +154,22 @@ export const decideRestockRequest = async (
   id: string,
   action: "approve" | "reject",
   actorId?: string,
+  authScope?: { warehouseId?: string | null },
 ) => {
   const existing = await prisma.restockRequest.findUnique({
     where: { id },
-    select: { id: true, status: true },
+    // The warehouse comes back so the decision can be scoped. `create` and `list` both
+    // narrow by the caller's DC and these two did not, so a DC-confined planner could
+    // approve stock for a site they cannot even see.
+    select: { id: true, status: true, warehouseId: true },
   });
   if (!existing) throw new NotFoundError(`Restock request '${id}' not found`);
+
+  // Not found rather than forbidden: a confined caller has no business learning that a
+  // request exists at a DC outside their scope, and 403 would tell them it does.
+  if (authScope?.warehouseId && existing.warehouseId !== authScope.warehouseId) {
+    throw new NotFoundError(`Restock request '${id}' not found`);
+  }
 
   if (existing.status !== RestockStatus.REQUESTED) {
     throw new ConflictError(

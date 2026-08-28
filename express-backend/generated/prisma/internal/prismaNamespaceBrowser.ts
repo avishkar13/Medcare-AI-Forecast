@@ -222,7 +222,8 @@ export const PlanningParameterScalarFieldEnum = {
   stockoutCostPerUnit: 'stockoutCostPerUnit',
   expiryCostPerUnit: 'expiryCostPerUnit',
   alertStockoutProbability: 'alertStockoutProbability',
-  alertExpiryWindowDays: 'alertExpiryWindowDays'
+  alertExpiryWindowDays: 'alertExpiryWindowDays',
+  minimumStockUnits: 'minimumStockUnits'
 } as const
 
 export type PlanningParameterScalarFieldEnum = (typeof PlanningParameterScalarFieldEnum)[keyof typeof PlanningParameterScalarFieldEnum]

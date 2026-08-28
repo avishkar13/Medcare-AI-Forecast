@@ -12,6 +12,7 @@ export const IS_PRODUCTION = env.NODE_ENV === "production";
 export const IS_TEST = env.NODE_ENV === "test";
 export const REQUEST_ID_HEADER = "x-request-id";
 export const TRAINING_ROWS_HEADER = "x-training-rows";
+export const EXPORT_ROWS_HEADER = "x-export-rows";
 
 export const SERVER = {
   host: env.HOST,
@@ -30,7 +31,9 @@ export const SERVER = {
 export const CORS = {
   origins: corsOrigins.includes("*") ? "*" : corsOrigins,
   credentials: corsOrigins.includes("*") ? false : env.CORS_CREDENTIALS,
-  exposedHeaders: [REQUEST_ID_HEADER, TRAINING_ROWS_HEADER, "x-future-promotions", "x-future-signals", "RateLimit", "RateLimit-Policy", "Retry-After"],
+  // Content-Disposition has to be exposed or the browser drops the filename and every
+  // download lands as "download"; x-export-rows is how a client detects a short file.
+  exposedHeaders: [REQUEST_ID_HEADER, TRAINING_ROWS_HEADER, EXPORT_ROWS_HEADER, "Content-Disposition", "x-future-promotions", "x-future-signals", "RateLimit", "RateLimit-Policy", "Retry-After"],
   maxAgeSeconds: 86_400,
 } as const;
 

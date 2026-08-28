@@ -4,9 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/config/query-keys";
 import { STALE_TIME } from "@/config/constants";
 import {
-  listDistributors,
   listProducts,
-  listPromotions,
   listWarehouses,
 } from "@/lib/api/masterdata";
 
@@ -33,18 +31,4 @@ export function useWarehouses() {
   });
 }
 
-export function useDistributors() {
-  return useQuery({
-    queryKey: queryKeys.masterdata.distributors(),
-    queryFn: () => listDistributors(),
-    staleTime: STALE_TIME.reference,
-  });
-}
 
-export function usePromotions(pageSize = 200) {
-  return useQuery({
-    queryKey: queryKeys.masterdata.promotions({ pageSize }),
-    queryFn: async () => (await listPromotions({ pageSize })).data,
-    staleTime: STALE_TIME.reference,
-  });
-}

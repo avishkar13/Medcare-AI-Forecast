@@ -51,6 +51,7 @@ const parameterSelect = {
   expiryCostPerUnit: true,
   alertStockoutProbability: true,
   alertExpiryWindowDays: true,
+  minimumStockUnits: true,
   product: { select: { sku: true, name: true, criticality: true } },
   warehouse: { select: { code: true, name: true, tier: true } },
 } satisfies Prisma.PlanningParameterSelect;
@@ -80,6 +81,7 @@ const toParameter = (row: ParameterRow) => ({
   // "inherited" rather than as a blank or as the global number styled as if set here.
   alertStockoutProbability: row.alertStockoutProbability,
   alertExpiryWindowDays: row.alertExpiryWindowDays,
+  minimumStockUnits: row.minimumStockUnits,
 });
 
 export const listParameters = async (query: ParametersQuery, authScope?: { warehouseId?: string | null }) => {
@@ -133,6 +135,7 @@ export const upsertParameters = async (body: UpsertParametersBody) => {
     expiryCostPerUnit: body.expiryCostPerUnit,
     alertStockoutProbability: body.alertStockoutProbability,
     alertExpiryWindowDays: body.alertExpiryWindowDays,
+    minimumStockUnits: body.minimumStockUnits,
   };
 
   const row = await prisma.planningParameter.upsert({

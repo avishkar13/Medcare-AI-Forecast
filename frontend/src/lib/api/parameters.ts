@@ -33,6 +33,8 @@ export interface UpsertParametersBody {
   /** Null clears the override and restores inheritance from the global setting. */
   alertStockoutProbability?: number | null;
   alertExpiryWindowDays?: number | null;
+  /** Null turns the unit floor off; there is no global counterpart to inherit. */
+  minimumStockUnits?: number | null;
 }
 
 /**

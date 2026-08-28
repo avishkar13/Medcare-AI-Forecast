@@ -34,6 +34,8 @@ export const planningParameterSchema = z.object({
    */
   alertStockoutProbability: z.number().nullable(),
   alertExpiryWindowDays: z.number().nullable(),
+  /** A floor in units. Null means the rule is off here - there is no global to inherit. */
+  minimumStockUnits: z.number().nullable(),
 });
 
 export type PlanningParameter = z.infer<typeof planningParameterSchema>;

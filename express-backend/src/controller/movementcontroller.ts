@@ -82,10 +82,20 @@ export const listRestockRequests = async (req: Request, res: Response) => {
 
 export const approveRestockRequest = async (req: Request, res: Response) => {
   const params = restockParamsSchema.parse(req.params);
-  ok(res, await restock.decideRestockRequest(params.id, "approve", req.userId));
+  ok(
+    res,
+    await restock.decideRestockRequest(params.id, "approve", req.userId, {
+      warehouseId: req.warehouseScope,
+    }),
+  );
 };
 
 export const rejectRestockRequest = async (req: Request, res: Response) => {
   const params = restockParamsSchema.parse(req.params);
-  ok(res, await restock.decideRestockRequest(params.id, "reject", req.userId));
+  ok(
+    res,
+    await restock.decideRestockRequest(params.id, "reject", req.userId, {
+      warehouseId: req.warehouseScope,
+    }),
+  );
 };

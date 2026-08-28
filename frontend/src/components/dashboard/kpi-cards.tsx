@@ -8,12 +8,17 @@ import {
   Sparkles,
   DollarSign 
 } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useScopedHref } from "@/hooks/use-scope";
 import { useDashboardSummary } from "@/hooks/use-dashboard";
 import { useWarehouses } from "@/hooks/use-masterdata";
 import { useFormatters } from "@/hooks/use-formatters";
 
 export function KpiCards() {
+  // Every one of these six cards carried a number about somewhere else in the app
+  // and no way to get there. Scoped, so the DC in the top bar travels with the click.
+  const scopedHref = useScopedHref();
   const { data, isPending, isError } = useDashboardSummary();
   const { data: warehouses } = useWarehouses();
   const { formatCurrency, formatNumber } = useFormatters();
@@ -53,7 +58,8 @@ export function KpiCards() {
   return (
     <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
       {/* Total Inventory Value */}
-      <Card>
+      <Link href={scopedHref("/inventory")} className="rounded-xl">
+      <Card className="h-full cursor-pointer transition-colors hover:border-primary/40">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium text-muted-foreground">Total Inventory Value</CardTitle>
           <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -65,9 +71,11 @@ export function KpiCards() {
           </p>
         </CardContent>
       </Card>
+      </Link>
 
       {/* SKUs Monitored */}
-      <Card>
+      <Link href={scopedHref("/inventory")} className="rounded-xl">
+      <Card className="h-full cursor-pointer transition-colors hover:border-primary/40">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium text-muted-foreground">SKUs Monitored</CardTitle>
           <PackageSearch className="h-4 w-4 text-muted-foreground" />
@@ -79,9 +87,11 @@ export function KpiCards() {
           </p>
         </CardContent>
       </Card>
+      </Link>
 
       {/* Stockout Risk */}
-      <Card>
+      <Link href={scopedHref("/alerts")} className="rounded-xl">
+      <Card className="h-full cursor-pointer transition-colors hover:border-primary/40">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium text-muted-foreground">Stockout Risk</CardTitle>
           <AlertTriangle className="h-4 w-4 text-destructive" />
@@ -93,9 +103,11 @@ export function KpiCards() {
           </p>
         </CardContent>
       </Card>
+      </Link>
 
       {/* Expiry Risk */}
-      <Card>
+      <Link href={scopedHref("/expiry")} className="rounded-xl">
+      <Card className="h-full cursor-pointer transition-colors hover:border-primary/40">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium text-muted-foreground">Expiry Risk (90 Days)</CardTitle>
           <Clock className="h-4 w-4 text-warning" />
@@ -107,9 +119,11 @@ export function KpiCards() {
           </p>
         </CardContent>
       </Card>
+      </Link>
 
       {/* Forecast Accuracy */}
-      <Card>
+      <Link href={scopedHref("/forecast")} className="rounded-xl">
+      <Card className="h-full cursor-pointer transition-colors hover:border-primary/40">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium text-muted-foreground">Forecast Accuracy</CardTitle>
           <TrendingUp className="h-4 w-4 text-ai" />
@@ -121,9 +135,11 @@ export function KpiCards() {
           </p>
         </CardContent>
       </Card>
+      </Link>
 
       {/* Pending Recommendations */}
-      <Card>
+      <Link href={scopedHref("/recommendations")} className="rounded-xl">
+      <Card className="h-full cursor-pointer transition-colors hover:border-primary/40">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium text-muted-foreground">Recommendations</CardTitle>
           <Sparkles className="h-4 w-4 text-primary" />
@@ -135,6 +151,7 @@ export function KpiCards() {
           </p>
         </CardContent>
       </Card>
+      </Link>
     </div>
   );
 }

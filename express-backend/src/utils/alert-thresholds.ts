@@ -26,11 +26,19 @@ export interface GlobalAlertThresholds {
 export interface AlertThresholdOverride {
   alertStockoutProbability?: number | null;
   alertExpiryWindowDays?: number | null;
+  /**
+   * A floor in units. Unlike the two above it has **no global counterpart** - one unit
+   * count across forty SKUs could not be right for any of them - so null here means the
+   * rule is simply not in play for this position, not "inherit".
+   */
+  minimumStockUnits?: number | null;
 }
 
 export interface ResolvedAlertThresholds {
   stockoutProbability: number;
   expiryWindow: number;
+  /** The unit floor, or null when this position has none set. */
+  minimumStockUnits: number | null;
   /** Which fields were overridden, so an alert can say what it was judged against. */
   overridden: { stockoutProbability: boolean; expiryWindow: boolean };
 }
@@ -52,9 +60,15 @@ export const resolveThresholds = (
   const hasStockout = stockout !== null && stockout !== undefined;
   const hasExpiry = expiry !== null && expiry !== undefined;
 
+  // A floor of zero is not a floor: it would arm on a position that is already empty
+  // and says nothing the probability rule has not said. Treated as unset.
+  const minimum = override?.minimumStockUnits;
+  const hasMinimum = minimum !== null && minimum !== undefined && minimum > 0;
+
   return {
     stockoutProbability: hasStockout ? stockout : global.stockoutProbability,
     expiryWindow: hasExpiry ? expiry : global.expiryWindow,
+    minimumStockUnits: hasMinimum ? minimum : null,
     overridden: { stockoutProbability: hasStockout, expiryWindow: hasExpiry },
   };
 };

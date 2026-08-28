@@ -137,7 +137,18 @@ function AlertsView() {
 
   return (
     <div className="flex min-h-screen w-full max-w-7xl mx-auto flex-col gap-5 pb-10">
-      <AlertsHeader onMarkAllRead={() => actions.markAllRead.mutate()} isFetching={isFetching} />
+      <AlertsHeader
+        onMarkAllRead={() => actions.markAllRead.mutate()}
+        isFetching={isFetching}
+        // The same narrowing the table is showing, so the file is not the whole network.
+        exportParams={{
+          ...(filters.severity === "all" ? {} : { severity: filters.severity }),
+          ...(filters.type === "all" ? {} : { type: filters.type }),
+          ...(filters.location === "all" ? {} : { location: filters.location }),
+          ...(filters.status === "all" ? {} : { status: filters.status }),
+          ...(dc ? { warehouseId: dc } : {}),
+        }}
+      />
 
       <AlertOverview data={overviewStats} />
 

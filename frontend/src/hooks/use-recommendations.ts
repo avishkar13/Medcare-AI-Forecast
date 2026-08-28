@@ -23,7 +23,12 @@ import {
  */
 const useScopedParams = (params?: RecommendationListParams): RecommendationListParams => {
   const dc = useUiStore((state) => state.dc);
-  return { ...params, ...(dc ? { warehouse: dc } : {}) };
+  // The SKU travels too. Five links across the dashboard, alerts, expiry and inventory
+  // build `/recommendations?sku=…` with `withScope`, and every one of them landed on
+  // the unfiltered network list because this dropped it - the deep link changed the
+  // URL and nothing else. It is part of the query key for the same reason `dc` is.
+  const sku = useUiStore((state) => state.sku);
+  return { ...params, ...(dc ? { warehouse: dc } : {}), ...(sku ? { sku } : {}) };
 };
 
 export function useRecommendations(params?: RecommendationListParams) {

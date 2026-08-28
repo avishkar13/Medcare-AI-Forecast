@@ -2,6 +2,7 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { RefreshCw } from "lucide-react";
+import { ExportButton } from "@/components/ui/export-button";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/config/query-keys";
@@ -176,6 +177,13 @@ function InventoryView() {
             <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
             <span>Refresh</span>
           </Button>
+          {/* E1 output 2: the item-wise stock view, narrowed exactly as the table is. */}
+          <ExportButton
+            path="/inventory/export"
+            fallbackName="item-wise-stock-view.csv"
+            label="stock positions"
+            params={filters}
+          />
         </div>
       </div>
 

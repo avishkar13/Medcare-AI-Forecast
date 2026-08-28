@@ -1,13 +1,31 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useRecommendations } from "@/hooks/use-recommendations";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useRecommendationAction, useRecommendations } from "@/hooks/use-recommendations";
 import { Briefcase, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { QueryError } from "@/components/ui/query-state";
 
 export function ExecutiveDecisionPanel() {
   const { data, isPending, isError } = useRecommendations({ pageSize: 3 });
+  // The most prominent button on the dashboard had no handler at all.
+  const { execute } = useRecommendationAction();
+  const [actingId, setActingId] = useState<string | null>(null);
+
+  const act = (id: string) => {
+    setActingId(id);
+    execute.mutate(id, {
+      onSuccess: () =>
+        toast.success("Decision executed", {
+          description: "A restock request has been raised where the action called for one.",
+        }),
+      onError: (error: Error) =>
+        toast.error("Could not execute the decision", { description: error.message }),
+      onSettled: () => setActingId(null),
+    });
+  };
 
   const topDecisions = (data?.data ?? []).map((rec) => ({
     id: rec.id,
@@ -20,9 +38,12 @@ export function ExecutiveDecisionPanel() {
     destinationDc: rec.warehouseCode,
   }));
 
-  if (isPending || topDecisions.length === 0) {
-
+  // Checked first and on its own: this used to sit *inside* the branch below, so a
+  // failed request rendered "No decisions pending" - a reassuring sentence about an
+  // empty queue, over an error.
   if (isError) return <QueryError label="the decision summary" />;
+
+  if (isPending || topDecisions.length === 0) {
     return (
       <Card>
         <CardContent className="py-6 text-sm text-muted-foreground">
@@ -91,12 +112,15 @@ export function ExecutiveDecisionPanel() {
                   <span className="text-sm font-bold text-success/90">{decision.expectedImpact}</span>
                 </div>
                 
-                <button className={`w-full group flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                <button
+                  disabled={actingId === decision.id}
+                  onClick={() => act(decision.id)}
+                  className={`w-full group flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer disabled:opacity-60 ${
                   decision.priority === 'critical' ? 'bg-destructive text-[#FFFFFF] hover:bg-destructive/90 shadow-md shadow-destructive/20' : 
                   decision.priority === 'high' ? 'bg-warning text-[#FFFFFF] hover:bg-warning/90 shadow-md shadow-warning/20' : 
                   'bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20'
                 }`}>
-                  Approve & Execute
+                  {actingId === decision.id ? "Working…" : "Approve & Execute"}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </button>
               </div>

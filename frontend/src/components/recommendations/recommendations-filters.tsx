@@ -1,5 +1,7 @@
 "use client";
 
+import { useWarehouses } from "@/hooks/use-masterdata";
+
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, FilterX, SlidersHorizontal } from "lucide-react";
@@ -25,6 +27,7 @@ export function RecommendationsFilters({
   search, setSearch, priority, setPriority, actionType, setActionType, 
   location, setLocation, status, setStatus, sortBy, setSortBy
 }: RecommendationsFiltersProps) {
+  const { data: warehouses } = useWarehouses();
 
   const hasFilters = search || priority !== "all priority" || actionType !== "all actions" || location !== "all locations" || status !== "Pending";
 
@@ -81,11 +84,16 @@ export function RecommendationsFilters({
             <SelectValue placeholder="Location" />
           </SelectTrigger>
           <SelectContent>
+            {/*
+              From the warehouse list. The four names hardcoded here did not exist in
+              the database, so every option produced "No recommendations found."
+            */}
             <SelectItem value="all locations">All Locations</SelectItem>
-            <SelectItem value="Northeast DC">Northeast DC</SelectItem>
-            <SelectItem value="South DC">South DC</SelectItem>
-            <SelectItem value="West Coast DC">West Coast DC</SelectItem>
-            <SelectItem value="Midwest DC">Midwest DC</SelectItem>
+            {(warehouses ?? []).map((warehouse) => (
+              <SelectItem key={warehouse.id} value={warehouse.name}>
+                {warehouse.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 

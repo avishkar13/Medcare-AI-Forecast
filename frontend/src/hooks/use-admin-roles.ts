@@ -7,7 +7,6 @@ import {
   deleteRole,
   listPermissions,
   assignRolePermissions,
-  removeRolePermission,
   CreateRoleInput,
   UpdateRoleInput,
   AssignPermissionsInput
@@ -100,19 +99,3 @@ export function useAssignRolePermissions() {
   });
 }
 
-export function useRemoveRolePermission() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ roleId, permissionId }: { roleId: string; permissionId: string }) =>
-      removeRolePermission(roleId, permissionId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["admin-roles"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-roles", variables.roleId] });
-      toast.success("Permission removed successfully");
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to remove permission");
-    },
-  });
-}

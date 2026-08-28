@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { Suspense, useState, useCallback } from "react";
+import { useScope } from "@/hooks/use-scope";
 import { ScenarioPreset, SimulationParams, SimulationOutput, SavedScenario, SimulationHistoryItem } from "@/types/simulation";
 import { SCENARIO_PRESETS, generateScenarioSummary } from "@/config/scenario-presets";
 import {
@@ -26,7 +27,31 @@ import { SimulationHistory } from "@/components/simulation/simulation-history";
 
 const DEFAULT_PRESET: ScenarioPreset = "demand-surge";
 
+/**
+ * `useScope` reads `useSearchParams`, so the page that calls it sits behind Suspense.
+ */
 export default function SimulationPage() {
+  return (
+    <Suspense
+      fallback={<p className="p-6 text-sm text-muted-foreground">Loading simulation…</p>}
+    >
+      <SimulationView />
+    </Suspense>
+  );
+}
+
+function SimulationView() {
+  /**
+   * This page read no URL scope at all, so arriving from "Simulate Transfer" on the
+   * expiry page silently dropped the `?dc=` the link carried and the top bar then
+   * disagreed with the URL.
+   *
+   * **What it does not do is scope the run.** A what-if is executed against the
+   * caller's own DC assignment on the server, not against a query parameter, so this
+   * keeps the shared scope honest rather than pretending the simulation narrowed.
+   */
+  useScope();
+
   // ─── State ─────────────────────────────────────────────────────
   const [preset, setPreset] = useState<ScenarioPreset>(DEFAULT_PRESET);
   const [params, setParams] = useState<SimulationParams>(SCENARIO_PRESETS[DEFAULT_PRESET].params);

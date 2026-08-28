@@ -111,6 +111,66 @@ async function request<T>(
   return { data: payload as T, meta: { generatedAt: new Date().toISOString() } };
 }
 
+/**
+ * The filename the server chose, or a sensible fallback.
+ *
+ * `Content-Disposition` is only readable cross-origin because it is listed in the
+ * backend's `CORS.exposedHeaders`; when it is missing the browser would otherwise save
+ * every file as "download".
+ */
+const filenameFrom = (disposition: string | null, fallback: string): string => {
+  const match = disposition?.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
+  return match?.[1] ? decodeURIComponent(match[1]) : fallback;
+};
+
+/**
+ * Fetches a file and hands it to the browser.
+ *
+ * Not a plain `<a href>`: these routes are authenticated, and a bare navigation carries
+ * no `Authorization` header, so the link would answer 401. The request goes through
+ * fetch with the token, and the response is turned into an object URL.
+ *
+ * Errors still arrive as an envelope, because the export routes build the whole file
+ * before sending - so a failure is a JSON error, not a truncated download.
+ */
+export const downloadFile = async (
+  path: string,
+  params?: QueryParams,
+  fallbackName = "export.csv",
+): Promise<{ filename: string; rows: number | null }> => {
+  const requestId = newRequestId();
+  const token = useAuthStore.getState().token;
+
+  const response = await fetch(buildUrl(path, params), {
+    headers: {
+      [REQUEST_ID_HEADER]: requestId,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    throw toApiError(payload, response.status, response.headers.get(REQUEST_ID_HEADER) ?? requestId);
+  }
+
+  const filename = filenameFrom(response.headers.get("content-disposition"), fallbackName);
+  const rowsHeader = response.headers.get("x-export-rows");
+  const blob = await response.blob();
+
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  // Revoked on the next tick rather than immediately: Safari cancels an in-flight
+  // download when the object URL disappears in the same frame as the click.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+
+  return { filename, rows: rowsHeader === null ? null : Number(rowsHeader) };
+};
+
 export const api = {
   get: <T>(path: string, params?: QueryParams, signal?: AbortSignal) =>
     request<T>("GET", path, { ...(params ? { params } : {}), ...(signal ? { signal } : {}) }).then(

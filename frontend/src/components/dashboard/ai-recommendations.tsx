@@ -3,12 +3,35 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useRecommendations } from "@/hooks/use-recommendations";
-import { Sparkles, ArrowRight, Info, CheckCircle2 } from "lucide-react";
+import { useRecommendationAction, useRecommendations } from "@/hooks/use-recommendations";
+import { Sparkles, ArrowRight, Info, CheckCircle2, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function AIRecommendations() {
   const { data, isPending, isError } = useRecommendations({ pageSize: 10 });
+  /**
+   * The panel's two CTAs had no handler at all, while the very same hook was already
+   * driving them correctly from the SKU drawer. Executing a stockout or transfer
+   * recommendation now also raises the restock request behind it, which is what makes
+   * "Execute Action" mean something.
+   */
+  const { execute, dismiss } = useRecommendationAction();
+  const [actingId, setActingId] = useState<string | null>(null);
+
+  const act = (id: string, action: "execute" | "dismiss") => {
+    setActingId(id);
+    const mutation = action === "execute" ? execute : dismiss;
+
+    mutation.mutate(id, {
+      onSuccess: () => toast.success(action === "execute" ? "Recommendation executed" : "Recommendation dismissed"),
+      // A row already acted on in another tab answers 409 - information, not a crash.
+      onError: (error: Error) =>
+        toast.error(`Could not ${action} the recommendation`, { description: error.message }),
+      onSettled: () => setActingId(null),
+    });
+  };
 
   // backend priority is CRITICAL/HIGH/MEDIUM/LOW, these components switch on lower case.
   // currentInventory and forecastDemand have no backend source, so they are omitted
@@ -126,9 +149,26 @@ export function AIRecommendations() {
               </div>
               
               <div className="flex justify-end gap-2 mt-1">
-                <Button variant="outline" size="sm" className="h-8">Dismiss</Button>
-                <Button size="sm" className="h-8 gap-1.5 cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 group">
-                  Execute Action <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 cursor-pointer"
+                  disabled={actingId === rec.id}
+                  onClick={() => act(rec.id, "dismiss")}
+                >
+                  Dismiss
+                </Button>
+                <Button
+                  size="sm"
+                  className="h-8 gap-1.5 cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 group"
+                  disabled={actingId === rec.id}
+                  onClick={() => act(rec.id, "execute")}
+                >
+                  {actingId === rec.id ? (
+                    <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Working…</>
+                  ) : (
+                    <>Execute Action <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" /></>
+                  )}
                 </Button>
               </div>
             </div>

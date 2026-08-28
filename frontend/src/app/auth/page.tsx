@@ -143,13 +143,15 @@ export default function AuthPage() {
                   <Label htmlFor="password" className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                     Password
                   </Label>
-                  <button 
-                    type="button" 
-                    className="text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
-                    disabled={isPending}
-                  >
-                    Recover Access
-                  </button>
+                  {/*
+                    Was a styled button with no handler and nowhere to go: there is no
+                    recovery route, and `POST /settings/security/reset-password` was
+                    removed from the backend precisely because it reported sending an
+                    email it never sent. Saying who to ask is the honest version.
+                  */}
+                  <span className="text-[11px] font-medium text-slate-400">
+                    Lost access? Ask an administrator
+                  </span>
                 </div>
                 <div className="relative">
                   <Input

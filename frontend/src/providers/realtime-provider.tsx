@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -39,6 +40,7 @@ const INTERRUPTS = new Set(["critical", "high"]);
 
 export function RealtimeProvider({ children }: { children: ReactNode }) {
   const client = useQueryClient();
+  const router = useRouter();
   // Subscribed rather than read once: the socket has to be rebuilt on login and torn
   // down on logout, and its rooms were joined under whichever identity it opened with.
   const token = useAuthStore((state) => state.token);
@@ -49,8 +51,13 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     const socket = connectSocket(token);
 
     if (!socket) {
-      setIsLive(false);
-      setCounts(null);
+      // Queued rather than set inline: setting state in the effect body runs an extra
+      // synchronous render pass before paint, which is what `set-state-in-effect`
+      // flags. There is nothing to clean up on this path, so the microtask is enough.
+      queueMicrotask(() => {
+        setIsLive(false);
+        setCounts(null);
+      });
       return;
     }
 
@@ -73,7 +80,9 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
             const params = new URLSearchParams();
             if (alert.warehouseId) params.set("dc", alert.warehouseId);
             if (alert.sku) params.set("sku", alert.sku);
-            window.location.href = `/alerts?${params.toString()}`;
+            // `router.push`, not `window.location.href`: a full document load here
+            // threw away the query cache and re-authenticated on every toast.
+            router.push(`/alerts?${params.toString()}`);
           },
         },
       });
@@ -86,7 +95,9 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     socket.on("alert:resolved", invalidate);
     socket.on("alert:counts", setCounts);
 
-    if (socket.connected) setIsLive(true);
+    // Same reason as the early return above: this reads the socket's current state
+    // during the effect, so the update is queued rather than applied inline.
+    if (socket.connected) queueMicrotask(() => setIsLive(true));
 
     return () => {
       socket.off("connect", onConnect);
@@ -100,7 +111,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       // identity, still in the rooms that identity was allowed to join.
       if (!useAuthStore.getState().token) disconnectSocket();
     };
-  }, [client, token]);
+  }, [client, token, router]);
 
   const value = useMemo(() => ({ isLive, counts }), [isLive, counts]);
 

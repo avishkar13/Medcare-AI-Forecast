@@ -28,6 +28,8 @@ export interface RecommendationListParams extends QueryParams {
   priority?: string;
   type?: string;
   warehouse?: string;
+  /** The backend narrows on this; it was missing here, so no caller could send it. */
+  sku?: string;
   runId?: string;
   page?: number;
   pageSize?: number;

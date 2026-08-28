@@ -7,7 +7,6 @@ interface ForecastScope {
   sku?: string;
   warehouse?: string;
   category?: string;
-  days: number;
 }
 
 interface FiltersState {
@@ -16,7 +15,7 @@ interface FiltersState {
   resetForecastScope: () => void;
 }
 
-const DEFAULT_FORECAST: ForecastScope = { days: 14 };
+const DEFAULT_FORECAST: ForecastScope = {};
 
 export const useFiltersStore = create<FiltersState>((set) => ({
   forecast: DEFAULT_FORECAST,
@@ -37,14 +36,23 @@ export const useFiltersStore = create<FiltersState>((set) => ({
  * page's own pickers still work: they apply wherever the URL says nothing.
  */
 export const useForecastScope = () => {
-  const { sku, warehouse, days } = useFiltersStore((state) => state.forecast);
+  const { sku, warehouse } = useFiltersStore((state) => state.forecast);
   const urlDc = useUiStore((state) => state.dc);
   const urlSku = useUiStore((state) => state.sku);
-  const urlHorizon = useUiStore((state) => state.horizonDays);
+  /**
+   * The horizon has exactly one owner: the URL.
+   *
+   * This used to read `urlHorizon ?? days` against a store copy - but `horizonDays` is
+   * initialised to a default and is therefore *never* undefined, so the `??` could not
+   * fall through and the page's own horizon selector silently changed nothing. Rather
+   * than invent a "the URL really meant it" signal, the duplicate was removed: the
+   * selector now writes to the URL like every other scope control.
+   */
+  const horizonDays = useUiStore((state) => state.horizonDays);
 
   return {
     sku: urlSku ?? sku,
     warehouse: urlDc ?? warehouse,
-    days: urlHorizon ?? days,
+    days: horizonDays,
   };
 };
