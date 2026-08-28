@@ -70,7 +70,7 @@ export function PriorityActions() {
                 read, which is what "review" meant.
               */}
               <Link
-                href={scopedHref("/recommendations", { sku: action.sku, dc: action.warehouseId })}
+                href={scopedHref("/recommendations", { sku: action.sku })}
                 className="w-full sm:w-auto shrink-0"
               >
                 <Button size="sm" className="w-full gap-1.5 cursor-pointer group" variant="secondary">

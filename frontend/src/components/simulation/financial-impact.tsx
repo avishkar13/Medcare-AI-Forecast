@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FinancialImpact as FinancialImpactType } from "@/types/simulation";
 import { ArrowRight, TrendingUp } from "lucide-react";
+import { useFormatters } from "@/hooks/use-formatters";
 
 interface FinancialImpactProps {
   data: FinancialImpactType;
@@ -16,6 +17,7 @@ const COST_CATEGORIES = [
 ];
 
 export function FinancialImpactComponent({ data }: FinancialImpactProps) {
+  const { formatCompactCurrency } = useFormatters();
   const maxCategoryVal = Math.max(
     ...COST_CATEGORIES.map(c => Math.max(data.currentBreakdown[c.key], data.simulatedBreakdown[c.key]))
   );
@@ -30,20 +32,20 @@ export function FinancialImpactComponent({ data }: FinancialImpactProps) {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
           <div className="flex-1 p-4 rounded-xl bg-background border border-border/50 text-center">
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Current Cost</p>
-            <p className="text-xl font-black text-foreground tabular-nums">${(data.currentCost / 1000).toFixed(1)}K</p>
+            <p className="text-xl font-black text-foreground tabular-nums">{formatCompactCurrency(data.currentCost)}</p>
           </div>
           <div className="flex items-center justify-center">
             <ArrowRight className="h-5 w-5 text-muted-foreground" />
           </div>
           <div className="flex-1 p-4 rounded-xl bg-background border border-border/50 text-center">
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Simulated Cost</p>
-            <p className="text-xl font-black text-foreground tabular-nums">${(data.simulatedCost / 1000).toFixed(1)}K</p>
+            <p className="text-xl font-black text-foreground tabular-nums">{formatCompactCurrency(data.simulatedCost)}</p>
           </div>
           <div className={`flex-1 p-4 rounded-xl text-center border ${data.additionalCost > 0 ? "bg-destructive/5 border-destructive/20" : "bg-success/5 border-success/20"}`}>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Net Change</p>
             <p className={`text-xl font-black tabular-nums flex items-center justify-center gap-1 ${data.additionalCost > 0 ? "text-destructive" : "text-success"}`}>
               <TrendingUp className={`h-4 w-4 ${data.additionalCost < 0 ? "rotate-180" : ""}`} />
-              {data.additionalCost > 0 ? "+" : ""}${(data.additionalCost / 1000).toFixed(1)}K
+              {data.additionalCost > 0 ? "+" : ""}{formatCompactCurrency(Math.abs(data.additionalCost))}
             </p>
           </div>
         </div>
@@ -64,7 +66,7 @@ export function FinancialImpactComponent({ data }: FinancialImpactProps) {
                     {cat.label}
                   </span>
                   <span className={`text-[10px] font-bold tabular-nums ${delta > 0 ? "text-destructive" : delta < 0 ? "text-success" : "text-muted-foreground"}`}>
-                    {delta > 0 ? "+" : ""}${(delta / 1000).toFixed(1)}K
+                    {delta > 0 ? "+" : ""}{formatCompactCurrency(Math.abs(delta))}
                   </span>
                 </div>
                 <div className="flex gap-1 h-2.5 mt-0.5">
@@ -74,7 +76,7 @@ export function FinancialImpactComponent({ data }: FinancialImpactProps) {
                       style={{ width: `${(current / maxCategoryVal) * 100}%` }}
                     />
                     <span className="absolute inset-y-0 left-0 flex items-center pl-1 text-[8px] font-bold text-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity">
-                      ${(current / 1000).toFixed(1)}K
+                      {formatCompactCurrency(current)}
                     </span>
                   </div>
                   <div className="flex-1 bg-muted/40 rounded overflow-hidden relative group">
@@ -83,7 +85,7 @@ export function FinancialImpactComponent({ data }: FinancialImpactProps) {
                       style={{ width: `${(simulated / maxCategoryVal) * 100}%` }}
                     />
                     <span className="absolute inset-y-0 left-0 flex items-center pl-1 text-[8px] font-bold text-background opacity-0 group-hover:opacity-100 transition-opacity mix-blend-exclusion">
-                      ${(simulated / 1000).toFixed(1)}K
+                      {formatCompactCurrency(simulated)}
                     </span>
                   </div>
                 </div>

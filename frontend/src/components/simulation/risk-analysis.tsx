@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RiskIndicator } from "@/types/simulation";
 import { AlertTriangle, Clock, Server, DollarSign, BrainCircuit, ArrowRight } from "lucide-react";
+import { useFormatters } from "@/hooks/use-formatters";
 
 interface RiskAnalysisProps {
   risks: RiskIndicator[];
@@ -25,6 +26,7 @@ const SEVERITY_STYLES: Record<string, string> = {
 };
 
 export function RiskAnalysis({ risks, aiInterpretation }: RiskAnalysisProps) {
+  const { formatCompactCurrency } = useFormatters();
   return (
     <Card className="rounded-xl border-border/60 shadow-sm">
       <CardHeader className="pb-3">
@@ -35,7 +37,7 @@ export function RiskAnalysis({ risks, aiInterpretation }: RiskAnalysisProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
           {risks.map((risk) => {
             const isUnit = risk.name === "Stockout Risk" || risk.name === "Capacity Risk";
-            const formatVal = (v: number) => isUnit ? `${v}%` : `$${(v / 1000).toFixed(1)}K`;
+            const formatVal = (v: number) => isUnit ? `${v}%` : formatCompactCurrency(v);
             const formatDelta = () => {
               if (isUnit) return `${risk.delta > 0 ? "+" : ""}${risk.delta}%`;
               return `${risk.delta > 0 ? "+" : ""}${risk.delta}%`;

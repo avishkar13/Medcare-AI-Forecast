@@ -4,29 +4,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SimulationMetric } from "@/types/simulation";
 import { ArrowUp, ArrowDown, Minus } from "lucide-react";
 
+import { useFormatters } from "@/hooks/use-formatters";
+
 interface SimulationResultsProps {
   metrics: SimulationMetric[];
 }
 
-function formatValue(value: number, format: SimulationMetric["format"], unit: string): string {
-  if (format === "currency") {
-    if (Math.abs(value) >= 1000000) return `$${(value / 1000000).toFixed(3)}M`;
-    if (Math.abs(value) >= 1000) return `$${(value / 1000).toFixed(1)}K`;
-    return `$${value.toFixed(0)}`;
-  }
-  return `${value}${unit}`;
-}
-
-function formatDelta(delta: number, format: SimulationMetric["format"], unit: string): string {
-  const sign = delta > 0 ? "+" : "";
-  if (format === "currency") {
-    if (Math.abs(delta) >= 1000) return `${sign}$${(delta / 1000).toFixed(1)}K`;
-    return `${sign}$${delta.toFixed(0)}`;
-  }
-  return `${sign}${delta}${unit}`;
-}
-
 export function SimulationResults({ metrics }: SimulationResultsProps) {
+  const { formatCompactCurrency } = useFormatters();
+
+  const formatValue = (value: number, format: SimulationMetric["format"], unit: string): string => {
+    if (format === "currency") {
+      return formatCompactCurrency(value);
+    }
+    return `${value}${unit}`;
+  };
+
+  const formatDelta = (delta: number, format: SimulationMetric["format"], unit: string): string => {
+    const sign = delta > 0 ? "+" : "";
+    if (format === "currency") {
+      return `${sign}${formatCompactCurrency(Math.abs(delta))}`;
+    }
+    return `${sign}${delta}${unit}`;
+  };
+
   return (
     <Card className="rounded-xl border-border/60 shadow-sm">
       <CardHeader className="pb-3">
