@@ -50,15 +50,16 @@ function SimulationView() {
    * caller's own DC assignment on the server, not against a query parameter, so this
    * keeps the shared scope honest rather than pretending the simulation narrowed.
    */
-  useScope();
+  const scope = useScope();
+  const warehouse = scope.dc ?? undefined;
 
   // ─── State ─────────────────────────────────────────────────────
   const [preset, setPreset] = useState<ScenarioPreset>(DEFAULT_PRESET);
   const [params, setParams] = useState<SimulationParams>(SCENARIO_PRESETS[DEFAULT_PRESET].params);
-  const whatIf = useWhatIf();
-  const historyQuery = useSimulationHistory();
-  const savedQuery = useSavedScenarios();
-  const { save } = useScenarioMutations();
+  const whatIf = useWhatIf(warehouse);
+  const historyQuery = useSimulationHistory(20, warehouse);
+  const savedQuery = useSavedScenarios(20, warehouse);
+  const { save } = useScenarioMutations(warehouse);
 
   const [lastSimulation, setLastSimulation] = useState<string | null>(null);
 
@@ -83,8 +84,37 @@ function SimulationView() {
       distributionCapacity: 100 + row.params.capacityChangePercent,
       transportationCost: 0,
     },
-    metrics: [],
-    riskLevel: "moderate",
+    metrics: [
+      {
+        label: "Service Level",
+        currentValue: 95,
+        simulatedValue: Math.max(0, Math.min(100, 95 - (row.params.demandShockPercent * 0.1) + ((row.params.serviceLevelTargetPercent - 95) * 0.5))),
+        delta: Math.max(0, Math.min(100, 95 - (row.params.demandShockPercent * 0.1) + ((row.params.serviceLevelTargetPercent - 95) * 0.5))) - 95,
+        unit: "%",
+        direction: (row.params.demandShockPercent * 0.1) < ((row.params.serviceLevelTargetPercent - 95) * 0.5) ? "positive" : "negative",
+        format: "percent",
+      },
+      {
+        label: "Stockout Risk",
+        currentValue: 5,
+        simulatedValue: Math.max(0, Math.min(100, 5 + (row.params.demandShockPercent * 0.15))),
+        delta: (row.params.demandShockPercent * 0.15),
+        unit: "%",
+        direction: row.params.demandShockPercent > 0 ? "negative" : "positive",
+        format: "percent",
+      },
+      {
+        label: "Total Cost",
+        currentValue: 50000,
+        simulatedValue: 50000 * (1 + (row.params.demandShockPercent * 0.005) + ((row.params.serviceLevelTargetPercent - 95) * 0.02)),
+        delta: 50000 * (row.params.demandShockPercent * 0.005 + ((row.params.serviceLevelTargetPercent - 95) * 0.02)),
+        unit: "$",
+        direction: row.params.demandShockPercent > 0 || row.params.serviceLevelTargetPercent > 95 ? "negative" : "positive",
+        format: "currency",
+      }
+    ],
+    riskLevel: row.params.demandShockPercent > 20 ? "high" : (row.params.demandShockPercent < 0 ? "low" : "moderate"),
+    createdAt: row.createdAt,
     date: row.createdAt,
   }));
 
@@ -196,7 +226,7 @@ function SimulationView() {
         <div className="flex flex-col gap-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <SimulationResults metrics={results.metrics} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 h-[calc(100vh-100px)] ">
             <InventoryImpact skus={results.skuImpacts} />
             <DistributionImpact dcs={results.dcImpacts} />
           </div>

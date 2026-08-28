@@ -25,20 +25,20 @@ export const runWhatIf = async (body: {
   description?: string;
   horizonDays?: number;
   params: WhatIfRequestParams;
-}) => whatIfAcceptedSchema.parse(await api.post<unknown>("/simulation/run", body));
+}, warehouse?: string) => whatIfAcceptedSchema.parse(await api.post<unknown>(`/simulation/run${warehouse ? `?warehouseId=${warehouse}` : ""}`, body));
 
-export const listHistory = async (limit = 20) =>
+export const listHistory = async (limit = 20, warehouse?: string) =>
   z
     .array(savedScenarioRowSchema)
-    .parse(await api.get<unknown>("/simulation/history", { limit }));
+    .parse(await api.get<unknown>("/simulation/history", { limit, ...(warehouse ? { warehouseId: warehouse } : {}) }));
 
-export const listSaved = async (limit = 20) =>
-  z.array(savedScenarioRowSchema).parse(await api.get<unknown>("/simulation/saved", { limit }));
+export const listSaved = async (limit = 20, warehouse?: string) =>
+  z.array(savedScenarioRowSchema).parse(await api.get<unknown>("/simulation/saved", { limit, ...(warehouse ? { warehouseId: warehouse } : {}) }));
 
 export const saveScenario = async (body: {
   name: string;
   description?: string;
   params: WhatIfRequestParams;
-}) => savedScenarioRowSchema.parse(await api.post<unknown>("/simulation/save", body));
+}, warehouse?: string) => savedScenarioRowSchema.parse(await api.post<unknown>(`/simulation/save${warehouse ? `?warehouseId=${warehouse}` : ""}`, body));
 
-export const deleteScenario = (id: string) => api.delete<void>(`/simulation/saved/${id}`);
+export const deleteScenario = (id: string, warehouse?: string) => api.delete<void>(`/simulation/saved/${id}${warehouse ? `?warehouseId=${warehouse}` : ""}`);

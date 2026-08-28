@@ -41,6 +41,40 @@ export const deltaSchema = z.object({
   percentChange: z.number().nullable(),
 });
 
+export const dcImpactSchema = z.object({
+  name: z.string(),
+  currentCapacity: z.number(),
+  simulatedCapacity: z.number(),
+  currentStockoutRisk: z.number(),
+  simulatedStockoutRisk: z.number(),
+  currentAtRiskValue: z.number(),
+  simulatedAtRiskValue: z.number(),
+});
+
+export const skuImpactSchema = z.object({
+  name: z.string(),
+  sku: z.string(),
+  currentInventory: z.number(),
+  simulatedInventory: z.number(),
+  optimalInventory: z.number(),
+});
+
+export const riskIndicatorSchema = z.object({
+  name: z.string(),
+  icon: z.string(),
+  currentValue: z.number(),
+  simulatedValue: z.number(),
+  delta: z.number(),
+  severity: z.enum(["low", "moderate", "high", "critical"]),
+});
+
+export const aiInsightSchema = z.object({
+  overallRisk: z.enum(["low", "moderate", "high", "critical"]),
+  confidence: z.number(),
+  insights: z.array(z.string()),
+  suggestedResponse: z.string(),
+});
+
 export const runComparisonSchema = z.object({
   scenario: z.object({ id: z.string(), horizonDays: z.number() }),
   baseline: z.object({ id: z.string(), horizonDays: z.number() }),
@@ -60,6 +94,10 @@ export const runComparisonSchema = z.object({
   }),
   risk: z.record(z.string(), deltaSchema),
   plan: z.record(z.string(), deltaSchema),
+  dcImpacts: z.array(dcImpactSchema),
+  skuImpacts: z.array(skuImpactSchema),
+  risks: z.array(riskIndicatorSchema),
+  aiInsight: aiInsightSchema,
   warnings: z.array(z.string()),
 });
 

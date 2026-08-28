@@ -84,9 +84,9 @@ export const toSimulationOutput = (
       metric("Expected Waste", Math.round(wasteNow), Math.round(simulation.expectedWaste), "units", "number", true),
       metric("Total Cost", Math.round(costNow), Math.round(optimization.totalCost), "$", "currency", true),
     ],
-    dcImpacts: [],
-    skuImpacts: [],
-    risks: [],
+    dcImpacts: comparison?.dcImpacts ?? [],
+    skuImpacts: comparison?.skuImpacts ?? [],
+    risks: comparison?.risks ?? [],
     financial: {
       currentCost: Math.round(costNow),
       simulatedCost: Math.round(optimization.totalCost),
@@ -104,16 +104,13 @@ export const toSimulationOutput = (
         expiryWaste: Math.round(optimization.expiryCost),
       },
     },
-    aiInsight: {
+    aiInsight: comparison?.aiInsight ?? {
       overallRisk: simulation.riskLevel,
       confidence: 0,
-      insights: [
-        `${simulation.serviceLevelPercent}% of simulated demand met from stock over ${simulation.iterations} iterations.`,
-        `${Math.round(simulation.expectedWaste)} units of expected waste, ${Math.round(optimization.expiryCost)} of it as expiry cost.`,
-        ...(comparison ? comparison.warnings : ["No baseline run to compare against."]),
-      ],
-      suggestedResponse: "",
+      insights: ["No baseline run to compare against."],
+      suggestedResponse: "Analyze baseline data first.",
     },
     summary: "",
   };
 };
+
