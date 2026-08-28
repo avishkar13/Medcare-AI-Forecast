@@ -77,10 +77,26 @@ const DEFAULT_SETTINGS = {
       sms: false,
       teams: false,
     },
+    /**
+     * Keyed on the alert type, because that is what `routeAlert` matches against.
+     *
+     * These were display labels - "Critical Stockout" against a detector emitting
+     * `stockout_risk` - so `rules.find(r => r.event === alert.type)` never matched and
+     * every alert fell through to `rule?.email ?? false`. Email and SMS were off for
+     * every alert ever raised, whatever the master toggles said.
+     *
+     * All six types are listed: three were missing entirely, so overstock, capacity
+     * breaches and supplier delays had no rule to find even in principle. The severity
+     * floor still applies on top, so this does not turn every low alert into an SMS.
+     */
     rules: [
-      { event: "Critical Stockout", inApp: true, email: true, sms: true },
-      { event: "Expiry Risk", inApp: true, email: true, sms: false },
-      { event: "Demand Spike", inApp: true, email: false, sms: false },
+      { event: "stockout_risk", inApp: true, email: true, sms: true },
+      { event: "expiry_risk", inApp: true, email: true, sms: false },
+      { event: "supplier_delay", inApp: true, email: true, sms: false },
+      { event: "capacity_breach", inApp: true, email: true, sms: false },
+      { event: "demand_spike", inApp: true, email: true, sms: false },
+      // Money sitting still rather than a risk to act on today: the bell is enough.
+      { event: "overstock", inApp: true, email: false, sms: false },
     ],
     dailyDigest: {
       enabled: true,

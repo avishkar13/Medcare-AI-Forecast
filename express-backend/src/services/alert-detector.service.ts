@@ -7,6 +7,7 @@ import { moneyFormatter, type MoneyFormatter } from "../utils/currency.js";
 import { OPEN_STATUSES, broadcastCounts } from "./alert.service.js";
 import { routeAlert, routeAlerts } from "./notification.service.js";
 import { emitAlert } from "../lib/realtime.js";
+import type { AlertType } from "../utils/alert-types.js";
 import {
   resolveThresholds,
   widestExpiryWindow,
@@ -52,7 +53,8 @@ interface AlertDraft {
    */
   fingerprint: string;
   severity: Severity;
-  type: string;
+  /** Typed against the canonical list, so a draft cannot name a type no rule covers. */
+  type: AlertType;
   title: string;
   sku: string | null;
   productName: string | null;
