@@ -392,6 +392,8 @@ model DRPPlan {
   date            DateTime
   quantity        Float
   reason          String?
+  /// A transfer is a proposal like a SupplyPlan is, so it decides the same way.
+  status          PlanStatus @default(PROPOSED)
 
   planningRun   PlanningRun @relation(fields: [planningRunId], references: [id])
   product       Product     @relation(fields: [productId], references: [id])
@@ -460,6 +462,7 @@ model Recommendation {
   expectedImpact String?
   impactValue    Float?
   signals        RecommendationSignal[]
+  restockRequest RestockRequest?
 
   createdAt DateTime @default(now())
 
@@ -712,6 +715,10 @@ model RestockRequest {
   reason      String?
   notes       String?
 
+  /// Set when executing a recommendation raised this request, which is what makes
+  /// "execute" produce something a warehouse can act on rather than a status change.
+  recommendationId String? @unique
+
   requestedById String?
   decidedById   String?
   decidedAt     DateTime?
@@ -719,8 +726,9 @@ model RestockRequest {
   fulfilledAt      DateTime?
   fulfillmentMovementId String?
 
-  product     Product   @relation(fields: [productId], references: [id])
-  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  product        Product         @relation(fields: [productId], references: [id])
+  warehouse      Warehouse       @relation(fields: [warehouseId], references: [id])
+  recommendation Recommendation? @relation(fields: [recommendationId], references: [id], onDelete: SetNull)
   requestedBy User?     @relation("RestockRequestedBy", fields: [requestedById], references: [id])
   decidedBy   User?     @relation("RestockDecidedBy", fields: [decidedById], references: [id])
 

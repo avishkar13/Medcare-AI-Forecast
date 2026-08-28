@@ -157,10 +157,31 @@ const drpSelect = {
   date: true,
   quantity: true,
   reason: true,
+  status: true,
   product: { select: { sku: true, name: true } },
   fromWarehouse: { select: { code: true, name: true } },
   toWarehouse: { select: { code: true, name: true } },
 } satisfies Prisma.DRPPlanSelect;
+
+type DrpRow = Prisma.DRPPlanGetPayload<{ select: typeof drpSelect }>;
+
+const toDrpPlan = (row: DrpRow) => ({
+  id: row.id,
+  planningRunId: row.planningRunId,
+  productId: row.productId,
+  sku: row.product.sku,
+  productName: row.product.name,
+  fromWarehouseId: row.fromWarehouseId,
+  fromWarehouseCode: row.fromWarehouse.code,
+  fromWarehouseName: row.fromWarehouse.name,
+  toWarehouseId: row.toWarehouseId,
+  toWarehouseCode: row.toWarehouse.code,
+  toWarehouseName: row.toWarehouse.name,
+  date: row.date.toISOString().slice(0, 10),
+  quantity: round(row.quantity),
+  reason: row.reason,
+  status: row.status,
+});
 
 export const listDrpPlans = async (query: DrpQuery, authScope?: { warehouseId?: string | null }) => {
   const effectiveWarehouse = query.warehouse ?? authScope?.warehouseId;
@@ -173,6 +194,7 @@ export const listDrpPlans = async (query: DrpQuery, authScope?: { warehouseId?: 
   const where: Prisma.DRPPlanWhereInput = {
     planningRunId: runId ?? NO_RUN,
     ...(productId === undefined ? {} : { productId }),
+    ...(query.status === undefined ? {} : { status: query.status }),
     // A warehouse filter means "transfers this DC is party to", either end. Filtering
     // one side only would hide half of what a DC is being asked to do.
     ...(warehouseId === undefined
@@ -193,24 +215,40 @@ export const listDrpPlans = async (query: DrpQuery, authScope?: { warehouseId?: 
   ]);
 
   return {
-    items: rows.map((row) => ({
-      id: row.id,
-      planningRunId: row.planningRunId,
-      productId: row.productId,
-      sku: row.product.sku,
-      productName: row.product.name,
-      fromWarehouseId: row.fromWarehouseId,
-      fromWarehouseCode: row.fromWarehouse.code,
-      fromWarehouseName: row.fromWarehouse.name,
-      toWarehouseId: row.toWarehouseId,
-      toWarehouseCode: row.toWarehouse.code,
-      toWarehouseName: row.toWarehouse.name,
-      date: row.date.toISOString().slice(0, 10),
-      quantity: round(row.quantity),
-      reason: row.reason,
-    })),
+    items: rows.map(toDrpPlan),
     total,
     totalUnits: round(totals._sum.quantity ?? 0),
     planningRunId: runId,
   };
+};
+
+/**
+ * A transfer decides exactly like a supply plan does.
+ *
+ * `DRPPlan` had no status at all, so the lane a run proposed could be read and never
+ * answered - half the plan surface was decidable and the other half was a report.
+ * Approving still moves nothing: the movement pair is recorded separately, the same
+ * boundary `decideSupplyPlan` respects.
+ */
+export const decideDrpPlan = async (id: string, action: "approve" | "reject") => {
+  const existing = await prisma.dRPPlan.findUnique({
+    where: { id },
+    select: { id: true, status: true },
+  });
+  if (!existing) throw new NotFoundError(`Transfer plan '${id}' not found`);
+
+  if (existing.status !== PlanStatus.PROPOSED) {
+    throw new ConflictError(
+      `Transfer plan '${id}' is ${existing.status} and cannot be ${action}d`,
+      { id, status: existing.status },
+    );
+  }
+
+  const row = await prisma.dRPPlan.update({
+    where: { id },
+    data: { status: SUPPLY_TRANSITIONS[action]! },
+    select: drpSelect,
+  });
+
+  return toDrpPlan(row);
 };

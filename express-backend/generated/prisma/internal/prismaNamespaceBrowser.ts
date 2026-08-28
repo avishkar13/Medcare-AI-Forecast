@@ -378,7 +378,8 @@ export const DRPPlanScalarFieldEnum = {
   toWarehouseId: 'toWarehouseId',
   date: 'date',
   quantity: 'quantity',
-  reason: 'reason'
+  reason: 'reason',
+  status: 'status'
 } as const
 
 export type DRPPlanScalarFieldEnum = (typeof DRPPlanScalarFieldEnum)[keyof typeof DRPPlanScalarFieldEnum]
@@ -549,6 +550,7 @@ export const RestockRequestScalarFieldEnum = {
   status: 'status',
   reason: 'reason',
   notes: 'notes',
+  recommendationId: 'recommendationId',
   requestedById: 'requestedById',
   decidedById: 'decidedById',
   decidedAt: 'decidedAt',

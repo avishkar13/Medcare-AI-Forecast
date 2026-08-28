@@ -123,6 +123,49 @@ export const projectFefoWaste = (batches: FefoBatch[], avgDailyDemand: number): 
   });
 };
 
+export interface ConsumableBatch {
+  id: string;
+  quantity: number;
+}
+
+export interface BatchDraw {
+  id: string;
+  /** Units taken from this batch. Never more than it held. */
+  units: number;
+  remaining: number;
+}
+
+export interface FefoConsumption {
+  draws: BatchDraw[];
+  /** Units the sub-ledger could not cover. Inventory.onHand stays authoritative. */
+  shortfall: number;
+}
+
+/**
+ * Draws units from batches in the order given - earliest expiry first, so the caller
+ * sorts and this stays arithmetic.
+ *
+ * `shortfall` is reported rather than thrown on: the batch table is a sub-ledger that
+ * can legitimately hold less than `Inventory.onHand` (stock received before batches
+ * were tracked, or a seeded position), and refusing the sale over that would make the
+ * ledger unable to record something that physically happened.
+ */
+export const consumeFefo = (batches: ConsumableBatch[], units: number): FefoConsumption => {
+  let outstanding = Math.max(0, units);
+  const draws: BatchDraw[] = [];
+
+  for (const batch of batches) {
+    if (outstanding <= 0) break;
+    const taken = Math.min(batch.quantity, outstanding);
+    if (taken <= 0) continue;
+
+    outstanding = round(outstanding - taken);
+    draws.push({ id: batch.id, units: round(taken), remaining: round(batch.quantity - taken) });
+  }
+
+  return { draws, shortfall: round(outstanding) };
+};
+
 export const round = (value: number, decimals = 2): number => {
   const factor = 10 ** decimals;
   return Math.round(value * factor) / factor;

@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { SERVER } from "../config/constants.js";
 import * as planning from "../services/planning.service.js";
 import * as compare from "../services/planning-compare.service.js";
+import * as outcome from "../services/outcome.service.js";
 import { ok, paginated } from "../utils/response.js";
 import {
   compareQuerySchema,
@@ -47,6 +48,11 @@ export const getOptimization = async (req: Request, res: Response) => {
   const params = runParamsSchema.parse(req.params);
   const result = await compare.getOptimization(params);
   ok(res, result, { planningRunId: params.id });
+};
+
+export const getOutcome = async (req: Request, res: Response) => {
+  const params = runParamsSchema.parse(req.params);
+  ok(res, await outcome.getOutcome(params), { planningRunId: params.id });
 };
 
 export const getSimulation = async (req: Request, res: Response) => {

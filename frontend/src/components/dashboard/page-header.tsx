@@ -5,6 +5,7 @@ import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { queryKeys } from "@/config/query-keys";
 import { useDashboardSummary } from "@/hooks/use-dashboard";
+import { RunPlanningButton } from "./run-planning-button";
 
 export function PageHeader() {
   const client = useQueryClient();
@@ -36,6 +37,13 @@ export function PageHeader() {
           <RefreshCw className={`h-3.5 w-3.5 ${summary.isFetching ? "animate-spin" : ""}`} />
           <span>Refresh</span>
         </Button>
+
+        {/*
+          Refresh re-reads; this re-derives. The distinction matters: no amount of
+          refetching produces a forecast, a supply plan or a transfer, because those
+          rows only exist once the executor has run.
+        */}
+        <RunPlanningButton />
       </div>
     </div>
   );

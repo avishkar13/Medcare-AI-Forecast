@@ -43,6 +43,7 @@ export type DRPPlanMinAggregateOutputType = {
   date: Date | null
   quantity: number | null
   reason: string | null
+  status: $Enums.PlanStatus | null
 }
 
 export type DRPPlanMaxAggregateOutputType = {
@@ -54,6 +55,7 @@ export type DRPPlanMaxAggregateOutputType = {
   date: Date | null
   quantity: number | null
   reason: string | null
+  status: $Enums.PlanStatus | null
 }
 
 export type DRPPlanCountAggregateOutputType = {
@@ -65,6 +67,7 @@ export type DRPPlanCountAggregateOutputType = {
   date: number
   quantity: number
   reason: number
+  status: number
   _all: number
 }
 
@@ -86,6 +89,7 @@ export type DRPPlanMinAggregateInputType = {
   date?: true
   quantity?: true
   reason?: true
+  status?: true
 }
 
 export type DRPPlanMaxAggregateInputType = {
@@ -97,6 +101,7 @@ export type DRPPlanMaxAggregateInputType = {
   date?: true
   quantity?: true
   reason?: true
+  status?: true
 }
 
 export type DRPPlanCountAggregateInputType = {
@@ -108,6 +113,7 @@ export type DRPPlanCountAggregateInputType = {
   date?: true
   quantity?: true
   reason?: true
+  status?: true
   _all?: true
 }
 
@@ -206,6 +212,7 @@ export type DRPPlanGroupByOutputType = {
   date: Date
   quantity: number
   reason: string | null
+  status: $Enums.PlanStatus
   _count: DRPPlanCountAggregateOutputType | null
   _avg: DRPPlanAvgAggregateOutputType | null
   _sum: DRPPlanSumAggregateOutputType | null
@@ -240,6 +247,7 @@ export type DRPPlanWhereInput = {
   date?: Prisma.DateTimeFilter<"DRPPlan"> | Date | string
   quantity?: Prisma.FloatFilter<"DRPPlan"> | number
   reason?: Prisma.StringNullableFilter<"DRPPlan"> | string | null
+  status?: Prisma.EnumPlanStatusFilter<"DRPPlan"> | $Enums.PlanStatus
   planningRun?: Prisma.XOR<Prisma.PlanningRunScalarRelationFilter, Prisma.PlanningRunWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
   fromWarehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
@@ -255,6 +263,7 @@ export type DRPPlanOrderByWithRelationInput = {
   date?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
   planningRun?: Prisma.PlanningRunOrderByWithRelationInput
   product?: Prisma.ProductOrderByWithRelationInput
   fromWarehouse?: Prisma.WarehouseOrderByWithRelationInput
@@ -273,6 +282,7 @@ export type DRPPlanWhereUniqueInput = Prisma.AtLeast<{
   date?: Prisma.DateTimeFilter<"DRPPlan"> | Date | string
   quantity?: Prisma.FloatFilter<"DRPPlan"> | number
   reason?: Prisma.StringNullableFilter<"DRPPlan"> | string | null
+  status?: Prisma.EnumPlanStatusFilter<"DRPPlan"> | $Enums.PlanStatus
   planningRun?: Prisma.XOR<Prisma.PlanningRunScalarRelationFilter, Prisma.PlanningRunWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
   fromWarehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
@@ -288,6 +298,7 @@ export type DRPPlanOrderByWithAggregationInput = {
   date?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
   _count?: Prisma.DRPPlanCountOrderByAggregateInput
   _avg?: Prisma.DRPPlanAvgOrderByAggregateInput
   _max?: Prisma.DRPPlanMaxOrderByAggregateInput
@@ -307,6 +318,7 @@ export type DRPPlanScalarWhereWithAggregatesInput = {
   date?: Prisma.DateTimeWithAggregatesFilter<"DRPPlan"> | Date | string
   quantity?: Prisma.FloatWithAggregatesFilter<"DRPPlan"> | number
   reason?: Prisma.StringNullableWithAggregatesFilter<"DRPPlan"> | string | null
+  status?: Prisma.EnumPlanStatusWithAggregatesFilter<"DRPPlan"> | $Enums.PlanStatus
 }
 
 export type DRPPlanCreateInput = {
@@ -314,6 +326,7 @@ export type DRPPlanCreateInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
   planningRun: Prisma.PlanningRunCreateNestedOneWithoutDrpPlansInput
   product: Prisma.ProductCreateNestedOneWithoutDrpPlansInput
   fromWarehouse: Prisma.WarehouseCreateNestedOneWithoutDrpFromInput
@@ -329,6 +342,7 @@ export type DRPPlanUncheckedCreateInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
 }
 
 export type DRPPlanUpdateInput = {
@@ -336,6 +350,7 @@ export type DRPPlanUpdateInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   planningRun?: Prisma.PlanningRunUpdateOneRequiredWithoutDrpPlansNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutDrpPlansNestedInput
   fromWarehouse?: Prisma.WarehouseUpdateOneRequiredWithoutDrpFromNestedInput
@@ -351,6 +366,7 @@ export type DRPPlanUncheckedUpdateInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
 }
 
 export type DRPPlanCreateManyInput = {
@@ -362,6 +378,7 @@ export type DRPPlanCreateManyInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
 }
 
 export type DRPPlanUpdateManyMutationInput = {
@@ -369,6 +386,7 @@ export type DRPPlanUpdateManyMutationInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
 }
 
 export type DRPPlanUncheckedUpdateManyInput = {
@@ -380,6 +398,7 @@ export type DRPPlanUncheckedUpdateManyInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
 }
 
 export type DRPPlanListRelationFilter = {
@@ -401,6 +420,7 @@ export type DRPPlanCountOrderByAggregateInput = {
   date?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  status?: Prisma.SortOrder
 }
 
 export type DRPPlanAvgOrderByAggregateInput = {
@@ -416,6 +436,7 @@ export type DRPPlanMaxOrderByAggregateInput = {
   date?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  status?: Prisma.SortOrder
 }
 
 export type DRPPlanMinOrderByAggregateInput = {
@@ -427,6 +448,7 @@ export type DRPPlanMinOrderByAggregateInput = {
   date?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  status?: Prisma.SortOrder
 }
 
 export type DRPPlanSumOrderByAggregateInput = {
@@ -606,6 +628,7 @@ export type DRPPlanCreateWithoutProductInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
   planningRun: Prisma.PlanningRunCreateNestedOneWithoutDrpPlansInput
   fromWarehouse: Prisma.WarehouseCreateNestedOneWithoutDrpFromInput
   toWarehouse: Prisma.WarehouseCreateNestedOneWithoutDrpToInput
@@ -619,6 +642,7 @@ export type DRPPlanUncheckedCreateWithoutProductInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
 }
 
 export type DRPPlanCreateOrConnectWithoutProductInput = {
@@ -659,6 +683,7 @@ export type DRPPlanScalarWhereInput = {
   date?: Prisma.DateTimeFilter<"DRPPlan"> | Date | string
   quantity?: Prisma.FloatFilter<"DRPPlan"> | number
   reason?: Prisma.StringNullableFilter<"DRPPlan"> | string | null
+  status?: Prisma.EnumPlanStatusFilter<"DRPPlan"> | $Enums.PlanStatus
 }
 
 export type DRPPlanCreateWithoutFromWarehouseInput = {
@@ -666,6 +691,7 @@ export type DRPPlanCreateWithoutFromWarehouseInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
   planningRun: Prisma.PlanningRunCreateNestedOneWithoutDrpPlansInput
   product: Prisma.ProductCreateNestedOneWithoutDrpPlansInput
   toWarehouse: Prisma.WarehouseCreateNestedOneWithoutDrpToInput
@@ -679,6 +705,7 @@ export type DRPPlanUncheckedCreateWithoutFromWarehouseInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
 }
 
 export type DRPPlanCreateOrConnectWithoutFromWarehouseInput = {
@@ -696,6 +723,7 @@ export type DRPPlanCreateWithoutToWarehouseInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
   planningRun: Prisma.PlanningRunCreateNestedOneWithoutDrpPlansInput
   product: Prisma.ProductCreateNestedOneWithoutDrpPlansInput
   fromWarehouse: Prisma.WarehouseCreateNestedOneWithoutDrpFromInput
@@ -709,6 +737,7 @@ export type DRPPlanUncheckedCreateWithoutToWarehouseInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
 }
 
 export type DRPPlanCreateOrConnectWithoutToWarehouseInput = {
@@ -758,6 +787,7 @@ export type DRPPlanCreateWithoutPlanningRunInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
   product: Prisma.ProductCreateNestedOneWithoutDrpPlansInput
   fromWarehouse: Prisma.WarehouseCreateNestedOneWithoutDrpFromInput
   toWarehouse: Prisma.WarehouseCreateNestedOneWithoutDrpToInput
@@ -771,6 +801,7 @@ export type DRPPlanUncheckedCreateWithoutPlanningRunInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
 }
 
 export type DRPPlanCreateOrConnectWithoutPlanningRunInput = {
@@ -807,6 +838,7 @@ export type DRPPlanCreateManyProductInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
 }
 
 export type DRPPlanUpdateWithoutProductInput = {
@@ -814,6 +846,7 @@ export type DRPPlanUpdateWithoutProductInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   planningRun?: Prisma.PlanningRunUpdateOneRequiredWithoutDrpPlansNestedInput
   fromWarehouse?: Prisma.WarehouseUpdateOneRequiredWithoutDrpFromNestedInput
   toWarehouse?: Prisma.WarehouseUpdateOneRequiredWithoutDrpToNestedInput
@@ -827,6 +860,7 @@ export type DRPPlanUncheckedUpdateWithoutProductInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
 }
 
 export type DRPPlanUncheckedUpdateManyWithoutProductInput = {
@@ -837,6 +871,7 @@ export type DRPPlanUncheckedUpdateManyWithoutProductInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
 }
 
 export type DRPPlanCreateManyFromWarehouseInput = {
@@ -847,6 +882,7 @@ export type DRPPlanCreateManyFromWarehouseInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
 }
 
 export type DRPPlanCreateManyToWarehouseInput = {
@@ -857,6 +893,7 @@ export type DRPPlanCreateManyToWarehouseInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
 }
 
 export type DRPPlanUpdateWithoutFromWarehouseInput = {
@@ -864,6 +901,7 @@ export type DRPPlanUpdateWithoutFromWarehouseInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   planningRun?: Prisma.PlanningRunUpdateOneRequiredWithoutDrpPlansNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutDrpPlansNestedInput
   toWarehouse?: Prisma.WarehouseUpdateOneRequiredWithoutDrpToNestedInput
@@ -877,6 +915,7 @@ export type DRPPlanUncheckedUpdateWithoutFromWarehouseInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
 }
 
 export type DRPPlanUncheckedUpdateManyWithoutFromWarehouseInput = {
@@ -887,6 +926,7 @@ export type DRPPlanUncheckedUpdateManyWithoutFromWarehouseInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
 }
 
 export type DRPPlanUpdateWithoutToWarehouseInput = {
@@ -894,6 +934,7 @@ export type DRPPlanUpdateWithoutToWarehouseInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   planningRun?: Prisma.PlanningRunUpdateOneRequiredWithoutDrpPlansNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutDrpPlansNestedInput
   fromWarehouse?: Prisma.WarehouseUpdateOneRequiredWithoutDrpFromNestedInput
@@ -907,6 +948,7 @@ export type DRPPlanUncheckedUpdateWithoutToWarehouseInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
 }
 
 export type DRPPlanUncheckedUpdateManyWithoutToWarehouseInput = {
@@ -917,6 +959,7 @@ export type DRPPlanUncheckedUpdateManyWithoutToWarehouseInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
 }
 
 export type DRPPlanCreateManyPlanningRunInput = {
@@ -927,6 +970,7 @@ export type DRPPlanCreateManyPlanningRunInput = {
   date: Date | string
   quantity: number
   reason?: string | null
+  status?: $Enums.PlanStatus
 }
 
 export type DRPPlanUpdateWithoutPlanningRunInput = {
@@ -934,6 +978,7 @@ export type DRPPlanUpdateWithoutPlanningRunInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   product?: Prisma.ProductUpdateOneRequiredWithoutDrpPlansNestedInput
   fromWarehouse?: Prisma.WarehouseUpdateOneRequiredWithoutDrpFromNestedInput
   toWarehouse?: Prisma.WarehouseUpdateOneRequiredWithoutDrpToNestedInput
@@ -947,6 +992,7 @@ export type DRPPlanUncheckedUpdateWithoutPlanningRunInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
 }
 
 export type DRPPlanUncheckedUpdateManyWithoutPlanningRunInput = {
@@ -957,6 +1003,7 @@ export type DRPPlanUncheckedUpdateManyWithoutPlanningRunInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quantity?: Prisma.FloatFieldUpdateOperationsInput | number
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
 }
 
 
@@ -970,6 +1017,7 @@ export type DRPPlanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   date?: boolean
   quantity?: boolean
   reason?: boolean
+  status?: boolean
   planningRun?: boolean | Prisma.PlanningRunDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   fromWarehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
@@ -985,6 +1033,7 @@ export type DRPPlanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   date?: boolean
   quantity?: boolean
   reason?: boolean
+  status?: boolean
   planningRun?: boolean | Prisma.PlanningRunDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   fromWarehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
@@ -1000,6 +1049,7 @@ export type DRPPlanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   date?: boolean
   quantity?: boolean
   reason?: boolean
+  status?: boolean
   planningRun?: boolean | Prisma.PlanningRunDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   fromWarehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
@@ -1015,9 +1065,10 @@ export type DRPPlanSelectScalar = {
   date?: boolean
   quantity?: boolean
   reason?: boolean
+  status?: boolean
 }
 
-export type DRPPlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planningRunId" | "productId" | "fromWarehouseId" | "toWarehouseId" | "date" | "quantity" | "reason", ExtArgs["result"]["dRPPlan"]>
+export type DRPPlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planningRunId" | "productId" | "fromWarehouseId" | "toWarehouseId" | "date" | "quantity" | "reason" | "status", ExtArgs["result"]["dRPPlan"]>
 export type DRPPlanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   planningRun?: boolean | Prisma.PlanningRunDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -1054,6 +1105,10 @@ export type $DRPPlanPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     date: Date
     quantity: number
     reason: string | null
+    /**
+     * A transfer is a proposal like a SupplyPlan is, so it decides the same way.
+     */
+    status: $Enums.PlanStatus
   }, ExtArgs["result"]["dRPPlan"]>
   composites: {}
 }
@@ -1489,6 +1544,7 @@ export interface DRPPlanFieldRefs {
   readonly date: Prisma.FieldRef<"DRPPlan", 'DateTime'>
   readonly quantity: Prisma.FieldRef<"DRPPlan", 'Float'>
   readonly reason: Prisma.FieldRef<"DRPPlan", 'String'>
+  readonly status: Prisma.FieldRef<"DRPPlan", 'PlanStatus'>
 }
     
 

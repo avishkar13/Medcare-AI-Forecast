@@ -23,6 +23,16 @@ export const rejectSupplyPlan = async (req: Request, res: Response) => {
   ok(res, await plans.decideSupplyPlan(id, "reject"));
 };
 
+export const approveDrpPlan = async (req: Request, res: Response) => {
+  const { id } = planParamsSchema.parse(req.params);
+  ok(res, await plans.decideDrpPlan(id, "approve"));
+};
+
+export const rejectDrpPlan = async (req: Request, res: Response) => {
+  const { id } = planParamsSchema.parse(req.params);
+  ok(res, await plans.decideDrpPlan(id, "reject"));
+};
+
 export const listDrpPlans = async (req: Request, res: Response) => {
   const query = drpQuerySchema.parse(req.query);
   enforceScopeConflict(query.warehouse, req);

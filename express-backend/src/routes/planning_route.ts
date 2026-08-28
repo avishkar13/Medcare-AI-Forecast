@@ -15,5 +15,8 @@ planningRouter.get("/runs/:id", rateLimiter.read, authorize("simulation:view"), 
 planningRouter.get("/runs/:id/compare", rateLimiter.read, authorize("simulation:view"), planningController.compareRuns);
 planningRouter.get("/runs/:id/optimization", rateLimiter.read, authorize("simulation:view"), planningController.getOptimization);
 planningRouter.get("/runs/:id/simulation", rateLimiter.read, authorize("simulation:view"), planningController.getSimulation);
+// Realised against planned. Reads the movement and demand ledgers, so it needs no
+// artefact of its own - which is why it works on any completed run, old ones included.
+planningRouter.get("/runs/:id/outcome", rateLimiter.read, authorize("simulation:view"), planningController.getOutcome);
 // The projection curve the executor has always written and nothing read. Phase 3.4.
 planningRouter.get("/runs/:id/inventory-plans", rateLimiter.read, authorize("simulation:view"), movementController.getInventoryPlans);

@@ -104,6 +104,8 @@ const listSelect = {
   product: { select: { sku: true, name: true, category: true, criticality: true } },
   warehouse: { select: { code: true, name: true, tier: true } },
   signals: { select: { id: true, type: true, label: true, direction: true } },
+  // What executing this raised, so a reader can follow the action rather than guess.
+  restockRequest: { select: { id: true, status: true, quantity: true } },
 } satisfies Prisma.RecommendationSelect;
 
 type ListedRow = Prisma.RecommendationGetPayload<{ select: typeof listSelect }>;
@@ -133,6 +135,7 @@ const toItem = (row: ListedRow) => ({
   warehouseName: row.warehouse.name,
   tier: row.warehouse.tier,
   signals: row.signals,
+  restockRequest: row.restockRequest,
   acknowledgedAt: row.acknowledgedAt?.toISOString() ?? null,
   resolvedAt: row.resolvedAt?.toISOString() ?? null,
   actedById: row.actedById,
@@ -298,6 +301,25 @@ const TRANSITIONS: Record<string, RecommendationStatus[]> = {
   dismiss: [RecommendationStatus.OPEN, RecommendationStatus.ACCEPTED],
 };
 
+/**
+ * Recommendation types that executing should actually raise stock for.
+ *
+ * `REDUCE_SUPPLY` is absent on purpose: it says "do not order", and there is no
+ * artefact for not doing something.
+ */
+const RAISES_RESTOCK = new Set<string>(["STOCKOUT_RISK", "TRANSFER_STOCK"]);
+
+/**
+ * Why the request exists, in the words of the recommendation that caused it.
+ *
+ * A transfer names its source so the warehouse reading the queue knows the stock is
+ * expected to come across the network rather than from a distributor.
+ */
+const restockReasonFor = (row: { type: string; message: string }) =>
+  row.type === "TRANSFER_STOCK"
+    ? `Transfer approved from a planning recommendation: ${row.message}`
+    : `Raised from a planning recommendation: ${row.message}`;
+
 const applyAction = async (
   { id }: RecommendationParams,
   action: "execute" | "dismiss",
@@ -305,7 +327,16 @@ const applyAction = async (
 ) => {
   const existing = await prisma.recommendation.findUnique({
     where: { id },
-    select: { id: true, status: true },
+    select: {
+      id: true,
+      status: true,
+      type: true,
+      message: true,
+      quantity: true,
+      productId: true,
+      warehouseId: true,
+      restockRequest: { select: { id: true } },
+    },
   });
   if (!existing) throw new NotFoundError(`Recommendation '${id}' not found`);
 
@@ -319,19 +350,53 @@ const applyAction = async (
   }
 
   const now = new Date();
-  const row = await prisma.recommendation.update({
-    where: { id },
-    data: {
-      status:
-        action === "execute" ? RecommendationStatus.COMPLETED : RecommendationStatus.REJECTED,
-      resolvedAt: now,
-      // Only stamped on the first acknowledgement, never moved by a later action.
-      ...(existing.status === RecommendationStatus.OPEN ? { acknowledgedAt: now } : {}),
-      // `req.userId` - a stand-in today, the authenticated user once auth is wired.
-      actedById: await resolveActorId(actorId),
-    },
-    select: listSelect,
-  });
+  const resolvedActorId = await resolveActorId(actorId);
+
+  /**
+   * Executing used to be a status flip and nothing else, so the ACT half of the loop
+   * was a person reading a row and retyping it somewhere. It now raises the request
+   * the recommendation is asking for, in the same transaction as the status change -
+   * a COMPLETED recommendation with no request behind it would be a lie either way
+   * round.
+   *
+   * Still no stock movement: a `RestockRequest` is a proposal that a warehouse
+   * approves and an arriving movement fulfils, which is the same boundary the
+   * executor respects.
+   */
+  const raisesRestock =
+    action === "execute" &&
+    RAISES_RESTOCK.has(existing.type) &&
+    existing.restockRequest === null &&
+    (existing.quantity ?? 0) > 0;
+
+  const [row] = await prisma.$transaction([
+    prisma.recommendation.update({
+      where: { id },
+      data: {
+        status:
+          action === "execute" ? RecommendationStatus.COMPLETED : RecommendationStatus.REJECTED,
+        resolvedAt: now,
+        // Only stamped on the first acknowledgement, never moved by a later action.
+        ...(existing.status === RecommendationStatus.OPEN ? { acknowledgedAt: now } : {}),
+        actedById: resolvedActorId,
+      },
+      select: listSelect,
+    }),
+    ...(raisesRestock
+      ? [
+          prisma.restockRequest.create({
+            data: {
+              productId: existing.productId,
+              warehouseId: existing.warehouseId,
+              quantity: existing.quantity!,
+              reason: restockReasonFor(existing),
+              recommendationId: existing.id,
+              ...(resolvedActorId === null ? {} : { requestedById: resolvedActorId }),
+            },
+          }),
+        ]
+      : []),
+  ]);
 
   return toItem(row);
 };

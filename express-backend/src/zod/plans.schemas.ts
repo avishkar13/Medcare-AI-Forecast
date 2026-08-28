@@ -21,6 +21,7 @@ export const drpQuerySchema = z.object({
   sku: text.optional(),
   /** Matches transfers where this warehouse is either the source or the destination. */
   warehouse: text.optional(),
+  status: z.enum(PlanStatus).optional(),
   page,
   pageSize,
 });
