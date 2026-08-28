@@ -2,9 +2,21 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForecastSeasonality, useForecastTrend } from "@/hooks/use-forecast";
-import { BarChart3, TrendingUp, Calendar, Zap } from "lucide-react";
+import { BarChart3, TrendingUp, TrendingDown, Minus, Calendar, Zap } from "lucide-react";
 import { useForecastScope } from "@/store/filters.store";
 import { QueryError } from "@/components/ui/query-state";
+
+function TrendIcon({ val }: { val: number | null }) {
+  if (val === null || val === 0) return <Minus className="h-4 w-4 text-muted-foreground" />;
+  if (val > 0) return <TrendingUp className="h-4 w-4 text-destructive" />;
+  return <TrendingDown className="h-4 w-4 text-ai" />;
+}
+
+const formatTrendStr = (val: number | null) => {
+  if (val === null) return "—";
+  if (val === 0) return "0%";
+  return val > 0 ? `+${val}%` : `${val}%`;
+};
 
 export function ForecastTrend() {
   const scope = useForecastScope();
@@ -41,15 +53,15 @@ export function ForecastTrend() {
           <div>
             <p className="text-xs font-medium text-muted-foreground mb-1">7-Day Trend</p>
             <div className="flex items-center gap-1.5">
-              <TrendingUp className="h-4 w-4 text-destructive" />
-              <span className="text-lg font-semibold">+{trends.sevenDayTrend}%</span>
+              <TrendIcon val={trends.sevenDayTrend} />
+              <span className="text-lg font-semibold">{formatTrendStr(trends.sevenDayTrend)}</span>
             </div>
           </div>
           <div>
             <p className="text-xs font-medium text-muted-foreground mb-1">30-Day Trend</p>
             <div className="flex items-center gap-1.5">
-              <TrendingUp className="h-4 w-4 text-destructive" />
-              <span className="text-lg font-semibold">+{trends.thirtyDayTrend}%</span>
+              <TrendIcon val={trends.thirtyDayTrend} />
+              <span className="text-lg font-semibold">{formatTrendStr(trends.thirtyDayTrend)}</span>
             </div>
           </div>
           <div>

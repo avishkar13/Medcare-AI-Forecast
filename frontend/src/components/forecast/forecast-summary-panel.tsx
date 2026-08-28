@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { useForecastKpi, useForecastSummary } from "@/hooks/use-forecast";
+import { useFormatters } from "@/hooks/use-formatters";
 import { useForecastScope } from "@/store/filters.store";
 import {
   Activity,
@@ -26,6 +27,7 @@ export function ForecastSummaryPanel() {
   const scope = useForecastScope();
   const { data, isPending, isError } = useForecastSummary(scope);
   const kpi = useForecastKpi(scope);
+  const { formatDate } = useFormatters();
 
   const summary = {
     predictedPeak: kpi.data?.expectedPeakDemand ?? 0,
@@ -41,29 +43,6 @@ export function ForecastSummaryPanel() {
   if (isPending) return null;
 
   if (isError) return <QueryError label="the forecast summary" />;
-
-  const formatPeakDate = (value: string) => {
-    try {
-      const date = new Date(value);
-
-      if (Number.isNaN(date.getTime())) {
-        return value;
-      }
-
-      return (
-        new Intl.DateTimeFormat("en-IN", {
-          timeZone: "Asia/Kolkata",
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-        }).format(date)
-      );
-    } catch {
-      return value;
-    }
-  };
 
   const isGrowing = summary.expectedTrend === "Growing";
 
@@ -121,7 +100,7 @@ export function ForecastSummaryPanel() {
             SCROLLABLE CONTENT
         ========================== */}
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 [scrollbar-width:thin]">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-5">
             {/* =========================
                 FORECAST TIMESTAMP
             ========================== */}
@@ -132,11 +111,11 @@ export function ForecastSummaryPanel() {
 
               <div className="min-w-0">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Forecast Generated
+                  Expected Peak Date
                 </p>
 
                 <p className="mt-0.5 truncate text-sm font-semibold text-foreground">
-                  {formatPeakDate(summary.peakDate)}
+                  {formatDate(summary.peakDate)}
                 </p>
               </div>
             </div>
@@ -231,7 +210,7 @@ export function ForecastSummaryPanel() {
             {/* =========================
                 CONFIDENCE RANGE
             ========================== */}
-            <div className="border-t border-border/60 pt-4">
+            <div className="border-t border-border/60 pt-6 mt-2">
               <div className="mb-2.5 flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
@@ -265,12 +244,12 @@ export function ForecastSummaryPanel() {
               <div className="relative overflow-hidden rounded-xl border border-ai/15 bg-ai/[0.035] p-3.5">
                 <div className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-ai/[0.04] to-transparent" />
 
-                <div className="relative flex items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-ai/20 bg-background/80">
+                <div className="relative flex items-center gap-2">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-ai/20 bg-background/80">
                     <ShieldCheck className="h-4.5 w-4.5 text-ai" />
                   </div>
 
-                  <div className="flex min-w-0 flex-1 items-center justify-between">
+                  <div className="flex min-w-0 flex-1 items-center justify-center">
                     <span className="text-xl font-bold tracking-tight text-foreground">
                       {summary.confidenceRange[0]}
                     </span>
@@ -299,7 +278,7 @@ export function ForecastSummaryPanel() {
             {/* =========================
                 ACCURACY / TREND
             ========================== */}
-            <div className="grid grid-cols-2 gap-3 border-t border-border/60 pt-4">
+            <div className="grid grid-cols-2 gap-3 border-t border-border/60 pt-6 mt-2">
               {/* Historical accuracy */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
@@ -325,7 +304,7 @@ export function ForecastSummaryPanel() {
                   </Tooltip>
                 </div>
 
-                <div className="flex min-h-[52px] items-center gap-2.5 rounded-xl border border-border/70 bg-background/75 px-3 shadow-sm">
+                <div className="flex min-h-[52px] items-center gap-2.5 rounded-xl border border-border/70 bg-background/75 px-3 py-2 shadow-sm">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-success/10">
                     <Target className="h-3.5 w-3.5 text-success" />
                   </div>
@@ -350,7 +329,7 @@ export function ForecastSummaryPanel() {
                   </p>
                 </div>
 
-                <div className="flex min-h-[52px] items-center justify-between gap-2 rounded-xl border border-border/70 bg-background/75 px-3 shadow-sm">
+                <div className="flex min-h-[52px] items-center justify-between gap-2 rounded-xl border border-border/70 bg-background/75 px-3 py-2 shadow-sm">
                   <div className="min-w-0">
                     <p className="truncate text-base font-bold text-foreground">
                       {summary.expectedTrend}
@@ -381,7 +360,7 @@ export function ForecastSummaryPanel() {
             {/* =========================
                 PEAK INFORMATION
             ========================== */}
-            <div className="rounded-xl border border-border/60 bg-muted/[0.18] px-3.5 py-3">
+            <div className="mt-2 rounded-xl border border-border/60 bg-muted/[0.18] px-3.5 py-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -399,7 +378,7 @@ export function ForecastSummaryPanel() {
                   </p>
 
                   <p className="mt-1 text-xs font-medium text-foreground">
-                    {formatPeakDate(summary.peakDate)}
+                    {formatDate(summary.peakDate)}
                   </p>
                 </div>
               </div>

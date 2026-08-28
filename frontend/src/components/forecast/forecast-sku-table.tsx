@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,20 +9,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useForecastSkus } from "@/hooks/use-forecast";
 import { Search, TrendingUp, TrendingDown, Minus, FilterX } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useForecastScope } from "@/store/filters.store";
-import { useScopedHref } from "@/hooks/use-scope";
+// import { useScopedHref } from "@/hooks/use-scope";
 import { useFormatters } from "@/hooks/use-formatters";
 import { QueryError } from "@/components/ui/query-state";
-
-/**
- * One sentinel, used by the state *and* by the option values.
- *
- * These were `"all categories"` / `"all trends"` / `"all risks"` in state against
- * `value="all"` in the options, so selecting "All Categories" set the state to a value
- * no comparison matched and emptied the table with no way back except the reset button
- * - which was itself always visible, because it compared against `"all"` too.
- */
-const ALL = "all";
+import { SkuDetailDrawer } from "@/components/inventory/sku-detail-drawer";
+import { useForecastScope } from "@/store/filters.store";
 
 /**
  * Risk, in one place.
@@ -56,14 +47,13 @@ const riskOf = (criticality: string): Risk =>
 
 export function ForecastSkuTable() {
   const scope = useForecastScope();
-  const router = useRouter();
-  const scopedHref = useScopedHref();
   const { formatNumber } = useFormatters();
 
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<string>(ALL);
-  const [trend, setTrend] = useState<string>(ALL);
-  const [risk, setRisk] = useState<string>(ALL);
+  const [category, setCategory] = useState<string | undefined>(undefined);
+  const [trend, setTrend] = useState<string | undefined>(undefined);
+  const [risk, setRisk] = useState<string | undefined>(undefined);
+  const [selectedSku, setSelectedSku] = useState<string | null>(null);
 
   const { data, isPending, isError } = useForecastSkus(scope);
 
@@ -128,9 +118,9 @@ export function ForecastSkuTable() {
           item.id.toLowerCase().includes(needle);
         return (
           matchSearch &&
-          (category === ALL || item.category === category) &&
-          (trend === ALL || item.trend === trend) &&
-          (risk === ALL || item.risk === risk)
+          (category === undefined || item.category === category) &&
+          (trend === undefined || item.trend === trend) &&
+          (risk === undefined || item.risk === risk)
         );
       }),
     [items, search, category, trend, risk],
@@ -141,14 +131,15 @@ export function ForecastSkuTable() {
 
   const resetFilters = () => {
     setSearch("");
-    setCategory(ALL);
-    setTrend(ALL);
-    setRisk(ALL);
+    setCategory(undefined);
+    setTrend(undefined);
+    setRisk(undefined);
   };
 
-  const isFiltered = Boolean(search) || category !== ALL || trend !== ALL || risk !== ALL;
+  const isFiltered = Boolean(search) || category !== undefined || trend !== undefined || risk !== undefined;
 
   return (
+    <>
     <Card className="col-span-full">
       <CardHeader>
         <CardTitle>Forecast by SKU</CardTitle>
@@ -169,12 +160,12 @@ export function ForecastSkuTable() {
             />
           </div>
           <div className="flex gap-2">
-            <Select value={category} onValueChange={(val) => setCategory(val as string)}>
+            <Select value={category || undefined} onValueChange={(val) => setCategory(val === "all" ? undefined : val as string)}>
               <SelectTrigger className="w-[150px] bg-background">
-                <SelectValue placeholder="Category" />
+                <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={ALL}>All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((name) => (
                   <SelectItem key={name} value={name}>
                     {name}
@@ -183,12 +174,12 @@ export function ForecastSkuTable() {
               </SelectContent>
             </Select>
 
-            <Select value={trend} onValueChange={(val) => setTrend(val as string)}>
+            <Select value={trend || undefined} onValueChange={(val) => setTrend(val === "all" ? undefined : val as string)}>
               <SelectTrigger className="w-[120px] bg-background">
-                <SelectValue placeholder="Trend" />
+                <SelectValue placeholder="All Trends" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={ALL}>All Trends</SelectItem>
+                <SelectItem value="all">All Trends</SelectItem>
                 {Object.entries(TREND).map(([key, entry]) => (
                   <SelectItem key={key} value={key}>
                     {entry.label}
@@ -197,12 +188,12 @@ export function ForecastSkuTable() {
               </SelectContent>
             </Select>
 
-            <Select value={risk} onValueChange={(val) => setRisk(val as string)}>
+            <Select value={risk || undefined} onValueChange={(val) => setRisk(val === "all" ? undefined : val as string)}>
               <SelectTrigger className="w-[120px] bg-background">
-                <SelectValue placeholder="Risk" />
+                <SelectValue placeholder="All Risks" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={ALL}>All Risks</SelectItem>
+                <SelectItem value="all">All Risks</SelectItem>
                 {Object.entries(RISK).map(([key, entry]) => (
                   <SelectItem key={key} value={key}>
                     {entry.label}
@@ -255,7 +246,7 @@ export function ForecastSkuTable() {
                       // The row advertised itself with a hover and did nothing. Its
                       // stock position is what a reader wants next from a forecast.
                       className="cursor-pointer hover:bg-muted/30"
-                      onClick={() => router.push(scopedHref("/inventory", { sku: item.id }))}
+                      onClick={() => setSelectedSku(item.id)}
                     >
                       <TableCell>
                         <p className="font-medium">{item.product}</p>
@@ -308,5 +299,12 @@ export function ForecastSkuTable() {
         </div>
       </CardContent>
     </Card>
+
+    <SkuDetailDrawer
+      skuId={selectedSku}
+      isOpen={selectedSku !== null}
+      onClose={() => setSelectedSku(null)}
+    />
+    </>
   );
 }

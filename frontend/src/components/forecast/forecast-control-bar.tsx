@@ -8,13 +8,13 @@ import { SlidersHorizontal, BrainCircuit } from "lucide-react";
 import { useProducts, useWarehouses } from "@/hooks/use-masterdata";
 import { useModelMetrics } from "@/hooks/use-models";
 import { useFiltersStore } from "@/store/filters.store";
-
-const ALL = "all";
+import { useScope } from "@/hooks/use-scope";
 
 export function ForecastControlBar() {
   const { data: products } = useProducts();
   const { data: warehouses } = useWarehouses();
   const { data: metrics } = useModelMetrics();
+  const { dc } = useScope();
 
   const scope = useFiltersStore((state) => state.forecast);
   const setScope = useFiltersStore((state) => state.setForecastScope);
@@ -45,16 +45,16 @@ export function ForecastControlBar() {
           </div>
 
           <Select
-            value={scope.sku ?? ALL}
+            value={scope.sku || undefined}
             onValueChange={(value) =>
-              setScope({ sku: !value || value === ALL ? undefined : value })
+              setScope({ sku: !value || value === "all" ? undefined : value })
             }
           >
             <SelectTrigger className="w-[220px] h-9">
-              <SelectValue placeholder="Select SKU" />
+              <SelectValue placeholder="All Products" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ALL}>All Products</SelectItem>
+              <SelectItem value="all">All Products</SelectItem>
               {visibleProducts.map((product) => (
                 <SelectItem key={product.sku} value={product.sku}>
                   {product.name}
@@ -64,16 +64,16 @@ export function ForecastControlBar() {
           </Select>
 
           <Select
-            value={scope.category ?? ALL}
+            value={scope.category || undefined}
             onValueChange={(value) =>
-              setScope({ category: !value || value === ALL ? undefined : value, sku: undefined })
+              setScope({ category: !value || value === "all" ? undefined : value, sku: undefined })
             }
           >
             <SelectTrigger className="w-[170px] h-9">
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ALL}>All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category} value={category}>
                   {category}
@@ -88,20 +88,26 @@ export function ForecastControlBar() {
             rule were comparing different value spaces and never agreed.
           */}
           <Select
-            value={scope.warehouse ?? ALL}
+            value={dc || scope.warehouse || undefined}
             onValueChange={(value) =>
-              setScope({ warehouse: !value || value === ALL ? undefined : value })
+              setScope({ warehouse: !value || value === "all" ? undefined : value })
             }
+            disabled={Boolean(dc)}
           >
-            <SelectTrigger className="w-[190px] h-9">
-              <SelectValue placeholder="Distribution Center" />
+            <SelectTrigger
+              className="w-[190px] h-9"
+              title={dc ? "Scoped by the DC selector in the top bar" : undefined}
+            >
+              <SelectValue placeholder="All DCs (Network)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ALL}>All DCs (Network)</SelectItem>
-              {(warehouses ?? []).map((warehouse) => (
-                <SelectItem key={warehouse.id} value={warehouse.id}>
-                  {warehouse.name}
-                </SelectItem>
+              {!dc && <SelectItem value="all">All DCs (Network)</SelectItem>}
+              {(warehouses ?? [])
+                .filter((w) => !dc || w.id === dc)
+                .map((warehouse) => (
+                  <SelectItem key={warehouse.id} value={warehouse.id}>
+                    {warehouse.name}
+                  </SelectItem>
               ))}
             </SelectContent>
           </Select>

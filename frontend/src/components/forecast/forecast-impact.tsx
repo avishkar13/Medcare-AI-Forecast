@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useForecastImpact } from "@/hooks/use-forecast";
+import { useFormatters } from "@/hooks/use-formatters";
 import { TrendingDown, ShieldCheck, DollarSign, PackageMinus } from "lucide-react";
 import { useForecastScope } from "@/store/filters.store";
 import { QueryError } from "@/components/ui/query-state";
@@ -9,11 +10,12 @@ import { QueryError } from "@/components/ui/query-state";
 export function ForecastImpact() {
   const scope = useForecastScope();
   const { data, isPending, isError } = useForecastImpact(scope);
+  const { formatCompactCurrency } = useFormatters();
 
   // the card was framed as reductions, which needs a baseline. the api reports one
   // run's actual cost and risk, so the tiles show those instead of a made-up delta.
   const money = (value: number | null) =>
-    value === null ? "—" : `$${(value / 1000).toFixed(1)}K`;
+    value === null ? "—" : formatCompactCurrency(value);
 
   if (isPending) return null;
 
