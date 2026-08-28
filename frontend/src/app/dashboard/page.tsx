@@ -17,7 +17,12 @@ import { PositionProjection } from "@/components/dashboard/position-projection";
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col w-full max-w-7xl mx-auto">
+    <div className="flex flex-col w-full max-w-7xl mx-auto relative min-h-screen">
+      {/* Decorative background glows */}
+      <div className="absolute top-[-100px] left-1/4 w-[600px] h-[400px] bg-primary/5 rounded-full blur-[100px] -z-10 pointer-events-none" />
+      <div className="absolute top-[600px] right-0 w-[500px] h-[500px] bg-ai/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[800px] h-[600px] bg-warning/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
+
       <PageHeader />
       
       <div className="flex flex-col gap-6">
@@ -59,10 +64,8 @@ export default function DashboardPage() {
 
         {/* Decision & Optimization Layer */}
         <div className="grid [&>*]:min-w-0 grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 h-[600px] lg:h-auto lg:relative">
-            <div className="h-full lg:absolute lg:inset-0">
-              <AIRecommendations />
-            </div>
+          <div className="lg:col-span-2 h-[600px] lg:h-[1500px]">
+            <AIRecommendations />
           </div>
           <div className="flex flex-col gap-6 lg:col-span-1">
             <OptimizationSummary />

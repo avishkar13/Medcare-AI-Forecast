@@ -99,27 +99,33 @@ const STATUS: Record<string, "Pending" | "Executed" | "Dismissed"> = {
   REJECTED: "Dismissed",
 };
 
-export const toRecommendationItem = (rec: Recommendation) => ({
-  id: rec.id,
-  title: rec.actionType ?? rec.type.replace(/_/g, " "),
-  actionType: ACTION[rec.type] ?? "Prioritize",
-  priority: (rec.priority.charAt(0) + rec.priority.slice(1).toLowerCase()) as
-    | "Critical"
-    | "High"
-    | "Medium"
-    | "Low",
-  confidence: rec.confidence ?? 0,
-  reason: rec.message,
-  sku: rec.sku,
-  productName: rec.productName ?? "Unknown Product",
-  category: rec.category ?? "Uncategorized",
-  location: rec.warehouseName,
-  recommendedQuantity: rec.quantity ?? 0,
-  expectedImpact: rec.expectedImpact ?? "",
-  impactValue: rec.impactValue ?? 0,
-  // The executor's cited signals, which the card has always been able to render.
-  // This was hardcoded to `[]` while every row arrived carrying them.
-  signals: rec.signals as RecommendationSignal[],
-  status: STATUS[rec.status] ?? "Pending",
-  createdAt: rec.createdAt,
-});
+export const toRecommendationItem = (rec: Recommendation) => {
+  const typeStr = rec.type ?? "STOCKOUT_RISK";
+  const priorityStr = rec.priority ?? "LOW";
+  const statusStr = rec.status ?? "OPEN";
+
+  return {
+    id: rec.id,
+    title: rec.actionType ?? typeStr.replace(/_/g, " "),
+    actionType: ACTION[typeStr] ?? "Prioritize",
+    priority: (priorityStr.charAt(0) + priorityStr.slice(1).toLowerCase()) as
+      | "Critical"
+      | "High"
+      | "Medium"
+      | "Low",
+    confidence: rec.confidence ?? 0,
+    reason: rec.message ?? "",
+    sku: rec.sku,
+    productName: rec.productName ?? "Unknown Product",
+    category: rec.category ?? "Uncategorized",
+    location: rec.warehouseName ?? "Unknown Location",
+    recommendedQuantity: rec.quantity ?? 0,
+    expectedImpact: rec.expectedImpact ?? "",
+    impactValue: rec.impactValue ?? 0,
+    // The executor's cited signals, which the card has always been able to render.
+    // This was hardcoded to `[]` while every row arrived carrying them.
+    signals: (rec.signals ?? []) as RecommendationSignal[],
+    status: STATUS[statusStr] ?? "Pending",
+    createdAt: rec.createdAt ?? new Date().toISOString(),
+  };
+};

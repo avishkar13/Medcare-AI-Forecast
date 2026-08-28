@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { QueryError } from "@/components/ui/query-state";
 
 export function ExecutiveDecisionPanel() {
-  const { data, isPending, isError } = useRecommendations({ pageSize: 3 });
+  const { data, isPending, isError } = useRecommendations({ pageSize: 15, status: "OPEN" });
   // The most prominent button on the dashboard had no handler at all.
   const { execute } = useRecommendationAction();
   const [actingId, setActingId] = useState<string | null>(null);
@@ -27,16 +27,19 @@ export function ExecutiveDecisionPanel() {
     });
   };
 
-  const topDecisions = (data?.data ?? []).map((rec) => ({
-    id: rec.id,
-    itemId: rec.sku,
-    action: rec.actionType ?? rec.type,
-    priority: rec.priority.toLowerCase(),
-    reason: rec.message,
-    expectedImpact: rec.expectedImpact ?? "",
-    suggestedQuantity: rec.quantity ?? 0,
-    destinationDc: rec.warehouseCode,
-  }));
+  const topDecisions = (data?.data ?? [])
+    .filter((rec) => rec.status === "OPEN" || rec.status === "ACCEPTED")
+    .map((rec) => ({
+      id: rec.id,
+      itemId: rec.sku,
+      action: rec.actionType ?? rec.type,
+      priority: rec.priority.toLowerCase(),
+      reason: rec.message,
+      expectedImpact: rec.expectedImpact ?? "",
+      suggestedQuantity: rec.quantity ?? 0,
+      destinationDc: rec.warehouseCode,
+    }))
+    .slice(0, 3);
 
   // Checked first and on its own: this used to sit *inside* the branch below, so a
   // failed request rendered "No decisions pending" - a reassuring sentence about an
@@ -72,8 +75,8 @@ export function ExecutiveDecisionPanel() {
   };
 
   return (
-    <Card className="col-span-full border-2 border-primary/20 bg-muted/10 shadow-lg mt-4">
-      <CardHeader className="pb-5 border-b border-border/50 bg-background/50">
+    <Card className="col-span-full border-success/20 bg-gradient-to-br from-card via-card to-success/5">
+      <CardHeader className="pb-3 border-b border-border/40 bg-muted/20">
         <CardTitle className="flex items-center gap-2 text-xl font-bold text-foreground">
           <Briefcase className="h-5 w-5 text-primary" />
           Today&apos;s Supply Chain Decisions

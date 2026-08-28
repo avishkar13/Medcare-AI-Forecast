@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useMemo } from "react";
 import Link from "next/link";
 import { ArrowDownRight, ArrowUpRight, Bell, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ import { useMovements } from "@/hooks/use-movements";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useScope } from "@/hooks/use-scope";
 import { useFormatters } from "@/hooks/use-formatters";
+import { useWarehouses } from "@/hooks/use-masterdata";
 import { MOVEMENT_TYPES } from "@/lib/api/movements";
 
 const selectClass =
@@ -45,16 +46,29 @@ export default function TransactionsPage() {
 }
 
 function TransactionsView() {
-  const { withScope, dcCode } = useScope();
+  const { withScope, dc, dcCode } = useScope();
   const { formatNumber } = useFormatters();
+  const { data: warehouses } = useWarehouses();
 
   const [search, setSearch] = useState("");
   const [type, setType] = useState("all");
+  const [location, setLocation] = useState("all");
   const debouncedSearch = useDebouncedValue(search);
+
+  // Filter locations if a global DC is active
+  const locations = useMemo(() => {
+    if (!warehouses) return [];
+    if (dc) {
+      const match = warehouses.find((w) => w.id === dc);
+      return match ? [match.name] : [];
+    }
+    return warehouses.map((w) => w.name);
+  }, [warehouses, dc]);
 
   const { data, isPending, isError, isFetching, refetch } = useMovements({
     ...(debouncedSearch ? { sku: debouncedSearch } : {}),
     ...(type === "all" ? {} : { type }),
+    ...(location === "all" ? {} : { warehouse: location }),
     pageSize: 100,
   });
 
@@ -105,6 +119,20 @@ function TransactionsView() {
               {MOVEMENT_TYPES.map((option) => (
                 <option key={option} value={option}>
                   {option.replace(/_/g, " ")}
+                </option>
+              ))}
+            </select>
+            <select
+              className={selectClass}
+              value={dc && locations.length === 1 ? locations[0] : location}
+              onChange={(event) => setLocation(event.target.value)}
+              disabled={Boolean(dc)}
+              title={dc ? "Scoped by the DC selector in the top bar" : undefined}
+            >
+              {dc && locations.length === 1 ? null : <option value="all">All Locations</option>}
+              {locations.map((loc) => (
+                <option key={loc} value={loc}>
+                  {loc}
                 </option>
               ))}
             </select>

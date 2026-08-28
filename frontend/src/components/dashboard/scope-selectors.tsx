@@ -1,9 +1,10 @@
 "use client";
 
-import { Building2, CalendarRange } from "lucide-react";
+import { Building2, CalendarRange, X } from "lucide-react";
 import { useScope } from "@/hooks/use-scope";
 import { useWarehouses } from "@/hooks/use-masterdata";
 import { useAuthStore } from "@/store/auth.store";
+import { Badge } from "@/components/ui/badge";
 
 const HORIZONS = [7, 14, 30, 60, 90];
 
@@ -18,7 +19,7 @@ const HORIZONS = [7, 14, 30, 60, 90];
  * anyone else's warehouse, so offering the choice would only produce an error.
  */
 export function ScopeSelectors() {
-  const { dc, horizonDays, setDc, setHorizonDays } = useScope();
+  const { dc, sku, setSku, horizonDays, setDc, setHorizonDays } = useScope();
   const { data: warehouses, isError } = useWarehouses();
   const confinedTo = useAuthStore((state) => state.user?.warehouseId ?? null);
 
@@ -75,6 +76,18 @@ export function ScopeSelectors() {
           ))}
         </select>
       </div>
+
+      {sku && (
+        <Badge 
+          variant="secondary" 
+          className="ml-2 gap-1 px-2 py-1 text-[11px] font-semibold flex items-center cursor-pointer hover:bg-destructive/10 hover:text-destructive transition-colors border-border/60"
+          onClick={() => setSku(undefined)}
+          title="Clear SKU Filter"
+        >
+          SKU: {sku}
+          <X className="h-3 w-3" />
+        </Badge>
+      )}
     </div>
   );
 }

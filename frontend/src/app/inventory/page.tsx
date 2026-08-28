@@ -140,8 +140,15 @@ function InventoryView() {
     [products],
   );
   const locations = useMemo(
-    () => (warehouses ?? []).map((warehouse) => warehouse.name),
-    [warehouses],
+    () => {
+      if (!warehouses) return [];
+      if (dc) {
+        const match = warehouses.find((w) => w.id === dc);
+        return match ? [match.name] : [];
+      }
+      return warehouses.map((warehouse) => warehouse.name);
+    },
+    [warehouses, dc],
   );
 
   const lastUpdated = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });

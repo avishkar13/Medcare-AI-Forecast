@@ -60,8 +60,8 @@ export function OptimizationSummary() {
   const warnings = data?.warnings ?? [];
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="pb-4 border-b border-border/50">
+    <Card className="flex flex-col h-[400px] border-primary/20 bg-gradient-to-br from-card via-card to-primary/5">
+      <CardHeader className="pb-2 border-b border-border/40 bg-muted/20">
         <CardTitle className="flex items-center gap-2 text-base">
           <TrendingDown className="h-4 w-4 text-success" />
           Optimization Impact

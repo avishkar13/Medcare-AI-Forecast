@@ -29,9 +29,9 @@ export function PositionProjection() {
   const [warehouse, setWarehouse] = useState<string | undefined>(undefined);
 
   const runId = runs?.data?.[0]?.id ?? null;
-  const effectiveSku = sku ?? urlSku;
+  const effectiveSku = sku ?? urlSku ?? products?.[0]?.sku;
   const effectiveWarehouse =
-    warehouse ?? dcCode ?? warehouses?.find((row) => row.id === dc)?.code;
+    warehouse ?? dcCode ?? warehouses?.find((row) => row.id === dc)?.code ?? warehouses?.[0]?.code;
 
   return (
     <div className="flex flex-col gap-3">

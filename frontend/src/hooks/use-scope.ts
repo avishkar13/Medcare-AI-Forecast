@@ -116,20 +116,21 @@ export function useScope(): Scope {
  */
 export function useScopedHref() {
   const dc = useUiStore((state) => state.dc);
-  const sku = useUiStore((state) => state.sku);
 
   return useCallback(
     (href: string, extra?: Record<string, string | undefined>) => {
       const [path, existing] = href.split("?");
       const next = new URLSearchParams(existing ?? "");
       if (dc && !next.has("dc")) next.set("dc", dc);
-      if (sku && !next.has("sku")) next.set("sku", sku);
+      // We intentionally do not forward `sku` here so top-level sidebar navigation
+      // clears the SKU. Deep links needing the SKU must explicitly pass it via `extra` 
+      // or use `withScope`.
       for (const [key, value] of Object.entries(extra ?? {})) {
         if (value !== undefined && value !== "") next.set(key, value);
       }
       const query = next.toString();
       return query ? `${path}?${query}` : path;
     },
-    [dc, sku],
+    [dc],
   );
 }

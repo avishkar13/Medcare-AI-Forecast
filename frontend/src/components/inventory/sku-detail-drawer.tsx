@@ -1,6 +1,6 @@
 "use client";
 
-import { useScopedHref } from "@/hooks/use-scope";
+import { useScope, useScopedHref } from "@/hooks/use-scope";
 import {
   Sheet,
   SheetContent,
@@ -36,6 +36,7 @@ interface SkuDetailDrawerProps {
 }
 
 export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps) {
+  const { dc, dcCode } = useScope();
   const scopedHref = useScopedHref();
   const { formatCurrency, formatNumber } = useFormatters();
   const { data, isPending, isError } = useInventoryDetail(skuId);
@@ -47,11 +48,49 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
   if (!skuId) return null;
 
   const product = data?.product;
-  // one row per warehouse; the drawer shows the network position for the sku
-  const positions = data?.positions ?? [];
+  const allPositions = data?.positions ?? [];
+  const positions = dc ? allPositions.filter((p) => p.warehouseId === dc) : allPositions;
+  
+  const allBatches = data?.batches ?? [];
+  const batches = dcCode ? allBatches.filter((b) => b.warehouseCode === dcCode) : allBatches;
+
+  const allMovements = movements?.data ?? [];
+  const filteredMovements = dc ? allMovements.filter((m) => m.warehouseId === dc) : allMovements;
+
   // the api rolls the sku up across warehouses, including the scale a stock bar
   // should be drawn against
   const network = data?.network;
+
+  // If a specific DC is selected, we compute the local metrics, otherwise we use the network summary
+  const onHand = dc ? positions.reduce((sum, p) => sum + p.onHand, 0) : (network?.onHand ?? 0);
+  const available = dc ? positions.reduce((sum, p) => sum + p.available, 0) : (network?.available ?? 0);
+  const reserved = positions.reduce((sum, p) => sum + p.reserved, 0);
+  const inTransit = positions.reduce((sum, p) => sum + p.inTransit, 0);
+  
+  const safetyStock = dc ? positions.reduce((sum, p) => sum + p.safetyStock, 0) : (network?.safetyStock ?? 0);
+  const reorderPoint = dc ? positions.reduce((sum, p) => sum + p.reorderPoint, 0) : (network?.reorderPoint ?? 0);
+  // Max capacity is only accurate network-wide, but we can approximate it for one DC
+  // based on the reorder point + safety stock + some buffer if not explicitly sent per DC. 
+  // However, `data.positions` does not have maxStock. Let's use what we have or a reasonable fallback.
+  const maximumStock = dc ? (reorderPoint * 2) : (network?.maximumInventory ?? 0); 
+  
+  const avgDailyDemand = dc ? positions.reduce((sum, p) => sum + (p.avgDailyDemand || 0), 0) : (network?.avgDailyDemand ?? 0);
+  
+  // Use max lead time across the filtered positions, or network lead time
+  const leadTimeDays = dc && positions.length ? Math.max(...positions.map(p => p.leadTimeDays || 0)) : (network?.leadTimeDays ?? 0);
+  
+  // Recalculate days of supply
+  const daysOfSupply = avgDailyDemand > 0 ? Math.floor(available / avgDailyDemand) : 999;
+  
+  const inventoryValue = dc ? positions.reduce((sum, p) => sum + (p.onHand * (product?.unitCost || 0)), 0) : (network?.inventoryValue ?? 0);
+
+  // Take highest risk from the filtered set
+  const riskLevels = ["critical", "high", "medium", "low"];
+  const highestRisk = positions.length > 0 
+    ? positions.reduce((acc, p) => 
+        riskLevels.indexOf(p.risk) < riskLevels.indexOf(acc) ? p.risk : acc
+      , "low")
+    : "low";
 
   const item = product
     ? {
@@ -60,22 +99,20 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
         category: product.category,
         criticality: product.criticality,
         location: positions.length === 1 ? positions[0]!.warehouseName : `${positions.length} DCs`,
-        onHand: network?.onHand ?? 0,
-        // The roll-up carries `available`; reserved and in-transit are only per
-        // position, so they are summed here rather than left off the network view.
-        available: network?.available ?? 0,
-        reserved: positions.reduce((total, row) => total + row.reserved, 0),
-        inTransit: positions.reduce((total, row) => total + row.inTransit, 0),
-        safetyStock: network?.safetyStock ?? 0,
-        reorderPoint: network?.reorderPoint ?? 0,
-        maximumStock: network?.maximumInventory ?? 0,
-        avgDailyDemand: network?.avgDailyDemand ?? 0,
-        leadTimeDays: network?.leadTimeDays ?? 0,
-        daysOfSupply: network?.daysOfSupply ?? 0,
+        onHand,
+        available,
+        reserved,
+        inTransit,
+        safetyStock,
+        reorderPoint,
+        maximumStock,
+        avgDailyDemand,
+        leadTimeDays,
+        daysOfSupply,
         unitValue: product.unitCost,
-        inventoryValue: network?.inventoryValue ?? 0,
-        risk: (network?.risk ?? "low") as InventoryRisk,
-        batches: (data?.batches ?? []).map((b) => ({
+        inventoryValue,
+        risk: highestRisk as InventoryRisk,
+        batches: batches.map((b) => ({
           id: b.batchId,
           sku: product.sku,
           location: b.warehouseCode,
@@ -86,11 +123,10 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
           valueAtRisk: b.valueAtRisk,
           expiryRisk: b.severity,
         })),
-        // The ledger exists as of Phase 3, so this reads it rather than standing empty.
-        movements: movements?.data ?? [],
+        movements: filteredMovements,
         // the top open recommendation for this sku, if the planner produced one
         aiRecommendation: (() => {
-          const match = (recs?.data ?? []).find((r) => r.sku === product.sku);
+          const match = (recs?.data ?? []).find((r) => r.sku === product.sku && (!dc || r.warehouseId === dc));
           return match
             ? {
                 id: match.id,
@@ -103,8 +139,8 @@ export function SkuDetailDrawer({ skuId, isOpen, onClose }: SkuDetailDrawerProps
               }
             : null;
         })(),
-        expiryRiskLevel: (data?.batches[0]?.severity ?? "low") as InventoryRisk,
-        stockoutRiskLevel: (network?.risk ?? "low") as InventoryRisk,
+        expiryRiskLevel: (batches[0]?.severity ?? "low") as InventoryRisk,
+        stockoutRiskLevel: highestRisk as InventoryRisk,
       }
     : null;
 

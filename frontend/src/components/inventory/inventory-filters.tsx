@@ -87,12 +87,12 @@ export function InventoryFilters({
           {/* Location - disabled while the top bar owns the scope */}
           <select
             className={selectClass}
-            value={dcLocked ? "all" : location}
+            value={dcLocked && locations.length === 1 ? locations[0] : location}
             onChange={(e) => onLocationChange(e.target.value)}
             disabled={dcLocked}
             title={dcLocked ? "Scoped by the DC selector in the top bar" : undefined}
           >
-            <option value="all">{dcLocked ? "Scoped by top bar" : "All Locations"}</option>
+            {dcLocked && locations.length === 1 ? null : <option value="all">All Locations</option>}
             {locations.map((l) => (
               <option key={l} value={l}>{l}</option>
             ))}

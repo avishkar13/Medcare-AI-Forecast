@@ -4,13 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useRecommendationAction, useRecommendations } from "@/hooks/use-recommendations";
-import { Sparkles, ArrowRight, Info, CheckCircle2, Loader2 } from "lucide-react";
+import { Sparkles, ArrowRight, Info, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { useFormatters } from "@/hooks/use-formatters";
 
 export function AIRecommendations() {
   const { data, isPending, isError } = useRecommendations({ pageSize: 10 });
+  const { formatCurrency } = useFormatters();
   /**
    * The panel's two CTAs had no handler at all, while the very same hook was already
    * driving them correctly from the SKU drawer. Executing a stockout or transfer
@@ -39,24 +42,21 @@ export function AIRecommendations() {
   const recommendations = (data?.data ?? []).map((rec) => ({
     id: rec.id,
     itemId: rec.sku,
-    action: rec.actionType ?? rec.type,
-    priority: rec.priority.toLowerCase(),
-    reason: rec.message,
+    action: rec.actionType ?? rec.type ?? "Prioritize",
+    priority: (rec.priority ?? "LOW").toLowerCase(),
+    reason: rec.message ?? "",
     expectedImpact: rec.expectedImpact ?? "",
-    confidenceScore: rec.confidence ?? 0,
+    // confidenceScore: rec.confidence ?? 0,
     suggestedQuantity: rec.quantity ?? 0,
     sourceDc: null as string | null,
     destinationDc: rec.warehouseCode,
-    // a recommendation does not carry the position it was derived from. showing a
-    // dash beats inventing a stock level.
-    currentInventory: null as number | null,
-    forecastDemand: null as number | null,
-    impactValue: rec.impactValue,
+    impactValue: rec.impactValue ?? 0,
+    signals: rec.signals ?? [],
   }));
 
   if (isPending || isError) {
     return (
-      <Card>
+      <Card className="flex flex-col shadow-sm h-full border-ai/20 bg-gradient-to-br from-card via-card to-ai-[0.02]">
         <CardContent className="py-6 text-sm text-muted-foreground">
           {isPending ? "Loading recommendations…" : "Could not load recommendations."}
         </CardContent>
@@ -75,7 +75,7 @@ export function AIRecommendations() {
   }
 
   const getPriorityColor = (priority: string) => {
-    switch(priority) {
+    switch (priority) {
       case "critical": return "bg-destructive text-[#FFFFFF] hover:bg-destructive/90 border-transparent";
       case "high": return "bg-warning text-[#FFFFFF] hover:bg-warning/90 border-transparent";
       case "medium": return "bg-primary/20 text-primary hover:bg-primary/30";
@@ -85,8 +85,8 @@ export function AIRecommendations() {
   };
 
   return (
-    <Card className="flex flex-col shadow-sm h-full">
-      <CardHeader className="pb-4 border-b border-border/50">
+    <Card className="flex flex-col shadow-sm h-full border-ai/20 bg-gradient-to-br from-card via-card to-ai-[0.02] overflow-hidden">
+      <CardHeader className="pb-3 border-b border-border/40 bg-muted/20">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
@@ -125,29 +125,41 @@ export function AIRecommendations() {
                     {rec.destinationDc && <span>To: <span className="text-foreground">{rec.destinationDc}</span></span>}
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-2 shrink-0">
+                {/* <div className="flex flex-col items-end gap-2 shrink-0">
                   <div className="flex items-center gap-1.5 bg-success/10 text-success px-2.5 py-1 rounded-md">
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     <span className="text-xs font-bold">{rec.confidenceScore}% Confidence</span>
                   </div>
-                </div>
+                </div> */}
               </div>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-muted/40 p-3 rounded-lg border border-border/50">
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Current Stock</span>
-                  <span className="text-sm font-semibold tabular-nums">{rec.currentInventory?.toLocaleString() ?? "—"}</span>
+
+              <div className="flex flex-col gap-3 bg-muted/40 p-3.5 rounded-lg border border-border/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Expected Impact</span>
+                    <span className="text-sm font-semibold text-success">
+                      {rec.expectedImpact || formatCurrency(rec.impactValue)}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Forecast Demand</span>
-                  <span className="text-sm font-semibold tabular-nums">{rec.forecastDemand?.toLocaleString() ?? "—"}</span>
-                </div>
-                <div className="flex flex-col gap-1 md:col-span-2">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Expected Impact</span>
-                  <span className="text-sm font-semibold text-success">{rec.expectedImpact}</span>
-                </div>
+                {rec.signals && rec.signals.length > 0 && (
+                  <div className="flex flex-col gap-1.5 pt-2 border-t border-border/50">
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Signals</span>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1">
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      {rec.signals.map((s: any, i: number) => (
+                        <span key={i} className="flex items-center gap-1.5 text-xs font-medium text-foreground/80">
+                          {s.direction === 'up' ? <TrendingUp className="h-3 w-3 text-destructive" /> :
+                            s.direction === 'down' ? <TrendingDown className="h-3 w-3 text-success" /> :
+                              <Minus className="h-3 w-3" />}
+                          {s.label}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-              
+
               <div className="flex justify-end gap-2 mt-1">
                 <Button
                   variant="outline"

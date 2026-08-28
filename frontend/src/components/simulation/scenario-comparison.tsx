@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SavedScenario } from "@/types/simulation";
 import { Plus, Play, Save } from "lucide-react";
+import { useFormatters } from "@/hooks/use-formatters";
 
 interface ScenarioComparisonProps {
   scenarios: SavedScenario[];
@@ -20,6 +21,7 @@ const SEVERITY_STYLES: Record<string, string> = {
 };
 
 export function ScenarioComparison({ scenarios, onApply, onSaveCurrent }: ScenarioComparisonProps) {
+  const { formatCompactCurrency } = useFormatters();
   const compareScenarios = scenarios.slice(0, 3);
   const metricLabels = ["Stockout Risk", "Supply Chain Cost", "Service Level", "Expiry Exposure"];
 
@@ -75,7 +77,7 @@ export function ScenarioComparison({ scenarios, onApply, onSaveCurrent }: Scenar
                       const metric = s.metrics[i === 0 ? 0 : i === 1 ? 2 : i === 2 ? 3 : 4];
                       if (!metric) return <td key={s.id} className="text-center py-2 px-3">—</td>;
                       const val = metric.format === "currency"
-                        ? `$${(metric.simulatedValue / 1000).toFixed(1)}K`
+                        ? formatCompactCurrency(metric.simulatedValue)
                         : `${metric.simulatedValue}%`;
                       return (
                         <td key={s.id} className="text-center py-2 px-3">

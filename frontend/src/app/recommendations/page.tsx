@@ -129,14 +129,12 @@ function RecommendationsView() {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
 
         {/* Left Column - Recommendations Queue */}
-        <div className="xl:col-span-8 h-[600px] xl:h-auto xl:relative">
-          <div className="h-full xl:absolute xl:inset-0">
-            <RecommendationList
-              recommendations={filteredItems}
-              onExecute={handleExecute}
-              onDismiss={handleDismiss}
-            />
-          </div>
+        <div className="xl:col-span-8 h-[600px] xl:h-[1300px]">
+          <RecommendationList
+            recommendations={filteredItems}
+            onExecute={handleExecute}
+            onDismiss={handleDismiss}
+          />
         </div>
 
         {/* Right Column - Intelligence & Impact */}

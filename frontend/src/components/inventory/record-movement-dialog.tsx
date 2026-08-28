@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRecordMovement } from "@/hooks/use-movements";
+import { useInventoryDetail } from "@/hooks/use-inventory";
 import { useProducts, useWarehouses } from "@/hooks/use-masterdata";
 import { MOVEMENT_TYPES } from "@/lib/api/movements";
 import { useScope } from "@/hooks/use-scope";
@@ -47,6 +48,13 @@ export function RecordMovementDialog() {
 
   const selectedDc =
     warehouse || dcCode || warehouses?.find((row) => row.id === dc)?.code || "";
+
+  // Fetch the stock level for the selected SKU, then pick out the relevant DC position
+  const { data: detail } = useInventoryDetail(sku || null);
+  const currentPosition =
+    sku && selectedDc && detail
+      ? detail.positions.find((p) => p.warehouseCode === selectedDc)
+      : null;
 
   const amount = Number(quantity);
   const isValid =
@@ -123,12 +131,16 @@ export function RecordMovementDialog() {
               className={selectClass}
               value={selectedDc}
               onChange={(event) => setWarehouse(event.target.value)}
+              disabled={Boolean(dcCode)}
+              title={dcCode ? "Scoped by the DC selector in the top bar" : undefined}
             >
-              <option value="">Select a DC…</option>
-              {(warehouses ?? []).map((row) => (
-                <option key={row.id} value={row.code}>
-                  {row.name}
-                </option>
+              {!dcCode && <option value="">Select a DC…</option>}
+              {(warehouses ?? [])
+                .filter((row) => !dcCode || row.code === dcCode)
+                .map((row) => (
+                  <option key={row.id} value={row.code}>
+                    {row.name}
+                  </option>
               ))}
             </select>
           </div>
@@ -149,6 +161,16 @@ export function RecordMovementDialog() {
               ))}
             </select>
           </div>
+
+          {currentPosition && (
+            <div className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-2 text-xs border border-border/50">
+              <span className="font-medium text-muted-foreground">Current Stock</span>
+              <div className="flex items-center gap-3 font-semibold text-foreground">
+                <span>{currentPosition.onHand.toLocaleString()} on hand</span>
+                <span>{currentPosition.available.toLocaleString()} available</span>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
