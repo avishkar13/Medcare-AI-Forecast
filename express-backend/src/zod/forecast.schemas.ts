@@ -31,10 +31,32 @@ export const forecastResponseSchema = z.object({
   forecasts: forecastSeriesSchema.array(),
 });
 
+const holdoutScoreSchema = z.object({
+  MAE: z.number().finite(),
+  RMSE: z.number().finite(),
+  wMAPE_percent: z.number().finite(),
+  bias_percent: z.number().finite(),
+});
+
+/**
+ * The engine's last fit, as served by `GET /model/metrics`.
+ *
+ * Only the fields `/forecast/performance` reports are declared; the file carries the
+ * per-fold CV and pinball losses too, and a future field must not fail this parse.
+ * Loose rather than strict for that reason.
+ */
+export const modelMetricsSchema = z.looseObject({
+  model_version: z.string().min(1).optional(),
+  test_rows: z.number().int().nonnegative().optional(),
+  xgboost: holdoutScoreSchema,
+  baseline_7_day_moving_average: holdoutScoreSchema.optional(),
+});
+
 export type ForecastPair = z.infer<typeof forecastPairSchema>;
 export type ForecastRequest = z.infer<typeof forecastRequestSchema>;
 export type ForecastResponse = z.infer<typeof forecastResponseSchema>;
 export type ForecastSeries = z.infer<typeof forecastSeriesSchema>;
+export type ModelMetrics = z.infer<typeof modelMetricsSchema>;
 
 const pairKey = (pair: ForecastPair) => `${pair.productId}:${pair.warehouseId}`;
 

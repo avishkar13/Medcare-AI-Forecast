@@ -115,6 +115,42 @@ describe("GET /api/forecast/* with a completed run", () => {
     assert.ok(isIsoDate(data.peakDate) || data.peakDate.length === 10);
   });
 
+  test("performance never reports a hardcoded metric for an unscoreable run", async () => {
+    // A freshly executed run forecasts only forward, so nothing has been realised and
+    // the scorer has no pairs. This branch used to answer with six literals pasted into
+    // the service - 87.9% accuracy over 2881 points - which read exactly like a
+    // measurement of this run. Whatever it serves now must say which it is.
+    const { data } = await get<
+      Meta & {
+        models: { source: string; isPrimary: boolean; accuracyPercent: number | null }[];
+        note: string | null;
+      }
+    >("/api/forecast/performance");
+
+    const accuracy = await get<Meta & { overall: { scoredPoints: number } }>("/api/forecast/accuracy");
+    assert.equal(accuracy.data.overall.scoredPoints, 0, "this test is only meaningful with nothing scored");
+
+    assert.ok(data.note, "an unscoreable run has to say so");
+
+    for (const model of data.models) {
+      assert.equal(
+        model.source,
+        "holdout",
+        "nothing was realised, so no row may claim to be measured on this run",
+      );
+    }
+
+    // With no engine reachable in CI there is nothing to report, and an empty list is
+    // the honest answer. What must never come back is the remembered constant.
+    for (const model of data.models) {
+      assert.notEqual(
+        model.accuracyPercent,
+        87.9,
+        "87.9 was the hardcoded literal; a figure here must be read from the engine",
+      );
+    }
+  });
+
   test("per-day figures divide by days, not by forecast rows", async () => {
     const { data } = await get<{ items: { forecastDays: number; forecastDemand: number }[] }>(
       "/api/forecast/network",

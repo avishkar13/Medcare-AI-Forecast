@@ -63,19 +63,29 @@ Scores this run's `Forecast.p50` against realised `DemandHistory`, for the forec
     "planningRunId": "cmt9...",
     "modelVersion": "medcare-xgb-qrf-v1",
     "models": [
-      { "modelVersion": "medcare-xgb-qrf-v1", "isPrimary": true, "scoredPoints": 640,
-        "accuracyPercent": 89.4, "wapePercent": 10.6, "mae": 5.2, "rmse": 7.4 }
+      { "modelVersion": "medcare-xgb-qrf-v1", "isPrimary": true, "source": "realised",
+        "scoredPoints": 640, "accuracyPercent": 89.4, "wapePercent": 10.6,
+        "mae": 5.2, "rmse": 7.4, "biasPercent": 1.8 }
     ],
     "note": null
   }
 }
 ```
 
-**One model produced these rows, so one row comes back.** A table comparing several would need several to have run.
-
 **Accuracy is `100 − WAPE`, weighted by volume** — not the mean of per-row percentages. A single near-zero actual would otherwise dominate the average and report a figure nobody would believe.
 
-**A fresh run forecasts only the future, so it has nothing to score.** `models` is then empty and `note` says why, rather than reporting a flattering number drawn from an empty set.
+### `source` says what you are looking at
+
+**A fresh run forecasts only the future, so it has nothing to score.** Rather than an empty table, the route then falls back to the engine's own training holdout, fetched live from `GET /model/metrics`: the XGBoost fit as the primary row and the 7-day moving average as a baseline to read it against. Those rows carry `source: "holdout"` and a `note` saying they were not measured on this run.
+
+| `source` | Meaning |
+| --- | --- |
+| `realised` | This run's forecasts scored against demand that actually happened |
+| `holdout` | The last fit's test split, from the engine. Not this run, not this data |
+
+**The distinction is a field, not a sentence**, because a client that ignores prose will still not mistake one for the other.
+
+These numbers were once six literals in `forecastread.service.ts` — correct when they were pasted, then frozen, so a retrain could not move them and nothing on screen revealed they were stale. If the engine is unreachable or has never been trained, `models` is empty and `note` says so. **A remembered number is not served in place of a missing one.**
 
 ---
 

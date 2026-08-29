@@ -104,8 +104,32 @@ describe("GET /api/dashboard/summary", () => {
 
   test("reports missing metrics as null rather than inventing a plausible figure", async () => {
     const { kpis } = await summary();
+
+    // Still strictly null: nothing in the schema records a promised delivery date, so
+    // there is no honest way to compute it.
     assert.equal(kpis.onTimeDeliveryRate, null, "no purchase-order model exists to compute this");
-    assert.equal(kpis.forecastAccuracy, null, "no completed planning run exists to compute this");
+
+    /**
+     * Accuracy is null *or* a real percentage - never a stand-in.
+     *
+     * This asserted `null` unconditionally, which held only because the seed had no run
+     * whose forecast window had already elapsed. The seed now backdates one so the KPI
+     * has something to score, so the assertion moves to the property that actually
+     * matters: the figure is either absent or computed, and never invented.
+     */
+    if (kpis.forecastAccuracy !== null) {
+      assert.ok(
+        kpis.forecastAccuracy >= 0 && kpis.forecastAccuracy <= 100,
+        "an accuracy outside 0-100 is not a reading anyone can act on",
+      );
+      const scored = await server.json<{ data: { scoredPoints: number } }>(
+        "/api/forecast/accuracy",
+      );
+      assert.ok(
+        scored.data.scoredPoints > 0,
+        "a non-null accuracy must be backed by points that were actually scored",
+      );
+    }
   });
 
   test("counts are whole numbers", async () => {
