@@ -8,7 +8,7 @@ Shared conventions are in [`conventions.api.md`](conventions.api.md).
 
 ## Shape
 
-One configuration tree, stored across eight related tables (`GeneralSettings`, `ForecastSettings`, `InventorySettings`, `AlertSettings`, `NotificationSettings`, `AISettings`, `IntegrationSettings`, `SecuritySettings`) and served as a single nested JSON object.
+One configuration tree, stored across four related tables (`GeneralSettings`, `AlertSettings`, `NotificationSettings`, `AISettings`) and served as a single nested JSON object.
 
 The mapping between the two lives in `src/services/settings.service.ts` (`mapPrismaToFrontend` / `mapFrontendToPrismaCreate`). That file owns the shape — it is not duplicated in a zod schema, because two copies of a shape this size are a guarantee they will drift.
 
@@ -48,7 +48,7 @@ Resets to defaults, then applies the body — a true replace rather than a `PATC
 
 ## How a write is applied
 
-The whole tree is rewritten on every write: delete the row, create it again from the merged value. A partial update across eight related tables would need eight upserts plus child reconciliation, for a configuration object that is written rarely.
+The whole tree is rewritten on every write: delete the row, create it again from the merged value. A partial update across four related tables would need four upserts plus child reconciliation, for a configuration object that is written rarely.
 
 **The delete and the create run in one transaction.** They used to be two separate `await`s, so a failure between them left the system with **no settings at all and no way back**. There is a test asserting exactly one row survives a write.
 
@@ -63,6 +63,20 @@ Leaf values are not individually validated — see *Shape* above for why. A patc
 | `200` | Read or write applied |
 | `400` | Body is not JSON, or is a bare scalar |
 | `422` | Body is an array |
+
+---
+
+## Blocks that were removed
+
+`forecast`, `inventory`, `integrations` and `security` are no longer part of the tree. Every field in them was written on save and then read by nothing — no detector, no formatter, no view, no scheduled job. They were not partial features waiting to be finished; they were controls that took input and discarded it.
+
+That is a worse failure than a missing setting, because it is invisible. A "Sync Frequency" nothing schedules on, an "Automatic Forecast Refresh" no refetch honours, an inventory threshold table that mirrors the alert thresholds one tab over without sharing their effect — each reads as configuration that has taken effect. The security block was the sharpest case: a two-factor toggle showing "on" against an implementation that does not exist claims a protection the system does not have.
+
+`alerts.types.forecastAnomaly` went for the same reason. It sat in a row of six live toggles, indistinguishable from them, and no detector raises a forecast anomaly.
+
+**The tables were deliberately not migrated away.** `ForecastSettings`, `InventorySettings`, `IntegrationSettings`, `IntegrationSource` and `SecuritySettings` remain declared in `schema.prisma` as optional relations on `SystemSettings`; they are simply no longer created, fetched or exposed. Dropping columns is destructive and irreversible, and none of this is on a hot path — leaving them costs nothing and keeps the door open if any of these grows a real implementation.
+
+`AlertSettings.typeForecastAnomaly` is the one exception that still gets written: the column is `Boolean` with no default, so the create writes a literal `false` rather than omitting it.
 
 ---
 

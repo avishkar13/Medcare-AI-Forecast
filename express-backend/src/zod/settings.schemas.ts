@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * The settings tree is eight related tables and the shape is owned by
+ * The settings tree is four related tables and the shape is owned by
  * `settings.service.ts`, which merges a patch into the current values and maps the
  * result onto those tables. Validating every leaf here would duplicate that shape in
  * a second place and guarantee the two drift.
@@ -13,5 +13,3 @@ import { z } from "zod";
 export const settingsPatchSchema = z
   .looseObject({})
   .refine((value) => !Array.isArray(value), { message: "settings patch must be an object" });
-
-export type SettingsPatch = z.infer<typeof settingsPatchSchema>;

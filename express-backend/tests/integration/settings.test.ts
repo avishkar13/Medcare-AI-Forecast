@@ -9,7 +9,7 @@ let server: TestServer;
 
 interface Settings {
   general: Record<string, unknown>;
-  forecast: Record<string, unknown>;
+  alerts: Record<string, unknown>;
   [key: string]: unknown;
 }
 
@@ -29,7 +29,7 @@ describe("GET /api/settings", () => {
   test("seeds defaults on first read and answers in the envelope", async () => {
     const settings = await read();
     assert.ok(settings.general, "the tree must come back whole");
-    assert.ok(settings.forecast);
+    assert.ok(settings.alerts);
   });
 });
 
@@ -65,7 +65,7 @@ describe("PATCH /api/settings", () => {
     });
 
     const after = await read();
-    assert.deepEqual(after.forecast, before.forecast, "forecast settings were not part of the patch");
+    assert.deepEqual(after.alerts, before.alerts, "alert settings were not part of the patch");
   });
 
   test("rejects a body that is not an object", async () => {

@@ -15,10 +15,6 @@ export function AISettings({
     onChange({ features: { ...data.features, [key]: value } });
   };
 
-  // const updateDecisionFactor = (key: keyof AppSettings["ai"]["decisionFactors"], value: number) => {
-  //   onChange({ decisionFactors: { ...data.decisionFactors, [key]: value } });
-  // };
-
   return (
     <SettingsSection 
       title="AI Configuration" 

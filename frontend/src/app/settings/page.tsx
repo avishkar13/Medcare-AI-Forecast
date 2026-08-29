@@ -10,14 +10,10 @@ import { cn } from "@/lib/utils";
 
 // Import all sections
 import { GeneralSettings } from "@/components/settings/general-settings";
-import { ForecastSettings } from "@/components/settings/forecast-settings";
-import { InventorySettings } from "@/components/settings/inventory-settings";
 import { AlertSettings } from "@/components/settings/alert-settings";
 import { NotificationSettings } from "@/components/settings/notification-settings";
 import { ThresholdSettings } from "@/components/settings/threshold-settings";
 import { AISettings } from "@/components/settings/ai-settings";
-import { IntegrationSettings } from "@/components/settings/integration-settings";
-import { SecuritySettings } from "@/components/settings/security-settings";
 import { PermissionGuard } from "@/components/auth/permission-guard";
 import { useAuthStore } from "@/store/auth.store";
 
@@ -63,10 +59,6 @@ export default function SettingsPage() {
     switch (activeSection) {
       case "general":
         return <GeneralSettings data={draftSettings.general} onChange={(v) => handleUpdate("general", v)} />;
-      case "forecast":
-        return <ForecastSettings data={draftSettings.forecast} onChange={(v) => handleUpdate("forecast", v)} />;
-      case "inventory":
-        return <InventorySettings data={draftSettings.inventory} onChange={(v) => handleUpdate("inventory", v)} />;
       case "alerts":
         return <AlertSettings data={draftSettings.alerts} onChange={(v) => handleUpdate("alerts", v)} />;
       case "thresholds":
@@ -77,10 +69,6 @@ export default function SettingsPage() {
         return <NotificationSettings data={draftSettings.notifications} onChange={(v) => handleUpdate("notifications", v)} />;
       case "ai":
         return <AISettings data={draftSettings.ai} onChange={(v) => handleUpdate("ai", v)} />;
-      case "integrations":
-        return <IntegrationSettings data={draftSettings.integrations} onChange={(v) => handleUpdate("integrations", v)} />;
-      case "security":
-        return <SecuritySettings data={draftSettings.security} onChange={(v) => handleUpdate("security", v)} />;
       default:
         return null;
     }
@@ -106,7 +94,7 @@ export default function SettingsPage() {
           <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">System Configuration</span>
           <h1 className="text-3xl font-black tracking-tight text-foreground">Settings</h1>
           <p className="text-sm text-muted-foreground mt-1 max-w-[500px]">
-            Configure forecasting, inventory monitoring, alerts, and application preferences.
+            Configure alerts, notifications, AI behaviour, and application preferences.
           </p>
         </div>
 

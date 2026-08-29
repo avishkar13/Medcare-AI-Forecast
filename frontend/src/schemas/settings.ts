@@ -6,11 +6,9 @@ import { z } from "zod";
  * Settings is the one surface where a silently dropped field is invisible: a toggle
  * that parses as `undefined` renders as off, and the user is looking at a control
  * that claims a state the server does not hold. Every field is therefore required
- * here - `settings.service.ts` reads eight tables that all have defaults, so nothing
+ * here - `settings.service.ts` reads four tables that all have defaults, so nothing
  * on this response is optional.
  */
-
-const thresholdPairSchema = z.object({ warning: z.number(), critical: z.number() });
 
 export const generalSettingsSchema = z.object({
   workspaceName: z.string(),
@@ -25,31 +23,6 @@ export const generalSettingsSchema = z.object({
   defaultLandingPage: z.string(),
 });
 
-export const forecastSettingsSchema = z.object({
-  defaultHorizon: z.number(),
-  defaultModel: z.string(),
-  confidenceThreshold: z.number(),
-  updateFrequency: z.string(),
-  predictionInterval: z.number(),
-  autoRefresh: z.boolean(),
-  targetAccuracy: z.number(),
-  alertAccuracyThreshold: z.number(),
-});
-
-export const inventorySettingsSchema = z.object({
-  defaultSafetyStock: z.number(),
-  reorderPoint: z.number(),
-  maxInventory: z.number(),
-  minServiceLevel: z.number(),
-  autoReorder: z.boolean(),
-  thresholds: z.object({
-    stockCoverage: thresholdPairSchema,
-    safetyStock: thresholdPairSchema,
-    capacity: thresholdPairSchema,
-    expiryWindow: thresholdPairSchema,
-  }),
-});
-
 export const alertSettingsSchema = z.object({
   realTimeMonitoring: z.boolean(),
   types: z.object({
@@ -58,7 +31,6 @@ export const alertSettingsSchema = z.object({
     expiryRisk: z.boolean(),
     supplierDelay: z.boolean(),
     capacityBreach: z.boolean(),
-    forecastAnomaly: z.boolean(),
     overstock: z.boolean(),
   }),
   thresholds: z.object({
@@ -112,40 +84,12 @@ export const aiSettingsSchema = z.object({
   }),
 });
 
-export const integrationSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  status: z.enum(["connected", "disconnected", "error"]),
-  lastSync: z.string(),
-  records: z.number(),
-});
-
-export const integrationSettingsSchema = z.object({
-  sources: z.array(integrationSchema),
-  totalRecords: z.number(),
-  dataRefresh: z.object({ autoSync: z.boolean(), frequency: z.string() }),
-  api: z.object({ status: z.string(), environment: z.string(), version: z.string() }),
-});
-
-export const securitySettingsSchema = z.object({
-  twoFactor: z.boolean(),
-  sessionTimeout: z.number(),
-  passwordPolicy: z.string(),
-  loginAlerts: z.boolean(),
-  auditLogging: z.boolean(),
-});
-
 export const appSettingsSchema = z.object({
   general: generalSettingsSchema,
-  forecast: forecastSettingsSchema,
-  inventory: inventorySettingsSchema,
   alerts: alertSettingsSchema,
   notifications: notificationSettingsSchema,
   ai: aiSettingsSchema,
-  integrations: integrationSettingsSchema,
-  security: securitySettingsSchema,
 });
 
 export type AppSettings = z.infer<typeof appSettingsSchema>;
 export type NotificationRule = z.infer<typeof notificationRuleSchema>;
-export type Integration = z.infer<typeof integrationSchema>;

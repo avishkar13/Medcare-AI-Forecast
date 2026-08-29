@@ -13,29 +13,6 @@ const DEFAULT_SETTINGS = {
     density: "comfortable",
     defaultLandingPage: "/dashboard",
   },
-  forecast: {
-    defaultHorizon: 30,
-    defaultModel: "AI Ensemble",
-    confidenceThreshold: 85,
-    updateFrequency: "6_hours",
-    predictionInterval: 95,
-    autoRefresh: true,
-    targetAccuracy: 85,
-    alertAccuracyThreshold: 80,
-  },
-  inventory: {
-    defaultSafetyStock: 14,
-    reorderPoint: 7,
-    maxInventory: 45,
-    minServiceLevel: 95,
-    autoReorder: true,
-    thresholds: {
-      stockCoverage: { warning: 14, critical: 7 },
-      safetyStock: { warning: 100, critical: 70 },
-      capacity: { warning: 85, critical: 100 },
-      expiryWindow: { warning: 60, critical: 30 },
-    },
-  },
   alerts: {
     realTimeMonitoring: true,
     types: {
@@ -44,7 +21,6 @@ const DEFAULT_SETTINGS = {
       expiryRisk: true,
       supplierDelay: true,
       capacityBreach: true,
-      forecastAnomaly: true,
       overstock: true,
     },
     thresholds: {
@@ -120,28 +96,6 @@ const DEFAULT_SETTINGS = {
       networkCapacity: 10,
     },
   },
-  integrations: {
-    sources: [
-      { id: "erp", name: "ERP", status: "connected", lastSync: "2 minutes ago", records: 42840 }
-    ],
-    totalRecords: 42840,
-    dataRefresh: {
-      autoSync: true,
-      frequency: "15_minutes",
-    },
-    api: {
-      status: "Connected",
-      environment: "Demo",
-      version: "v1.0",
-    },
-  },
-  security: {
-    twoFactor: true,
-    sessionTimeout: 30,
-    passwordPolicy: "Strong",
-    loginAlerts: true,
-    auditLogging: true,
-  },
 };
 
 const mapPrismaToFrontend = (dbSettings: any) => {
@@ -159,29 +113,6 @@ const mapPrismaToFrontend = (dbSettings: any) => {
       density: dbSettings.general.density,
       defaultLandingPage: dbSettings.general.defaultLandingPage,
     },
-    forecast: {
-      defaultHorizon: dbSettings.forecast.defaultHorizon,
-      defaultModel: dbSettings.forecast.defaultModel,
-      confidenceThreshold: dbSettings.forecast.confidenceThreshold,
-      updateFrequency: dbSettings.forecast.updateFrequency,
-      predictionInterval: dbSettings.forecast.predictionInterval,
-      autoRefresh: dbSettings.forecast.autoRefresh,
-      targetAccuracy: dbSettings.forecast.targetAccuracy,
-      alertAccuracyThreshold: dbSettings.forecast.alertAccuracyThreshold,
-    },
-    inventory: {
-      defaultSafetyStock: dbSettings.inventory.defaultSafetyStock,
-      reorderPoint: dbSettings.inventory.reorderPoint,
-      maxInventory: dbSettings.inventory.maxInventory,
-      minServiceLevel: dbSettings.inventory.minServiceLevel,
-      autoReorder: dbSettings.inventory.autoReorder,
-      thresholds: {
-        stockCoverage: { warning: dbSettings.inventory.coverageWarning, critical: dbSettings.inventory.coverageCritical },
-        safetyStock: { warning: dbSettings.inventory.safetyStockWarning, critical: dbSettings.inventory.safetyStockCritical },
-        capacity: { warning: dbSettings.inventory.capacityWarning, critical: dbSettings.inventory.capacityCritical },
-        expiryWindow: { warning: dbSettings.inventory.expiryWindowWarning, critical: dbSettings.inventory.expiryWindowCritical },
-      }
-    },
     alerts: {
       realTimeMonitoring: dbSettings.alerts.realTimeMonitoring,
       types: {
@@ -190,7 +121,6 @@ const mapPrismaToFrontend = (dbSettings: any) => {
         expiryRisk: dbSettings.alerts.typeExpiryRisk,
         supplierDelay: dbSettings.alerts.typeSupplierDelay,
         capacityBreach: dbSettings.alerts.typeCapacityBreach,
-        forecastAnomaly: dbSettings.alerts.typeForecastAnomaly,
         overstock: dbSettings.alerts.typeOverstock,
       },
       thresholds: {
@@ -242,35 +172,6 @@ const mapPrismaToFrontend = (dbSettings: any) => {
         networkCapacity: dbSettings.ai.factorNetworkCapacity,
       }
     },
-    integrations: {
-      sources: dbSettings.integrations.sources ? dbSettings.integrations.sources.map((s: any) => ({
-        id: s.sourceId,
-        name: s.name,
-        status: s.status,
-        lastSync: s.lastSync,
-        records: s.records
-      })) : [],
-      totalRecords: (dbSettings.integrations.sources ?? []).reduce(
-        (sum: number, source: any) => sum + source.records,
-        0,
-      ),
-      dataRefresh: {
-        autoSync: dbSettings.integrations.autoSync,
-        frequency: dbSettings.integrations.syncFrequency,
-      },
-      api: {
-        status: dbSettings.integrations.apiStatus,
-        environment: dbSettings.integrations.apiEnvironment,
-        version: dbSettings.integrations.apiVersion,
-      }
-    },
-    security: {
-      twoFactor: dbSettings.security.twoFactor,
-      sessionTimeout: dbSettings.security.sessionTimeout,
-      passwordPolicy: dbSettings.security.passwordPolicy,
-      loginAlerts: dbSettings.security.loginAlerts,
-      auditLogging: dbSettings.security.auditLogging,
-    },
   };
 };
 
@@ -288,24 +189,6 @@ const mapFrontendToPrismaCreate = (payload: any) => {
       density: payload.general.density,
       defaultLandingPage: payload.general.defaultLandingPage,
     } },
-    forecast: { create: payload.forecast },
-    inventory: {
-      create: {
-        defaultSafetyStock: payload.inventory.defaultSafetyStock,
-        reorderPoint: payload.inventory.reorderPoint,
-        maxInventory: payload.inventory.maxInventory,
-        minServiceLevel: payload.inventory.minServiceLevel,
-        autoReorder: payload.inventory.autoReorder,
-        coverageWarning: payload.inventory.thresholds.stockCoverage.warning,
-        coverageCritical: payload.inventory.thresholds.stockCoverage.critical,
-        safetyStockWarning: payload.inventory.thresholds.safetyStock.warning,
-        safetyStockCritical: payload.inventory.thresholds.safetyStock.critical,
-        capacityWarning: payload.inventory.thresholds.capacity.warning,
-        capacityCritical: payload.inventory.thresholds.capacity.critical,
-        expiryWindowWarning: payload.inventory.thresholds.expiryWindow.warning,
-        expiryWindowCritical: payload.inventory.thresholds.expiryWindow.critical,
-      }
-    },
     alerts: {
       create: {
         realTimeMonitoring: payload.alerts.realTimeMonitoring,
@@ -314,7 +197,9 @@ const mapFrontendToPrismaCreate = (payload: any) => {
         typeExpiryRisk: payload.alerts.types.expiryRisk,
         typeSupplierDelay: payload.alerts.types.supplierDelay,
         typeCapacityBreach: payload.alerts.types.capacityBreach,
-        typeForecastAnomaly: payload.alerts.types.forecastAnomaly,
+        // Still required by the column, but no detector raises a forecast anomaly, so it
+        // is written off rather than offered as a toggle that changes nothing.
+        typeForecastAnomaly: false,
         typeOverstock: payload.alerts.types.overstock,
         thresholdStockoutProb: payload.alerts.thresholds.stockoutProbability,
         thresholdDemandDeviation: payload.alerts.thresholds.demandDeviation,
@@ -360,38 +245,25 @@ const mapFrontendToPrismaCreate = (payload: any) => {
         factorNetworkCapacity: payload.ai.decisionFactors.networkCapacity,
       }
     },
-    integrations: {
-      create: {
-        autoSync: payload.integrations.dataRefresh.autoSync,
-        syncFrequency: payload.integrations.dataRefresh.frequency,
-        apiStatus: payload.integrations.api.status,
-        apiEnvironment: payload.integrations.api.environment,
-        apiVersion: payload.integrations.api.version,
-        sources: {
-          create: payload.integrations.sources.map((s: any) => ({
-            sourceId: s.id,
-            name: s.name,
-            status: s.status,
-            lastSync: s.lastSync,
-            records: s.records
-          }))
-        }
-      }
-    },
-    security: { create: payload.security },
   };
 };
 
 
+/**
+ * Only the blocks something reads.
+ *
+ * `ForecastSettings`, `InventorySettings`, `IntegrationSettings` and `SecuritySettings`
+ * are still declared in the schema but are no longer created, fetched or exposed. Every
+ * field in them was written on save and then consulted by nothing - no detector, no
+ * formatter, no view - so the controls above them promised behaviour that did not exist.
+ * A "Sync Frequency" nothing schedules on and a 2FA toggle nothing enforces are worse
+ * than absent settings, because they read as configuration that has taken effect.
+ */
 const include = {
   general: true,
-  forecast: true,
-  inventory: true,
   alerts: true,
   notifications: { include: { rules: true } },
   ai: true,
-  integrations: { include: { sources: true } },
-  security: true,
 } as const;
 
 /**
@@ -405,7 +277,7 @@ const include = {
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-export const deepMerge = <T>(base: T, patch: unknown): T => {
+const deepMerge = <T>(base: T, patch: unknown): T => {
   if (!isPlainObject(base) || !isPlainObject(patch)) return (patch === undefined ? base : patch) as T;
 
   const merged: Record<string, unknown> = { ...base };
@@ -433,8 +305,8 @@ export const getSettings = async () => {
 /**
  * Replaces the configuration tree with the current one deep-merged with `patch`.
  *
- * The whole tree is rewritten because the shape is eight related tables and a
- * partial update across them would need eight upserts plus child reconciliation.
+ * The whole tree is rewritten because the shape is four related tables and a
+ * partial update across them would need four upserts plus child reconciliation.
  * The delete and the create run **in one transaction**: they used to be two awaits,
  * so a failure between them left the system with no settings at all and no way back.
  */

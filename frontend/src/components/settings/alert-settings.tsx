@@ -43,7 +43,6 @@ export function AlertSettings({
             <SettingsRow title="Expiry Risk" className="py-2"><SettingsToggle checked={data.types.expiryRisk} onCheckedChange={(v) => updateType("expiryRisk", v)} /></SettingsRow>
             <SettingsRow title="Supplier Delay" className="py-2"><SettingsToggle checked={data.types.supplierDelay} onCheckedChange={(v) => updateType("supplierDelay", v)} /></SettingsRow>
             <SettingsRow title="Capacity Breach" className="py-2"><SettingsToggle checked={data.types.capacityBreach} onCheckedChange={(v) => updateType("capacityBreach", v)} /></SettingsRow>
-            <SettingsRow title="Forecast Anomaly" className="py-2"><SettingsToggle checked={data.types.forecastAnomaly} onCheckedChange={(v) => updateType("forecastAnomaly", v)} /></SettingsRow>
             <SettingsRow title="Overstock" className="py-2"><SettingsToggle checked={data.types.overstock} onCheckedChange={(v) => updateType("overstock", v)} /></SettingsRow>
           </div>
         </div>
