@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useScopedHref } from "@/hooks/use-scope";
+import { useScope, useScopedHref } from "@/hooks/use-scope";
 import { useDcExposure, useExpiryBatches, useWastePrevention } from "@/hooks/use-expiry";
 import { ExpiryBatch, ExpiryStatus } from "@/types/expiry";
 
@@ -46,6 +46,7 @@ const statusOf = (demandCoveragePercent: number, daysRemaining: number): ExpiryS
 export default function ExpiryRiskPage() {
   const router = useRouter();
   const scopedHref = useScopedHref();
+  const { dc } = useScope();
   const batchQuery = useExpiryBatches();
   const exposure = useDcExposure();
   const waste = useWastePrevention();
@@ -151,6 +152,9 @@ export default function ExpiryRiskPage() {
 
     // FEFO Override
     if (fefoActive) {
+      // FEFO View focuses specifically on batches that need urgent prioritization
+      result = result.filter(b => b.status === "prioritized" || b.daysRemaining <= 30);
+      
       // Prioritize earliest expiry & highest waste risk
       result.sort((a, b) => {
         if (a.daysRemaining !== b.daysRemaining) return a.daysRemaining - b.daysRemaining;
@@ -223,7 +227,7 @@ export default function ExpiryRiskPage() {
       
       <ExpiryOverview />
 
-      <ExpiryFilters filters={filters} updateFilter={updateFilter} onReset={resetFilters} />
+      <ExpiryFilters filters={filters} updateFilter={updateFilter} onReset={resetFilters} selectedDcId={dc} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2 flex flex-col">

@@ -17,7 +17,7 @@ import { PositionProjection } from "@/components/dashboard/position-projection";
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col w-full max-w-7xl mx-auto relative min-h-screen">
+    <div className="flex flex-col w-full max-w-7xl mx-auto relative min-h-screen overflow-x-hidden p-4 md:p-6">
       {/* Decorative background glows */}
       <div className="absolute top-[-100px] left-1/4 w-[600px] h-[400px] bg-primary/5 rounded-full blur-[100px] -z-10 pointer-events-none" />
       <div className="absolute top-[600px] right-0 w-[500px] h-[500px] bg-ai/5 rounded-full blur-[120px] -z-10 pointer-events-none" />

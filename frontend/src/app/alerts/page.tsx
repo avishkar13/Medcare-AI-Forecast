@@ -152,10 +152,11 @@ function AlertsView() {
 
       <AlertOverview data={overviewStats} />
 
-      <AlertFilters
-        filters={filters}
-        onChange={setFilters}
-        onReset={() => setFilters(defaultFilters)}
+      <AlertFilters 
+        filters={filters} 
+        onChange={setFilters} 
+        onReset={() => setFilters(defaultFilters)} 
+        selectedDcId={dc}
       />
 
       <ActiveAlertList

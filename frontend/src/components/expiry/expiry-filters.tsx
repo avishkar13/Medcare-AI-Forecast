@@ -11,10 +11,14 @@ interface ExpiryFiltersProps {
   filters: any;
   updateFilter: (key: string, value: string) => void;
   onReset: () => void;
+  selectedDcId?: string;
 }
 
-export function ExpiryFilters({ filters, updateFilter, onReset }: ExpiryFiltersProps) {
+export function ExpiryFilters({ filters, updateFilter, onReset, selectedDcId }: ExpiryFiltersProps) {
   const { data: warehouses } = useWarehouses();
+
+  const selectedWarehouse = warehouses?.find(w => w.id === selectedDcId);
+  const displayLocation = selectedWarehouse ? selectedWarehouse.name : filters.location;
 
   const hasActiveFilters = 
     filters.search !== "" || 
@@ -108,8 +112,9 @@ export function ExpiryFilters({ filters, updateFilter, onReset }: ExpiryFiltersP
         </select>
 
         <select
-          className={`h-8 px-2.5 py-0 border rounded-lg text-[10px] font-bold uppercase tracking-wider outline-none focus:ring-1 focus:ring-primary/30 cursor-pointer transition-all hover:brightness-95 ${filters.location !== 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-muted/10 border-border/50 text-muted-foreground hover:border-border/80'}`}
-          value={filters.location}
+          disabled={!!selectedDcId}
+          className={`h-8 px-2.5 py-0 border rounded-lg text-[10px] font-bold uppercase tracking-wider outline-none focus:ring-1 focus:ring-primary/30 ${selectedDcId ? 'opacity-50 cursor-not-allowed bg-muted/10 border-border/50 text-muted-foreground' : 'cursor-pointer transition-all hover:brightness-95'} ${!selectedDcId && filters.location !== 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-muted/10 border-border/50 text-muted-foreground hover:border-border/80'}`}
+          value={displayLocation}
           onChange={(e) => updateFilter("location", e.target.value)}
         >
           {/* Real DCs, from the warehouse list. The four hardcoded names did not exist. */}

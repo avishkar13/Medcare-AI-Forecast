@@ -25,7 +25,7 @@ export function AIExpiryAssessment() {
   if (isError) return <QueryError label="the expiry assessment" />;
 
   return (
-    <Card className="border-ai/30 shadow-sm bg-ai/5  flex flex-col relative overflow-hidden">
+    <Card className="border-ai/30 shadow-sm bg-gradient-to-br from-ai/5 via-background to-ai/10 flex flex-col relative overflow-hidden">
       <div className="absolute top-0 left-0 w-1 h-full bg-ai" />
       <CardHeader className="pb-4 border-b border-ai/20">
         <CardTitle className="text-sm font-bold flex items-center justify-between">

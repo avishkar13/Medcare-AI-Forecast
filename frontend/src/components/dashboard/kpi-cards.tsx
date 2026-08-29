@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useScopedHref } from "@/hooks/use-scope";
+import { useScopedHref, useScope } from "@/hooks/use-scope";
 import { useDashboardSummary } from "@/hooks/use-dashboard";
 import { useWarehouses } from "@/hooks/use-masterdata";
 import { useFormatters } from "@/hooks/use-formatters";
@@ -19,6 +19,7 @@ export function KpiCards() {
   // Every one of these six cards carried a number about somewhere else in the app
   // and no way to get there. Scoped, so the DC in the top bar travels with the click.
   const scopedHref = useScopedHref();
+  const scope = useScope();
   const { data, isPending, isError } = useDashboardSummary();
   const { data: warehouses } = useWarehouses();
   const { formatCurrency, formatNumber } = useFormatters();
@@ -83,7 +84,9 @@ export function KpiCards() {
         <CardContent>
           <div className="text-2xl font-bold text-foreground">{formatNumber(kpis.skusMonitored)}</div>
           <p className="text-xs text-muted-foreground mt-1">
-            Active tracking across {warehouses?.length ?? 0} locations
+            {scope.dc 
+              ? "Active tracking for selected location" 
+              : `Active tracking across ${warehouses?.length ?? 0} locations`}
           </p>
         </CardContent>
       </Card>
