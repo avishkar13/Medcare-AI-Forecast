@@ -70,18 +70,18 @@ export function AtRiskBatchTable({ batches, onBatchClick, onActionClick }: AtRis
         </div>
       </div>
 
-        <div className="hidden md:block overflow-auto max-h-[500px]">
-          <Table className="text-xs">
+        <div className="hidden md:block overflow-y-auto max-h-[500px] no-scrollbar">
+          <Table className="text-xs [&_th]:px-1 [&_td]:px-1 w-full table-fixed">
             <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
               <TableRow className="hover:bg-transparent border-border/50 bg-muted/5 h-8">
                 <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground w-[70px]">Risk</TableHead>
-                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Product & Batch</TableHead>
-                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Location</TableHead>
-                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right">Quantity</TableHead>
-                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">Expiry</TableHead>
-                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right">Demand Cov.</TableHead>
-                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right">Value Risk</TableHead>
-                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right w-[90px]">Action</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground w-1/4">Product & Batch</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground w-[15%]">Location</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right w-[6%]">Qty</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground w-[12%]">Expiry</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right w-[10%]">Cov.</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right w-[10%]">Value Risk</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground text-right w-[70px]">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

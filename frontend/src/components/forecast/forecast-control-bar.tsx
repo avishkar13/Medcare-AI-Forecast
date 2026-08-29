@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal, BrainCircuit } from "lucide-react";
 import { useProducts, useWarehouses } from "@/hooks/use-masterdata";
@@ -21,7 +21,7 @@ export function ForecastControlBar() {
   const resetScope = useFiltersStore((state) => state.resetForecastScope);
 
   const categories = useMemo(
-    () => [...new Set((products ?? []).map((product) => product.category))].sort(),
+    () => [...new Set((products ?? []).map((product) => product.category).filter((c): c is string => c !== null))].sort(),
     [products],
   );
 
@@ -45,13 +45,17 @@ export function ForecastControlBar() {
           </div>
 
           <Select
-            value={scope.sku || undefined}
+            value={scope.sku || "all"}
             onValueChange={(value) =>
               setScope({ sku: !value || value === "all" ? undefined : value })
             }
           >
             <SelectTrigger className="w-[220px] h-9">
-              <SelectValue placeholder="All Products" />
+              <span className="truncate">
+                {scope.sku && scope.sku !== "all"
+                  ? products?.find((p) => p.sku === scope.sku)?.name ?? scope.sku
+                  : "All Products"}
+              </span>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Products</SelectItem>
@@ -64,13 +68,17 @@ export function ForecastControlBar() {
           </Select>
 
           <Select
-            value={scope.category || undefined}
+            value={scope.category || "all"}
             onValueChange={(value) =>
               setScope({ category: !value || value === "all" ? undefined : value, sku: undefined })
             }
           >
             <SelectTrigger className="w-[170px] h-9">
-              <SelectValue placeholder="All Categories" />
+              <span className="truncate">
+                {scope.category && scope.category !== "all"
+                  ? scope.category
+                  : "All Categories"}
+              </span>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
@@ -88,7 +96,7 @@ export function ForecastControlBar() {
             rule were comparing different value spaces and never agreed.
           */}
           <Select
-            value={dc || scope.warehouse || undefined}
+            value={dc || scope.warehouse || "all"}
             onValueChange={(value) =>
               setScope({ warehouse: !value || value === "all" ? undefined : value })
             }
@@ -98,7 +106,11 @@ export function ForecastControlBar() {
               className="w-[190px] h-9"
               title={dc ? "Scoped by the DC selector in the top bar" : undefined}
             >
-              <SelectValue placeholder="All DCs (Network)" />
+              <span className="truncate">
+                {(dc || scope.warehouse) && (dc || scope.warehouse) !== "all"
+                  ? warehouses?.find((w) => w.id === (dc || scope.warehouse))?.name ?? (dc || scope.warehouse)
+                  : "All DCs (Network)"}
+              </span>
             </SelectTrigger>
             <SelectContent>
               {!dc && <SelectItem value="all">All DCs (Network)</SelectItem>}

@@ -1,9 +1,9 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-// `Bell` moved into NotificationCenter along with the badge it used to sit beside.
-import { Menu, Settings, LogOut } from "lucide-react";
+import { useTheme } from "next-themes";
+import { Menu, Settings, LogOut, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,6 +23,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { SidebarContent } from "./sidebar";
 import { NotificationCenter } from "./notification-center";
 import { ScopeSelectors } from "./scope-selectors";
+import { useSettings, useSaveSettings } from "@/hooks/use-settings";
 
 function getInitials(name?: string) {
   if (!name) return "U";
@@ -41,6 +42,25 @@ export function Navbar() {
   const router = useRouter();
 
   const { user, logout } = useAuthStore();
+  const { setTheme, theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const { data: settings } = useSettings();
+  const saveSettings = useSaveSettings();
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    if (settings?.general) {
+      saveSettings.mutate({
+        general: { ...settings.general, theme: newTheme }
+      });
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -106,6 +126,24 @@ export function Navbar() {
         <Suspense fallback={<div className="hidden md:block h-8 w-56" />}>
           <ScopeSelectors />
         </Suspense>
+
+        {/* Theme Toggle */}
+        {mounted && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 text-muted-foreground hover:text-foreground hidden sm:flex"
+            onClick={toggleTheme}
+            title="Toggle theme"
+          >
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+            <span className="sr-only">Toggle theme</span>
+          </Button>
+        )}
 
         {/* Notifications */}
         <NotificationCenter />

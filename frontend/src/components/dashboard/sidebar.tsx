@@ -182,17 +182,17 @@ export function SidebarContent() {
                       {item.title}
                     </div>
                     {item.title === "Alerts" && kpis?.activeAlerts !== undefined && kpis.activeAlerts > 0 && (
-                      <span className="bg-destructive text-muted text-[10px] font-bold px-1.5 py-0.5 rounded-md min-w-5 text-center">
+                      <span className="bg-destructive text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
                         {kpis.activeAlerts}
                       </span>
                     )}
                     {item.title === "Recommendations" && kpis?.pendingRecommendations !== undefined && kpis.pendingRecommendations > 0 && (
-                      <span className="bg-ai/20 text-ai text-[10px] font-bold px-1.5 py-0.5 rounded-md min-w-5 text-center">
+                      <span className="bg-ai/20 text-ai dark:text-ai-foreground dark:bg-ai/40 text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
                         {kpis.pendingRecommendations}
                       </span>
                     )}
                     {item.title === "Expiry Risk" && kpis?.expiryRiskItems !== undefined && kpis.expiryRiskItems > 0 && (
-                      <span className="bg-warning text-muted text-[10px] font-bold px-1.5 py-0.5 rounded-md min-w-5 text-center">
+                      <span className="bg-warning text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
                         {kpis.expiryRiskItems}
                       </span>
                     )}

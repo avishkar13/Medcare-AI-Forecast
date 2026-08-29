@@ -139,8 +139,8 @@ export function DemandForecastChart() {
                 <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} tickMargin={10} minTickGap={30} />
                 <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}`} />
                 <RechartsTooltip 
-                  contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
-                  labelStyle={{ fontWeight: 'bold', marginBottom: '8px' }}
+                  contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', backgroundColor: 'var(--card)', color: 'var(--card-foreground)' }}
+                  labelStyle={{ fontWeight: 'bold', marginBottom: '8px', color: 'var(--card-foreground)' }}
                 />
                 
                 {/* Confidence Interval */}

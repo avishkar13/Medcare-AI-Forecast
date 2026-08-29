@@ -34,10 +34,14 @@ interface AlertFiltersProps {
   filters: AlertFilterState;
   onChange: (filters: AlertFilterState) => void;
   onReset: () => void;
+  selectedDcId?: string;
 }
 
-export function AlertFilters({ filters, onChange, onReset }: AlertFiltersProps) {
+export function AlertFilters({ filters, onChange, onReset, selectedDcId }: AlertFiltersProps) {
   const { data: warehouses } = useWarehouses();
+
+  const selectedWarehouse = warehouses?.find(w => w.id === selectedDcId);
+  const displayLocation = selectedWarehouse ? selectedWarehouse.name : filters.location;
 
   const updateFilter = (key: keyof AlertFilterState, value: string) => {
     onChange({ ...filters, [key]: value });
@@ -79,12 +83,6 @@ export function AlertFilters({ filters, onChange, onReset }: AlertFiltersProps) 
               <option value="severity">Sort by: Severity</option>
               <option value="newest">Sort by: Newest</option>
               <option value="oldest">Sort by: Oldest</option>
-              {/*
-                "Business Impact" used to be a fourth option here and the page had no
-                branch for it, so choosing it silently gave you severity order.
-                `businessImpact` is a sentence, not a figure - there is nothing to sort
-                on - so the option is gone rather than quietly lying about the order.
-              */}
             </select>
           </div>
         </div>
@@ -125,8 +123,6 @@ export function AlertFilters({ filters, onChange, onReset }: AlertFiltersProps) 
           onChange={(e) => updateFilter("status", e.target.value)}
         >
           <option value="all">Status: All</option>
-          {/* The backend's own alias for "not resolved". This is the landing view, so
-              "All" is free to mean all - resolved included - rather than both. */}
           <option value="open">Open</option>
           <option value="new">New</option>
           <option value="acknowledged">Acknowledged</option>
@@ -135,8 +131,9 @@ export function AlertFilters({ filters, onChange, onReset }: AlertFiltersProps) 
         </select>
 
         <select
-          className={`h-7 px-2 py-0 border rounded-[4px] text-[10px] font-bold uppercase tracking-wider outline-none focus:ring-1 focus:ring-primary/30 cursor-pointer transition-colors ${filters.location !== 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-muted/10 border-border/50 text-muted-foreground'}`}
-          value={filters.location}
+          disabled={!!selectedDcId}
+          className={`h-7 px-2 py-0 border rounded-[4px] text-[10px] font-bold uppercase tracking-wider outline-none focus:ring-1 focus:ring-primary/30 ${selectedDcId ? 'opacity-50 cursor-not-allowed bg-muted/10 border-border/50 text-muted-foreground' : 'cursor-pointer transition-colors'} ${!selectedDcId && filters.location !== 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-muted/10 border-border/50 text-muted-foreground'}`}
+          value={displayLocation}
           onChange={(e) => updateFilter("location", e.target.value)}
         >
           {/*

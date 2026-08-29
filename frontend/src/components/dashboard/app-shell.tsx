@@ -58,7 +58,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Show a subtle loading state during initial client-side hydration or while verifying auth
   if (!mounted || isInitializing) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
+      <div className="flex h-screen w-full items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
       </div>
     );

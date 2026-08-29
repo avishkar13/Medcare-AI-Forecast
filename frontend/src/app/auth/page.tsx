@@ -65,7 +65,7 @@ export default function AuthPage() {
   const isFormValid = email.trim() !== "" && password.trim() !== "";
 
   return (
-    <div className="flex min-h-screen w-full bg-slate-50 selection:bg-primary/10">
+    <div className="flex min-h-screen w-full bg-background selection:bg-primary/10">
       {/* Left Column - Form */}
       <div className="flex w-full flex-col justify-center px-6 sm:px-12 lg:w-[55%] xl:w-1/2 lg:px-24">
         <div className="mx-auto w-full max-w-[420px]">
@@ -75,14 +75,14 @@ export default function AuthPage() {
               <Activity className="h-6 w-6 text-white" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold tracking-tight text-slate-900 leading-none">MedCare Pharma</span>
-              <span className="text-[10px] font-bold text-slate-500 tracking-[0.2em] uppercase mt-1.5">Command Center</span>
+              <span className="text-xl font-bold tracking-tight text-foreground leading-none">MedCare Pharma</span>
+              <span className="text-[10px] font-bold text-muted-foreground tracking-[0.2em] uppercase mt-1.5">Command Center</span>
             </div>
           </div>
 
           <div className="mb-10">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900">Sign in to your account</h2>
-            <p className="text-sm text-slate-500 mt-2.5">Enter your enterprise credentials to access the AI Engine.</p>
+            <h2 className="text-3xl font-bold tracking-tight text-foreground">Sign in to your account</h2>
+            <p className="text-sm text-muted-foreground mt-2.5">Enter your enterprise credentials to access the AI Engine.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -93,7 +93,7 @@ export default function AuthPage() {
             )}
             
             <div className="space-y-2.5">
-              <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-slate-600">
+              <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Email
               </Label>
               <Input
@@ -106,10 +106,10 @@ export default function AuthPage() {
                 disabled={isPending}
                 aria-invalid={fieldErrors.email !== undefined}
                 aria-describedby={fieldErrors.email ? "email-error" : undefined}
-                className={`h-12 bg-white shadow-sm focus-visible:ring-2 focus-visible:ring-offset-0 transition-all text-sm rounded-xl ${
+                className={`h-12 bg-background shadow-sm focus-visible:ring-2 focus-visible:ring-offset-0 transition-all text-sm rounded-xl ${
                   fieldErrors.email
                     ? "border-red-300 focus-visible:ring-red-400 focus-visible:border-red-400"
-                    : "border-slate-200 focus-visible:ring-primary/20 focus-visible:border-primary"
+                    : "border-border focus-visible:ring-primary/20 focus-visible:border-primary"
                 }`}
                 autoComplete="username"
               />
@@ -122,10 +122,10 @@ export default function AuthPage() {
             
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Password
                 </Label>
-                <span className="text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors cursor-help">
+                <span className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-help">
                   Lost access?
                 </span>
               </div>
@@ -139,17 +139,17 @@ export default function AuthPage() {
                   disabled={isPending}
                   aria-invalid={fieldErrors.password !== undefined}
                   aria-describedby={fieldErrors.password ? "password-error" : undefined}
-                  className={`h-12 bg-white shadow-sm focus-visible:ring-2 focus-visible:ring-offset-0 transition-all pr-12 text-sm rounded-xl ${
+                  className={`h-12 bg-background shadow-sm focus-visible:ring-2 focus-visible:ring-offset-0 transition-all pr-12 text-sm rounded-xl ${
                     fieldErrors.password
                       ? "border-red-300 focus-visible:ring-red-400 focus-visible:border-red-400"
-                      : "border-slate-200 focus-visible:ring-primary/20 focus-visible:border-primary"
+                      : "border-border focus-visible:ring-primary/20 focus-visible:border-primary"
                   }`}
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md transition-all"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-all"
                   disabled={isPending}
                   tabIndex={-1}
                 >
@@ -189,11 +189,11 @@ export default function AuthPage() {
           </form>
 
           {/* Security Footer */}
-          <div className="mt-16 pt-8 border-t border-slate-200">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+          <div className="mt-16 pt-8 border-t border-border">
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
               Internal Network Only
             </p>
-            <p className="text-xs text-slate-500 max-w-sm leading-relaxed font-medium">
+            <p className="text-xs text-muted-foreground max-w-sm leading-relaxed font-medium">
               Unauthorized access is strictly prohibited and actively monitored by MedCare InfoSec.
             </p>
           </div>

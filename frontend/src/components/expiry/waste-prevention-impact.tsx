@@ -25,7 +25,7 @@ export function WastePreventionImpact() {
   if (isError) return <QueryError label="waste prevention" />;
 
   return (
-    <Card className="border-border/60 shadow-sm bg-background h-full flex flex-col">
+    <Card className="border-border/60 shadow-sm bg-gradient-to-br from-background via-background to-success/5 h-full flex flex-col">
       <CardHeader className="pb-4 border-b border-border/50">
         <CardTitle className="text-sm font-bold flex items-center gap-2">
           <Coins className="h-4 w-4 text-muted-foreground" />

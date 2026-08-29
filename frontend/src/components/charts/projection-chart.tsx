@@ -130,8 +130,9 @@ export function ProjectionChart({ runId, sku, warehouse }: ProjectionChartProps)
             <CartesianGrid strokeDasharray="3 3" className="stroke-border/40" vertical={false} />
             <XAxis dataKey="date" tick={{ fontSize: 11 }} tickMargin={8} />
             <YAxis tick={{ fontSize: 11 }} width={56} />
-            <RechartsTooltip
-              contentStyle={{ fontSize: 12, borderRadius: 8 }}
+            <RechartsTooltip 
+              contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', backgroundColor: 'var(--card)', color: 'var(--card-foreground)' }}
+              labelStyle={{ fontWeight: 'bold', marginBottom: '8px', color: 'var(--card-foreground)' }}
               formatter={(value, name) => [
                 typeof value === "number" ? Math.round(value) : value,
                 name,
