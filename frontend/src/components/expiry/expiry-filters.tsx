@@ -112,18 +112,22 @@ export function ExpiryFilters({ filters, updateFilter, onReset, selectedDcId }: 
         </select>
 
         <select
-          disabled={!!selectedDcId}
-          className={`h-8 px-2.5 py-0 border rounded-lg text-[10px] font-bold uppercase tracking-wider outline-none focus:ring-1 focus:ring-primary/30 ${selectedDcId ? 'opacity-50 cursor-not-allowed bg-muted/10 border-border/50 text-muted-foreground' : 'cursor-pointer transition-all hover:brightness-95'} ${!selectedDcId && filters.location !== 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-muted/10 border-border/50 text-muted-foreground hover:border-border/80'}`}
+          className={`h-8 px-2.5 py-0 border rounded-lg text-[10px] font-bold uppercase tracking-wider outline-none focus:ring-1 focus:ring-primary/30 cursor-pointer transition-all hover:brightness-95 ${!selectedDcId && filters.location !== 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-muted/10 border-border/50 text-muted-foreground hover:border-border/80'}`}
           value={displayLocation}
           onChange={(e) => updateFilter("location", e.target.value)}
         >
-          {/* Real DCs, from the warehouse list. The four hardcoded names did not exist. */}
-          <option value="all">Location: All DCs</option>
-          {(warehouses ?? []).map((warehouse) => (
-            <option key={warehouse.id} value={warehouse.name}>
-              {warehouse.name}
-            </option>
-          ))}
+          {selectedDcId && selectedWarehouse ? (
+            <option value={selectedWarehouse.name}>{selectedWarehouse.name}</option>
+          ) : (
+            <>
+              <option value="all">Location: All DCs</option>
+              {(warehouses ?? []).map((warehouse) => (
+                <option key={warehouse.id} value={warehouse.name}>
+                  {warehouse.name}
+                </option>
+              ))}
+            </>
+          )}
         </select>
 
         <select

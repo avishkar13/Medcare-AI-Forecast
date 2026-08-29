@@ -44,8 +44,8 @@ export function ForecastSeasonality() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.weeklyPattern} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                  <XAxis dataKey="day" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis fontSize={11} tickLine={false} axisLine={false} />
+                  <XAxis dataKey="day" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: 'var(--muted-foreground)' }} />
+                  <YAxis fontSize={11} tickLine={false} axisLine={false} width={30} tick={{ fill: 'var(--muted-foreground)' }} />
                   <Tooltip 
                     cursor={{ fill: 'var(--muted)' }}
                     contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: 'var(--background)' }}
@@ -67,8 +67,8 @@ export function ForecastSeasonality() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.monthlyTrend} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                  <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis fontSize={11} tickLine={false} axisLine={false} />
+                  <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} tick={{ fill: 'var(--muted-foreground)' }} />
+                  <YAxis fontSize={11} tickLine={false} axisLine={false} width={30} tick={{ fill: 'var(--muted-foreground)' }} />
                   <Tooltip 
                     cursor={{ fill: 'var(--muted)' }}
                     contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: 'var(--background)' }}

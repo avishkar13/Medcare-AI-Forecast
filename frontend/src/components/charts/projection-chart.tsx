@@ -128,8 +128,8 @@ export function ProjectionChart({ runId, sku, warehouse }: ProjectionChartProps)
         <ResponsiveContainer width="100%" height={320}>
           <ComposedChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-border/40" vertical={false} />
-            <XAxis dataKey="date" tick={{ fontSize: 11 }} tickMargin={8} />
-            <YAxis tick={{ fontSize: 11 }} width={56} />
+            <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }} tickMargin={8} />
+            <YAxis tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }} width={56} />
             <RechartsTooltip 
               contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', backgroundColor: 'var(--card)', color: 'var(--card-foreground)' }}
               labelStyle={{ fontWeight: 'bold', marginBottom: '8px', color: 'var(--card-foreground)' }}

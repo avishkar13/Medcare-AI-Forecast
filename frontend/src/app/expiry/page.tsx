@@ -152,10 +152,7 @@ export default function ExpiryRiskPage() {
 
     // FEFO Override
     if (fefoActive) {
-      // FEFO View focuses specifically on batches that need urgent prioritization
-      result = result.filter(b => b.status === "prioritized" || b.daysRemaining <= 30);
-      
-      // Prioritize earliest expiry & highest waste risk
+      // Prioritize earliest expiry & highest waste risk for all items
       result.sort((a, b) => {
         if (a.daysRemaining !== b.daysRemaining) return a.daysRemaining - b.daysRemaining;
         return b.wasteValue - a.wasteValue;
@@ -229,8 +226,8 @@ export default function ExpiryRiskPage() {
 
       <ExpiryFilters filters={filters} updateFilter={updateFilter} onReset={resetFilters} selectedDcId={dc} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2 flex flex-col">
+      <div className="grid [&>*]:min-w-0 grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-2 flex flex-col min-w-0">
           <ExpiryExposure />
           <ExpiryTimeline />
           <AtRiskBatchTable 

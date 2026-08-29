@@ -87,7 +87,7 @@ export default function AuthPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+              <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
                 {error}
               </div>
             )}
@@ -108,13 +108,13 @@ export default function AuthPage() {
                 aria-describedby={fieldErrors.email ? "email-error" : undefined}
                 className={`h-12 bg-background shadow-sm focus-visible:ring-2 focus-visible:ring-offset-0 transition-all text-sm rounded-xl ${
                   fieldErrors.email
-                    ? "border-red-300 focus-visible:ring-red-400 focus-visible:border-red-400"
+                    ? "border-destructive focus-visible:ring-destructive focus-visible:border-destructive"
                     : "border-border focus-visible:ring-primary/20 focus-visible:border-primary"
                 }`}
                 autoComplete="username"
               />
               {fieldErrors.email && (
-                <p id="email-error" className="text-xs font-medium text-red-600">
+                <p id="email-error" className="text-xs font-medium text-destructive">
                   {fieldErrors.email}
                 </p>
               )}
@@ -141,7 +141,7 @@ export default function AuthPage() {
                   aria-describedby={fieldErrors.password ? "password-error" : undefined}
                   className={`h-12 bg-background shadow-sm focus-visible:ring-2 focus-visible:ring-offset-0 transition-all pr-12 text-sm rounded-xl ${
                     fieldErrors.password
-                      ? "border-red-300 focus-visible:ring-red-400 focus-visible:border-red-400"
+                      ? "border-destructive focus-visible:ring-destructive focus-visible:border-destructive"
                       : "border-border focus-visible:ring-primary/20 focus-visible:border-primary"
                   }`}
                   autoComplete="current-password"
@@ -164,7 +164,7 @@ export default function AuthPage() {
                 </button>
               </div>
               {fieldErrors.password && (
-                <p id="password-error" className="text-xs font-medium text-red-600">
+                <p id="password-error" className="text-xs font-medium text-destructive">
                   {fieldErrors.password}
                 </p>
               )}

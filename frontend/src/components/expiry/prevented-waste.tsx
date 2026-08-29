@@ -14,7 +14,7 @@ export function PreventedWaste({ records, totalValueSaved }: PreventedWasteProps
   const { formatCompactCurrency: formatCurrency } = useFormatters();
 
   return (
-    <Card className="border-border/60 shadow-sm bg-background h-full flex flex-col">
+    <Card className="flex flex-col h-full shadow-sm border-border/40 overflow-hidden bg-gradient-to-br from-card via-card to-primary/5">
       <CardHeader className="pb-4 border-b border-border/50">
         <CardTitle className="text-sm font-bold flex items-center justify-between">
           <span className="flex items-center gap-2 text-muted-foreground">

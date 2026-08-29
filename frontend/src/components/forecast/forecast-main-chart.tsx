@@ -74,8 +74,8 @@ export function ForecastMainChart() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-              <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} tickMargin={10} minTickGap={20} />
-              <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}`} />
+              <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} tickMargin={10} minTickGap={20} tick={{ fill: 'var(--muted-foreground)' }} />
+              <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}`} tick={{ fill: 'var(--muted-foreground)' }} />
               
               <RechartsTooltip 
                 contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', backgroundColor: 'var(--background)' }}

@@ -74,9 +74,9 @@ export function InventoryHealthChart() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={items} margin={{ top: 20, right: 10, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                <XAxis dataKey="name" fontSize={11} tickLine={false} axisLine={false} tickMargin={10} />
+                <XAxis dataKey="name" fontSize={11} tickLine={false} axisLine={false} tickMargin={10} tick={{ fill: 'var(--muted-foreground)' }} />
                 {/* Units, not money. This axis used to render unit counts as currency. */}
-                <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => formatNumber(val as number)} />
+                <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => formatNumber(val as number)} tick={{ fill: 'var(--muted-foreground)' }} />
                 <RechartsTooltip
                   cursor={{ fill: 'var(--muted)', opacity: 0.4 }}
                   contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', backgroundColor: 'var(--card)', color: 'var(--card-foreground)' }}
@@ -101,8 +101,8 @@ export function InventoryHealthChart() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart layout="vertical" data={catChartData} margin={{ top: 0, right: 10, left: 30, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
-                  <XAxis type="number" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => formatCompactCurrency(val)} />
-                  <YAxis dataKey="name" type="category" fontSize={12} tickLine={false} axisLine={false} tickMargin={10} />
+                  <XAxis type="number" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => formatCompactCurrency(val)} tick={{ fill: 'var(--muted-foreground)' }} />
+                  <YAxis dataKey="name" type="category" fontSize={12} tickLine={false} axisLine={false} tickMargin={10} tick={{ fill: 'var(--muted-foreground)' }} />
                   <RechartsTooltip
                     cursor={{ fill: 'var(--muted)', opacity: 0.2 }}
                     contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', backgroundColor: 'var(--card)', color: 'var(--card-foreground)' }}

@@ -131,23 +131,22 @@ export function AlertFilters({ filters, onChange, onReset, selectedDcId }: Alert
         </select>
 
         <select
-          disabled={!!selectedDcId}
-          className={`h-7 px-2 py-0 border rounded-[4px] text-[10px] font-bold uppercase tracking-wider outline-none focus:ring-1 focus:ring-primary/30 ${selectedDcId ? 'opacity-50 cursor-not-allowed bg-muted/10 border-border/50 text-muted-foreground' : 'cursor-pointer transition-colors'} ${!selectedDcId && filters.location !== 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-muted/10 border-border/50 text-muted-foreground'}`}
+          className={`h-7 px-2 py-0 border rounded-[4px] text-[10px] font-bold uppercase tracking-wider outline-none focus:ring-1 focus:ring-primary/30 cursor-pointer transition-colors ${!selectedDcId && filters.location !== 'all' ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-muted/10 border-border/50 text-muted-foreground'}`}
           value={displayLocation}
           onChange={(e) => updateFilter("location", e.target.value)}
         >
-          {/*
-            Built from the warehouse list, not hardcoded. The four names here were
-            "Northeast DC / South DC / West Coast DC / Midwest DC" - none of which
-            exist in this database - so every option returned zero rows. `location`
-            matches on the display name, which is what the backend filters on.
-          */}
-          <option value="all">Location: All DCs</option>
-          {(warehouses ?? []).map((warehouse) => (
-            <option key={warehouse.id} value={warehouse.name}>
-              {warehouse.name}
-            </option>
-          ))}
+          {selectedDcId && selectedWarehouse ? (
+            <option value={selectedWarehouse.name}>{selectedWarehouse.name}</option>
+          ) : (
+            <>
+              <option value="all">Location: All DCs</option>
+              {(warehouses ?? []).map((warehouse) => (
+                <option key={warehouse.id} value={warehouse.name}>
+                  {warehouse.name}
+                </option>
+              ))}
+            </>
+          )}
         </select>
 
         {/*
