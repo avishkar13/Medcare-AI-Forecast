@@ -60,7 +60,7 @@ export function OptimizationSummary() {
   const warnings = data?.warnings ?? [];
 
   return (
-    <Card className="flex flex-col h-[400px] border-primary/20 bg-gradient-to-br from-card via-card to-primary/5">
+    <Card className="flex flex-col h-[700px] border-primary/20 bg-gradient-to-br from-card via-card to-primary/5">
       <CardHeader className="pb-2 border-b border-border/40 bg-muted/20">
         <CardTitle className="flex items-center gap-2 text-base">
           <TrendingDown className="h-4 w-4 text-success" />
@@ -100,15 +100,17 @@ export function OptimizationSummary() {
           <p className="text-xs text-muted-foreground mt-3">{warnings.join(" ")}</p>
         ) : null}
 
-        <div className="w-full h-[140px] mt-2">
+        <div className="w-full h-[220px] mt-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
               <XAxis type="number" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val/1000}k`} />
-              <YAxis dataKey="name" type="category" fontSize={11} tickLine={false} axisLine={false} width={60} />
+              <YAxis dataKey="name" type="category" fontSize={11} tickLine={false} axisLine={false} width={80} />
               <RechartsTooltip 
                 cursor={{ fill: 'var(--muted)', opacity: 0.4 }}
-                contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', fontSize: '12px' }}
+                contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', fontSize: '12px', backgroundColor: 'var(--card)', color: 'var(--card-foreground)' }}
+                labelStyle={{ color: 'var(--card-foreground)' }}
+                itemStyle={{ color: 'var(--card-foreground)' }}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 formatter={(value: any) => [formatCurrency(Number(value)), undefined]}
               />

@@ -37,6 +37,7 @@ export type {
 export interface ForecastParams extends QueryParams {
   sku?: string;
   warehouse?: string;
+  category?: string;
   days?: number;
   historyDays?: number;
 }

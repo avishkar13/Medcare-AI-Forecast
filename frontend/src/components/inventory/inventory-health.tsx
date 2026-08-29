@@ -133,7 +133,11 @@ export function InventoryHealth({ warehouseId }: { warehouseId?: string }) {
                       boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                       fontSize: "12px",
                       padding: "8px 12px",
+                      backgroundColor: "var(--card)",
+                      color: "var(--card-foreground)",
                     }}
+                    labelStyle={{ color: "var(--card-foreground)" }}
+                    itemStyle={{ color: "var(--card-foreground)" }}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     formatter={(value: any) => [`${value} positions`, undefined]}
                   />
@@ -208,13 +212,18 @@ export function InventoryHealth({ warehouseId }: { warehouseId?: string }) {
                   width={90}
                 />
                 <RechartsTooltip
+                  cursor={{ fill: "var(--muted)", opacity: 0.2 }}
                   contentStyle={{
                     borderRadius: "8px",
                     border: "1px solid var(--border)",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                     fontSize: "12px",
                     padding: "8px 12px",
+                    backgroundColor: "var(--card)",
+                    color: "var(--card-foreground)",
                   }}
+                  labelStyle={{ color: "var(--card-foreground)" }}
+                  itemStyle={{ color: "var(--card-foreground)" }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(value: any, _name: any, item: any) => [
                     // Both counts, because they differ network-wide and reading one as the

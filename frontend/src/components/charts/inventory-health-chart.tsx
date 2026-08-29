@@ -79,7 +79,8 @@ export function InventoryHealthChart() {
                 <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => formatNumber(val as number)} />
                 <RechartsTooltip
                   cursor={{ fill: 'var(--muted)', opacity: 0.4 }}
-                  contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+                  contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', backgroundColor: 'var(--card)', color: 'var(--card-foreground)' }}
+                  labelStyle={{ color: 'var(--card-foreground)' }}
                   formatter={(val: unknown) => `${formatNumber(val as number)} units`}
                 />
                 <Legend wrapperStyle={{ paddingTop: '10px', fontSize: '12px' }} />
@@ -104,7 +105,8 @@ export function InventoryHealthChart() {
                   <YAxis dataKey="name" type="category" fontSize={12} tickLine={false} axisLine={false} tickMargin={10} />
                   <RechartsTooltip
                     cursor={{ fill: 'var(--muted)', opacity: 0.2 }}
-                    contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+                    contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', backgroundColor: 'var(--card)', color: 'var(--card-foreground)' }}
+                    labelStyle={{ color: 'var(--card-foreground)' }}
                     formatter={(val: unknown) => formatCurrency(val as number)}
                   />
                   <Bar dataKey="value" fill="var(--ai)" radius={[0, 4, 4, 0]} barSize={20} name="Inventory Value" opacity={0.8} />

@@ -36,7 +36,7 @@ export const useFiltersStore = create<FiltersState>((set) => ({
  * page's own pickers still work: they apply wherever the URL says nothing.
  */
 export const useForecastScope = () => {
-  const { sku, warehouse } = useFiltersStore((state) => state.forecast);
+  const { sku, warehouse, category } = useFiltersStore((state) => state.forecast);
   const urlDc = useUiStore((state) => state.dc);
   const urlSku = useUiStore((state) => state.sku);
   /**
@@ -53,6 +53,7 @@ export const useForecastScope = () => {
   return {
     sku: urlSku ?? sku,
     warehouse: urlDc ?? warehouse,
+    category,
     days: horizonDays,
   };
 };

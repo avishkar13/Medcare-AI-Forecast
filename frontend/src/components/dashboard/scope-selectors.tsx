@@ -5,6 +5,7 @@ import { useScope } from "@/hooks/use-scope";
 import { useWarehouses } from "@/hooks/use-masterdata";
 import { useAuthStore } from "@/store/auth.store";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const HORIZONS = [7, 14, 30, 60, 90];
 
@@ -27,10 +28,7 @@ export function ScopeSelectors() {
     ? warehouses?.find((warehouse) => warehouse.id === confinedTo)
     : undefined;
 
-  const selectClass =
-    "h-8 rounded-md border bg-muted/10 px-2 text-[11px] font-semibold outline-none " +
-    "transition-colors focus:ring-1 focus:ring-primary/30 cursor-pointer " +
-    "border-border/60 text-foreground";
+
 
   return (
     <div className="hidden md:flex items-center gap-2">
@@ -42,39 +40,49 @@ export function ScopeSelectors() {
             {confinedWarehouse?.name ?? confinedWarehouse?.code ?? "Your DC"}
           </span>
         ) : (
-          <select
-            aria-label="Distribution centre"
-            className={selectClass}
+          <Select
             value={dc ?? "all"}
-            onChange={(event) =>
-              setDc(event.target.value === "all" ? undefined : event.target.value)
+            onValueChange={(value) =>
+              setDc(!value || value === "all" ? undefined : value)
             }
             disabled={isError}
           >
-            <option value="all">All DCs</option>
-            {(warehouses ?? []).map((warehouse) => (
-              <option key={warehouse.id} value={warehouse.id}>
-                {warehouse.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="h-8 w-[140px] text-[11px] font-semibold bg-muted/10 border-border/60">
+              <span className="truncate">
+                {dc && dc !== "all"
+                  ? warehouses?.find((w) => w.id === dc)?.name ?? dc
+                  : "All DCs"}
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All DCs</SelectItem>
+              {(warehouses ?? []).map((warehouse) => (
+                <SelectItem key={warehouse.id} value={warehouse.id}>
+                  {warehouse.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
       </div>
 
       <div className="flex items-center gap-1.5">
         <CalendarRange className="h-3.5 w-3.5 text-muted-foreground" />
-        <select
-          aria-label="Horizon in days"
-          className={selectClass}
-          value={horizonDays}
-          onChange={(event) => setHorizonDays(Number(event.target.value))}
+        <Select
+          value={String(horizonDays)}
+          onValueChange={(value) => setHorizonDays(Number(value))}
         >
-          {HORIZONS.map((days) => (
-            <option key={days} value={days}>
-              {days} days
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="h-8 w-[100px] text-[11px] font-semibold bg-muted/10 border-border/60">
+            <SelectValue placeholder="Horizon" />
+          </SelectTrigger>
+          <SelectContent>
+            {HORIZONS.map((days) => (
+              <SelectItem key={days} value={String(days)}>
+                {days} days
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {sku && (

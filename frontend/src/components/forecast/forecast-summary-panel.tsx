@@ -241,7 +241,7 @@ export function ForecastSummaryPanel() {
                 </Tooltip>
               </div>
 
-              <div className="relative overflow-hidden rounded-xl border border-ai/15 bg-ai/[0.035] p-3.5">
+              <div className="relative overflow-hidden rounded-xl border border-ai/15 bg-ai/[0.035] p-2">
                 <div className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-ai/[0.04] to-transparent" />
 
                 <div className="relative flex items-center gap-2">
@@ -250,7 +250,7 @@ export function ForecastSummaryPanel() {
                   </div>
 
                   <div className="flex min-w-0 flex-1 items-center justify-center">
-                    <span className="text-xl font-bold tracking-tight text-foreground">
+                    <span className="text-md font-bold tracking-tight text-foreground">
                       {summary.confidenceRange[0]}
                     </span>
 
@@ -262,7 +262,7 @@ export function ForecastSummaryPanel() {
                       <div className="h-px flex-1 bg-border" />
                     </div>
 
-                    <span className="text-xl font-bold tracking-tight text-foreground">
+                    <span className="text-md font-bold tracking-tight text-foreground">
                       {summary.confidenceRange[1]}
                     </span>
                   </div>

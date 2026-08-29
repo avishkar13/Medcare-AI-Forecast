@@ -10,7 +10,7 @@ import { InventoryDistribution } from "@/components/dashboard/inventory-distribu
 import { AIRecommendations } from "@/components/dashboard/ai-recommendations";
 import { OptimizationSummary } from "@/components/dashboard/optimization-summary";
 import { PlanVsActual } from "@/components/dashboard/plan-vs-actual";
-import { WhatIfSimulation } from "@/components/dashboard/what-if-simulation";
+// import { WhatIfSimulation } from "@/components/dashboard/what-if-simulation";
 import { ExecutiveDecisionPanel } from "@/components/dashboard/executive-decision-panel";
 import { LiveActivity } from "@/components/dashboard/live-activity";
 import { PositionProjection } from "@/components/dashboard/position-projection";
@@ -64,13 +64,13 @@ export default function DashboardPage() {
 
         {/* Decision & Optimization Layer */}
         <div className="grid [&>*]:min-w-0 grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 h-[600px] lg:h-[1500px]">
+          <div className="lg:col-span-2 h-[600px] lg:h-[1200px]">
             <AIRecommendations />
           </div>
           <div className="flex flex-col gap-6 lg:col-span-1">
             <OptimizationSummary />
             <PlanVsActual />
-            <WhatIfSimulation />
+            {/* <WhatIfSimulation /> */}
           </div>
         </div>
 
