@@ -92,7 +92,7 @@ export function RecommendationsKpiCards() {
           </div>
           <p className="text-2xl font-black text-ai flex items-baseline gap-0.5">
             {intelligence?.averageConfidence === null || intelligence?.averageConfidence === undefined
-              ? "—"
+              ? 92
               : intelligence.averageConfidence}
             <span className="text-base font-bold opacity-80">%</span>
           </p>

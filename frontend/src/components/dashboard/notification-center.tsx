@@ -12,6 +12,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAlertActions, useAlertOverview, useAlerts } from "@/hooks/use-alerts";
 import { useRealtime } from "@/providers/realtime-provider";
+import { useUiStore } from "@/store/ui.store";
 import { cn } from "@/lib/utils";
 import type { SystemAlert } from "@/types/alert";
 
@@ -67,8 +68,10 @@ export function NotificationCenter() {
   const { data, isPending, isError } = useAlerts({ status: "open", pageSize: 6 });
   const { markAllRead } = useAlertActions();
 
-  const unresolved = counts?.unresolved ?? overview?.unresolvedCount ?? 0;
-  const critical = counts?.critical ?? overview?.criticalCount ?? 0;
+  const dc = useUiStore((state) => state.dc);
+
+  const unresolved = (dc ? overview?.unresolvedCount : counts?.unresolved) ?? overview?.unresolvedCount ?? 0;
+  const critical = (dc ? overview?.criticalCount : counts?.critical) ?? overview?.criticalCount ?? 0;
   const alerts = data?.data ?? [];
 
   return (

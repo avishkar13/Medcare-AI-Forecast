@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, ComposedChart, Line } from "recharts";
 import { useForecastAccuracy, useForecastChart, useForecastSummary } from "@/hooks/use-forecast";
 import { useProducts, useWarehouses } from "@/hooks/use-masterdata";
+import { useScope } from "@/hooks/use-scope";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { QueryError } from "@/components/ui/query-state";
@@ -16,10 +17,16 @@ export function DemandForecastChart() {
 
   const { data: products } = useProducts();
   const { data: warehouses } = useWarehouses();
+  
+  const { dc } = useScope();
+  
+  const scopedWarehouse = warehouses?.find(w => w.id === dc);
+  const scopedWarehouseCode = scopedWarehouse?.code;
+  const effectiveWarehouse = dc ? scopedWarehouseCode : warehouse;
 
-  const { data: chart, isPending, isError } = useForecastChart({ sku, warehouse, days: horizon, historyDays: horizon });
-  const { data: accuracy } = useForecastAccuracy({ sku, warehouse });
-  const { data: summary } = useForecastSummary({ sku, warehouse });
+  const { data: chart, isPending, isError } = useForecastChart({ sku, warehouse: effectiveWarehouse, days: horizon, historyDays: horizon });
+  const { data: accuracy } = useForecastAccuracy({ sku, warehouse: effectiveWarehouse });
+  const { data: summary } = useForecastSummary({ sku, warehouse: effectiveWarehouse });
 
   // history and prediction do not overlap in time, so they concatenate rather than merge
   const data = [
@@ -101,16 +108,22 @@ export function DemandForecastChart() {
               <option key={product.sku} value={product.sku}>{product.name}</option>
             ))}
           </select>
-          <select
-            className="h-8 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            value={warehouse ?? ""}
-            onChange={(e) => setWarehouse(e.target.value || undefined)}
-          >
-            <option value="">All Distribution Centers</option>
-            {(warehouses ?? []).map((row) => (
-              <option key={row.code} value={row.code}>{row.name}</option>
-            ))}
-          </select>
+          {dc ? (
+            <div className="h-8 rounded-md border border-input bg-muted/30 px-3 py-1.5 text-sm shadow-sm flex items-center text-muted-foreground">
+              {scopedWarehouse?.name || "Loading..."}
+            </div>
+          ) : (
+            <select
+              className="h-8 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              value={warehouse ?? ""}
+              onChange={(e) => setWarehouse(e.target.value || undefined)}
+            >
+              <option value="">All Distribution Centers</option>
+              {(warehouses ?? []).map((row) => (
+                <option key={row.code} value={row.code}>{row.name}</option>
+              ))}
+            </select>
+          )}
           <div className="flex items-center rounded-md border border-input p-0.5 ml-2">
             {[7, 14, 30].map(h => (
               <button 

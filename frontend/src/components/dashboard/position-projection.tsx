@@ -28,10 +28,13 @@ export function PositionProjection() {
   const [sku, setSku] = useState<string | undefined>(undefined);
   const [warehouse, setWarehouse] = useState<string | undefined>(undefined);
 
+  const scopedWarehouse = warehouses?.find(w => w.id === dc);
+
   const runId = runs?.data?.[0]?.id ?? null;
   const effectiveSku = sku ?? urlSku ?? products?.[0]?.sku;
-  const effectiveWarehouse =
-    warehouse ?? dcCode ?? warehouses?.find((row) => row.id === dc)?.code ?? warehouses?.[0]?.code;
+  const effectiveWarehouse = dc
+    ? scopedWarehouse?.code
+    : warehouse ?? dcCode ?? warehouses?.find((row) => row.id === dc)?.code ?? warehouses?.[0]?.code;
 
   return (
     <div className="flex flex-col gap-3">
@@ -52,19 +55,25 @@ export function PositionProjection() {
             </option>
           ))}
         </select>
-        <select
-          className={selectClass}
-          value={effectiveWarehouse ?? ""}
-          onChange={(event) => setWarehouse(event.target.value || undefined)}
-          aria-label="Distribution centre"
-        >
-          <option value="">Select a DC…</option>
-          {(warehouses ?? []).map((row) => (
-            <option key={row.id} value={row.code}>
-              {row.name}
-            </option>
-          ))}
-        </select>
+        {dc ? (
+          <div className="h-8 rounded-md border border-input bg-muted/30 px-2 py-1.5 text-xs font-medium shadow-sm flex items-center text-muted-foreground">
+            {scopedWarehouse?.name || "Loading..."}
+          </div>
+        ) : (
+          <select
+            className={selectClass}
+            value={effectiveWarehouse ?? ""}
+            onChange={(event) => setWarehouse(event.target.value || undefined)}
+            aria-label="Distribution centre"
+          >
+            <option value="">Select a DC…</option>
+            {(warehouses ?? []).map((row) => (
+              <option key={row.id} value={row.code}>
+                {row.name}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <ProjectionChart
