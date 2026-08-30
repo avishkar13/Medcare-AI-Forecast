@@ -12,6 +12,6 @@ userRoutes.get("/", userController.listUsers);
 
 // Modifying operations
 userRoutes.post("/", authorize("users:create"), userController.createUser);
-userRoutes.patch("/:userId", authorize("users:edit"), userController.updateUser);
+userRoutes.patch("/:userId", authorize("users:update"), userController.updateUser);
 userRoutes.patch("/:userId/status", authorize("users:deactivate"), userController.deactivateUser);
-userRoutes.post("/:userId/reset-password", authorize("users:edit"), userController.resetPassword);
+userRoutes.post("/:userId/reset-password", authorize("users:update"), userController.resetPassword);

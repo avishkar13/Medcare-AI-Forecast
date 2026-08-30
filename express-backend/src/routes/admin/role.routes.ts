@@ -14,8 +14,8 @@ roleRoutes.get("/:roleId", roleController.getRole);
 
 // Modifying operations
 roleRoutes.post("/", authorize("roles:create"), roleController.createRole);
-roleRoutes.patch("/:roleId", authorize("roles:edit"), roleController.updateRole);
+roleRoutes.patch("/:roleId", authorize("roles:update"), roleController.updateRole);
 roleRoutes.delete("/:roleId", authorize("roles:delete"), roleController.deleteRole);
 
-roleRoutes.put("/:roleId/permissions", authorize("roles:edit"), roleController.assignPermissions);
-roleRoutes.delete("/:roleId/permissions/:permissionId", authorize("roles:edit"), roleController.removePermission);
+roleRoutes.put("/:roleId/permissions", authorize("roles:update"), roleController.assignPermissions);
+roleRoutes.delete("/:roleId/permissions/:permissionId", authorize("roles:update"), roleController.removePermission);

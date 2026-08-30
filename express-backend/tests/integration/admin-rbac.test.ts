@@ -84,8 +84,8 @@ before(async () => {
     create: { key: "inventory:edit", name: "Inventory Edit", module: "inventory", action: "edit" },
   });
 
-  // Assign roles:view, roles:create, roles:edit, roles:delete, users:view, users:create, users:edit, users:deactivate
-  const adminPerms = ["roles:view", "roles:create", "roles:edit", "roles:delete", "users:view", "users:create", "users:edit", "users:deactivate"];
+  // Assign roles:view, roles:create, roles:update, roles:delete, users:view, users:create, users:update, users:deactivate
+  const adminPerms = ["roles:view", "roles:create", "roles:update", "roles:delete", "users:view", "users:create", "users:update", "users:deactivate"];
   for (const p of adminPerms) {
     const perm = await prisma.permission.upsert({
       where: { key: p },
